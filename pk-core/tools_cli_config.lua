@@ -49,6 +49,12 @@ local empty_table,
         'tidentityset'
       }
 
+local tstr
+      = import 'lua-nucleo/tstr.lua'
+      {
+        'tstr'
+      }
+
 local invariant
       = import 'lua-nucleo/functional.lua'
       {
@@ -467,7 +473,7 @@ do
       return nil, err
     end
 
-    return treadonly(config, callbacks), args
+    return treadonly(config, callbacks, tstr), args
   end
 end
 

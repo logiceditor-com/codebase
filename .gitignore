@@ -6,3 +6,6 @@
 .DS_Store
 .project
 .settings
+
+/lua-nucleo
+/lua-aplicado

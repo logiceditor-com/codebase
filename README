@@ -8,3 +8,15 @@ All rights reserved.
 
 Copyright (c) 2009-2010, Alexander Gladysh <agladysh@gmail.com>
 Copyright (c) 2009-2010, Dmitry Potapov <dmitry.v.potapov@gmail.com>
+
+This project depends on lua-nucleo and lua-aplicado
+
+http://github.com/lua-nucleo/lua-nucleo
+http://github.com/lua-aplicado/lua-aplicado
+
+To run tests, add simlinks to them in the project root directory
+
+Example (run at root directory)
+
+ln -s ../lua-nucleo/lua-nucleo
+ln -s ../lua-aplicado/lua-aplicado

@@ -348,7 +348,7 @@ Options:
     --help                Pring this text
     --dump-format         Print config file format
     --root=<path>         Absolute path to project
-    --param=<lua-table>   Add data lua-table to config
+    --param=<lua-table>   Add data from lua-table to config
     --config=<filename>   Override config filename
     --no-config           Do not load project config file
     --no-defaults         Do not load base config file

@@ -346,11 +346,37 @@ local print_tools_cli_config_usage = function(extra_help, schema)
 Options:
 
     --help                Pring this text
+    --dump-format         Print config file format
     --root=<path>         Absolute path to project
     --param=<lua-table>   Add data lua-table to config
     --config=<filename>   Override config filename
     --no-config           Do not load project config file
     --no-defaults         Do not load base config file
+
+Config format:
+
+]])
+
+  -- TODO: This should be more Lua-like!
+  dump_nodes(
+      schema, -- dump schema
+      "-",    -- to stdout
+      "id",   -- tag field
+      "name", -- name field
+      true,   -- with indent
+      true    -- with names
+    )
+
+  io.stdout:flush()
+
+end
+
+local print_format = function(schema)
+  arguments(
+      "table", schema
+    )
+
+  io.stdout:write([[
 
 Config format:
 
@@ -407,8 +433,18 @@ do
         ...
       )
 
+    local help_printed = false
     if args["--help"] then
       print_tools_cli_config_usage(extra_help, schema)
+      help_printed = true
+    end
+
+    if args["--dump-format"] then
+      print_format(schema)
+      help_printed = true
+    end
+
+    if help_printed then
       return os.exit(1) -- TODO: This is caller's business!
     end
 

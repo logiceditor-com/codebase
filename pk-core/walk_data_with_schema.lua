@@ -466,6 +466,7 @@ local load_data_walkers = function(chunk, extra_env)
     local value = data[key]
     if value == nil and data_schema.default ~= nil then
       value = tclone(data_schema.default)
+      data[key] = value -- Patch data with default value
     end
     return value
   end

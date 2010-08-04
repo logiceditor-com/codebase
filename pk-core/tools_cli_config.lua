@@ -353,19 +353,7 @@ Options:
     --no-config           Do not load project config file
     --no-defaults         Do not load base config file
 
-Config format:
-
 ]])
-
-  -- TODO: This should be more Lua-like!
-  dump_nodes(
-      schema, -- dump schema
-      "-",    -- to stdout
-      "id",   -- tag field
-      "name", -- name field
-      true,   -- with indent
-      true    -- with names
-    )
 
   io.stdout:flush()
 

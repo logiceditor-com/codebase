@@ -448,11 +448,12 @@ do
       return os.exit(1) -- TODO: This is caller's business!
     end
 
-    -- Hack!
-    local PROJECT_PATH = args["--root"]
-    if not PROJECT_PATH then
-      error("no --root option found")
-    end
+    -- Note tclone()
+    local args_config = arg_to_param_mapper(tclone(args))
+
+    -- Hack. Implicitly forcing config schema to have PROJECT_PATH key
+    -- Better to do this explicitly somehow?
+    local PROJECT_PATH = args_config.PROJECT_PATH
 
     local config_filename = args["--config"] or project_config_filename
 
@@ -487,7 +488,7 @@ do
 
     -- Hack. Doing tclone() to remove __metatabled metatable
     config = twithdefaults(
-        arg_to_param_mapper(tclone(args)),
+        args_config,
         twithdefaults(
             tclone(extra_param),
             twithdefaults(

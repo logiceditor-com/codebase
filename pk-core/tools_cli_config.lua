@@ -370,7 +370,7 @@ Config format:
 
 ]])
 
-  -- TODO: This should be more Lua-like!
+  -- TODO: Output should be more Lua-like!
   dump_nodes(
       schema, -- dump schema
       "-",    -- to stdout

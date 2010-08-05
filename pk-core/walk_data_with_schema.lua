@@ -629,7 +629,7 @@ local load_data_walkers = function(chunk, extra_env)
      --    which returns as table current path in data (including leafs).
      --    Path is calculated on each call of the function.
      ["types:factory"] = function(self, data)
-        assert_is_nil(self.factory_)
+        assert_is_nil(self.types_.factory_)
         self.types_.factory_ = assert_is_function(data.handler)
       end;
     };

@@ -405,4 +405,6 @@ end
 
 return
 {
+  create_tree_walker_with_checker_factory
+    = create_tree_walker_with_checker_factory;
 }

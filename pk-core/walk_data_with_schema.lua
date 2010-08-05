@@ -4,16 +4,18 @@
 -- Sandbox warning: alias all globals!
 --------------------------------------------------------------------------------
 
+local assert, rawget, tostring, setmetatable
+    = assert, rawget, tostring, setmetatable
+
 local table_concat, table_insert, table_remove
     = table.concat, table.insert, table.remove
 
-local debug_traceback, debug_getinfo = debug.traceback, debug.getinfo
+--------------------------------------------------------------------------------
 
-local assert, error, pairs, rawset, rawget, select
-    = assert, error, pairs, rawset, rawget, select
-
-local setfenv, setmetatable, tostring, xpcall
-    = setfenv, setmetatable, tostring, xpcall
+local log, dbg, spam, log_error
+      = import 'pk-core/log.lua' { 'make_loggers' } (
+          "pk-core/walk_data_with_schema", "WDS"
+        )
 
 --------------------------------------------------------------------------------
 
@@ -27,22 +29,26 @@ local arguments,
         'method_arguments'
       }
 
-local is_table,
-      is_function
+local is_table
       = import 'lua-nucleo/type.lua'
       {
-        'is_table',
-        'is_function'
+        'is_table'
       }
 
 local assert_is_nil,
-      assert_is_table,
       assert_is_function
       = import 'lua-nucleo/typeassert.lua'
       {
         'assert_is_nil',
-        'assert_is_table',
         'assert_is_function'
+      }
+
+local tkeys,
+      tclone
+      = import 'lua-nucleo/table-utils.lua'
+      {
+        'tkeys',
+        'tclone'
       }
 
 local do_nothing
@@ -51,48 +57,10 @@ local do_nothing
         'do_nothing'
       }
 
-local unique_object
-      = import 'lua-nucleo/misc.lua'
-      {
-        'unique_object'
-      }
-
 local make_checker
       = import 'lua-nucleo/checker.lua'
       {
         'make_checker'
-      }
-
-local tkeys,
-      tclone,
-      tset,
-      torderedset,
-      torderedset_insert,
-      torderedset_remove,
-      twithdefaults,
-      tivalues
-      = import 'lua-nucleo/table-utils.lua'
-      {
-        'tkeys',
-        'tclone',
-        'tset',
-        'torderedset',
-        'torderedset_insert',
-        'torderedset_remove',
-        'twithdefaults',
-        'tivalues'
-      }
-
-local make_loggers
-      = import 'pk-core/log.lua'
-      {
-        'make_loggers'
-      }
-
-local make_dsl_loader
-      = import 'pk-core/dsl_loader.lua'
-      {
-        'make_dsl_loader'
       }
 
 local walk_tagged_tree
@@ -101,204 +69,15 @@ local walk_tagged_tree
         'walk_tagged_tree'
       }
 
+local common_load_schema
+      = import 'pk-core/common_load_schema.lua'
+      {
+        'common_load_schema'
+      }
+
 --------------------------------------------------------------------------------
 
-local log, dbg, spam, log_error = make_loggers("pk-core/validate_table", "EVT")
-
---------------------------------------------------------------------------------
-
--- TODO: Lazy! Do not create so many closures!
-local load_data_schema -- TODO: Generalize more. Apigen uses similar code.
-do
-  load_data_schema = function(
-      chunk,
-      extra_env,
-      allowed_namespaces,
-      need_file_line
-    )
-    extra_env = extra_env or { }
-    arguments(
-        "function", chunk,
-        "table", extra_env
-      )
-    optional_arguments(
-        "table", allowed_namespaces,
-        "boolean", need_file_line -- TODO: Hack. Not generic enough
-      )
-    if allowed_namespaces then
-      allowed_namespaces = tset(allowed_namespaces)
-    end
-
-    local positions = torderedset({ })
-    local unhandled_positions = { }
-    local soup = { }
-
-    local make_common_loader = function(namespace)
-      arguments("string", namespace)
-
-      local name_filter = function(tag, name, ...)
-        assert(select("#", ...) == 0, "extra arguments are not supported")
-
-        local data
-
-        if is_table(name) then -- data-only-call
-          -- Allowing data.name to be missing.
-          data = name
-        elseif is_function(name) then -- handler-only-call
-          -- Allowing data.name to be missing.
-          data =
-          {
-            handler = name;
-          }
-        else -- normal named call
-          data =
-          {
-            name = name;
-          }
-        end
-
-        data.tag = tag
-        data.namespace = namespace;
-        data.id = namespace .. ":" .. tag
-
-        -- Calls to debug.getinfo() are slow,
-        -- so we're not doing them by default.
-        if need_file_line then
-          -- TODO: Hack. Depth level is too dependent on the dsl_loader
-          --       internals. Better to traverse stack until schema is found.
-          local info = debug.getinfo(3, "Sl")
-          data.source_ = info.source
-          data.file_ = info.short_src
-          data.line_ = info.currentline
-        end
-
-        torderedset_insert(positions, data)
-        unhandled_positions[data] = positions[data]
-
-        return data
-      end
-
-      local data_filter = function(name_data, value_data)
-        assert_is_table(name_data)
-
-        -- A special case for handler-only named tags
-        if is_function(value_data) then
-          value_data =
-          {
-            handler = value_data;
-          }
-        end
-
-        -- Letting user to override any default values (including name and tag)
-        local data = twithdefaults(value_data, name_data)
-
-        local position = assert(positions[name_data])
-        assert(soup[position] == nil)
-        soup[position] = data
-
-        -- Can't remove from set, need id to be taken
-        unhandled_positions[name_data] = nil
-
-        return data
-      end
-
-      return make_dsl_loader(name_filter, data_filter)
-    end
-
-    local loaders = { }
-
-    local environment = setmetatable(
-        { },
-        {
-          __index = function(t, namespace)
-            -- Can't put it as setmetatable first argument -- 
-            -- we heavily change that table afterwards.
-            local v = extra_env[namespace]
-            if v ~= nil then
-              return v
-            end
-
-            -- TODO: optimizable. Employ metatables.
-            if allowed_namespaces and not allowed_namespaces[namespace] then
-              error(
-                  "attempted to read from global `"
-               .. tostring(namespace) .. "'",
-                  2
-                )
-            end
-
-            local loader = make_common_loader(namespace)
-            loaders[namespace] = loader
-
-            local v = loader:get_interface()
-            rawset(t, namespace, v)
-            return v
-          end;
-
-          __newindex = function(t, k, v)
-            error("attempted to write to global `" .. tostring(k) .. "'", 2)
-          end;
-        }
-      )
-
-    -- TODO: Restore chunk environment?
-    setfenv(
-        chunk,
-        environment
-      )
-
-    assert(
-        xpcall(
-            chunk,
-            function(err)
-              log_error("failed to load schema:\n" .. debug_traceback(err))
-              return err
-            end
-          )
-      )
-
-    -- For no-name top-level tags
-    for data, position in pairs(unhandled_positions) do
-      assert(soup[position] == nil)
-      soup[position] = data
-    end
-
-    assert(#soup > 0, "no data in schema")
-
-    for _, loader in pairs(loaders) do
-      soup = loader:finalize_data(soup)
-    end
-
-    -- TODO: OVERHEAD! Try to get the list of top-level nodes from dsl_loader.
-    soup = torderedset(soup)
-
-    local function unsoup(soup, item)
-      for k, v in pairs(item) do
-        if is_table(k) then
-          torderedset_remove(soup, k)
-          unsoup(soup, k)
-        end
-        if is_table(v) then
-          torderedset_remove(soup, v)
-          unsoup(soup, v)
-        end
-      end
-
-      return soup
-    end
-
-    local n_soup = #soup
-    for i = 1, n_soup do
-      if soup[i] ~= nil then -- may be already unsouped
-        unsoup(soup, soup[i])
-      end
-    end
-
-    local schema = tivalues(soup)
-
-    return schema
-  end
-end
+local load_data_schema = common_load_schema
 
 --------------------------------------------------------------------------------
 

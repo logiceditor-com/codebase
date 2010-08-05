@@ -222,17 +222,17 @@ do
          .. " expected: " .. tostring(expected)
           )
       end
-      return self.checker_
+      return self
     end
 
     local ensure = function(self, ...)
       self.checker_:ensure(...)
-      return self.checker_
+      return self
     end
 
     local fail = function(self, msg)
       self.checker_:fail(msg)
-      return self.checker_
+      return self
     end
 
     types:factory (function(checker)

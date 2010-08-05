@@ -336,8 +336,8 @@ do
   end
 
   local fail_at_unknown_down = function(self, data)
-    -- TODO: Overhead. Move this check at metatable level.
-    if not self.up[data.id] then
+    -- TODO: Overhead! Move this check at metatable level.
+    if not rawget(self.up, data.id) then
       self:fail(data, "unknown language construct")
       return "break" -- Do not traverse subtree
     end

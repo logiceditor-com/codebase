@@ -235,6 +235,10 @@ do
       return self
     end
 
+    local good = function(self)
+      return self.checker_:good()
+    end
+
     types:factory (function(checker)
 
       return
@@ -242,6 +246,7 @@ do
         ensure_equals = ensure_equals;
         ensure = ensure;
         fail = fail;
+        good = good;
         --
         checker_ = checker;
       }

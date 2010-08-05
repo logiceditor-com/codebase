@@ -7,7 +7,7 @@
 local table_concat, table_insert, table_remove
     = table.concat, table.insert, table.remove
 
-local debug_traceback = debug.traceback
+local debug_traceback, debug_getinfo = debug.traceback, debug.getinfo
 
 local assert, error, pairs, rawset, rawget, select
     = assert, error, pairs, rawset, rawget, select
@@ -110,14 +110,20 @@ local log, dbg, spam, log_error = make_loggers("pk-core/validate_table", "EVT")
 -- TODO: Lazy! Do not create so many closures!
 local load_data_schema -- TODO: Generalize more. Apigen uses similar code.
 do
-  load_data_schema = function(chunk, extra_env, allowed_namespaces)
+  load_data_schema = function(
+      chunk,
+      extra_env,
+      allowed_namespaces,
+      need_file_line
+    )
     extra_env = extra_env or { }
     arguments(
         "function", chunk,
         "table", extra_env
       )
     optional_arguments(
-        "table", allowed_namespaces
+        "table", allowed_namespaces,
+        "boolean", need_file_line -- TODO: Hack. Not generic enough
       )
     if allowed_namespaces then
       allowed_namespaces = tset(allowed_namespaces)
@@ -154,6 +160,17 @@ do
         data.tag = tag
         data.namespace = namespace;
         data.id = namespace .. ":" .. tag
+
+        -- Calls to debug.getinfo() are slow,
+        -- so we're not doing them by default.
+        if need_file_line then
+          -- TODO: Hack. Depth level is too dependent on the dsl_loader
+          --       internals. Better to traverse stack until schema is found.
+          local info = debug.getinfo(3, "Sl")
+          data.source_ = info.source
+          data.file_ = info.short_src
+          data.line_ = info.currentline
+        end
 
         torderedset_insert(positions, data)
         unhandled_positions[data] = positions[data]

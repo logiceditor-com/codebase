@@ -168,6 +168,11 @@ do
       return path
     end
 
+    local get_current_node = function(self)
+      local path = self:get_current_node_path()
+      return path[#path]
+    end
+
     local get_current_node_path_readable
     do
       local get_node_path_name = function(node)
@@ -208,6 +213,7 @@ do
       good = good;
       result = result;
       --
+      get_current_node = get_current_node;
       get_current_node_path = get_current_node_path;
       get_current_node_path_readable = get_current_node_path_readable;
       push_node_to_path = push_node_to_path;

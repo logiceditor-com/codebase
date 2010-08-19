@@ -73,14 +73,18 @@ local make_dsl_loader
 local common_load_schema -- TODO: Generalize more. Apigen uses similar code.
 do
   common_load_schema = function(
-      chunk,
+      chunks,
       extra_env,
       allowed_namespaces,
       need_file_line
     )
+    if is_function(chunks) then
+      chunks = { chunks }
+    end
+
     extra_env = extra_env or { }
     arguments(
-        "function", chunk,
+        "table", chunks,
         "table", extra_env
       )
     optional_arguments(
@@ -203,21 +207,25 @@ do
         }
       )
 
-    -- TODO: Restore chunk environment?
-    setfenv(
-        chunk,
-        environment
-      )
+    for i = 1, #chunks do
+      local chunk = chunks[i]
 
-    assert(
-        xpcall(
-            chunk,
-            function(err)
-              log_error("failed to load schema:\n" .. debug_traceback(err))
-              return err
-            end
-          )
-      )
+      -- TODO: Restore chunk environment?
+      setfenv(
+          chunk,
+          environment
+        )
+
+      assert(
+          xpcall(
+              chunk,
+              function(err)
+                log_error("failed to load schema:\n" .. debug_traceback(err))
+                return err
+              end
+            )
+        )
+    end
 
     -- For no-name top-level tags
     for data, position in pairs(unhandled_positions) do

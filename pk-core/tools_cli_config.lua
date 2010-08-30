@@ -350,7 +350,7 @@ local print_tools_cli_config_usage = function(extra_help, schema)
 
 Options:
 
-    --help                Pring this text
+    --help                Print this text
     --dump-format         Print config file format
     --root=<path>         Absolute path to project
     --param=<lua-table>   Add data from lua-table to config

@@ -51,7 +51,7 @@ local log, dbg, spam, log_error = make_loggers("pk-core/tagged-tree", "TTR")
 -- Nodes with unknown tag_fields are traversed
 local walk_tagged_tree
 do
-  local function impl(tree, obj, down, up, tag_field, visited)
+  local function impl(tree, obj, down, up, tag_field, visited, key)
     assert(visited[tree] == nil, "recursion detected")
     visited[tree] = true
 
@@ -61,7 +61,7 @@ do
 
       local down_handler = down[tag]
       if down_handler then
-        local res = down_handler(obj, tree)
+        local res = down_handler(obj, tree, key)
         if res == "break" then
           skip = true
         else
@@ -72,7 +72,7 @@ do
       if not skip then
         for k, v in pairs(tree) do
           if is_table(v) then
-            impl(v, obj, down, up, tag_field, visited)
+            impl(v, obj, down, up, tag_field, visited, key)
           end
         end
       end
@@ -80,7 +80,7 @@ do
       if not skip then
         local up_handler = up[tag]
         if up_handler then
-          up_handler(obj, tree)
+          up_handler(obj, tree, key)
         end
       end
     end
@@ -102,7 +102,8 @@ do
         walkers.down or empty_table,
         walkers.up or empty_table,
         tag_field,
-        { }
+        { },
+        nil
       )
   end
 end

@@ -228,18 +228,18 @@ do
     wrap_down = function(handler)
       arguments("function", handler)
 
-      return function(walkers, data)
+      return function(walkers, data, key)
         walkers:push_node_to_path(data)
 
-        return handler(walkers, data)
+        return handler(walkers, data, key)
       end
     end
 
     wrap_up = function(handler)
       arguments("function", handler)
 
-      return function(walkers, data)
-        handler(walkers, data)
+      return function(walkers, data, key)
+        handler(walkers, data, key)
 
         walkers:pop_node_from_path(data)
       end

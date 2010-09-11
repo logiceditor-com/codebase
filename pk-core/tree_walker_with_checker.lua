@@ -321,7 +321,7 @@ do
       common_set_mt(
           self.updown_.down,
           wrap_down(handler),
-          "duplicated default_down call",
+          "duplicate default_down call",
           "twwc.updown.down"
         )
     end
@@ -335,7 +335,7 @@ do
       common_set_mt(
           self.updown_.up,
           wrap_up(handler),
-          "duplicated default_up call",
+          "duplicate default_up call",
           "twwc.updown.up"
         )
     end

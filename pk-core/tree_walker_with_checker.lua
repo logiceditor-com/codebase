@@ -116,8 +116,11 @@ do
 
       self:checker():fail(
           where
-       .. "bad " .. data.id .. " \""
-       .. table_concat(self:get_current_node_path_readable(), ".") .. "\": "
+       .. "bad " .. tostring(data[self.tag_field_]) .. " \""
+       .. table_concat(
+            self:get_current_node_path_readable(),
+            self.node_path_separator_
+          ) .. "\": "
        .. tostring(msg)
         )
 
@@ -173,25 +176,32 @@ do
       return path[#path]
     end
 
-    local get_current_node_path_readable
-    do
-      local get_node_path_name = function(node)
-        local name = node.name
-        if not is_string(name) or #name > 32 then -- TODO: ?!
-          name = nil
-        end
-
-        if not name then
-          name = "(" .. node.id .. ")"
-        end
-
-        return name
+    local get_node_path_name = function(node, name_field, tag_field)
+      local name = node[name_field]
+      if not is_string(name) or #name > 32 then -- TODO: ?!
+        name = nil
       end
 
-      get_current_node_path_readable = function(self)
-        method_arguments(self)
-        return timap(get_node_path_name, self:get_current_node_path())
+      if not name then
+        name = tostring(node[tag_field])
+        if #name > 32 then
+          name = name:sub(1, 29) .. "..."
+        end
+
+        name = "(" .. name .. ")"
       end
+
+      return name
+    end
+
+    local get_current_node_path_readable = function(self)
+      method_arguments(self)
+      return timap(
+          get_node_path_name,
+          self:get_current_node_path(),
+          self.name_field_,
+          self.tag_field_
+        )
     end
 
     local push_node_to_path = function(self, data)
@@ -201,7 +211,14 @@ do
     local pop_node_from_path = function(self, data)
       local actual_node = table_remove(self:get_current_node_path())
       -- Note raw equality check
-      assert(actual_node == data, "bad implementation: unbalanced path")
+      if actual_node ~= data then
+        log_error("current path:", self:get_current_node_path_readable())
+        log_error(
+            "tried to pop head",
+            get_node_path_name(data, self.name_field_, self.tag_field_)
+          )
+        error("bad implementation: unbalanced path")
+      end
     end
 
     prototype_mt =
@@ -218,6 +235,10 @@ do
       get_current_node_path_readable = get_current_node_path_readable;
       push_node_to_path = push_node_to_path;
       pop_node_from_path = pop_node_from_path;
+      --
+      tag_field_ = "id";
+      name_field_ = "name";
+      node_path_separator_ = ".";
     }
     prototype_mt.__metatable = "twwc"
     prototype_mt.__index = prototype_mt
@@ -231,7 +252,13 @@ do
       return function(walkers, data, key)
         walkers:push_node_to_path(data)
 
-        return handler(walkers, data, key)
+        local result = handler(walkers, data, key)
+
+        if result == "break" then
+          walkers:pop_node_from_path(data)
+        end
+
+        return result
       end
     end
 
@@ -248,6 +275,24 @@ do
 
   local up = { }
   do
+    up["walker:tag_field"] = function(self, data)
+      assert(self.updown_.tag_field_ == nil, "duplicate tag field definition")
+      self.updown_.tag_field_ = data.name
+    end
+
+    up["walker:name_field"] = function(self, data)
+      assert(self.updown_.name_field_ == nil, "duplicate name field definition")
+      self.updown_.name_field_ = data.name
+    end
+
+    up["walker:node_path_separator"] = function(self, data)
+      assert(
+          self.updown_.node_path_separator_ == nil,
+          "duplicate node path separator field definition"
+        )
+      self.updown_.node_path_separator_ = data.name
+    end
+
     up["walker:default_down"] = function(self, data)
       self:set_down_mt(assert_is_function(data.handler))
     end
@@ -343,7 +388,7 @@ do
 
   local fail_at_unknown_down = function(self, data)
     -- TODO: Overhead! Move this check at metatable level.
-    if not rawget(self.up, data.id) then
+    if not rawget(self.up, data[self.tag_field_]) then
       self:fail("unknown language construct")
       self:pop_node_from_path(data)
       return "break" -- Do not traverse subtree
@@ -380,6 +425,7 @@ do
     }
 
     for i = 1, #schema do
+      -- Note this "id" is not the same as the data tag_field.
       walk_tagged_tree(schema[i], walkers, "id")
     end
 

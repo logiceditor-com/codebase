@@ -107,22 +107,27 @@ do
 
     local fail = function(self, msg)
       local path = self:get_current_node_path()
-      local data = assert(path[#path])
+      local data = path[#path]
 
-      local where = ""
-      if data.file_ and data.line_ then
-        where = data.file_ .. ":" .. data.line_ .. ": "
+      if not data then
+        -- TODO: ?!
+        self:checker():fail("(???):", tostring(msg))
+      else
+        local where = ""
+        if data.file_ and data.line_ then
+          where = data.file_ .. ":" .. data.line_ .. ": "
+        end
+
+        self:checker():fail(
+            where
+         .. "bad " .. tostring(data[self.tag_field_]) .. " \""
+         .. table_concat(
+              self:get_current_node_path_readable(),
+              self.node_path_separator_
+            ) .. "\": "
+         .. tostring(msg)
+          )
       end
-
-      self:checker():fail(
-          where
-       .. "bad " .. tostring(data[self.tag_field_]) .. " \""
-       .. table_concat(
-            self:get_current_node_path_readable(),
-            self.node_path_separator_
-          ) .. "\": "
-       .. tostring(msg)
-        )
 
       return self
     end

@@ -72,7 +72,7 @@ do
       if not skip then
         for k, v in pairs(tree) do
           if is_table(v) then
-            impl(v, obj, down, up, tag_field, visited, key)
+            impl(v, obj, down, up, tag_field, visited, k)
           end
         end
       end

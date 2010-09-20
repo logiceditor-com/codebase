@@ -8,6 +8,9 @@
 .settings
 .directory
 
+/lua-nucleo
+/lua-aplicado
+
 *.kdevelop.*
 *.kdevelop
 *.kdevses

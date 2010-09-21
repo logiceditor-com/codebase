@@ -1,0 +1,112 @@
+PK.common_custom_renderers = new function()
+{
+  this.render_binary_data = function (v)
+  {
+    return I18N('binary data');
+  }
+
+  this.make_enum_renderer = function(my_enum)
+  {
+    return function(v)
+    {
+      if( v === "")
+        return I18N('not defined');
+
+      for(i = 0; i < my_enum.length; i++)
+      {
+        var data = my_enum[i];
+        if( data[0] == v )
+          return data[1];
+      }
+
+      return I18N('invalid field value');
+    }
+  };
+
+  this.render_bool = this.make_enum_renderer([[0, I18N('no')], [1, I18N('yes')]]);
+
+  this.make_timestamp_renderer = function(format, print_time)
+  {
+    return function(v)
+    {
+      if(v == "")
+        return I18N("not defined");
+
+      if(v == "-" || v == 0 || v == "0")
+        return I18N('invalid field value');
+
+      var current_format = format;
+
+      // TODO: Bad hack, to be removed ASAP!
+      if (typeof(v) == "number")
+      {
+        v = String(v);
+        current_format = "U";
+      }
+
+      var dt;
+      if (current_format)
+        dt = Date.parseDate(v, current_format);
+      else
+        dt = new Date(v);
+      if (!dt)
+        return I18N('invalid field value');
+
+      if(!print_time)
+        return dt.format("d.m.Y");
+
+      return dt.format("Y-m-d H:i:sO");
+    }
+  };
+
+  this.render_profile = function(v)
+  {
+    var record = PK.stores.admin_profiles.getById(v);
+    if(record && record.data)
+    {
+      return I18N(record.data.title);
+    }
+    else
+    {
+      return I18N('invalid field value');
+    }
+  };
+
+  this.make_renderer = function(value_type, use_enum_renderer, enum_items)
+  {
+    switch (Number(value_type))
+    {
+      case PK.table_element_types.STRING:
+      case PK.table_element_types.INT:
+        return undefined;
+        break;
+
+      case PK.table_element_types.ENUM:
+        if(!use_enum_renderer || !enum_items)
+          return undefined;
+        return this.make_enum_renderer(enum_items);
+        break;
+
+      case PK.table_element_types.BOOL:
+        return this.render_bool;
+        break;
+
+      case PK.table_element_types.DATE:
+        return this.make_timestamp_renderer(undefined, false);
+        break;
+
+      case PK.table_element_types.PHONE:
+      case PK.table_element_types.MAIL:
+      case PK.table_element_types.DB_IDS:
+        return undefined;
+        break;
+
+      case PK.table_element_types.BINARY_DATA:
+        return this.render_binary_data;
+        break;
+
+      default:
+        return undefined;
+    }
+  };
+};

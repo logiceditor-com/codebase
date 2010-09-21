@@ -3,7 +3,7 @@
 --------------------------------------------------------------------------------
 
 -- Note: must be done before "dofile('lua-nucleo/strict.lua')"
-dofile('test-lib/require.lua')
+dofile('pk-test/require.lua')
 
 --------------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ assert(loadfile('lua-nucleo/import.lua'))(import_get_path)
 
 do
   local init_test_logging_system
-        = import 'test-lib/log.lua'
+        = import 'pk-test/log.lua'
         {
           'init_test_logging_system'
         }

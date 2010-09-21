@@ -19,7 +19,9 @@ This project also depends on pk-core and pk-test
 These dependencies are intentionally not added as subtrees.
 To run tests, add following symlinks:
 
-lib/lua-nucleo
-lib/lua-aplicado
-lib/pk-core
-lib/pk-test
+test/lua-nucleo -> lua-nucleo/lua-nucleo
+test/lua-aplicado -> lua-aplicado/lua-aplicado
+test/pk-core -> pk-core/pk-core
+test/pk-test -> pk-test/pk-test
+test/test.lua -> pk-test/util/test.lua
+test/test.sh -> pk-test/util/test.sh

@@ -18,7 +18,9 @@
 nohup.out
 *.log
 
-/lib/lua-nucleo
-/lib/lua-aplicado
-/lib/pk-core
-/lib/pk-test
+/test/lua-nucleo
+/test/lua-aplicado
+/test/pk-core
+/test/pk-test
+/test/test.lua
+/test/test.sh

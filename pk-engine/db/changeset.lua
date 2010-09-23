@@ -2,6 +2,12 @@
 -- changeset.lua: applying and reverting db changesets
 --------------------------------------------------------------------------------
 
+local tostring, pcall = tostring, pcall
+local os_time = os.time
+local table_sort = table.sort
+
+--------------------------------------------------------------------------------
+
 local arguments,
       method_arguments,
       optional_arguments
@@ -125,7 +131,7 @@ local apply_db_changeset = function(db_conn, changeset)
 
   -- Writing to changeset list ahead of apply to ensure UUID is unique.
   -- TODO: Use some generic function.
-  local time = os.time()
+  local time = os_time()
   local res, err = db_conn:execute(
           [[INSERT INTO `]]..CHANGESET_TABLE_NAME..[[`]]
        .. [[ (`uuid`, `stime`)]]
@@ -318,6 +324,7 @@ local revert_db_changeset = function(db_conn, changeset)
    .. [[ LIMIT 1]]
     )
   if res ~= 1 then
+    local msg
     if not res then
       msg = "failed to unregister changeset: " .. err
     else
@@ -340,7 +347,7 @@ local load_all_changesets = function()
       { }
     )
 
-  table.sort(filenames)
+  table_sort(filenames)
 
   spam("found db changeset files", filenames)
   if #filenames == 0 then

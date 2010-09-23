@@ -154,16 +154,6 @@ do
     return math.random(0, INT_MAX)
   end
 
-  -- TODO: WTF?! Why list is not serialized?!
-  local serialized_list = function(self)
-    method_arguments(self)
-
-    -- TODO: Shouldn't it be in luabins format?!
-    -- TODO: That should be list, not a single value
-    --       Allow empty lists too.
-    return { { math.random(INT_MAX) } }
-  end
-
   local text = function(self)
     method_arguments(self)
 
@@ -268,7 +258,6 @@ do
       primary_key = primary_key;
       primary_ref = primary_ref;
       ref = ref;
-      serialized_list = serialized_list;
       text = text;
       timeofday = timeofday;
       timestamp = timestamp;

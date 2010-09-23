@@ -49,8 +49,6 @@ local log, dbg, spam, log_error = make_loggers("db/changeset", "DCH")
 --------------------------------------------------------------------------------
 
 -- TODO: Make these constants configurable
-
-local DB_CHANGESETS_PATH = "logic/db/changes"
 local MAX_UUID_LENGTH = 128
 local CHANGESET_TABLE_NAME = "pk_changes"
 
@@ -339,10 +337,13 @@ end
 
 --------------------------------------------------------------------------------
 
-local load_all_changesets = function()
-  -- TODO: Filter required changes only?
+local load_all_changesets = function(db_changes_path)
+  arguments(
+      "string", db_changes_path
+    )
+
   local filenames = find_all_files(
-      DB_CHANGESETS_PATH,
+      db_changes_path,
       ".*%.lua$",
       { }
     )

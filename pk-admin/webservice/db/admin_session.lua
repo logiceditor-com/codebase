@@ -300,5 +300,6 @@ return
   may_create_one_admin_session = may_create_one_session;
   try_create_admin_session = try_create_session;
   --
-  create_admin_session_checker = create_session_checker;
+  -- Note that this name is a part of the apigen contract.
+  create_session_checker = create_session_checker;
 }

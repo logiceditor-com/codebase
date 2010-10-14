@@ -48,7 +48,7 @@ local make_db_manager
         'make_db_manager'
       }
 
-local make_config_manager
+local make_default_config_manager
       = import 'pk-engine/srv/internal_config/client.lua'
       {
         'make_config_manager'
@@ -136,7 +136,12 @@ do
   -- Private function.
   local get_context
   do
-    local create_common_context = function(wsapi_env)
+    local create_common_context = function(wsapi_env, config_manager_maker)
+      arguments(
+          "table", wsapi_env
+          "function", config_manager_maker
+        )
+
       local config_host = wsapi_env.PK_CONFIG_HOST
       local config_port = tonumber(wsapi_env.PK_CONFIG_PORT)
 
@@ -150,7 +155,7 @@ do
         error("missing config host and/or port")
       end
 
-      local config_manager = make_config_manager(config_host, config_port)
+      local config_manager = config_manager_maker(config_host, config_port)
 
       return
       {
@@ -172,7 +177,7 @@ do
       if not self.common_context_mt_ then
         self.common_context_mt_ =
         {
-          __index = create_common_context(wsapi_env);
+          __index = create_common_context(wsapi_env, self.config_manager_maker_);
           __metatable = true;
         }
       end
@@ -247,10 +252,16 @@ do
     end
   end
 
-  make_request_manager = function(request_handler)
+  make_request_manager = function(request_handler, config_manager_maker)
     arguments(
-        "table", request_handler
+        "table", request_handler,
+        "function", config_manager_maker
       )
+    optional_arguments(
+        "function", config_manager_maker
+      )
+
+    config_manager_maker = config_manager_maker or make_default_config_manager
 
     return
     {
@@ -258,6 +269,7 @@ do
       --
       request_handler_ = request_handler;
       common_context_mt_ = nil;
+      config_manager_maker_ = config_manager_maker;
     }
   end
 end
@@ -287,12 +299,15 @@ do
     }
   end
 
-  make_request_manager_using_handlers = function(handlers)
+  make_request_manager_using_handlers = function(handlers, config_manager_maker)
     arguments(
         "table", handlers
       )
+    optional_arguments(
+        "function", config_manager_maker
+      )
 
-    return make_request_manager(make_request_handler(handlers))
+    return make_request_manager(make_request_handler(handlers), config_manager_maker)
   end
 end
 

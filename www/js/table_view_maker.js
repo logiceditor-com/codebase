@@ -236,20 +236,28 @@ PK.make_table_view_panel = function(
     //editItem();
   };
 
-  var tbar = [
-    {
-      text: I18N('Add'),
-      tooltip: I18N('Click to add'),
-      iconCls:'icon-add',
-      handler: addItem
-    }, '-', //add a separator
-    {
-      text: I18N('Delete'),
-      tooltip: I18N('Click to delete'),
-      iconCls:'icon-delete',
-      handler: confirmDelete
-    }
-  ];
+  var tbar = [];
+  if(params.hide_std_tbar_buttons)
+  {
+    tbar = [];
+  }
+  else
+  {
+    tbar = [
+      {
+        text: I18N('Add'),
+        tooltip: I18N('Click to add'),
+        iconCls:'icon-add',
+        handler: addItem
+      }, '-', //add a separator
+      {
+        text: I18N('Delete'),
+        tooltip: I18N('Click to delete'),
+        iconCls:'icon-delete',
+        handler: confirmDelete
+      }
+    ];
+  }
 
   if(params.custom_tbar)
   {

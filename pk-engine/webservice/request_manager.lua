@@ -138,7 +138,7 @@ do
   do
     local create_common_context = function(wsapi_env, config_manager_maker)
       arguments(
-          "table", wsapi_env
+          "table", wsapi_env,
           "function", config_manager_maker
         )
 

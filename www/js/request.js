@@ -44,7 +44,7 @@ PK.on_server_error = function(error_id)
       break;
     case "SESSION_EXPIRED":
       CRITICAL_ERROR(I18N('Session expired. Re-login, please.'));
-      PK.navigation.go_to_topic("client-login", undefined, true);
+      PK.navigation.go_to_topic("login", undefined, true);
       break;
     default:
       CRITICAL_ERROR(I18N('Sorry, please try again. Server error: ') + error_id);

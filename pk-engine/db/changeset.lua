@@ -363,8 +363,7 @@ local load_all_changesets = function(db_changes_path)
   for i = 1, #filenames do
     local filename = filenames[i]
 
-    -- TODO: Should we call import() here? We should not cache changesets!
-    local changeset = import(filename) ()
+    local changeset = assert(assert(loadfile(filename)) ())
 
     -- spam("loaded changeset", filename, changeset)
 

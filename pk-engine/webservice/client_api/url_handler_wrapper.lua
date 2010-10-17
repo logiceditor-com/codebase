@@ -101,10 +101,13 @@ do
         return response_fn(error_formatter_fn(tostring(err)))
       end
 
-      local output, err = call(handler_fn, api_context, input)
+      -- TODO: HACK! Remove that "extra".
+      local output, extra = call(handler_fn, api_context, input)
       if not output then
         api_context:destroy()
         api_context = nil
+
+        local err = extra
 
         return response_fn(error_formatter_fn(tostring(err)))
       end
@@ -112,7 +115,8 @@ do
       local rendered_output, err = call(
           output_renderer,
           api_context,
-          output
+          output,
+          extra
         )
       if not rendered_output then
         api_context:destroy()

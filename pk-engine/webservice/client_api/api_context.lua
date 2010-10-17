@@ -82,6 +82,12 @@ do
         or get_cached_request(self).POST
   end
 
+  local get_request = function(self)
+    method_arguments(self)
+    return self.param_stack_[#self.param_stack_] -- TODO: Should this use param_stack?!
+        or get_cached_request(self).GET
+  end
+
   local raw_internal_config_manager = function(self)
     method_arguments(self)
     return self.context_.config_manager
@@ -230,6 +236,7 @@ do
       --
       request_ip = request_ip;
       post_request = post_request;
+      get_request = get_request;
       --
       push_param = push_param; -- Private
       pop_param = pop_param; -- Private

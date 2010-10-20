@@ -78,7 +78,8 @@ PK.common_custom_editors = new function()
         {
           if(value && value != startValue && value.length > 0)
           {
-            this_ge.setValue(Ext.util.MD5(value));
+            //this_ge.setValue(Ext.util.MD5(value));
+            this_ge.setValue(value);
           }
           return true;
         }

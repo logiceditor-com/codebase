@@ -48,6 +48,14 @@ local make_db_manager
         'make_db_manager'
       }
 
+local make_redis_manager,
+      make_redis_connection_manager
+      = import 'pk-engine/redis/redis_manager.lua'
+      {
+        'make_redis_manager',
+        'make_redis_connection_manager'
+      }
+
 local make_default_config_manager
       = import 'pk-engine/srv/internal_config/client.lua'
       {
@@ -162,6 +170,7 @@ do
         config_manager = config_manager;
         net_connection_manager = make_net_connection_manager();
         db_manager = make_db_manager(config_manager, make_db_connection_manager());
+        redis_manager = make_redis_manager(config_manager, make_redis_connection_manager());
       }
     end
 

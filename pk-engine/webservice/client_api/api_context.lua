@@ -45,6 +45,14 @@ local make_api_db,
         'destroy_api_db'
       }
 
+local make_api_redis,
+      destroy_api_redis
+      = import 'pk-engine/webservice/client_api/api_redis.lua'
+      {
+        'make_api_redis',
+        'destroy_api_redis'
+      }
+
 --------------------------------------------------------------------------------
 
 local log, dbg, spam, log_error = make_loggers("webservice/client_api/api_context", "APC")
@@ -74,6 +82,15 @@ do
       self.cached_db_ = make_api_db(self.tables_, self.context_.db_manager)
     end
     return self.cached_db_
+  end
+
+  -- Private method
+  local get_cached_redis = function(self)
+    method_arguments(self)
+    if not self.cached_redis_ then
+      self.cached_redis_ = make_api_redis(self.context_.redis_manager)
+    end
+    return self.cached_redis_
   end
 
   local post_request = function(self)
@@ -152,12 +169,24 @@ do
       self.cached_db_ = nil
     end
 
+    -- Not using get_cached_redis() since we don't want to create redis
+    -- if it was not used
+    if self.cached_redis_ then
+      destroy_api_redis(self.cached_redis_)
+      self.cached_redis_ = nil
+    end
+
     assert(#self.param_stack_ == 0, "unbalanced param stack on destroy")
   end
 
   local db = function(self)
     method_arguments(self)
     return get_cached_db(self)
+  end
+
+  local redis = function(self)
+    method_arguments(self)
+    return get_cached_redis(self)
   end
 
   local handle_url = function(self, url, param)
@@ -233,6 +262,7 @@ do
       game_config = game_config;
       admin_config = admin_config;
       db = db;
+      redis = redis;
       --
       request_ip = request_ip;
       post_request = post_request;
@@ -250,6 +280,7 @@ do
       cached_game_config_ = nil;
       cached_admin_config_ = nil;
       cached_db_ = nil;
+      cached_redis_ = nil;
       --
       tables_ = db_tables;
       www_game_config_getter_ = www_game_config_getter;

@@ -243,7 +243,8 @@ do
       end
 
 
-      log(status, context.wsapi_env.PATH_INFO)
+      -- WARNING! Do not uncomment! Too much spamming on heavy load!
+      -- log(status, context.wsapi_env.PATH_INFO)
 
       return
         assert_is_number(status),

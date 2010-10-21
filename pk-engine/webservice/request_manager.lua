@@ -242,7 +242,6 @@ do
         }
       end
 
-
       -- WARNING! Do not uncomment! Too much spamming on heavy load!
       -- log(status, context.wsapi_env.PATH_INFO)
 

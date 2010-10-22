@@ -64,7 +64,7 @@ do
       spam("created connection pool", pool_id) --, info)
     end
 
-    spam("acquiring connection from pool", pool_id)
+    -- spam("acquiring connection from pool", pool_id)
 
     local conn, err = pool:acquire()
     if not conn then
@@ -84,7 +84,7 @@ do
 
     local pool = assert(self.pools_[pool_id])
 
-    spam("unacquiring connection from pool", pool_id)
+    -- spam("unacquiring connection from pool", pool_id)
 
     pool:unacquire(conn)
   end

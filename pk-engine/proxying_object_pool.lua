@@ -163,7 +163,9 @@ do
       )
 
     -- TODO: Need object metatype in arguments
-    assert(is_table(object) or is_userdata(object))
+    if not (is_table(object) or is_userdata(object)) then
+      error("own: wrong object type: " .. type(object))
+    end
 
     local free_objects = self.free_objects_
     free_objects[#free_objects + 1] = object

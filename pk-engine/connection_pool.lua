@@ -46,7 +46,13 @@ do
 
     local conn = pool:acquire()
     if not conn then
-      pool:own(self.persistent_connector_:connect())
+      local res, err = self.persistent_connector_:connect()
+      if not res then
+        log("connection pool: failed to acquire connection:", err)
+        return nil, err
+      end
+
+      pool:own(res)
       conn = assert(pool:acquire())
     end
 

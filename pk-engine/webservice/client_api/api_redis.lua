@@ -96,7 +96,7 @@ do
             "string", redis_name
           )
 
-        local v = self[factories_cache_key][redis_name]
+        local v = self[factories_cache_key][redis_name].redis_conn
         self[redis_name] = v
         return v
       end;

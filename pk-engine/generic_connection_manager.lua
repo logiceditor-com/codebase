@@ -66,7 +66,11 @@ do
 
     spam("acquiring connection from pool", pool_id)
 
-    local conn = pool:acquire()
+    local conn, err = pool:acquire()
+    if not conn then
+      log_error("acquire failed:", err)
+      return nil, err
+    end
 
     return conn, pool_id
   end

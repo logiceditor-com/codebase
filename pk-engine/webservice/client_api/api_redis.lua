@@ -79,7 +79,7 @@ do
   {
     __index = function(t, redis_name)
       local v = function(self) -- TODO: Weird.
-        return self[connections_key][redis_name]
+        return self[connections_cache_key][redis_name]
       end
       t[redis_name] = v
       return v

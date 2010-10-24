@@ -51,7 +51,10 @@ local error_handler_for_call = function(msg)
 end
 
 local create_error_object = function(error_id)
-  return { error_tag, error_id }
+  if not is_error_object(error_id) then
+    return { error_tag, error_id }
+  end
+  return error_id
 end
 
 local get_error_id = function(err)

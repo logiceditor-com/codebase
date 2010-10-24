@@ -62,7 +62,7 @@ local get_error_id = function(err)
 end
 
 local throw = function(error_id)
-  error(create_error_object(error_id))
+  return error(create_error_object(error_id))
 end
 
 local pcall_adaptor_for_call = function(status, ...)
@@ -74,7 +74,7 @@ local pcall_adaptor_for_call = function(status, ...)
       return nil, error_id
     end
 
-    error(err) -- Not our error, rethrow
+    return error(err) -- Not our error, rethrow
   end
   return ... -- TODO: Shouldn't we return true here?
 end
@@ -107,6 +107,13 @@ local try = function(error_id, result, err, ...)
   return result, err, ...
 end
 
+local rethrow = function(err)
+  if not is_error_object(err) then
+    return throw(err)
+  end
+  error(err) -- Rethrowing our error
+end
+
 --------------------------------------------------------------------------------
 
 return
@@ -114,6 +121,7 @@ return
   call = call;
   try = try;
   fail = fail;
+  rethrow = rethrow;
   --
   error_handler_for_call = error_handler_for_call;
 }

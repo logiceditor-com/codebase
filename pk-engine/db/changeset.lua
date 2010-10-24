@@ -179,7 +179,7 @@ local apply_db_changeset = function(db_conn, changeset)
       end
     end
 
-    err = status and res or err
+    err = (not status) and res or err
     return nil, "failed to apply changeset `" .. changeset.UUID .. "': " .. err
   end
 

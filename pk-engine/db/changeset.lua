@@ -2,7 +2,7 @@
 -- changeset.lua: applying and reverting db changesets
 --------------------------------------------------------------------------------
 
-local tostring, pcall = tostring, pcall
+local tostring, pcall, xpcall = tostring, pcall, xpcall
 local os_time = os.time
 local table_sort = table.sort
 
@@ -149,7 +149,13 @@ local apply_db_changeset = function(db_conn, changeset)
     end
   end
 
-  local status, res, err = pcall(changeset.apply, db_conn)
+  local status, res, err = xpcall(
+      function() return changeset.apply(db_conn) end,
+      function(msg)
+        log_error(debug.traceback(msg))
+        return msg
+      end
+    )
   if not status or not res then
     -- TODO: Use some generic function.
     local undo_res, undo_err = db_conn:execute(

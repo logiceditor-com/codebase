@@ -107,11 +107,11 @@ local try = function(error_id, result, err, ...)
   return result, err, ...
 end
 
-local rethrow = function(err)
+local rethrow = function(error_id, err)
   if not is_error_object(err) then
-    return throw(err)
+    return fail(error_id, err)
   end
-  error(err) -- Rethrowing our error
+  error(err) -- Rethrowing our error, ignoring error_id
 end
 
 --------------------------------------------------------------------------------

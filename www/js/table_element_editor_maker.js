@@ -215,6 +215,8 @@ PK.make_linked_field_editor = function(element_id, params)
 //   msg_on_successful_update
 //   msg_on_successful_insert
 // Optional parameters:
+//   element_id
+//   hide_std_tbar_buttons
 //   table_view_params_maker
 //   update_request_params_maker
 //   insert_request_params_maker
@@ -235,8 +237,14 @@ PK.make_table_element_editor = function(params)
       LOG("initing topic: table_element_editor ");
 
       var element_id;
+      if(params.element_id)
+      {
+        element_id = params.element_id
+      }
       if(show_params && show_params.length > 0 && show_params[0] !== "new")
-        element_id = show_params[0];
+      {
+        element_id = show_params[0]
+      }
 
       var title_;
       if(element_id)
@@ -475,20 +483,28 @@ PK.make_table_element_editor = function(params)
 
       function makePanel(source)
       {
-        tbar = [
-          {
-            text: I18N('Save'),
-            tooltip: I18N('Click to save'),
-            iconCls: 'icon-save',
-            handler: addOrUpdateItem
-          }, '-', //add a separator
-          {
-            text: I18N('Cancel'),
-            tooltip: I18N('Click to cancel editing'),
-            iconCls: 'icon-cancel',
-            handler: cancelEditing
-          }
-        ];
+        var tbar = []
+        if(params.hide_std_tbar_buttons)
+        {
+          tbar = []
+        }
+        else
+        {
+          tbar = [
+            {
+              text: I18N('Save'),
+              tooltip: I18N('Click to save'),
+              iconCls: 'icon-save',
+              handler: addOrUpdateItem
+            }, '-', //add a separator
+            {
+              text: I18N('Cancel'),
+              tooltip: I18N('Click to cancel editing'),
+              iconCls: 'icon-cancel',
+              handler: cancelEditing
+            }
+          ]
+        }
 
         var make_button_handler = function(handler, param1)
         {

@@ -216,7 +216,7 @@ PK.make_linked_field_editor = function(element_id, params)
 //   msg_on_successful_insert
 // Optional parameters:
 //   element_id
-//   hide_std_tbar_buttons
+//   read_only_data
 //   table_view_params_maker
 //   update_request_params_maker
 //   insert_request_params_maker
@@ -484,7 +484,7 @@ PK.make_table_element_editor = function(params)
       function makePanel(source)
       {
         var tbar = []
-        if(params.hide_std_tbar_buttons)
+        if(params.read_only_data)
         {
           tbar = []
         }

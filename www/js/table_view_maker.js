@@ -74,11 +74,14 @@ PK.make_grid_panel = function(params)
 //   on_edit_item
 //   on_successful_delete
 //   add_request_params
+//   per_page
 PK.make_table_view_panel = function(
     panel_getter, title, columns, params, show_params
   )
 {
-  var PER_PAGE = 1000000; //20;
+  var per_page = 20
+  if (params.per_page !== undefined)
+    per_page = params.per_page
 
   var reader_fields = new Array;
 
@@ -114,7 +117,7 @@ PK.make_table_view_panel = function(
   if(params.store_maker)
   {
     store_ = params.store_maker(
-        reader_fields, params.server_handler_name, PER_PAGE, show_params
+        reader_fields, params.server_handler_name, per_page, show_params
       );
   }
   else
@@ -276,7 +279,7 @@ PK.make_table_view_panel = function(
       tbar: tbar,
       height: 550,
       width: 1010,
-      per_page: PER_PAGE,
+      per_page: per_page,
       displayMsg: params.displayMsg,
       emptyMsg: params.emptyMsg,
       render_to: 'main-module-panel',

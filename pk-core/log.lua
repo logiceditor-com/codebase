@@ -17,6 +17,7 @@ local arguments,
       }
 
 local LOG_LEVEL,
+      END_OF_LOG_MESSAGE,
       make_common_logging_config,
       make_logging_system,
       wrap_file_sink,
@@ -25,6 +26,7 @@ local LOG_LEVEL,
       = import 'lua-nucleo/log.lua'
       {
         'LOG_LEVEL',
+        'END_OF_LOG_MESSAGE',
         'make_common_logging_config',
         'make_logging_system',
         'wrap_file_sink',
@@ -110,24 +112,44 @@ do
     -- Empty; everything is enabled by default.
   }
 
+  local reopen_log
+
   common_init_logging_to_file = function(log_file_name)
     arguments(
         "string", log_file_name
       )
 
     if not is_common_logging_system_initialized() then
+      assert(not reopen_log)
+
       local logging_config = make_common_logging_config(
           LOG_LEVEL_CONFIG,
           LOG_MODULE_CONFIG
         )
       local log_file = assert(io.open(log_file_name, "a"))
-      -- TODO: We MUST support USR1 signal log reload!
-      create_common_logging_system("", wrap_file_sink(log_file), logging_config)
 
-      return true
+      reopen_log = function()
+        log_file:close()
+        log_file = assert(io.open(log_file_name, "a"))
+      end
+      local function sink(v)
+        log_file:write(v)
+        if v == END_OF_LOG_MESSAGE then
+          log_file:flush() -- TODO: ?! Slow.
+        end
+        return sink
+      end
+
+      create_common_logging_system(
+          "",
+          sink,
+          logging_config
+        )
+
+      return true, reopen_log
     end
 
-    return false
+    return false, assert(reopen_log)
   end
 end
 

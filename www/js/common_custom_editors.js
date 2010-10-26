@@ -129,6 +129,10 @@ PK.common_custom_editors = new function()
         return undefined;
         break;
 
+      case PK.table_element_types.MONEY:
+        return undefined;
+        break;
+
       default:
         return undefined;
     }

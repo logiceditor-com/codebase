@@ -74,10 +74,7 @@ PK.common_custom_renderers = new function()
 
   this.render_money = function(v)
   {
-    if( v === "")
-      return I18N('no');
-
-    return v + ' rub';
+    return (Number(v) / 100) + " " + I18N('rub');
   };
 
   this.make_renderer = function(value_type, use_enum_renderer, enum_items)

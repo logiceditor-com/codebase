@@ -8,5 +8,6 @@ PK.table_element_types =
   PHONE:        6,
   MAIL:         7,
   DB_IDS:       8,
-  BINARY_DATA:  9
+  BINARY_DATA:  9,
+  MONEY:       10
 };

@@ -73,6 +73,10 @@ PK.common_custom_convertors = new function()
           return v;
           break;
 
+        case PK.object_tag_value_types.MONEY:
+          return v;
+          break;
+
         default:
           return v;
       }

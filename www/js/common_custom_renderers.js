@@ -72,6 +72,14 @@ PK.common_custom_renderers = new function()
     }
   };
 
+  this.render_money = function(v)
+  {
+    if( v === "")
+      return I18N('no');
+
+    return v + ' rub';
+  };
+
   this.make_renderer = function(value_type, use_enum_renderer, enum_items)
   {
     switch (Number(value_type))
@@ -103,6 +111,10 @@ PK.common_custom_renderers = new function()
 
       case PK.table_element_types.BINARY_DATA:
         return this.render_binary_data;
+        break;
+
+      case PK.table_element_types.MONEY:
+        return this.render_money;
         break;
 
       default:

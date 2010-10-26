@@ -114,6 +114,12 @@ do
     return md5.sumhexa("salt" .. tostring(math.random()))
   end
 
+  local password = function(self)
+    method_arguments(self)
+
+    return md5.sumhexa("salt" .. tostring(math.random()))
+  end
+
   local optional_ip = function(self)
     method_arguments(self)
 

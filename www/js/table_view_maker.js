@@ -69,6 +69,7 @@ PK.make_grid_panel = function(params)
 //   server_handler_name
 // Optional parameters:
 //   read_only_data
+//   append_only_data
 //   store_maker
 //   on_add_item
 //   on_edit_item
@@ -154,7 +155,7 @@ PK.make_table_view_panel = function(
     {
       if(params.on_edit_item)
         params.on_edit_item(params.table_element_editor, show_params, id);
-      else if (!params.read_only_data)
+      else if (!params.read_only_data && !params.append_only_data)
         PK.navigation.go_to_topic(params.table_element_editor, [id]);
     }
   };
@@ -244,6 +245,17 @@ PK.make_table_view_panel = function(
   if(params.read_only_data)
   {
     tbar = [];
+  }
+  else if(params.append_only_data)
+  {
+    tbar = [
+      {
+        text: I18N('Add'),
+        tooltip: I18N('Click to add'),
+        iconCls:'icon-add',
+        handler: addItem
+      }
+    ];
   }
   else
   {

@@ -76,6 +76,7 @@ PK.make_grid_panel = function(params)
 //   on_successful_delete
 //   add_request_params
 //   per_page
+//   custom_tbar
 PK.make_table_view_panel = function(
     panel_getter, title, columns, params, show_params
   )

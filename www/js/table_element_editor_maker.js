@@ -223,6 +223,7 @@ PK.make_linked_field_editor = function(element_id, params)
 //   on_successful_update
 //   on_successful_insert
 //   primaryKey
+//   custom_tbar
 PK.make_table_element_editor = function(params)
 {
   return new function()

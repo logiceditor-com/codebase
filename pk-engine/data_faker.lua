@@ -11,6 +11,8 @@
 local uuid = require 'uuid'
 local md5 = require 'md5'
 
+local md5_sumhexa = md5.sumhexa
+
 --------------------------------------------------------------------------------
 
 local arguments,
@@ -111,13 +113,13 @@ do
   local md5 = function(self)
     method_arguments(self)
 
-    return md5.sumhexa("salt" .. tostring(math.random()))
+    return md5_sumhexa("salt" .. tostring(math.random()))
   end
 
   local password = function(self)
     method_arguments(self)
 
-    return md5.sumhexa("salt" .. tostring(math.random()))
+    return md5_sumhexa("salt" .. tostring(math.random()))
   end
 
   local optional_ip = function(self)
@@ -259,6 +261,7 @@ do
       int = int;
       ip = ip;
       md5 = md5;
+      password = password;
       optional_ip = optional_ip;
       optional_ref = optional_ref;
       primary_key = primary_key;

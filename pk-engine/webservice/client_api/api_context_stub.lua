@@ -1,10 +1,9 @@
 --------------------------------------------------------------------------------
--- api_context.lua: handler context wrapper for api
+-- api_context_stub.lua: handler context wrapper for api (without wsapi)
 --------------------------------------------------------------------------------
--- NOTE: When changing, remember to change api_context_stub.lua as well
+-- NOTE: When changing, remember to change api_context as well
 --------------------------------------------------------------------------------
 
-require 'wsapi.request'
 require 'socket.url'
 
 --------------------------------------------------------------------------------
@@ -39,6 +38,32 @@ local try,
         'fail'
       }
 
+local make_net_connection_manager
+      = import 'pk-engine/net/net_connection_manager.lua'
+      {
+        'make_net_connection_manager'
+      }
+
+local make_db_connection_manager
+      = import 'pk-engine/db/db_connection_manager.lua'
+      {
+        'make_db_connection_manager'
+      }
+
+local make_db_manager
+      = import 'pk-engine/db/db_manager.lua'
+      {
+        'make_db_manager'
+      }
+
+local make_redis_manager,
+      make_redis_connection_manager
+      = import 'pk-engine/redis/redis_manager.lua'
+      {
+        'make_redis_manager',
+        'make_redis_connection_manager'
+      }
+
 local make_api_db,
       destroy_api_db
       = import 'pk-engine/webservice/client_api/api_db.lua'
@@ -57,22 +82,41 @@ local make_api_redis,
 
 --------------------------------------------------------------------------------
 
-local log, dbg, spam, log_error = make_loggers("webservice/client_api/api_context", "APC")
+local log, dbg, spam, log_error = make_loggers("webservice/client_api/api_context_stub", "APS")
 
 --------------------------------------------------------------------------------
 
 -- WARNING: Call methods of the context inside call() protection only!
 -- NOTE: It is OK to create context object outside of call() protection.
-local make_api_context
+local make_api_context_stub
 do
+  local get_context_stub = function(internal_config_manager) -- NOTE: When changing this, remember to change request_manager.lua as well!
+    arguments(
+        "table", internal_config_manager
+      )
+
+    local config_manager = config_manager_maker(config_host, config_port)
+
+    return setmetatable( -- TODO: Cache
+        { },
+        {
+          __index =
+          {
+            config_manager = config_manager;
+            net_connection_manager = make_net_connection_manager();
+            db_manager = make_db_manager(config_manager, make_db_connection_manager());
+            redis_manager = make_redis_manager(config_manager, make_redis_connection_manager());
+          };
+          __metatable = "context_stub";
+        }
+      )
+  end
+
   -- Private method
   local get_cached_request = function(self)
     method_arguments(self)
     if not self.cached_request_ then
-      self.cached_request_ = wsapi.request.new(
-          self.context_.wsapi_env,
-          { overwrite = true }
-        )
+      fail("INTERNAL_ERROR", "can't get cached_request: have no wsapi")
     end
     return self.cached_request_
   end
@@ -148,14 +192,7 @@ do
 
   local request_ip = function(self)
     method_arguments(self)
-
-    -- WARNING: This function should not fail even if IP is unknown!
-
-    -- TODO: If REMOTE_ADDR does not exist or is empty,
-    --       or starts with '127', '10.' or '192',
-    --       try to look into X-Forwarded-For header.
-
-    return self.context_.wsapi_env.REMOTE_ADDR or ""
+    fail("INTERNAL_ERROR", "can't get request_ip: have no wsapi")
   end
 
   -- Note that we do not have anything destroyable (yet)
@@ -241,19 +278,19 @@ do
     return table.remove(self.param_stack_)
   end
 
-  make_api_context = function(
-      context,
+  make_api_context_stub = function(
+      internal_config_manager,
       db_tables,
       www_game_config_getter,
       www_admin_config_getter,
       internal_call_handlers
     )
     arguments(
-        "table",    context,
+        "table",    internal_config_manager,
         "table",    db_tables,
         "function", www_admin_config_getter,
         "function", www_game_config_getter,
-        "table", internal_call_handlers
+        "table",    internal_call_handlers
       )
 
     return
@@ -276,7 +313,7 @@ do
       destroy = destroy; -- Private
       --
       -- WARNING: Do not expose this variable (see push/pop_param).
-      context_ = context;
+      context_ = get_context_stub(internal_config_manager);
       --
       cached_request_ = nil;
       cached_game_config_ = nil;
@@ -298,5 +335,5 @@ end
 
 return
 {
-  make_api_context = make_api_context;
+  make_api_context_stub = make_api_context_stub;
 }

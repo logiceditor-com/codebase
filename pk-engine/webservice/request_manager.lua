@@ -142,7 +142,7 @@ end
 local make_request_manager
 do
   -- Private function.
-  local get_context
+  local get_context -- NOTE: When changing this, remember to change api_context_stub.lua as well!
   do
     local create_common_context = function(wsapi_env, config_manager_maker)
       arguments(

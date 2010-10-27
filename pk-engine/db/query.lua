@@ -248,12 +248,15 @@ local raw_update_or_insert_one = function(
       "table",  updates
     )
 
-  local num_affected_rows, err = db_conn:execute(
+  local query =
       [[INSERT INTO `]] .. table_name .. [[`]]
    .. [[ (]] .. table.concat(keys, ",") .. [[)]]
    .. [[ VALUES (]] .. table.concat(values, ",") .. [[)]]
    .. [[ ON DUPLICATE KEY UPDATE ]] .. table.concat(updates, ", ")
-    )
+
+  -- spam("executing", query)
+
+  local num_affected_rows, err = db_conn:execute(query)
 
   if not num_affected_rows then
     return nil, err

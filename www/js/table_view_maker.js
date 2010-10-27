@@ -70,6 +70,7 @@ PK.make_grid_panel = function(params)
 // Optional parameters:
 //   read_only_data
 //   append_only_data
+//   prohibit_deletion
 //   store_maker
 //   on_add_item
 //   on_edit_item
@@ -247,7 +248,7 @@ PK.make_table_view_panel = function(
   {
     tbar = [];
   }
-  else if(params.append_only_data)
+  else if(params.append_only_data || params.prohibit_deletion)
   {
     tbar = [
       {

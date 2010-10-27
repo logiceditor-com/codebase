@@ -307,6 +307,13 @@ PK.make_table_element_editor = function(params)
             item[properties[name].mapping] = data[name];
         }
 
+        var hidden_fields = general_properties_panel_.hidden_fields
+        if (hidden_fields)
+        {
+          for (var name in hidden_fields)
+            item[name] = hidden_fields[name]
+        }
+
         var request_url, request_params;
         if(element_id)
         {

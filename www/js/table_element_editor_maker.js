@@ -512,6 +512,11 @@ PK.make_table_element_editor = function(params)
           return function() { return handler(param1); }
         }
 
+        var make_button_handler_using_general_panel = function(handler)
+        {
+          return function() { return handler(general_properties_panel_); }
+        }
+
         if(params.custom_tbar)
         {
           for(var i = 0; i < params.custom_tbar.length; i++)
@@ -523,9 +528,8 @@ PK.make_table_element_editor = function(params)
                 text:     params.custom_tbar[i].text,
                 tooltip:  params.custom_tbar[i].tooltip,
                 iconCls:  params.custom_tbar[i].iconCls,
-                handler:  make_button_handler(
-                    params.custom_tbar[i].handler,
-                    general_properties_panel_
+                handler:  make_button_handler_using_general_panel(
+                    params.custom_tbar[i].handler
                   )
               };
               tbar.push(tbar_item);

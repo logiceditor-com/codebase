@@ -90,12 +90,10 @@ local log, dbg, spam, log_error = make_loggers("webservice/client_api/api_contex
 -- NOTE: It is OK to create context object outside of call() protection.
 local make_api_context_stub
 do
-  local get_context_stub = function(internal_config_manager) -- NOTE: When changing this, remember to change request_manager.lua as well!
+  local get_context_stub = function(config_manager) -- NOTE: When changing this, remember to change request_manager.lua as well!
     arguments(
-        "table", internal_config_manager
+        "table", config_manager
       )
-
-    local config_manager = config_manager_maker(config_host, config_port)
 
     return setmetatable( -- TODO: Cache
         { },

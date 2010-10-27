@@ -455,7 +455,14 @@ do
       assert(dostring_in_environment(args["--param"], extra_param, "@--param"))
     end
 
-    local base_config = make_config_environment({ PROJECT_PATH = PROJECT_PATH })
+    -- TODO: Hack? Only base and project configs are allowed import()
+    -- TODO: Let user to specify environment explicitly instead.
+    local base_config = make_config_environment(
+        {
+          PROJECT_PATH = PROJECT_PATH;
+          import = import;
+        }
+      )
     if not args["--no-defaults"] then
       --[[
       io.stdout:write(
@@ -467,7 +474,16 @@ do
       assert(do_in_environment(base_config_chunk, base_config))
     end
 
-    local config = make_config_environment({ PROJECT_PATH = PROJECT_PATH })
+    if base_config.import == import then
+      base_config.import = nil -- TODO: Hack. Use metatables instead
+    end
+
+    local config = make_config_environment(
+        {
+          PROJECT_PATH = PROJECT_PATH;
+          import = import;
+        }
+      )
     if not args["--no-config"] then
       --[[
       io.stdout:write(
@@ -477,6 +493,10 @@ do
       --]]
       local config_chunk = assert(loadfile(project_config_filename))
       assert(do_in_environment(config_chunk, config))
+    end
+
+    if config.import == import then
+      config.import = nil -- TODO: Hack. Use metatables instead
     end
 
     -- Hack. Doing tclone() to remove __metatabled metatable

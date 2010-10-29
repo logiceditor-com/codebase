@@ -277,14 +277,30 @@ PK.make_table_view_panel = function(
     ];
   }
 
+  var make_button_handler_using_panel_getter = function(handler)
+  {
+    return function() { return handler(panel_getter()) }
+  }
+
   if(params.custom_tbar)
   {
     for(var i = 0; i < params.custom_tbar.length; i++)
     {
-      var tbar_item = params.custom_tbar[i];
-      var handler = tbar_item.handler;
-      tbar_item.handler = function() { return handler(panel_getter()); };
-      tbar[tbar.length] = tbar_item;
+      if (typeof(params.custom_tbar[i]) != "string")
+      {
+        var tbar_item =
+        {
+          text:     params.custom_tbar[i].text,
+          tooltip:  params.custom_tbar[i].tooltip,
+          iconCls:  params.custom_tbar[i].iconCls,
+          handler:  make_button_handler_using_panel_getter(
+              params.custom_tbar[i].handler
+            )
+        };
+        tbar.push(tbar_item);
+      }
+      else
+        tbar.push(params.custom_tbar[i]);
     }
   }
 

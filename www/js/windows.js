@@ -57,7 +57,6 @@ PK.Windows = new function() {
     })
 
     window_.show()
-    window_.alignTo(id)
     window_.getComponent(0).focus(true, true)
   }
 }

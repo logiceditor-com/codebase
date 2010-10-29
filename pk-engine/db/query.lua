@@ -477,18 +477,14 @@ local subtract_values_one = function(
       .. "`" .. field .. "`-" .. tonumber(value)
 
     -- TODO: Make limit configurable?!
-    checks[#checks + 1] = "`" .. field .. "`-" .. tonumber(value) .. ">=0"
-  end
-
-  for field, value in pairs(row) do
-    checks[#checks + 1] = "`" .. field .. "`='" .. db_conn:escape(value) .. "'"
+    checks[#checks + 1] = " AND `" .. field .. "`-" .. tonumber(value) .. ">=0"
   end
 
   local num_affected_rows, err = db_conn:execute(
       [[UPDATE `]]..table_name..[[` SET ]]
    .. table.concat(sets, [[,]])
-   .. [[ WHERE 1 AND ]]
-   .. table.concat(checks, [[ AND ]])
+   .. [[ WHERE 1 AND `]]..primary_key..[[`=']]..db_conn:escape(row[primary_key])..[[']]
+   .. table.concat(checks, [[]])
    .. post_query
    .. [[ LIMIT 1]]
     )
@@ -577,15 +573,11 @@ local add_values_one = function(
     -- checks[#checks + 1] = "`" .. field .. "`-" .. tonumber(value) .. ">=0"
   end
 
-  for field, value in pairs(row) do
-    checks[#checks + 1] = "`" .. field .. "`='" .. db_conn:escape(value) .. "'"
-  end
-
   local num_affected_rows, err = db_conn:execute(
       [[UPDATE `]]..table_name..[[` SET ]]
    .. table.concat(sets, [[,]])
-   .. [[ WHERE 1 AND ]]
-   .. table.concat(checks, [[ AND ]])
+   .. [[ WHERE 1 AND `]]..primary_key..[[`=']]..db_conn:escape(row[primary_key])..[[']]
+   .. table.concat(checks, [[]])
    .. post_query
    .. [[ LIMIT 1]]
     )

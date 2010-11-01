@@ -77,13 +77,28 @@ PK.common_custom_renderers = new function()
     return (Number(v) / 100) + " " + I18N('rub');
   };
 
-  this.make_renderer = function(value_type, use_enum_renderer, enum_items)
+  this.make_real_renderer = function(precision)
+  {
+    return function(v)
+    {
+      if (precision == undefined)
+        return v;
+      return String(Math.round(Number(100 * v) / precision) * precision)
+    }
+  };
+
+  this.make_renderer = function(value_type, use_enum_renderer, enum_items, precision)
   {
     switch (Number(value_type))
     {
       case PK.table_element_types.STRING:
-      case PK.table_element_types.INT:
         return undefined;
+        break;
+
+      case PK.table_element_types.INT:
+        if (!precision)
+          return undefined;
+        return this.make_real_renderer(precision);
         break;
 
       case PK.table_element_types.ENUM:

@@ -109,6 +109,7 @@ do
       elseif num_affected_rows == 0 then
         return false -- Not found
       elseif num_affected_rows == nil then
+        log_error("delete_many failed:", err)
         return nil, err -- Propagate error
       else
         return nil,

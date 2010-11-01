@@ -70,6 +70,7 @@ do
       --  spam("receive once (err, no partial)", self.conn_:getfd())
       --end
 
+      log_error("receive('*a') failed:", err)
       return nil, err
     end
 
@@ -88,6 +89,7 @@ do
     while buffer_size < bytes do
       local res, err = receive_once(self)
       if not res then
+        log_error("receive_once failed:", err)
         return nil, err
       end
 
@@ -117,6 +119,7 @@ do
         -- TODO: ?!
         buffer:write(table.concat(read)) -- Put all read data back into buffer
 
+        log_error("receive_once failed:", err)
         return nil, err
       end
 
@@ -180,6 +183,7 @@ local read_const = function(buf_conn, expected)
   end
 
   if err then
+    log_error("read_bytes failed:", err)
     return nil, err
   end
 

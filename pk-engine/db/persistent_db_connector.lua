@@ -160,6 +160,7 @@ do
     return function(self, ...)
       local db_conn, err = get_connection(self)
       if not db_conn then
+        log_error(name, "failed:", err)
         return nil, err
       end
 
@@ -174,6 +175,7 @@ do
 
     local conn, err = get_connection(self)
     if not conn then
+      log_error("get_connection failed:", err)
       return nil, err
     end
 

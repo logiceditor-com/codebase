@@ -259,6 +259,7 @@ local raw_update_or_insert_one = function(
   local num_affected_rows, err = db_conn:execute(query)
 
   if not num_affected_rows then
+    log_error("raw_update_or_insert_one query failed:", err)
     return nil, err
   end
 

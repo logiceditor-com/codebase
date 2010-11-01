@@ -37,6 +37,7 @@ local list_db_tables = function(db_conn)
 
   local cursor, err = db_conn:execute("SHOW TABLES")
   if not cursor then
+    log_error("SHOW TABLES failed:", err)
     return nil, err
   end
 

@@ -60,7 +60,7 @@ do
       self.conn_proxy_, err = self.connector_:connect()
 
       if not self.conn_proxy_ then
-        dbg("connection failed", err)
+        log_error("connection failed", err)
         return nil, err
       end
 
@@ -90,12 +90,13 @@ do
 
     local conn, err = get_connection(self)
     if not conn then
+      log_error("get_connection failed:", err)
       return nil, err
     end
 
     local res, err, last_byte = conn:send(data, i, j)
     if not res then
-      dbg("send failed", err)
+      log_error("send failed", err)
       if connection_was_broken(err) then
         close_connection(self)
       end
@@ -112,12 +113,13 @@ do
 
     local conn, err = get_connection(self)
     if not conn then
+      log_error("receive failed:", err)
       return nil, err
     end
 
     local res, err, partial_result = conn:receive(pattern, prefix)
     if not res then
-      dbg("receive failed", err)
+      log_error("receive failed", err)
       if connection_was_broken(err) then
         close_connection(self)
       end
@@ -142,6 +144,7 @@ do
 
     local conn, err = get_connection(self)
     if not conn then
+      log_error("receive failed:", err)
       return nil, err
     end
 

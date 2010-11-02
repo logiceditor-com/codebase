@@ -2,13 +2,21 @@ function SetGlobalSessionCookies()
 {
   var MINUTES_TILL_EXPIRATION = 10;
 
-  var uid = Get_Cookie("uid"), sid = Get_Cookie("sid"),
-    username = Get_Cookie("username"), profile = Get_Cookie("profile");
+  var
+    server_answer_error = Get_Cookie("server_answer_error"),
+    uid = Get_Cookie("uid"),
+    sid = Get_Cookie("sid"),
+    username = Get_Cookie("username"),
+    profile = Get_Cookie("profile");
 
   Delete_Cookie("uid", "/api/session");
   Delete_Cookie("sid", "/api/session");
   Delete_Cookie("username","/api/session");
   Delete_Cookie("profile", "/api/session");
+  Delete_Cookie("server_answer_error", "/api/session");
+
+  if (server_answer_error != null)
+    Set_Cookie("server_answer_error", server_answer_error, MINUTES_TILL_EXPIRATION * 60, "/");
 
   if (uid != null)
     Set_Cookie("uid",       uid,      MINUTES_TILL_EXPIRATION * 60, "/");

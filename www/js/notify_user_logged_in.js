@@ -10,8 +10,15 @@ function SetGlobalSessionCookies()
   Delete_Cookie("username","/api/session");
   Delete_Cookie("profile", "/api/session");
 
-  Set_Cookie("uid",       uid,      MINUTES_TILL_EXPIRATION * 60, "/");
-  Set_Cookie("sid",       sid,      MINUTES_TILL_EXPIRATION * 60, "/");
-  Set_Cookie("username",  username, MINUTES_TILL_EXPIRATION * 60, "/");
-  Set_Cookie("profile",   profile,  MINUTES_TILL_EXPIRATION * 60, "/");
+  if (uid != null)
+    Set_Cookie("uid",       uid,      MINUTES_TILL_EXPIRATION * 60, "/");
+
+  if (sid != null)
+    Set_Cookie("sid",       sid,      MINUTES_TILL_EXPIRATION * 60, "/");
+
+  if (username != null)
+    Set_Cookie("username",  username, MINUTES_TILL_EXPIRATION * 60, "/");
+
+  if (profile != null)
+    Set_Cookie("profile",   profile,  MINUTES_TILL_EXPIRATION * 60, "/");
 }

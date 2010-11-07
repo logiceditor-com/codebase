@@ -46,8 +46,8 @@ local error_handler_for_call = function(msg)
   if not is_error_object(msg) then
     msg = debug.traceback(msg)
     log_error(msg)
-  --else -- Useful for debugging. Keep commented out.
-  --  spam("caught: ", debug.traceback(msg[2]))
+  else
+    spam("caught: ", debug.traceback(msg[2])) -- Required for debugging
   end
   return msg
 end

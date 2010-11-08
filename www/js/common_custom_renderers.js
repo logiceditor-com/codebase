@@ -72,9 +72,13 @@ PK.common_custom_renderers = new function()
     }
   };
 
-  this.render_money = function(v)
+  this.make_money_renderer = function(suffix_in)
   {
-    return (Number(v) / 100) + " " + I18N('rub');
+    var suffix = suffix_in ? suffix_in : 'rub'
+    return function(v)
+    {
+      return (Number(v) / 100) + " " + I18N(suffix);
+    }
   };
 
   this.make_real_renderer = function(precision)
@@ -87,7 +91,8 @@ PK.common_custom_renderers = new function()
     }
   };
 
-  this.make_renderer = function(value_type, use_enum_renderer, enum_items, precision)
+  // use_enum_renderer, enum_items, precision
+  this.make_renderer = function(value_type, params)
   {
     switch (Number(value_type))
     {
@@ -96,15 +101,15 @@ PK.common_custom_renderers = new function()
         break;
 
       case PK.table_element_types.INT:
-        if (!precision)
+        if (!params.precision)
           return undefined;
-        return this.make_real_renderer(precision);
+        return this.make_real_renderer(params.precision);
         break;
 
       case PK.table_element_types.ENUM:
-        if(!use_enum_renderer || !enum_items)
+        if(!params.use_enum_renderer || !params.enum_items)
           return undefined;
-        return this.make_enum_renderer(enum_items);
+        return this.make_enum_renderer(params.enum_items);
         break;
 
       case PK.table_element_types.BOOL:
@@ -126,7 +131,7 @@ PK.common_custom_renderers = new function()
         break;
 
       case PK.table_element_types.MONEY:
-        return this.render_money;
+        return this.make_money_renderer(params.suffix);
         break;
 
       default:

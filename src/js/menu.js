@@ -1,0 +1,48 @@
+//Taken from http://www.manfbraun.de/cont/tech/probs/ExtMenuWithTooltip2e.js
+PK.override_menu_item_to_enable_tooltips = function()
+{
+  Ext.override(Ext.menu.Item, {
+    onRender: function(container, position)
+      {
+        if (!this.itemTpl)
+        {
+          this.itemTpl = Ext.menu.Item.prototype.itemTpl = new Ext.XTemplate
+          (
+            '<a id="{id}" class="{cls}" hidefocus="true" unselectable="on" href="{href}"',
+            '<tpl if="hrefTarget">',
+            ' target="{hrefTarget}"',
+            '</tpl>',
+            '>',
+            '<img src="{icon}" class="x-menu-item-icon {iconCls}"/>',
+            '<span class="x-menu-item-text">{text}</span>',
+            '</a>'
+          );
+        }
+        var a = this.getTemplateArgs();
+        this.el = position ? this.itemTpl.insertBefore(position, a, true) : this.itemTpl.append(container, a, true);
+        this.iconEl = this.el.child('img.x-menu-item-icon');
+        this.textEl = this.el.child('.x-menu-item-text');
+        if (this.tooltip)
+        {
+          this.tooltip = new Ext.ToolTip(Ext.apply({
+                target: this.el
+                }, Ext.isObject(this.tooltip) ? this.tooltip : { html: this.tooltip } ));
+        }
+        Ext.menu.Item.superclass.onRender.call(this, container, position);
+      },
+    getTemplateArgs: function()
+        {
+          var result = {
+              id: this.id,
+              cls: this.itemCls + (this.menu ?  ' x-menu-item-arrow' : '') + (this.cls ?  ' ' + this.cls : ''),
+              href: this.href || '#',
+              tooltip: this.tooltip,
+              hrefTarget: this.hrefTarget,
+              icon: this.icon || Ext.BLANK_IMAGE_URL,
+              iconCls: this.iconCls || '',
+              text: this.itemText || this.text || ' '
+              };
+          return result;
+        }
+  })
+}

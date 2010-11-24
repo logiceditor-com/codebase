@@ -257,14 +257,14 @@ do
       return soup
     end
 
-    local n_soup = #soup
+    local values = tivalues(soup) -- TODO: Hack. Workaround for torderedset changing value order
+
+    local n_soup = #values
     for i = 1, n_soup do
-      if soup[i] ~= nil then -- may be already unsouped
-        unsoup(soup, soup[i])
-      end
+      unsoup(soup, values[i])
     end
 
-    local schema = tivalues(soup)
+    local schema = tivalues(soup) -- Get rid of the set part
 
     return schema
   end

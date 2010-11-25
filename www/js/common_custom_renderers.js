@@ -117,7 +117,7 @@ PK.common_custom_renderers = new function()
         break;
 
       case PK.table_element_types.DATE:
-        return this.make_timestamp_renderer(undefined, false);
+        return this.make_timestamp_renderer(undefined, params.print_time);
         break;
 
       case PK.table_element_types.PHONE:

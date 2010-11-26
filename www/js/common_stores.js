@@ -88,8 +88,19 @@ PK.common_stores = new function()
 
 //------------------------------------------------------------------------------
 
+  // Parameters:
+  //   field_names
+  //   primary_key
+  //   request_url
+  // Optional parameters:
+  //   request_params
+  //   autoLoad
+  //   on_no_items
+  //   remote_sorting_params = { field:<field_name>, dir: <ASC/DESC> }
   this.make_common_store = function(
-      field_names, primary_key, request_url, request_params, autoLoad
+      field_names, primary_key,
+      request_url, request_params, autoLoad, on_no_items,
+      remote_sorting_params
     )
   {
     return this.make_store_with_custom_fields(
@@ -97,7 +108,9 @@ PK.common_stores = new function()
         primary_key,
         request_url,
         request_params,
-        autoLoad
+        autoLoad,
+        on_no_items,
+        remote_sorting_params
       );
   }
 

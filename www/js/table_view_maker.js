@@ -72,6 +72,7 @@ PK.make_grid_panel = function(params)
 //   append_only_data
 //   prohibit_deletion
 //   store_maker
+//   remote_sorting_params
 //   on_add_item
 //   on_edit_item
 //   on_successful_delete
@@ -134,7 +135,7 @@ PK.make_table_view_panel = function(
 
     store_ = PK.common_stores.make_store_with_custom_fields(
       reader_fields, params.primaryKey, params.server_handler_name + '/list',
-      request_params, false
+      request_params, false, undefined, params.remote_sorting_params
     );
   }
 

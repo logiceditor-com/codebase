@@ -12,16 +12,25 @@ PK.common_stores = new function()
 
 //------------------------------------------------------------------------------
 
+  // Parameters:
+  //   fields
+  //   primary_key
+  //   request_url
+  // Optional parameters:
+  //   request_params
+  //   autoLoad
+  //   on_no_items
+  //   remote_sorting_params = { field:<field_name>, dir: <ASC/DESC> }
   this.make_store_with_custom_fields = function(
-      fields, primary_key, request_url, request_params, autoLoad, on_no_items
+      fields, primary_key,
+      request_url, request_params, autoLoad, on_no_items,
+      remote_sorting_params
     )
   {
     var reader = new Ext.data.JsonReader({
         root: 'result.item',
         totalProperty: 'result.total',
         //groupField: 'size',
-        //sortInfo: {field: 'name', direction: 'ASC'},
-        //remoteSort: true,
         id: primary_key,
         fields: fields
       });
@@ -42,13 +51,23 @@ PK.common_stores = new function()
     else
       baseParams = {};
 
+    var remoteSort = false
+    var sortInfo = { field: primary_key, direction: "ASC" }
+
+    if(remote_sorting_params)
+    {
+      remoteSort = true
+      sortInfo = remote_sorting_params
+    }
+
     var store = new Ext.data.Store(
     {
       autoLoad: autoLoad,
       proxy: proxy,
       baseParams: PK.make_admin_request_params(baseParams),
       reader: reader,
-      sortInfo: { field: primary_key, direction: "ASC" }
+      sortInfo: sortInfo,
+      remoteSort: remoteSort
     });
 
     store.on(

@@ -5,7 +5,6 @@
 -- WARNING: Run code here inside call()
 --
 --------------------------------------------------------------------------------
--- TODO: Move to pk-engine/redis
 -- TODO: Implement some GC-ing of locks?
 --------------------------------------------------------------------------------
 
@@ -52,7 +51,7 @@ local make_loggers
 --------------------------------------------------------------------------------
 
 local log, dbg, spam, log_error = make_loggers(
-    "banner-lib/redis/lock",
+    "redis/lock",
     "RLK"
   )
 

@@ -20,6 +20,14 @@ local arguments,
         'method_arguments'
       }
 
+local tilistofrecordfields,
+      tipermute_inplace
+      = import 'lua-nucleo/table-utils.lua'
+      {
+        'tilistofrecordfields',
+        'tipermute_inplace'
+      }
+
 local fail,
       try,
       rethrow
@@ -31,9 +39,21 @@ local fail,
       }
 
 local do_with_redis_lock_ttl
-      = import 'pk-banner/banner-lib/redis/lock.lua'
+      = import 'pk-engine/redis/lock.lua'
       {
         'do_with_redis_lock_ttl'
+      }
+
+local rtry,
+      hmset_workaround,
+      hgetall_workaround,
+      lpush_ilist
+      = import 'pk-engine/redis/workarounds.lua'
+      {
+        'rtry',
+        'hmset_workaround',
+        'hgetall_workaround',
+        'lpush_ilist'
       }
 
 local make_loggers
@@ -42,51 +62,12 @@ local make_loggers
         'make_loggers'
       }
 
-local rtry,
-      hmset_workaround,
-      hgetall_workaround,
-      lpush_ilist
-      = import 'pk-banner/banner-lib/redis/workarounds.lua'
-      {
-        'rtry',
-        'hmset_workaround',
-        'hgetall_workaround',
-        'lpush_ilist'
-      }
-
 --------------------------------------------------------------------------------
 
 local log, dbg, spam, log_error = make_loggers(
-    "banner-lib/redis/system",
+    "redis/system",
     "RSY"
   )
-
---------------------------------------------------------------------------------
-
--- TODO: Move to lua-nucleo
-local tilistofrecordfields = function(t, k)
-  local r = { }
-  for i = 1, #t do
-    local v = t[i][k]
-    assert(v ~= nil, "missing required key")
-    r[#r + 1] = v
-  end
-  return r
-end
-
--- TODO: Move to lua-nucleo
-local tipermute_inplace = function(t, n, count, random)
-  n = n or #t
-  count = count or n
-  random = random or math.random
-
-  for i = 1, count do
-    local j = random(i, n)
-    t[i], t[j] = t[j], t[i]
-  end
-
-  return t
-end
 
 --------------------------------------------------------------------------------
 

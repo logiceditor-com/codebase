@@ -39,7 +39,7 @@ local make_loggers
 --------------------------------------------------------------------------------
 
 local log, dbg, spam, log_error = make_loggers(
-    "banner-lib/redis/workarounds",
+    "redis/workarounds",
     "BRW"
   )
 

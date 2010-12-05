@@ -89,7 +89,7 @@ PK.common_custom_editors = new function()
   };
 
 
-  this.make_editor_maker = function(value_type, enum_items)
+  this.make_editor_maker = function(value_type, params)
   {
     switch (Number(value_type))
     {
@@ -102,9 +102,9 @@ PK.common_custom_editors = new function()
         break;
 
       case PK.table_element_types.ENUM:
-        if(!enum_items)
+        if(!params.enum_items)
           return undefined;
-        return this.make_enum_editor_maker(enum_items);
+        return this.make_enum_editor_maker(params.enum_items);
         break;
 
       case PK.table_element_types.BOOL:

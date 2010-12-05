@@ -91,7 +91,9 @@ PK.common_custom_renderers = new function()
     }
   };
 
-  // use_enum_renderer, enum_items, precision
+  // Optional parameters:
+  //   enum_items
+  //   precision
   this.make_renderer = function(value_type, params)
   {
     switch (Number(value_type))
@@ -107,7 +109,7 @@ PK.common_custom_renderers = new function()
         break;
 
       case PK.table_element_types.ENUM:
-        if(!params.use_enum_renderer || !params.enum_items)
+        if(!params.enum_items)
           return undefined;
         return this.make_enum_renderer(params.enum_items);
         break;

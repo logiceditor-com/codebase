@@ -417,7 +417,10 @@ do
     )
     arguments(
         "table", schema,
-        "string", base_config_filename,
+        "string", base_config_filename
+      )
+
+    optional_arguments(
         "string", project_config_filename
       )
 
@@ -484,7 +487,7 @@ do
           import = import;
         }
       )
-    if not args["--no-config"] then
+    if not args["--no-config"] and project_config_filename then
       --[[
       io.stdout:write(
           "--> loading project config file ", project_config_filename, "\n"

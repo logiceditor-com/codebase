@@ -448,7 +448,7 @@ do
     -- Better to do this explicitly somehow?
     local PROJECT_PATH = args_config.PROJECT_PATH
 
-    local config_filename = args["--config"] or project_config_filename
+    local project_config_filename = args["--config"] or project_config_filename
 
     local extra_param = make_config_environment({ PROJECT_PATH = PROJECT_PATH })
     if args["--param"] then

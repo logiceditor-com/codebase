@@ -1516,4 +1516,59 @@ end
 -- TODO: ALSO LOCK REMOTELY!
 -- TODO: Handle rock REMOVAL!
 
-assert(actions[select(1, ...)], "unknown action")(select(2, ...))
+--assert(actions[select(1, ...)], "unknown action")(select(2, ...))
+
+local run = function(...)
+--[[
+  SCHEMA = load_tools_cli_data_schema(
+      assert(loadfile(CONFIG_SCHEMA_FILENAME))
+    )
+
+  CONFIG, ARGS = assert(load_tools_cli_config(
+      function(args)
+        -- TODO: Must include all those into help
+
+        local action = args[1] or args["--action"]
+        local param = { }
+
+        if action == "initialize_db" then
+          param.db_name = args[2] or args["--db-name"]
+          param.force = not not args["force"]
+        elseif action == "revert_changes" then
+          param.stop_at_uuid = args[2] or args["--uuid"]
+          if args["--revert-all"] then
+            param.stop_at_uuid = "all" -- Hack.
+          end
+        end
+
+        return
+        {
+          PROJECT_PATH = args["--root"];
+          db_changes =
+          {
+            action =
+            {
+              name = action;
+              param = param;
+            };
+          }
+        }
+      end,
+      EXTRA_HELP,
+      SCHEMA,
+      BASE_CONFIG_FILENAME,
+      PROJECT_CONFIG_FILENAME,
+      ...
+    ))
+
+  ACTIONS[CONFIG.db_changes.action.name]()
+]]
+  log("Run successful")
+end
+
+--------------------------------------------------------------------------------
+
+return
+{
+  run = run;
+}

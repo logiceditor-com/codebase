@@ -1519,6 +1519,7 @@ end
 --assert(actions[select(1, ...)], "unknown action")(select(2, ...))
 
 local run = function(...)
+  assert(actions[select(1, ...)], "unknown action")(select(2, ...))
 --[[
   SCHEMA = load_tools_cli_data_schema(
       assert(loadfile(CONFIG_SCHEMA_FILENAME))

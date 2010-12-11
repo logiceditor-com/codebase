@@ -1563,7 +1563,7 @@ local run = function(...)
 
   ACTIONS[CONFIG.db_changes.action.name]()
 ]]
-  log("Run successful")
+  log("Run successful, params", ...)
 end
 
 --------------------------------------------------------------------------------

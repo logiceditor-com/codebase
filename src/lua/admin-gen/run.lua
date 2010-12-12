@@ -2,11 +2,6 @@
 -- admin-gen.lua: server handlers and client code generator
 --------------------------------------------------------------------------------
 
-dofile('tools-lib/init/require-developer.lua')
-dofile('tools-lib/init/init.lua')
-
---------------------------------------------------------------------------------
-
 local lfs = require 'lfs'
 
 --------------------------------------------------------------------------------
@@ -101,14 +96,10 @@ local tpretty
         'tpretty'
       }
 
-local CONFIG_SCHEMA_FILENAME,
-      BASE_CONFIG_FILENAME,
-      PROJECT_CONFIG_FILENAME
-      = import 'tools-lib/config.lua'
+local create_config_schema
+      = import 'project-config/schema.lua'
       {
-        'CONFIG_SCHEMA_FILENAME',
-        'BASE_CONFIG_FILENAME',
-        'PROJECT_CONFIG_FILENAME'
+        'create_config_schema',
       }
 
 --------------------------------------------------------------------------------
@@ -122,13 +113,11 @@ math.randomseed(12345)
 
 --------------------------------------------------------------------------------
 
-local SCHEMA = load_tools_cli_data_schema(
-    assert(loadfile(CONFIG_SCHEMA_FILENAME))
-  )
-
 local EXTRA_HELP, CONFIG, ARGS
 
 --------------------------------------------------------------------------------
+
+local SCHEMA = create_config_schema()
 
 local ACTIONS = { }
 
@@ -214,8 +203,8 @@ CONFIG, ARGS = assert(load_tools_cli_config(
     end,
     EXTRA_HELP,
     SCHEMA,
-    BASE_CONFIG_FILENAME,
-    PROJECT_CONFIG_FILENAME,
+    nil,
+    nil,
     ...
   ))
 

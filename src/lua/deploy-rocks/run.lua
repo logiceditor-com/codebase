@@ -185,6 +185,12 @@ local remote_luarocks_remove_forced,
         'remote_luarocks_list_installed_rocks'
       }
 
+local load_project_manifest
+      = import 'pk-tools/project_manifest.lua'
+      {
+        'load_project_manifest'
+      }
+
 --------------------------------------------------------------------------------
 
  -- TODO: DO NOT HARDCODE PATHS!
@@ -312,58 +318,6 @@ local remote_ensure_sudo_is_passwordless = function(host)
 end
 
 --------------------------------------------------------------------------------
-
-local load_manifest = function(manifest_path, project_path, context)
-  arguments(
-      "string", manifest_path,
-      "string", project_path
-    )
-
-  writeln_flush("--> loading manifest from `", manifest_path, "'...")
-
-  local env =
-  {
-    import = import; -- This is a trusted sandbox
-    assert = assert;
-    PROJECT_PATH = project_path;
-  }
-
-  local filenames = find_all_files(manifest_path, ".*%.lua$")
-  table.sort(filenames)
-
-  for i = 1, #filenames do
-    local filename = filenames[i]
-
-    local manifest_str = assert(read_file(filename))
-
-    -- TODO: ?!?!?! HACK?
-    manifest_str = fill_curly_placeholders(
-        manifest_str,
-        context
-      )
-
-    local manifest_chunk = assert(loadstring(manifest_str, "=" .. filename))
-
-    local ok, result = assert(
-        do_in_environment(
-            manifest_chunk,
-            env
-          )
-      )
-    assert(result == nil)
-  end
-
-  -- Hack. Use metatable instead.
-  if env.import == import then
-    env.import = nil
-  end
-
-  if env.assert == assert then
-    env.assert = nil
-  end
-
-  return env
-end
 
 local get_cluster_info = function(manifest, cluster_name)
   local clusters = timapofrecords(manifest.clusters, "name")
@@ -1319,12 +1273,10 @@ actions.deploy_from_code = function(...)
     end
   end
 
-  local manifest = load_manifest(
-      project_path .. manifest_path,
+  local manifest = load_project_manifest(
+      manifest_path,
       project_path,
-      {
-        CLUSTER_NAME = cluster_name;
-      }
+      cluster_name
     )
 
   if debug then
@@ -1372,12 +1324,10 @@ actions.deploy_from_versions_file = function(...)
 
   -- TODO: Should we copy versions file to get a new timestamp?
 
-  local manifest = load_manifest(
-      project_path .. manifest_path,
+  local manifest = load_project_manifest(
+      manifest_path,
       project_path,
-      {
-        CLUSTER_NAME = cluster_name;
-      }
+      cluster_name
     )
 
   if debug then
@@ -1430,12 +1380,10 @@ actions.partial_deploy_from_versions_file = function(...)
 
   -- TODO: Should we copy versions file to get a new timestamp?
 
-  local manifest = load_manifest(
-      project_path .. manifest_path,
+  local manifest = load_project_manifest(
+      manifest_path,
       project_path,
-      {
-        CLUSTER_NAME = cluster_name;
-      }
+      cluster_name
     )
 
   if debug then

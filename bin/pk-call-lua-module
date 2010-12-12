@@ -1,0 +1,51 @@
+#! /usr/bin/env luajit2
+
+--------------------------------------------------------------------------------
+-- pk-call-lua-module: run arbitrary function from Lua module in pk environment
+--------------------------------------------------------------------------------
+
+pcall(require, 'luarocks.require') -- Ignoring errors
+
+--------------------------------------------------------------------------------
+
+-- pk-engine
+require 'copas' -- Should be loaded first
+require 'posix'
+require 'socket'
+require 'socket.http'
+require 'luabins'
+require 'socket.url'
+require 'md5'
+require 'luasql.mysql'
+require 'uuid'
+require 'lfs'
+require 'ev'
+require 'ltn12'
+require 'random'
+require 'sidereal'
+
+--------------------------------------------------------------------------------
+
+require 'lua-nucleo.module'
+require 'lua-nucleo.strict'
+require 'pk-core.module'
+
+--------------------------------------------------------------------------------
+
+import 'pk-core/common_logging.lua' { 'create_common_stdout_logging' } ()
+
+--------------------------------------------------------------------------------
+
+local extra_path = assert(select(1, ...), "missing extra_path")
+local module_name = assert(select(2, ...), "missing module_name")
+local function_name = assert(select(3, ...), "missing function_name")
+
+if extra_path ~= "" then
+  package.path = package.path .. ":" .. extra_path
+end
+
+local module = require(module_name)
+assert(
+    module[function_name],
+    "module does not export specified function"
+  )(select(4, ...))

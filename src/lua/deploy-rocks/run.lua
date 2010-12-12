@@ -348,7 +348,6 @@ end
 -- Assuming we're operating under atomic lock
 local write_current_versions = function(manifest, cluster_info, new_versions)
   local filename = manifest.local_cluster_versions_path
-    .. "/" .. cluster_info.name
     .. "/versions-" .. os.date("%Y-%m-%d-%H-%M-%S")
 
   local i = 1
@@ -366,7 +365,6 @@ end
 
 local update_version_symlink = function(manifest, cluster_info, new_versions_filename)
   local expected_path = manifest.local_cluster_versions_path
-    .. "/" .. cluster_info.name
   local versions_current_filename = expected_path .. "/versions-current.lua"
 
   if new_versions_filename:sub(1, 1) ~= "/" then -- TODO: ?!

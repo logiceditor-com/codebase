@@ -1491,7 +1491,21 @@ end
 -- TODO: Handle rock REMOVAL!
 
 local run = function(...)
-  assert(actions[select(1, ...)], "unknown action")(select(2, ...))
+  -- TODO: WTF?!
+  local project_path = select(1, ...)
+  local manifest_path = select(2, ...)
+  local action_name = select(3, ...)
+  local cluster_name = select(4, ...)
+
+  assert(
+      actions[action_name],
+      "unknown action"
+    )(
+      cluster_name,
+      project_path,
+      manifest_path,
+      select(5, ...)
+    )
 end
 
 --------------------------------------------------------------------------------

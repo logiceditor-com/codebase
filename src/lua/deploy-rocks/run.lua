@@ -1,29 +1,3 @@
-#! /usr/bin/env luajit2
-
---------------------------------------------------------------------------------
--- deploy-rocks: system deployer
---------------------------------------------------------------------------------
-
-pcall(require, 'luarocks.require') -- Ignoring errors
-
---------------------------------------------------------------------------------
-
-local lfs = require 'lfs' -- needed by lua-aplicado
-local socket = require 'socket' -- needed by logging
-
---------------------------------------------------------------------------------
-
-require 'lua-nucleo.module'
-require 'lua-nucleo.strict'
-require 'lua-aplicado.module'
-require 'pk-core.module'
-
---------------------------------------------------------------------------------
-
-import 'pk-core/common_logging.lua' { 'create_common_stdout_logging' } ()
-
---------------------------------------------------------------------------------
-
 local log, dbg, spam, log_error
       = import 'pk-core/log.lua' { 'make_loggers' } (
           "deploy-rocks", "DRO"

@@ -340,7 +340,7 @@ local load_custom_versions = function(manifest, path)
 end
 
 local load_current_versions = function(manifest, cluster_info)
-  local path = manifest.local_cluster_versions_path .. "/" .. cluster_info.name .. "/versions-current.lua"
+  local path = manifest.local_cluster_versions_path .. "/versions-current.lua"
 
   return load_custom_versions(manifest, path)
 end

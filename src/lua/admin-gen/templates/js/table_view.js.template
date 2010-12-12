@@ -1,0 +1,20 @@
+$(HEADER)
+PK.navigation.add_topic(
+    $(TOPIC_NAME),
+    function() { return PK.make_table_view({
+        title: $(TITLE),
+        primaryKey: $(PRIMARY_KEY),
+        columns:
+        [
+          $(COLUMNS)
+        ],
+        read_only_data: $(READ_ONLY_DATA),
+        append_only_data: $(APPEND_ONLY_DATA),
+        prohibit_deletion: $(PROHIBIT_DELETION),
+        remote_sorting_params: { field: $(PRIMARY_KEY), direction: 'ASC' },
+        displayMsg: I18N('Displaying items {0} - {1} of {2}'),
+        emptyMsg: I18N('No items'),
+        table_element_editor: $(TABLE_ELEMENT_EDITOR),
+        server_handler_name: $(HANDLER)
+      })}
+  );

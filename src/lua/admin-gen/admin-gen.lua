@@ -1,0 +1,224 @@
+--------------------------------------------------------------------------------
+-- admin-gen.lua: server handlers and client code generator
+--------------------------------------------------------------------------------
+
+dofile('tools-lib/init/require-developer.lua')
+dofile('tools-lib/init/init.lua')
+
+--------------------------------------------------------------------------------
+
+local lfs = require 'lfs'
+
+--------------------------------------------------------------------------------
+
+local arguments,
+      optional_arguments,
+      method_arguments,
+      eat_true
+      = import 'lua-nucleo/args.lua'
+      {
+        'arguments',
+        'optional_arguments',
+        'method_arguments',
+        'eat_true'
+      }
+
+local is_table
+      = import 'lua-nucleo/type.lua'
+      {
+        'is_table'
+      }
+
+local assert_is_table,
+      assert_is_number,
+      assert_is_string
+      = import 'lua-nucleo/typeassert.lua'
+      {
+        'assert_is_table',
+        'assert_is_number',
+        'assert_is_string'
+      }
+
+local empty_table,
+      timap,
+      tkeys
+      = import 'lua-nucleo/table.lua'
+      {
+        'empty_table',
+        'timap',
+        'tkeys'
+      }
+
+local make_loggers
+      = import 'pk-core/log.lua'
+      {
+        'make_loggers'
+      }
+
+local load_db_schema
+      = import 'admin-gen/load_db_schema.lua'
+      {
+        'load_db_schema'
+      }
+
+local validate_db_schema
+      = import 'admin-gen/schema-validator.lua'
+      {
+        'validate_db_schema'
+      }
+
+local generate_client_api_schema
+      = import 'admin-gen/generate-client-api-schema.lua'
+      {
+        'generate_client_api_schema'
+      }
+
+local generate_js
+      = import 'admin-gen/generate-js.lua'
+      {
+        'generate_js'
+      }
+
+local load_tools_cli_data_schema,
+      load_tools_cli_config,
+      print_tools_cli_config_usage
+      = import 'pk-core/tools_cli_config.lua'
+      {
+        'load_tools_cli_data_schema',
+        'load_tools_cli_config',
+        'print_tools_cli_config_usage'
+      }
+
+local freeform_table_value
+      = import 'pk-core/tools_cli_config.lua'
+      {
+        'freeform_table_value'
+      }
+
+local tpretty
+      = import 'lua-nucleo/tpretty.lua'
+      {
+        'tpretty'
+      }
+
+local CONFIG_SCHEMA_FILENAME,
+      BASE_CONFIG_FILENAME,
+      PROJECT_CONFIG_FILENAME
+      = import 'tools-lib/config.lua'
+      {
+        'CONFIG_SCHEMA_FILENAME',
+        'BASE_CONFIG_FILENAME',
+        'PROJECT_CONFIG_FILENAME'
+      }
+
+--------------------------------------------------------------------------------
+
+local log, dbg, spam, log_error = make_loggers("admin-gen", "ADG")
+
+--------------------------------------------------------------------------------
+
+-- NOTE: Generation requires fixed random seed for consistency
+math.randomseed(12345)
+
+--------------------------------------------------------------------------------
+
+local SCHEMA = load_tools_cli_data_schema(
+    assert(loadfile(CONFIG_SCHEMA_FILENAME))
+  )
+
+local EXTRA_HELP, CONFIG, ARGS
+
+--------------------------------------------------------------------------------
+
+local ACTIONS = { }
+
+ACTIONS.help = function()
+  print_tools_cli_config_usage(EXTRA_HELP, SCHEMA)
+end
+
+ACTIONS.generate_admin_api_schema = function()
+  local tables = load_db_schema(CONFIG.common.db.schema_filename)
+  validate_db_schema(tables)
+
+  local out_dir = CONFIG.admin_gen.intermediate.api_schema_dir
+
+  -- TODO: Detect obsolete files and fail instead of this!
+  log("Removing", out_dir.."*")
+  assert(
+      os.execute( -- TODO: Use lfs.
+          'rm -rf "' .. out_dir .. '*"'
+        ) == 0
+    )
+
+  log("Generating client api schema to", out_dir)
+  generate_client_api_schema(tables, out_dir)
+
+  log("OK")
+end
+
+ACTIONS.check_config = function()
+  io.stdout:write("config OK\n")
+  io.stdout:flush()
+end
+
+ACTIONS.dump_config = function()
+  io.stdout:write(tpretty(freeform_table_value(CONFIG), " ", 80), "\n")
+  io.stdout:flush()
+end
+
+ACTIONS.generate_js = function(
+    db_schema_filename
+  )
+  local tables = load_db_schema(CONFIG.common.db.schema_filename)
+  validate_db_schema(tables)
+
+  local out_dir = CONFIG.admin_gen.intermediate.js_dir
+
+  -- TODO: Detect obsolete files and fail instead of this!
+  log("Removing", out_dir.."*")
+  assert(
+      os.execute( -- TODO: Use lfs.
+          'rm -rf "' .. out_dir .. '*"'
+        ) == 0
+    )
+
+  log("Generating js to", out_dir)
+  generate_js(tables, out_dir)
+
+  log("OK")
+end
+
+--------------------------------------------------------------------------------
+
+EXTRA_HELP = [[
+
+Usage:
+
+  ]] .. arg[0] .. [[ --root=<PROJECT_PATH> <action> [options]
+
+Actions:
+
+  * ]] .. table.concat(tkeys(ACTIONS), "\n  * ") .. [[
+
+]]
+
+--------------------------------------------------------------------------------
+
+CONFIG, ARGS = assert(load_tools_cli_config(
+    function(args)
+      return
+      {
+        PROJECT_PATH = args["--root"];
+        admin_gen = { action = { name = args[1] or args["--action"]; }; };
+      }
+    end,
+    EXTRA_HELP,
+    SCHEMA,
+    BASE_CONFIG_FILENAME,
+    PROJECT_CONFIG_FILENAME,
+    ...
+  ))
+
+--------------------------------------------------------------------------------
+
+ACTIONS[CONFIG.admin_gen.action.name]()

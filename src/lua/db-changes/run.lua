@@ -62,22 +62,26 @@ local revert_changes
 
 local load_tools_cli_data_schema,
       load_tools_cli_config,
-      print_tools_cli_config_usage
+      print_tools_cli_config_usage,
+      freeform_table_value
       = import 'pk-core/tools_cli_config.lua'
       {
         'load_tools_cli_data_schema',
         'load_tools_cli_config',
-        'print_tools_cli_config_usage'
+        'print_tools_cli_config_usage',
+        'freeform_table_value'
       }
 
-local CONFIG_SCHEMA_FILENAME,
-      BASE_CONFIG_FILENAME,
-      PROJECT_CONFIG_FILENAME
-      = import 'tools-lib/config.lua'
+local tpretty
+      = import 'lua-nucleo/tpretty.lua'
       {
-        'CONFIG_SCHEMA_FILENAME',
-        'BASE_CONFIG_FILENAME',
-        'PROJECT_CONFIG_FILENAME'
+        'tpretty'
+      }
+
+local create_config_schema
+      = import 'project-config/schema.lua'
+      {
+        'create_config_schema',
       }
 
 --------------------------------------------------------------------------------
@@ -94,6 +98,16 @@ local ACTIONS = { }
 
 ACTIONS.help = function()
   print_tools_cli_config_usage(EXTRA_HELP, SCHEMA)
+end
+
+ACTIONS.check_config = function()
+  io.stdout:write("config OK\n")
+  io.stdout:flush()
+end
+
+ACTIONS.dump_config = function()
+  io.stdout:write(tpretty(freeform_table_value(CONFIG), " ", 80), "\n")
+  io.stdout:flush()
 end
 
 ACTIONS.initialize_db = function()
@@ -157,9 +171,7 @@ Actions:
 --------------------------------------------------------------------------------
 
 local run = function(...)
-  SCHEMA = load_tools_cli_data_schema(
-      assert(loadfile(CONFIG_SCHEMA_FILENAME))
-    )
+  SCHEMA = create_config_schema()
 
   CONFIG, ARGS = assert(load_tools_cli_config(
       function(args)
@@ -193,8 +205,8 @@ local run = function(...)
       end,
       EXTRA_HELP,
       SCHEMA,
-      BASE_CONFIG_FILENAME,
-      PROJECT_CONFIG_FILENAME,
+      nil,
+      nil,
       ...
     ))
 

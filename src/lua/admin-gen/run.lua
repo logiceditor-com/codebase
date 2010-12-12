@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
--- admin-gen.lua: server handlers and client code generator
+-- run.lua: server handlers and client code generator
 --------------------------------------------------------------------------------
 
 local lfs = require 'lfs'
@@ -76,17 +76,13 @@ local generate_js
 
 local load_tools_cli_data_schema,
       load_tools_cli_config,
-      print_tools_cli_config_usage
+      print_tools_cli_config_usage,
+      freeform_table_value
       = import 'pk-core/tools_cli_config.lua'
       {
         'load_tools_cli_data_schema',
         'load_tools_cli_config',
-        'print_tools_cli_config_usage'
-      }
-
-local freeform_table_value
-      = import 'pk-core/tools_cli_config.lua'
-      {
+        'print_tools_cli_config_usage',
         'freeform_table_value'
       }
 

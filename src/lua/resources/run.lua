@@ -1,10 +1,5 @@
 --------------------------------------------------------------------------------
--- main.lua: the resource updater
---------------------------------------------------------------------------------
-
-dofile('tools-lib/init/require-serverside.lua')
-dofile('tools-lib/init/init.lua')
-
+-- run.lua: the resource updater
 --------------------------------------------------------------------------------
 
 local lfs = require 'lfs'
@@ -97,22 +92,26 @@ local TABLES = import 'logic/db/tables.lua' ()
 
 local load_tools_cli_data_schema,
       load_tools_cli_config,
-      print_tools_cli_config_usage
+      print_tools_cli_config_usage,
+      freeform_table_value
       = import 'pk-core/tools_cli_config.lua'
       {
         'load_tools_cli_data_schema',
         'load_tools_cli_config',
-        'print_tools_cli_config_usage'
+        'print_tools_cli_config_usage',
+        'freeform_table_value'
       }
 
-local CONFIG_SCHEMA_FILENAME,
-      BASE_CONFIG_FILENAME,
-      PROJECT_CONFIG_FILENAME
-      = import 'tools-lib/config.lua'
+local tpretty
+      = import 'lua-nucleo/tpretty.lua'
       {
-        'CONFIG_SCHEMA_FILENAME',
-        'BASE_CONFIG_FILENAME',
-        'PROJECT_CONFIG_FILENAME'
+        'tpretty'
+      }
+
+local create_config_schema
+      = import 'project-config/schema.lua'
+      {
+        'create_config_schema',
       }
 
 --------------------------------------------------------------------------------
@@ -161,9 +160,7 @@ end
 
 --------------------------------------------------------------------------------
 
-local SCHEMA = load_tools_cli_data_schema(
-    assert(loadfile(CONFIG_SCHEMA_FILENAME))
-  )
+local SCHEMA = create_config_schema()
 
 local EXTRA_HELP, CONFIG, ARGS
 
@@ -173,6 +170,16 @@ local ACTIONS = { }
 
 ACTIONS.help = function()
   print_tools_cli_config_usage(EXTRA_HELP, SCHEMA)
+end
+
+ACTIONS.check_config = function()
+  io.stdout:write("config OK\n")
+  io.stdout:flush()
+end
+
+ACTIONS.dump_config = function()
+  io.stdout:write(tpretty(freeform_table_value(CONFIG), " ", 80), "\n")
+  io.stdout:flush()
 end
 
 ACTIONS.list = function()
@@ -437,8 +444,8 @@ CONFIG, ARGS = assert(load_tools_cli_config(
     end,
     EXTRA_HELP,
     SCHEMA,
-    BASE_CONFIG_FILENAME,
-    PROJECT_CONFIG_FILENAME,
+    nil,
+    nil,
     ...
   ))
 

@@ -143,7 +143,7 @@ ACTIONS.update = function(manifest_path, subtree_name, cluster_name)
           error("subtree " .. git_remote_name .. " url is outdated")
         end
 
-        if lfs.attributes(subtree_path) then
+        if lfs.attributes(git_dir.."/"..subtree_path) then
           log("initializing remote", git_remote_name, "not initializing subtree in", subtree_path)
           git_remote_add(git_dir, git_remote_name, git_remote_url, true) -- With fetch
         else

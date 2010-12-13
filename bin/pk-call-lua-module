@@ -26,6 +26,19 @@ require 'sidereal'
 
 --------------------------------------------------------------------------------
 
+-- pk-tools
+if jit == nil then
+  -- NOTE: This actually is used in apigen only,
+  --       all other tools are LJ2-compatible.
+  require 'inspector' -- Actually that's lbci
+else
+  require 'jit.util'
+  require 'jit.vmdef'
+  require 'bit' -- Builtin to LJ2
+end
+
+--------------------------------------------------------------------------------
+
 require 'lua-nucleo.module'
 require 'lua-nucleo.strict'
 require 'pk-core.module'

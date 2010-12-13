@@ -145,6 +145,16 @@ do
       MOIMIR_AUTHENTIFICATION_KEY = context.identifier(1, 256);
       VKONTAKTE_USER_ID = context.identifier(1, 256);
       VKONTAKTE_AUTH_KEY = context.identifier(1, 256);
+--------------------------------------------------------------------------------
+-- BEGIN POSTCARDS
+--------------------------------------------------------------------------------
+-- TODO MOVE ELSEWHERE
+      POSTCARD_GROUP_ID = context.db_id();
+      COMMON_TEXT_ID = context.db_id();
+      POSTCARD_ID = context.db_id();
+--------------------------------------------------------------------------------
+-- END POSTCARDS
+--------------------------------------------------------------------------------
     }
   end
 end

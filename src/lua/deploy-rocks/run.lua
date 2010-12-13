@@ -508,7 +508,7 @@ do
       local path = assert(subproject.local_path) .. "/" .. assert(subproject.provides_rocks_repo)
       local manifest_path = assert(action.manifest)
 
-      writeln_flush("----> Adding rocks from", manifest_path)
+      writeln_flush("----> Adding rocks from ", manifest_path)
 
       local manifest_chunk = assert(loadfile(manifest_path)) -- path should be absolute
 
@@ -525,7 +525,7 @@ do
           if dry_run then
             writeln_flush("-!!-> DRY RUN: Want to generate rockspecs")
           else
-            writeln_flush("--> Generating rockspecs with", tstr(rockspec.generator), "...")
+            writeln_flush("--> Generating rockspecs with ", tstr(rockspec.generator), "...")
             local rockspec_generator = is_table(rockspec.generator)
               and rockspec.generator
                or { rockspec.generator }
@@ -543,7 +543,7 @@ do
         local name = assert(data.package)
 
         if dry_run then
-          writeln_flush("-!!-> DRY RUN: Want to rebuild", filename)
+          writeln_flush("-!!-> DRY RUN: Want to rebuild ", filename)
         else
           writeln_flush("----> Rebuilding `", filename, "'...")
           luarocks_ensure_rock_not_installed_forced(name)
@@ -551,7 +551,7 @@ do
         end
 
         if dry_run then
-          writeln_flush("-!!-> DRY RUN: Want to pack", filename)
+          writeln_flush("-!!-> DRY RUN: Want to pack ", filename)
         else
           writeln_flush("----> Packing `", filename, "'...")
           luarocks_pack_to(name, path)
@@ -597,7 +597,7 @@ do
         local action = pre_deploy_actions[i]
         local tool_name = assert(action.tool)
 
-        writeln_flush("----> Running pre-deploy action", tool_name, "...")
+        writeln_flush("----> Running pre-deploy action ", tool_name, "...")
 
         assert(handlers[tool_name], "unknown action")(
             manifest,
@@ -646,7 +646,11 @@ do
       local subproject = subprojects[i]
       local name = subproject.name
 
-      if subproject.pre_deploy_actions then
+      if not subproject.pre_deploy_actions then
+        writeln_flush("----> No pre-deploy actions for ", name)
+      else
+        writeln_flush("----> Running pre-deploy actions for ", name)
+
         run_pre_deploy_actions(
             manifest,
             cluster_info,

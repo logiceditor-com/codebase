@@ -350,13 +350,14 @@ local print_tools_cli_config_usage = function(extra_help, schema)
 
 Options:
 
-    --help                Print this text
-    --dump-format         Print config file format
-    --root=<path>         Absolute path to project
-    --param=<lua-table>   Add data from lua-table to config
-    --config=<filename>   Override config filename
-    --no-config           Do not load project config file
-    --no-defaults         Do not load base config file
+    --help                     Print this text
+    --dump-format              Print config file format
+    --root=<path>              Absolute path to project
+    --param=<lua-table>        Add data from lua-table to config
+    --config=<filename>        Override config filename
+    --no-config                Do not load project config file
+    --base-config=<filename>   Override base config filename
+    --no-base-config           Do not load base project config file
 
 ]])
 
@@ -417,10 +418,10 @@ do
     )
     arguments(
         "table", schema,
-        "string", base_config_filename
       )
 
     optional_arguments(
+        "string", base_config_filename
         "string", project_config_filename
       )
 
@@ -452,6 +453,7 @@ do
     local PROJECT_PATH = args_config.PROJECT_PATH
 
     local project_config_filename = args["--config"] or project_config_filename
+    local base_config_filename = args["--base-config"] or base_config_filename
 
     local extra_param = make_config_environment({ PROJECT_PATH = PROJECT_PATH })
     if args["--param"] then
@@ -466,7 +468,7 @@ do
           import = import;
         }
       )
-    if not args["--no-defaults"] then
+    if not args["--no-base-config"] then
       --[[
       io.stdout:write(
           "--> loading base config file ", base_config_filename, "\n"

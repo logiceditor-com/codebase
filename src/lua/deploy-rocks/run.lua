@@ -43,6 +43,12 @@ local tpretty
         'tpretty'
       }
 
+local tstr
+      = import 'lua-nucleo/tstr.lua'
+      {
+        'tstr'
+      }
+
 local tset,
       timapofrecords,
       twithdefaults,
@@ -154,7 +160,8 @@ local luarocks_exec,
       luarocks_load_manifest,
       luarocks_get_rocknames_in_manifest,
       luarocks_install_from,
-      luarocks_parse_installed_rocks
+      luarocks_parse_installed_rocks,
+      luarocks_load_rockspec
       = import 'lua-aplicado/shell/luarocks.lua'
       {
         'luarocks_exec',
@@ -170,7 +177,8 @@ local luarocks_exec,
         'luarocks_load_manifest',
         'luarocks_get_rocknames_in_manifest',
         'luarocks_install_from',
-        'luarocks_parse_installed_rocks'
+        'luarocks_parse_installed_rocks',
+        'luarocks_load_rockspec'
       }
 
 local remote_luarocks_remove_forced,
@@ -485,6 +493,126 @@ do
     return changed_rocks_set, tset(changed_subprojects)
   end
 
+  local run_pre_deploy_actions
+  do
+    local handlers = { }
+
+    handlers.add_rocks_from_pk_rocks_manifest = function(
+        manifest,
+        cluster_info,
+        subproject,
+        current_versions,
+        dry_run,
+        action
+      )
+      local path = assert(subproject.local_path) .. "/" .. assert(subproject.provides_rocks_repo)
+      local manifest_path = assert(action.manifest)
+
+      writeln_flush("----> Adding rocks from ", manifest_path)
+
+      local manifest_chunk = assert(loadfile(manifest_path)) -- path should be absolute
+
+      -- TODO: Sandbox it?
+      local manifest = manifest_chunk()
+      local ROCKS = assert(manifest.ROCKS)
+
+      -- TODO: Rebuild only if rock's file dependencies is changed
+
+      for i = 1, #ROCKS do
+        local rockspec = ROCKS[i]
+
+        if rockspec.generator then
+          if dry_run then
+            writeln_flush("-!!-> DRY RUN: Want to generate rockspecs")
+          else
+            writeln_flush("--> Generating rockspecs with ", tstr(rockspec.generator), "...")
+            local rockspec_generator = is_table(rockspec.generator)
+              and rockspec.generator
+               or { rockspec.generator }
+            assert(
+                shell_exec(
+                    "cd", action.local_path,
+                    "&&", unpack(rockspec.generator)
+                  ) == 0
+              )
+          end
+        end
+
+        local filename = assert(rockspec[1])
+        local data = luarocks_load_rockspec(action.local_path .. "/" .. filename)
+        local name = assert(data.package)
+
+        if dry_run then
+          writeln_flush("-!!-> DRY RUN: Want to rebuild ", filename)
+        else
+          writeln_flush("----> Rebuilding `", filename, "'...")
+          luarocks_ensure_rock_not_installed_forced(name)
+          luarocks_make_in(filename, action.local_path)
+        end
+
+        if dry_run then
+          writeln_flush("-!!-> DRY RUN: Want to pack ", filename)
+        else
+          writeln_flush("----> Packing `", filename, "'...")
+          luarocks_pack_to(name, path)
+          copy_file_to_dir(action.local_path .. "/" .. filename, path)
+          writeln_flush("----> Rebuilding manifest...")
+          luarocks_admin_make_manifest(path)
+        end
+      end
+
+      if dry_run then
+        writeln_flush("-!!-> DRY RUN: Want to commit added rocks")
+      else
+        -- TODO: HACK! Add only generated files!
+        writeln_flush("----> Committing added rocks...")
+        git_add_directory(subproject.local_path, path)
+        git_commit_with_editable_message(
+            subproject.local_path,
+            subproject.name .. ": updated rocks"
+          )
+      end
+    end
+
+    run_pre_deploy_actions = function(
+        manifest,
+        cluster_info,
+        subproject,
+        pre_deploy_actions,
+        current_versions,
+        dry_run
+      )
+      arguments(
+          "table", manifest,
+          "table", cluster_info,
+          "table", subproject,
+          "table", pre_deploy_actions,
+          "table", current_versions,
+          "boolean", dry_run
+        )
+
+      writeln_flush("----> Running pre-deploy actions...")
+
+      for i = 1, #pre_deploy_actions do
+        local action = pre_deploy_actions[i]
+        local tool_name = assert(action.tool)
+
+        writeln_flush("----> Running pre-deploy action ", tool_name, "...")
+
+        assert(handlers[tool_name], "unknown action")(
+            manifest,
+            cluster_info,
+            subproject,
+            current_versions,
+            dry_run,
+            action
+          )
+      end
+
+      writeln_flush("----> Done dunning pre-deploy actions.")
+    end
+  end
+
   local update_rocks = function(manifest, cluster_info, current_versions, dry_run)
     arguments(
         "table", manifest,
@@ -517,6 +645,21 @@ do
     for i = 1, #subprojects do
       local subproject = subprojects[i]
       local name = subproject.name
+
+      if not subproject.pre_deploy_actions then
+        writeln_flush("----> No pre-deploy actions for ", name)
+      else
+        writeln_flush("----> Running pre-deploy actions for ", name)
+
+        run_pre_deploy_actions(
+            manifest,
+            cluster_info,
+            subproject,
+            subproject.pre_deploy_actions,
+            current_versions,
+            dry_run
+          )
+      end
 
       if subproject.no_deploy then
         writeln_flush("----> Skipping no-deploy subproject `", name, "'.")
@@ -647,9 +790,9 @@ do
               have_changed_rocks = true
               if subproject.rockspec_generator then
                 if dry_run then
-                  writeln_flush("-!!-> DRY RUN: Want to generate rocks")
+                  writeln_flush("-!!-> DRY RUN: Want to generate rockspecs")
                 else
-                  writeln_flush("----> Generating rocks...")
+                  writeln_flush("----> Generating rockspecs...")
                   local rockspec_generator = is_table(subproject.rockspec_generator)
                     and subproject.rockspec_generator
                      or { subproject.rockspec_generator }

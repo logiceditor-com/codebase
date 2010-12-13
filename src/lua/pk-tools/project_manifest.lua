@@ -27,12 +27,10 @@ local do_in_environment
         'do_in_environment'
       }
 
-local read_file,
-      find_all_files
+local load_all_files_with_curly_placeholders
       = import 'lua-aplicado/filesystem.lua'
       {
-        'read_file',
-        'find_all_files'
+        'load_all_files_with_curly_placeholders'
       }
 
 local fill_curly_placeholders
@@ -40,49 +38,6 @@ local fill_curly_placeholders
       {
         'fill_curly_placeholders'
       }
-
---------------------------------------------------------------------------------
-
--- TODO: Generalize to lua-aplicado
-local load_files_with_curly_placeholders = function(path, context)
-  arguments(
-      "string", path,
-      "table", context
-    )
-
-  local env =
-  {
-    import = import; -- This is a trusted sandbox
-    assert = assert;
-  }
-
-  local filenames = find_all_files(path, ".*%.lua$")
-  table.sort(filenames)
-
-  for i = 1, #filenames do
-    local filename = filenames[i]
-
-    local str = assert(read_file(filename))
-
-    str = fill_curly_placeholders(str, context)
-
-    local chunk = assert(loadstring(str, "=" .. filename))
-
-    local ok, result = assert(do_in_environment(chunk, env))
-    assert(result == nil)
-  end
-
-  -- Hack. Use metatable instead.
-  if env.import == import then
-    env.import = nil
-  end
-
-  if env.assert == assert then
-    env.assert = nil
-  end
-
-  return env
-end
 
 --------------------------------------------------------------------------------
 
@@ -109,16 +64,40 @@ do
         "string", cluster_name
       )
 
-    return load_files_with_curly_placeholders(
-        manifest_path,
-        setmetatable(
-            {
-              PROJECT_PATH = project_path;
-              CLUSTER_NAME = cluster_name;
-            },
-            mt
+    local chunks = assert(
+        load_all_files_with_curly_placeholders(
+            manifest_path,
+            ".*%.lua$",
+            setmetatable(
+                {
+                  PROJECT_PATH = project_path;
+                  CLUSTER_NAME = cluster_name;
+                },
+                mt
+              )
           )
       )
+
+    local env =
+    {
+      import = import; -- This is a trusted sandbox
+      assert = assert;
+    }
+
+    for i = 1, #chunks do
+      assert(do_in_environment(chunks[i], env))
+    end
+
+    -- Hack. Use metatable instead.
+    if env.import == import then
+      env.import = nil
+    end
+
+    if env.assert == assert then
+      env.assert = nil
+    end
+
+    return env
   end
 end
 
@@ -126,6 +105,5 @@ end
 
 return
 {
-  load_files_with_curly_placeholders = load_files_with_curly_placeholders;
   load_project_manifest = load_project_manifest;
 }

@@ -189,21 +189,29 @@ Actions:
 
 --------------------------------------------------------------------------------
 
-CONFIG, ARGS = assert(load_tools_cli_config(
-    function(args)
-      return
-      {
-        PROJECT_PATH = args["--root"];
-        admin_gen = { action = { name = args[1] or args["--action"]; }; };
-      }
-    end,
-    EXTRA_HELP,
-    SCHEMA,
-    nil,
-    nil,
-    ...
-  ))
+local run = function(...)
+  assert(jit ~= nil)
+  CONFIG, ARGS = assert(load_tools_cli_config(
+      function(args)
+        return
+        {
+          PROJECT_PATH = args["--root"];
+          admin_gen = { action = { name = args[1] or args["--action"]; }; };
+        }
+      end,
+      EXTRA_HELP,
+      SCHEMA,
+      nil,
+      nil,
+      ...
+    ))
+
+  ACTIONS[CONFIG.admin_gen.action.name]()
+end
 
 --------------------------------------------------------------------------------
 
-ACTIONS[CONFIG.admin_gen.action.name]()
+return
+{
+  run = run;
+}

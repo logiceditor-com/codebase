@@ -162,7 +162,7 @@ local log, dbg, spam, log_error = make_loggers("apigen", "AGE")
 
 -- NOTE: Generation requires fixed random seed for consistency
 math.randomseed(12345)
-assert(jit ~= nil) --TODO: remove this after all tests
+
 --------------------------------------------------------------------------------
 
 local generate_documents = function(
@@ -655,30 +655,38 @@ Actions:
 
 --------------------------------------------------------------------------------
 
-CONFIG, ARGS = assert(load_tools_cli_config(
-    function(args)
-      local keep_tmp = nil
-      if args["--keep-tmp"] then
-        keep_tmp = true
-      end
+local run = function(...)
+  assert(jit ~= nil)
+  CONFIG, ARGS = assert(load_tools_cli_config(
+      function(args)
+        local keep_tmp = nil
+        if args["--keep-tmp"] then
+          keep_tmp = true
+        end
 
-      return
-      {
-        PROJECT_PATH = args["--root"];
-        apigen =
+        return
         {
-          keep_tmp = keep_tmp;
-          action = { name = args[1] or args["--action"]; };
-        };
-      }
-    end,
-    EXTRA_HELP,
-    SCHEMA,
-    nil,
-    nil,
-    ...
-  ))
+          PROJECT_PATH = args["--root"];
+          apigen =
+          {
+            keep_tmp = keep_tmp;
+            action = { name = args[1] or args["--action"]; };
+          };
+        }
+      end,
+      EXTRA_HELP,
+      SCHEMA,
+      nil,
+      nil,
+      ...
+    ))
+
+  ACTIONS[CONFIG.apigen.action.name]()
+end
 
 --------------------------------------------------------------------------------
 
-ACTIONS[CONFIG.apigen.action.name]()
+return
+{
+  run = run;
+}

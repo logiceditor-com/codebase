@@ -1,4 +1,4 @@
-#! /usr/bin/env luajit2
+#! /usr/bin/env pk-lua-interpreter
 
 --------------------------------------------------------------------------------
 -- pk-call-lua-module: run arbitrary function from Lua module in pk environment

@@ -786,9 +786,9 @@ do
               have_changed_rocks = true
               if subproject.rockspec_generator then
                 if dry_run then
-                  writeln_flush("-!!-> DRY RUN: Want to generate rocks")
+                  writeln_flush("-!!-> DRY RUN: Want to generate rockspecs")
                 else
-                  writeln_flush("----> Generating rocks...")
+                  writeln_flush("----> Generating rockspecs...")
                   local rockspec_generator = is_table(subproject.rockspec_generator)
                     and subproject.rockspec_generator
                      or { subproject.rockspec_generator }

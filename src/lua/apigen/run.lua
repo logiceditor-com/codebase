@@ -162,7 +162,7 @@ local log, dbg, spam, log_error = make_loggers("apigen", "AGE")
 
 -- NOTE: Generation requires fixed random seed for consistency
 math.randomseed(12345)
-
+assert(jit ~= nil) --TODO: remove this after all tests
 --------------------------------------------------------------------------------
 
 local generate_documents = function(

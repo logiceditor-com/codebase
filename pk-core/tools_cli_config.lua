@@ -417,11 +417,11 @@ do
       ... -- Pass cli arguments here
     )
     arguments(
-        "table", schema,
+        "table", schema
       )
 
     optional_arguments(
-        "string", base_config_filename
+        "string", base_config_filename,
         "string", project_config_filename
       )
 

@@ -612,7 +612,7 @@ do
   end
 
   local validate_export = function(walkers, data)
-    log("data = ", data)
+
     common_check_url_node(walkers, data)
 
     if not data.exports then

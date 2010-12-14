@@ -2,11 +2,22 @@
 -- schema.lua: apigen configuration file format
 --------------------------------------------------------------------------------
 
-do
-  local common_tool_config_schema_chunk
-    = import 'pk-tools/schema-common.lua' { 'common_tool_config_schema_chunk' }
+local load_tools_cli_data_schema
+      = import 'pk-core/tools_cli_config.lua'
+      {
+        'load_tools_cli_data_schema'
+      }
 
-  schema_chunk = function()
+local common_tool_config_schema_chunk
+      = import 'pk-tools.project-config.schema-common'
+      {
+        'common_tool_config_schema_chunk'
+      }
+
+local create_config_schema
+
+do
+  local schema_chunk = function()
     cfg:root
     {
       common_tool_config_schema_chunk();

@@ -49,6 +49,12 @@ local empty_table,
         'tidentityset'
       }
 
+local tpretty
+      = import 'lua-nucleo/tpretty.lua'
+      {
+        'tpretty'
+      }
+
 local tstr
       = import 'lua-nucleo/tstr.lua'
       {
@@ -75,6 +81,13 @@ local do_in_environment,
         'do_in_environment',
         'dostring_in_environment',
         'make_config_environment'
+      }
+local load_all_files,
+      find_all_files
+      = import 'lua-aplicado/filesystem.lua'
+      {
+        'load_all_files',
+        'find_all_files'
       }
 
 local make_loggers
@@ -475,8 +488,23 @@ do
         )
       io.stdout:flush()
       --]]
-      local base_config_chunk = assert(loadfile(base_config_filename))
-      assert(do_in_environment(base_config_chunk, base_config))
+      if lfs.attributes(base_config_filename).mode == "directory" then
+        log(base_config_filename, "is directory")
+        log("Loading files:")
+        local base_config_files = find_all_files(base_config_filename, ".");
+--        log(tpretty(find_all_files(base_config_filename, "."), "  ", 80))
+--        log(tpretty(load_all_files(base_config_filename, "."), "  ", 80))
+        local base_config_chunks = load_all_files(base_config_filename, ".")
+        for i = 1, #base_config_chunks do
+          log(base_config_files[i])
+          assert(do_in_environment(base_config_chunks[i], base_config))
+        end 
+      end
+      if lfs.attributes(base_config_filename).mode == "file" then
+        log(base_config_filename, "is file") 
+        local base_config_chunk = assert(loadfile(base_config_filename))
+        assert(do_in_environment(base_config_chunk, base_config))
+      end
     end
 
     if base_config.import == import then

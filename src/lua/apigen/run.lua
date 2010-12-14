@@ -149,7 +149,7 @@ local tpretty
       }
 
 local create_config_schema
-      = import 'project-config/schema.lua'
+      = import 'apigen/project-config/schema.lua'
       {
         'create_config_schema',
       }
@@ -656,7 +656,6 @@ Actions:
 --------------------------------------------------------------------------------
 
 local run = function(...)
-  assert(jit ~= nil)
   CONFIG, ARGS = assert(load_tools_cli_config(
       function(args)
         local keep_tmp = nil

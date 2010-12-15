@@ -127,7 +127,7 @@ local tpretty
       }
 
 local create_config_schema
-      = import 'project-config/schema.lua'
+      = import 'dbgen/project-config/schema.lua'
       {
         'create_config_schema',
       }
@@ -348,57 +348,64 @@ Actions:
 
 --------------------------------------------------------------------------------
 
-CONFIG, ARGS = assert(load_tools_cli_config(
-    function(args)
-      local action = args[1] or args["--action"]
-      local param = { }
+local run = function(...)
+  CONFIG, ARGS = assert(load_tools_cli_config(
+      function(args)
+        local action = args[1] or args["--action"]
+        local param = { }
 
-      if
-        tset({
-            "update_changes";
-            "update_tables";
-            "update_tables_test_data";
-            "update_db";
-            "update_data_changeset"
-          })[action]
-      then
-        param.force = not not args["force"]
-      end
-
-      if action == "update_data_changeset" then
-        param.table_name = args[2] or args["--table-name"]
-      end
-
-      if action == "initialize_db" then
-        param.db_name = args[2] or args["--db-name"]
-        param.force = not not args["force"]
-      elseif action == "revert_changes" then
-        param.stop_at_uuid = args[2] or args["--uuid"]
-        if args["--revert-all"] then
-          param.stop_at_uuid = "all" -- Hack.
+        if
+          tset({
+              "update_changes";
+              "update_tables";
+              "update_tables_test_data";
+              "update_db";
+              "update_data_changeset"
+            })[action]
+        then
+          param.force = not not args["force"]
         end
-      end
 
-      return
-      {
-        PROJECT_PATH = args["--root"];
-        dbgen =
+        if action == "update_data_changeset" then
+          param.table_name = args[2] or args["--table-name"]
+        end
+
+        if action == "initialize_db" then
+          param.db_name = args[2] or args["--db-name"]
+          param.force = not not args["force"]
+        elseif action == "revert_changes" then
+          param.stop_at_uuid = args[2] or args["--uuid"]
+          if args["--revert-all"] then
+            param.stop_at_uuid = "all" -- Hack.
+          end
+        end
+
+        return
         {
-          action =
+          PROJECT_PATH = args["--root"];
+          dbgen =
           {
-            name = action;
-            param = param;
-          };
+            action =
+            {
+              name = action;
+              param = param;
+            };
+          }
         }
-      }
-    end,
-    EXTRA_HELP,
-    SCHEMA,
-    nil,
-    nil,
-    ...
-  ))
+      end,
+      EXTRA_HELP,
+      SCHEMA,
+      nil,
+      nil,
+      ...
+    ))
+
+  ACTIONS[CONFIG.dbgen.action.name]()
+end
 
 --------------------------------------------------------------------------------
 
-ACTIONS[CONFIG.dbgen.action.name]()
+return
+{
+  run = run;
+}

@@ -51,13 +51,13 @@ local make_loggers
       }
 
 local load_db_schema
-      = import 'admin-gen/load_db_schema.lua'
+      = import 'pk-tools/schema/db/load_db_schema.lua'
       {
         'load_db_schema'
       }
 
 local validate_db_schema
-      = import 'admin-gen/schema-validator.lua'
+      = import 'pk-tools/schema/db/schema-validator.lua'
       {
         'validate_db_schema'
       }
@@ -93,7 +93,7 @@ local tpretty
       }
 
 local create_config_schema
-      = import 'project-config/schema.lua'
+      = import 'admin-gen/project-config/schema.lua'
       {
         'create_config_schema',
       }
@@ -190,7 +190,6 @@ Actions:
 --------------------------------------------------------------------------------
 
 local run = function(...)
-  assert(jit ~= nil)
   CONFIG, ARGS = assert(load_tools_cli_config(
       function(args)
         return

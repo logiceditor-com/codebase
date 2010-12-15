@@ -94,7 +94,7 @@ local PK_ADMIN_EXPORTS,
       PK_TEST_EXPORTS,
       PK_ENGINE_TEST_EXPORTS,
       merge_exports
-      = import '/tools/schema/code/exports.lua'
+      = import 'tools/schema/code/exports.lua'
       {
         'PK_ADMIN_EXPORTS',
         'PK_CLIENT_EXPORTS',
@@ -109,7 +109,7 @@ local PK_ADMIN_EXPORTS,
       }
 
 local REQUIRE_GLOBALS
-      = import '/tools/schema/code/requires.lua'
+      = import 'tools/schema/code/requires.lua'
       {
         'REQUIRE_GLOBALS',
       }
@@ -117,7 +117,7 @@ local REQUIRE_GLOBALS
 local LUA51_GLOBALS,
       LUAJIT2_GLOBALS,
       LUA_NUCLEO_GLOBALS
-      = import '/tools/schema/code/globals.lua'
+      = import 'tools/schema/code/globals.lua'
       {
         'LUA51_GLOBALS',
         'LUAJIT2_GLOBALS',

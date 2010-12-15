@@ -109,7 +109,7 @@ local tpretty
       }
 
 local create_config_schema
-      = import 'project-config/schema.lua'
+      = import 'apigen/project-config/schema.lua'
       {
         'create_config_schema',
       }
@@ -434,21 +434,28 @@ Actions:
 
 --------------------------------------------------------------------------------
 
-CONFIG, ARGS = assert(load_tools_cli_config(
-    function(args)
-      return
-      {
-        PROJECT_PATH = args["--root"];
-        resources = { action = { name = args[1] or args["--action"]; }; };
-      }
-    end,
-    EXTRA_HELP,
-    SCHEMA,
-    nil,
-    nil,
-    ...
-  ))
+local run = function(...)
+  CONFIG, ARGS = assert(load_tools_cli_config(
+      function(args)
+        return
+        {
+          PROJECT_PATH = args["--root"];
+          resources = { action = { name = args[1] or args["--action"]; }; };
+        }
+      end,
+      EXTRA_HELP,
+      SCHEMA,
+      nil,
+      nil,
+      ...
+    ))
+
+  ACTIONS[CONFIG.resources.action.name]()
+end
 
 --------------------------------------------------------------------------------
 
-ACTIONS[CONFIG.resources.action.name]()
+return
+{
+  run = run;
+}

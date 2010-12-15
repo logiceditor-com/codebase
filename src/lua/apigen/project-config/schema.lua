@@ -21,6 +21,7 @@ do
     cfg:root
     {
 --      common_tool_config_schema_chunk();
+-- TODO: remove common part, make it to include externally
 --------------------------------------------------------------------------------
 -- Temporarily added common part
   cfg:node "common"

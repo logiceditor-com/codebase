@@ -63,7 +63,7 @@ local tpretty
       }
 
 local create_config_schema
-      = import 'project-config/schema.lua'
+      = import 'list-exports/project-config/schema.lua'
       {
         'create_config_schema',
       }
@@ -230,21 +230,27 @@ Actions:
 
 --------------------------------------------------------------------------------
 
-CONFIG, ARGS = assert(load_tools_cli_config(
-    function(args)
-      return
-      {
-        PROJECT_PATH = args["--root"];
-        list_exports = { action = { name = args[1] or args["--action"]; }; };
-      }
-    end,
-    EXTRA_HELP,
-    SCHEMA,
-    nil,
-    nil,
-    ...
-  ))
+local run = function(...)
+  CONFIG, ARGS = assert(load_tools_cli_config(
+      function(args)
+        return
+        {
+          PROJECT_PATH = args["--root"];
+          list_exports = { action = { name = args[1] or args["--action"]; }; };
+        }
+      end,
+      EXTRA_HELP,
+      SCHEMA,
+      nil,
+      nil,
+      ...
+    ))
+  ACTIONS[CONFIG.list_exports.action.name]()
+end
 
 --------------------------------------------------------------------------------
 
-ACTIONS[CONFIG.list_exports.action.name]()
+return
+{
+  run = run;
+}

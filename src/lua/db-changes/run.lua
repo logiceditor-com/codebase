@@ -79,7 +79,7 @@ local tpretty
       }
 
 local create_config_schema
-      = import 'project-config/schema.lua'
+      = import 'apigen/project-config/schema.lua'
       {
         'create_config_schema',
       }

@@ -24,10 +24,10 @@ PK.navigation = new function()
   };
 
   // Run by user interface - just a request
-  this.go_to_topic = function(topic, params, show_topic)
+  this.go_to_topic = function(topic, params, must_show_topic)
   {
     var token = (topic)?(topic):("");
-    if(show_topic === undefined) { show_topic = false; };
+    if(must_show_topic === undefined) { show_topic = false; };
 
     if(params && params.length)
     {
@@ -35,9 +35,11 @@ PK.navigation = new function()
         token += "/" + params[i];
     }
 
+    var prevToken = Ext.History.getToken();
+
     Ext.History.add(token);
 
-    if(show_topic)
+    if(prevToken == token && must_show_topic)
       this.show_topic(topic, params);
   };
 

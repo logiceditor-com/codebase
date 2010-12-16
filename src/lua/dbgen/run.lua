@@ -382,7 +382,7 @@ local run = function(...)
 
         return
         {
-          PROJECT_PATH = args["--root"];
+          PROJECT_PATH = assert(args["--root"], "missing --root");
           dbgen =
           {
             action =

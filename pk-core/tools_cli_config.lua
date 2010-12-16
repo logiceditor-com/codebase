@@ -488,14 +488,15 @@ do
         )
       io.stdout:flush()
       --]]
-      if lfs.attributes(base_config_filename).mode == "directory" then
+
+      local attr = assert(lfs.attributes(base_config_filename))
+      if attr == "directory" then
         local base_config_files = find_all_files(base_config_filename, ".");
         local base_config_chunks = load_all_files(base_config_filename, ".")
         for i = 1, #base_config_chunks do
           assert(do_in_environment(base_config_chunks[i], base_config))
         end 
-      end
-      if lfs.attributes(base_config_filename).mode == "file" then
+      elseif attr == "file" then
         local base_config_chunk = assert(loadfile(base_config_filename))
         assert(do_in_environment(base_config_chunk, base_config))
       end

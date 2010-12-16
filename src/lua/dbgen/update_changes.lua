@@ -42,6 +42,12 @@ local empty_table,
         'timap'
       }
 
+local escape_lua_pattern
+      = import 'lua-nucleo/string.lua'
+      {
+        'escape_lua_pattern'
+      }
+
 local find_all_files
       = import 'lua-aplicado/filesystem.lua'
       {
@@ -134,9 +140,8 @@ local update_changesets = function(
   for i = 1, #existing_changesets do
     local changeset_name = existing_changesets[i]
 
-    -- TODO: Escape out_dir
     local n_str, name = changeset_name:match(
-        "^" .. out_dir .. "/(%d%d%d%d)%-(.*)%.lua$"
+        "^" .. escape_lua_pattern(out_dir) .. "/(%d%d%d%d)%-(.*)%.lua$"
       )
     local n = tonumber(n_str)
     if not n or not name then

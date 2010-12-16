@@ -489,11 +489,7 @@ do
       io.stdout:flush()
       --]]
       if lfs.attributes(base_config_filename).mode == "directory" then
-        log(base_config_filename, "is directory")
-        log("Loading files:")
         local base_config_files = find_all_files(base_config_filename, ".");
---        log(tpretty(find_all_files(base_config_filename, "."), "  ", 80))
---        log(tpretty(load_all_files(base_config_filename, "."), "  ", 80))
         local base_config_chunks = load_all_files(base_config_filename, ".")
         for i = 1, #base_config_chunks do
           log(base_config_files[i])

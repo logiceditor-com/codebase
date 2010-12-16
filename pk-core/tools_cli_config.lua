@@ -490,7 +490,7 @@ do
       --]]
 
       local attr = assert(lfs.attributes(base_config_filename))
-      if attr == "directory" then
+      if attr.mode == "directory" then
         local base_config_files = find_all_files(base_config_filename, ".")
         local base_config_chunks = load_all_files(base_config_filename, ".")
         for i = 1, #base_config_chunks do
@@ -520,7 +520,7 @@ do
       io.stdout:flush()
       --]]
       local attr = assert(lfs.attributes(project_config_filename))
-      if attr == "directory" then
+      if attr.mode == "directory" then
         local project_config_files = find_all_files(project_config_filename, ".")
         local project_config_chunks = load_all_files(project_config_filename, ".")
         for i = 1, #project_config_chunks do

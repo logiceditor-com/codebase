@@ -463,7 +463,7 @@ do
 
     -- Hack. Implicitly forcing config schema to have PROJECT_PATH key
     -- Better to do this explicitly somehow?
-    local PROJECT_PATH = args_config.PROJECT_PATH
+    local PROJECT_PATH = assert(args_config.PROJECT_PATH, "missing PROJECT_PATH")
 
     local project_config_filename = args["--config"] or project_config_filename
     local base_config_filename = args["--base-config"] or base_config_filename

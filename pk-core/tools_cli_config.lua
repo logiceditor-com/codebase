@@ -492,12 +492,10 @@ do
         local base_config_files = find_all_files(base_config_filename, ".");
         local base_config_chunks = load_all_files(base_config_filename, ".")
         for i = 1, #base_config_chunks do
-          log(base_config_files[i])
           assert(do_in_environment(base_config_chunks[i], base_config))
         end 
       end
       if lfs.attributes(base_config_filename).mode == "file" then
-        log(base_config_filename, "is file") 
         local base_config_chunk = assert(loadfile(base_config_filename))
         assert(do_in_environment(base_config_chunk, base_config))
       end

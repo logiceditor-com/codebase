@@ -469,6 +469,13 @@ ACTIONS.update_handlers = function()
     )
 
   local api = load_schema(api_schema_dir)
+  -- TODO: URGENT! make validation possible before generate_exports_list
+  generate_exports_list(
+      api,
+      out_exports_list_name,
+      out_file_root,
+      out_exports_dir_name
+    )
   validate_schema(api)
 
   -- Note: unconditionally overriding files.
@@ -510,12 +517,6 @@ local create_session_checker
         )
     )
 
-  generate_exports_list(
-      api,
-      out_exports_list_name,
-      out_file_root,
-      out_exports_dir_name
-    )
   generate_exports(api, out_file_root, out_exports_dir_name)
   generate_url_handlers(api, out_file_root, out_handlers_dir_name)
 

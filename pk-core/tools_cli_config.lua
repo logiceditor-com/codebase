@@ -481,7 +481,7 @@ do
           import = import;
         }
       )
-    if not args["--no-base-config"] then
+    if not args["--no-base-config"] and base_config_filename then
       --[[
       io.stdout:write(
           "--> loading base config file ", base_config_filename, "\n"

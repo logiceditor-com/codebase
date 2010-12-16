@@ -1,0 +1,159 @@
+#! /usr/bin/env luajit2
+
+local SERVICE_NAME = assert(select(1, ...), "missing service name")
+local SERVICE_NODE = assert(
+    tonumber(
+        ( assert(select(2, ...), "missing service node") )
+      ),
+    "service node must be number"
+  )
+local ACTION_NAME = assert(select(3, ...), "missing action name")
+
+--------------------------------------------------------------------------------
+
+-- pk-engine
+require 'copas' -- Should be loaded first
+require 'posix'
+require 'socket'
+require 'socket.http'
+require 'luabins'
+require 'socket.url'
+require 'md5'
+require 'luasql.mysql'
+require 'uuid'
+require 'lfs'
+require 'ev'
+require 'ltn12'
+require 'random'
+require 'sidereal'
+
+require 'lua-nucleo.module'
+require 'lua-nucleo.strict'
+
+--------------------------------------------------------------------------------
+
+local LOG_LEVEL,
+      wrap_file_sink,
+      make_common_logging_config
+      = import 'lua-nucleo/log.lua'
+      {
+        'LOG_LEVEL',
+        'wrap_file_sink',
+        'make_common_logging_config'
+      }
+
+local create_common_logging_system,
+      get_current_logsystem_date_microsecond
+      = import 'pk-core/log.lua'
+      {
+        'create_common_logging_system',
+        'get_current_logsystem_date_microsecond'
+      }
+
+--------------------------------------------------------------------------------
+
+do
+  local LOG_LEVEL_CONFIG =
+  {
+    [LOG_LEVEL.ERROR] = true;
+    [LOG_LEVEL.LOG]   = true;
+    [LOG_LEVEL.DEBUG] = false;
+    [LOG_LEVEL.SPAM]  = false;
+  }
+
+  local LOG_MODULE_CONFIG =
+  {
+    -- Empty; everything is enabled by default.
+  }
+
+  local logging_system_id = ""
+
+  create_common_logging_system(
+      logging_system_id,
+      wrap_file_sink(io.stdout),
+      make_common_logging_config(
+          LOG_LEVEL_CONFIG,
+          LOG_MODULE_CONFIG
+        ),
+      get_current_logsystem_date_microsecond
+    )
+end
+
+--------------------------------------------------------------------------------
+
+local tstr
+      = import 'lua-nucleo/tstr.lua'
+      {
+        'tstr'
+      }
+
+local tset
+      = import 'lua-nucleo/table-utils.lua'
+      {
+        'tset'
+      }
+
+local make_config_manager
+      = import 'pk-postcards/postcards-lib/internal_config_client.lua'
+      {
+        'make_config_manager'
+      }
+
+local make_redis_manager,
+      make_redis_connection_manager
+      = import 'pk-engine/redis/redis_manager.lua'
+      {
+        'make_redis_manager',
+        'make_redis_connection_manager'
+      }
+
+local push_task
+      = import 'pk-engine/redis/system.lua'
+      {
+        'push_task'
+      }
+
+local http_request
+      = import 'pk-engine/connector.lua'
+      {
+        'http_request'
+      }
+
+local INTERNAL_CONFIG_HOST,
+      INTERNAL_CONFIG_PORT
+      = import 'pk-postcards/cluster/config.lua'
+      {
+        'INTERNAL_CONFIG_HOST',
+        'INTERNAL_CONFIG_PORT'
+      }
+
+--------------------------------------------------------------------------------
+
+local config_manager = assert(make_config_manager(INTERNAL_CONFIG_HOST, INTERNAL_CONFIG_PORT))
+
+local SERVICE = assert(config_manager:get_services_config(SERVICE_NAME), "unknown service")
+
+assert(SERVICE.actions[ACTION_NAME], "unknown action")
+
+local NODE_INFO = assert(
+    assert(SERVICE.nodes)[SERVICE_NODE], "unknown service node"
+  )
+
+local redis_manager = assert(make_redis_manager(config_manager, make_redis_connection_manager()))
+
+local conn, conn_id = assert(redis_manager:acquire_redis_connection("system"))
+assert(push_task(conn, assert(SERVICE.prefix) .. SERVICE_NODE, ACTION_NAME))
+redis_manager:unacquire_redis_connection(conn, conn_id)
+
+if NODE_INFO.url then
+  local answer = assert(
+      http_request(assert(NODE_INFO.url))
+    )
+
+  io.stdout:write(answer, "\n")
+else
+  -- TODO: Get status somehow! (At least check if task was taken from Redis;
+  --       note that service may leave response in Redis as well;
+  --       this would help to workaround 502 on shutdown.)
+  io.stdout:write("Silent OK", "\n")
+end

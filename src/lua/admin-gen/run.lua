@@ -51,13 +51,13 @@ local make_loggers
       }
 
 local load_db_schema
-      = import 'pk-tools/schema/db/load_db_schema.lua'
+      = import 'pk-tools/schema-lib/db/load_db_schema.lua'
       {
         'load_db_schema'
       }
 
 local validate_db_schema
-      = import 'pk-tools/schema/db/schema-validator.lua'
+      = import 'pk-tools/schema-lib/db/schema-validator.lua'
       {
         'validate_db_schema'
       }

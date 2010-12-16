@@ -16,6 +16,4 @@ if [ -z "$(which ${LUA})" ]; then
   fi
 fi
 
-echo "XXX USING ${LUA}" >&2
-
 /usr/bin/env ${LUA} $@

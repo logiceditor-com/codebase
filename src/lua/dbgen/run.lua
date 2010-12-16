@@ -65,7 +65,7 @@ local update_file,
       }
 
 local load_db_schema
-      = import 'pk-tools/schema/db/load_db_schema.lua'
+      = import 'pk-tools/schema-lib/db/load_db_schema.lua'
       {
         'load_db_schema'
       }

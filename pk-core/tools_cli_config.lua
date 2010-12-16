@@ -491,7 +491,7 @@ do
 
       local attr = assert(lfs.attributes(base_config_filename))
       if attr == "directory" then
-        local base_config_files = find_all_files(base_config_filename, ".");
+        local base_config_files = find_all_files(base_config_filename, ".")
         local base_config_chunks = load_all_files(base_config_filename, ".")
         for i = 1, #base_config_chunks do
           assert(do_in_environment(base_config_chunks[i], base_config))
@@ -519,8 +519,17 @@ do
         )
       io.stdout:flush()
       --]]
-      local config_chunk = assert(loadfile(project_config_filename))
-      assert(do_in_environment(config_chunk, config))
+      local attr = assert(lfs.attributes(project_config_filename))
+      if attr == "directory" then
+        local project_config_files = find_all_files(project_config_filename, ".")
+        local project_config_chunks = load_all_files(project_config_filename, ".")
+        for i = 1, #project_config_chunks do
+          assert(do_in_environment(project_config_chunks[i], config))
+        end
+      else
+        local project_config_chunk = assert(loadfile(project_config_filename))
+        assert(do_in_environment(project_config_chunk, config))
+      end
     end
 
     if config.import == import then

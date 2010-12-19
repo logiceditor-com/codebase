@@ -378,7 +378,7 @@ local update_version_symlink = function(manifest, cluster_info, new_versions_fil
   local versions_current_filename = expected_path .. "/versions-current.lua"
 
   if new_versions_filename:sub(1, 1) ~= "/" then -- TODO: ?!
-    new_versions_filename = manifest.project_path .. "/" .. new_versions_filename
+    new_versions_filename = assert(manifest.project_path) .. "/" .. new_versions_filename
   end
 
   local path, filename = splitpath(new_versions_filename)

@@ -31,10 +31,12 @@ local is_table
         'is_table'
       }
 
-local assert_is_table
+local assert_is_table,
+      assert_is_string
       = import 'lua-nucleo/typeassert.lua'
       {
-        'assert_is_table'
+        'assert_is_table',
+        'assert_is_string'
       }
 
 local tpretty
@@ -1076,7 +1078,7 @@ do
       end
 
       for i = 1, #rocks_must_be_installed do
-        local rock_name = rocks_must_be_installed[i]
+        local rock_name = assert_is_string(rocks_must_be_installed[i])
         if not installed_rocks_set[rock_name] then
           if machine.deployed_rocks_set[rock_name] then
             writeln_flush("-> Skipping mandatory rock `" .. rock_name .. "': marked as installed by someone else")

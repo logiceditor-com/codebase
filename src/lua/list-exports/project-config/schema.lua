@@ -21,6 +21,7 @@ do
     cfg:root
     {
 --      common_tool_config_schema_chunk();
+
 -- TODO: remove common part, make it to include externally
 --------------------------------------------------------------------------------
 -- Temporarily added common part
@@ -37,6 +38,7 @@ do
           cfg:non_empty_ilist "sources"
           {
             cfg:path "sources_dir";
+            cfg:optional_string "root_dir_only";
             cfg:path "profile_filename";
             cfg:path "out_filename";
           };

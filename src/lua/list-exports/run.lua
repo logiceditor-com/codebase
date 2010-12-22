@@ -20,6 +20,12 @@ local is_table
         'is_table'
       }
 
+local escape_lua_pattern
+      = import 'lua-nucleo/string.lua'
+      {
+        'escape_lua_pattern'
+      }
+
 local empty_table,
       timap,
       tkeys,
@@ -30,6 +36,12 @@ local empty_table,
         'timap',
         'tkeys',
         'tclone'
+      }
+
+local tpretty
+      = import 'lua-nucleo/tpretty.lua'
+      {
+        'tpretty'
       }
 
 local find_all_files
@@ -56,16 +68,10 @@ local load_tools_cli_data_schema,
         'freeform_table_value'
       }
 
-local tpretty
-      = import 'lua-nucleo/tpretty.lua'
-      {
-        'tpretty'
-      }
-
 local create_config_schema
       = import 'list-exports/project-config/schema.lua'
       {
-        'create_config_schema',
+        'create_config_schema'
       }
 
 --------------------------------------------------------------------------------
@@ -78,14 +84,19 @@ local Q = function(v) return ("%q"):format(tostring(v)) end
 
 --------------------------------------------------------------------------------
 
-local list = function(sources_dir, profile_filename, out_filename)
+local list = function(sources_dir, root_dir_only, profile_filename, out_filename)
   sources_dir = sources_dir:gsub("/+$", "") -- Remove trailing slashes
+  root_dir_only = root_dir_only and root_dir_only:gsub("/+$", "") -- Remove trailing slashes
 
   log(
       "listing all exports in ", sources_dir .. "/",
       "using profile", profile_filename,
       "dumping to", out_filename
     )
+
+  if root_dir_only then
+    log("only in root directory", root_dir_only) -- TODO: bad name
+  end
 
   local PROFILE = import(profile_filename) ()
 
@@ -101,21 +112,36 @@ local list = function(sources_dir, profile_filename, out_filename)
       }
     )
 
-  local files = find_all_files(sources_dir, "%.lua$")
+  local files = find_all_files(
+      root_dir_only and (sources_dir .. "/" .. root_dir_only) or sources_dir,
+      "%.lua$"
+    )
+
   table.sort(files)
 
   for i = 1, #files do
     local filename = files[i]
+    local listed_filename = filename
 
-    if PROFILE.skip[filename] then
-      log("skipping file", filename)
+    if root_dir_only then
+      listed_filename = filename:gsub(
+          escape_lua_pattern(sources_dir) .. "/",
+          ""
+        )
+    end
+
+    if PROFILE.skip[listed_filename] then
+      log("skipping file", listed_filename)
     else
       log("loading exports from file", filename)
+      if root_dir_only then
+        log("file would be mentioned as", listed_filename)
+      end
 
       local exports = import (filename) ()
       for name, _ in pairs(exports) do
         local map = export_map[name]
-        map[#map + 1] = filename
+        map[#map + 1] = listed_filename
       end
     end
   end
@@ -145,7 +171,7 @@ local list = function(sources_dir, profile_filename, out_filename)
 
     file:write([[
 --------------------------------------------------------------------------------
--- generated exports map for ]], sources_dir .. "/", [[
+-- generated exports map for ]], (root_dir_only or sources_dir), "/", [[
 
 --------------------------------------------------------------------------------
 -- WARNING! Do not change manually.
@@ -208,6 +234,7 @@ ACTIONS.list_all = function()
 
     list(
         source.sources_dir,
+        source.root_dir_only, -- May be nil
         exports.profiles_dir .. source.profile_filename,
         exports.exports_dir .. source.out_filename
       )

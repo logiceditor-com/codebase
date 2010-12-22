@@ -160,6 +160,14 @@ do
       self:ensure_equals("unexpected type", type(value), "string")
     end)
 
+    types:up "cfg:optional_string" (function(self, info, value)
+      self:ensure(
+          "unexpected type",
+          value == nil or type(value) == "string",
+          type(value)
+        )
+    end)
+
     types:up "cfg:non_empty_string" (function(self, info, value)
       local _ =
         self:ensure_equals("unexpected type", type(value), "string"):good()

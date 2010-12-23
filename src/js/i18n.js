@@ -32,13 +32,13 @@ PK.i18n = new function()
   {
     if (current_language_ === undefined)
     {
-      CRITICAL_ERROR("Current language not set!")
+      CRITICAL_ERROR("Current language not set! Text: " + s)
       return '!!!' + s + '!!!';
     }
 
     if (!language_packs_[current_language_])
     {
-      CRITICAL_ERROR("No language pack for " + current_language_)
+      CRITICAL_ERROR("No language pack for " + current_language_ + ". Text: " + s)
       return '!!!' + s + '!!!';
     }
 

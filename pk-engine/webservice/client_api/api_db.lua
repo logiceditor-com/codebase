@@ -166,7 +166,7 @@ do
         )
     end
 
-    return self.enquirer_:list(self.db_conn_, what, postquery)
+    return self.enquirer_:list(self.db_conn_, what .. (postquery or ""))
   end
 
   -- A custom method

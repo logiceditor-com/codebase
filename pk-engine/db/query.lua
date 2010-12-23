@@ -697,20 +697,28 @@ local delete_all = function(db_conn, table_name, primary_key, post_query)
   return num_affected_rows
 end
 
-local list = function(db_conn, table_name, primary_key, post_query)
+local list = function(db_conn, table_name, primary_key, post_query, fields)
   post_query = post_query or ''
+
+  fields = fields or '*' -- TODO: Write tests for this
+  if is_table(fields) then
+    fields = table.concat(fields, ",") -- Intentionally not escaping, be careful
+  end
+  assert(fields ~= "", "must have fields")
+
   arguments(
       "userdata", db_conn,
       "string", table_name,
       "string", primary_key, -- Unused
-      "string", post_query
+      "string", post_query,
+      "string", fields
     )
 
-  local cursor, err = db_conn:execute(
-      [[SELECT * FROM `]]..table_name..[[`]]
-   .. [[ WHERE 1]]
-   .. post_query
-    )
+  local query = [[SELECT ]] .. fields
+   .. [[ FROM `]] .. table_name .. [[`]]
+   .. [[ WHERE 1]] .. post_query
+
+  local cursor, err = db_conn:execute(query)
   if not cursor then
     return nil, "list failed: " .. err
   end

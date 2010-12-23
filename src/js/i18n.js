@@ -22,8 +22,29 @@ PK.i18n = new function()
 
   this.add_language_pack = function(lang, pack)
   {
+    if (current_language_ === undefined)
+    {
+      this.set_current_language(lang)
+    }
+
     language_packs_[lang] = pack
     this.language[lang] = lang
+  }
+
+  //----------------------------------------------------------------------------
+
+  this.extend_language_pack = function(lang, pack)
+  {
+    if (language_packs_[lang] == undefined)
+    {
+      this.add_language_pack(lang, pack)
+      return
+    }
+
+    for(var k in pack)
+    {
+      language_packs_[lang][k] = pack[k]
+    }
   }
 
   //----------------------------------------------------------------------------

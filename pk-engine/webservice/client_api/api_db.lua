@@ -155,18 +155,19 @@ do
   end
 
   -- A special case.
-  local list = function(self, what, postquery)
+  local list = function(self, what, postquery, fields)
     method_arguments(self)
     -- Rest of arguments have variable types
 
     if is_table(what) then
       return self.enquirer_:list(
           self.db_conn_,
-          postquery_for_data(self.db_conn_, what) .. (postquery or "")
+          postquery_for_data(self.db_conn_, what) .. (postquery or ""),
+          fields
         )
     end
 
-    return self.enquirer_:list(self.db_conn_, what .. (postquery or ""))
+    return self.enquirer_:list(self.db_conn_, what .. (postquery or ""), fields)
   end
 
   -- A custom method

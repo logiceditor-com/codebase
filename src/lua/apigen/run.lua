@@ -2,6 +2,16 @@
 -- run.lua: client API handlers and tests generator
 --------------------------------------------------------------------------------
 
+local math = math
+local os = os
+local io = io
+local table = table
+
+local assert, unpack
+    = assert, unpack
+
+--------------------------------------------------------------------------------
+
 local lfs = require 'lfs'
 
 --------------------------------------------------------------------------------
@@ -36,12 +46,16 @@ local assert_is_table,
 
 local empty_table,
       timap,
-      tkeys
+      tkeys,
+      tappend_many,
+      tset_many
       = import 'lua-nucleo/table.lua'
       {
         'empty_table',
         'timap',
-        'tkeys'
+        'tkeys',
+        'tappend_many',
+        'tset_many'
       }
 
 local make_loggers
@@ -154,6 +168,12 @@ local create_config_schema
         'create_config_schema',
       }
 
+local merge_exports
+      = import 'pk-tools/exports.lua'
+      {
+        'merge_exports'
+      }
+
 --------------------------------------------------------------------------------
 
 local log, dbg, spam, log_error = make_loggers("apigen", "AGE")
@@ -165,6 +185,7 @@ math.randomseed(12345)
 
 --------------------------------------------------------------------------------
 
+-- TODO: This should use lua-aplicado/shell*
 local generate_documents = function(
     api,
     latex_template_filename,
@@ -277,7 +298,45 @@ local generate_documents = function(
   else
     log("NOT removing", tmpdir, "as configured")
   end
+end
 
+--------------------------------------------------------------------------------
+
+-- TODO: Ugly?
+local get_exports_requires_globals = function(config)
+  local known_exports, allowed_requires, allowed_globals
+
+  do
+    known_exports = { }
+
+    local filenames = config.exports
+    for i = 1, #filenames do
+      local filename = filenames[i].filename
+      known_exports = merge_exports(known_exports, import(filename)())
+    end
+  end
+
+  do
+    local allowed_requires = { }
+    local filenames = config.requires
+    for i = 1, #filenames do
+      local filename = filenames[i].filename
+      allowed_requires = tappend_many(allowed_requires, import(filename)())
+    end
+  end
+
+  do
+    local data = { }
+    local filenames = config.globals
+    for i = 1, #filenames do
+      local filename = filenames[i].filename
+      data[#data + 1] = import(filename)()
+    end
+
+    allowed_globals = tset_many(unpack(data))
+  end
+
+  return known_exports, allowed_requires, allowed_globals
 end
 
 --------------------------------------------------------------------------------
@@ -333,10 +392,13 @@ ACTIONS.check = function()
   local ACTION_CONFIG = CONFIG.apigen.action.param
   local MODE_CONFIG = CONFIG.common.www.application
 
+  local known_exports, allowed_requires, allowed_globals
+      = get_exports_requires_globals(freeform_table_value(MODE_CONFIG.code))
+
   local api_schema_dir = MODE_CONFIG.api_schema_dir
 
   local api = load_schema(api_schema_dir)
-  validate_schema(api)
+  validate_schema(known_exports, allowed_requires, allowed_globals, api)
 
   log("OK")
 end
@@ -349,8 +411,11 @@ ACTIONS.dump_urls = function()
 
   local out_filename = ACTION_CONFIG.out_filename
 
+  local known_exports, allowed_requires, allowed_globals
+      = get_exports_requires_globals(freeform_table_value(MODE_CONFIG.code))
+
   local api = load_schema(api_schema_dir)
-  validate_schema(api)
+  validate_schema(known_exports, allowed_requires, allowed_globals, api)
 
   local out = (out_filename == "-")
     and io.stdout
@@ -380,8 +445,11 @@ ACTIONS.dump_markdown_docs = function()
   local OUT_CONFIG = MODE_CONFIG.generated
   local api_schema_dir = MODE_CONFIG.api_schema_dir
 
+  local known_exports, allowed_requires, allowed_globals
+      = get_exports_requires_globals(freeform_table_value(MODE_CONFIG.code))
+
   local api = load_schema(api_schema_dir)
-  validate_schema(api)
+  validate_schema(known_exports, allowed_requires, allowed_globals, api)
 
   io.write(generate_docs(api), "\n")
   io.stdout:flush()
@@ -400,8 +468,11 @@ ACTIONS.generate_documents = function()
   local out_doc_md_filename = OUT_CONFIG.doc_md_filename
   local out_doc_pdf_filename = OUT_CONFIG.doc_pdf_filename
 
+  local known_exports, allowed_requires, allowed_globals
+      = get_exports_requires_globals(freeform_table_value(MODE_CONFIG.code))
+
   local api = load_schema(api_schema_dir)
-  validate_schema(api)
+  validate_schema(known_exports, allowed_requires, allowed_globals, api)
 
   generate_documents(
       api,
@@ -424,8 +495,11 @@ ACTIONS.update_exports = function()
   local out_exports_dir_name = OUT_CONFIG.exports_dir_name
   local out_exports_list_name = OUT_CONFIG.exports_list_name
 
+  local known_exports, allowed_requires, allowed_globals
+      = get_exports_requires_globals(freeform_table_value(MODE_CONFIG.code))
+
   local api = load_schema(api_schema_dir)
-  validate_schema(api)
+  validate_schema(known_exports, allowed_requires, allowed_globals, api)
 
   generate_exports_list(
       api,
@@ -433,7 +507,10 @@ ACTIONS.update_exports = function()
       out_file_root,
       out_exports_dir_name
     )
-  generate_exports(api, out_file_root, out_exports_dir_name)
+  generate_exports(
+      api, out_file_root, out_exports_dir_name,
+      known_exports, allowed_requires, allowed_globals
+    )
 
   log("OK")
 end
@@ -476,7 +553,11 @@ ACTIONS.update_handlers = function()
       out_file_root,
       out_exports_dir_name
     )
-  validate_schema(api)
+
+  local known_exports, allowed_requires, allowed_globals
+      = get_exports_requires_globals(freeform_table_value(MODE_CONFIG.code))
+
+  validate_schema(known_exports, allowed_requires, allowed_globals, api)
 
   -- Note: unconditionally overriding files.
 
@@ -498,18 +579,27 @@ ACTIONS.update_handlers = function()
         )
     )
 
-  assert(
-      write_file(
-          out_file_root .. out_handlers_index_filename,
-          generate_url_handler_index(
-              api,
-              { HEADER = [[
+  local header
+  if MODE_CONFIG.session_checker_file_name then
+    header = [[
 local create_session_checker
 = import ']] .. MODE_CONFIG.session_checker_file_name .. [['
 {
 'create_session_checker'
 }
-]]},
+]]
+  else
+    header = [[]]
+  end
+
+  assert(
+      write_file(
+          out_file_root .. out_handlers_index_filename,
+          generate_url_handler_index(
+              api,
+              {
+                HEADER = header;
+              },
               out_handlers_dir_name,
               out_data_formats_filename,
               out_base_url_prefix
@@ -517,8 +607,14 @@ local create_session_checker
         )
     )
 
-  generate_exports(api, out_file_root, out_exports_dir_name)
-  generate_url_handlers(api, out_file_root, out_handlers_dir_name)
+  generate_exports(
+      api, out_file_root, out_exports_dir_name,
+      known_exports, allowed_requires, allowed_globals
+    )
+  generate_url_handlers(
+      api, out_file_root, out_handlers_dir_name,
+      known_exports, allowed_requires, allowed_globals
+    )
 
   if have_unity_client then
     assert(
@@ -559,6 +655,9 @@ ACTIONS.update_all = function()
   local out_doc_md_filename = OUT_CONFIG.doc_md_filename
   local out_doc_pdf_filename = OUT_CONFIG.doc_pdf_filename
 
+  local known_exports, allowed_requires, allowed_globals
+      = get_exports_requires_globals(freeform_table_value(MODE_CONFIG.code))
+
   -- TODO: Detect obsolete files and fail instead of this!
   log("Removing", out_file_root.."/"..out_handlers_dir_name.."/*")
   assert(
@@ -568,7 +667,7 @@ ACTIONS.update_all = function()
     )
 
   local api = load_schema(api_schema_dir)
-  validate_schema(api)
+  validate_schema(known_exports, allowed_requires, allowed_globals, api) -- TODO: See update_handlers for hack with generate_exports_list
 
   -- Note: unconditionally overriding files.
 
@@ -590,18 +689,27 @@ ACTIONS.update_all = function()
         )
     )
 
-  assert(
-      write_file(
-          out_file_root .. out_handlers_index_filename,
-          generate_url_handler_index(
-              api,
-              { HEADER = [[
+  local header
+  if MODE_CONFIG.session_checker_file_name then
+    header = [[
 local create_session_checker
 = import ']] .. MODE_CONFIG.session_checker_file_name .. [['
 {
 'create_session_checker'
 }
-]]},
+]]
+  else
+    header = [[]]
+  end
+
+  assert(
+      write_file(
+          out_file_root .. out_handlers_index_filename,
+          generate_url_handler_index(
+              api,
+              {
+                HEADER = header;
+              },
               out_handlers_dir_name,
               out_data_formats_filename,
               out_base_url_prefix
@@ -615,8 +723,14 @@ local create_session_checker
       out_file_root,
       out_exports_dir_name
     )
-  generate_exports(api, out_file_root, out_exports_dir_name)
-  generate_url_handlers(api, out_file_root, out_handlers_dir_name)
+  generate_exports(
+      api, out_file_root, out_exports_dir_name,
+      known_exports, allowed_requires, allowed_globals
+    )
+  generate_url_handlers(
+      api, out_file_root, out_handlers_dir_name,
+      known_exports, allowed_requires, allowed_globals
+    )
 
   if have_unity_client then
     assert(

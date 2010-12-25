@@ -84,81 +84,9 @@ local make_loggers
         'make_loggers'
       }
 
-local PK_ADMIN_EXPORTS,
-      PK_CLIENT_EXPORTS,
-      PK_ENGINE_EXPORTS,
-      LUA_NUCLEO_EXPORTS,
-      LUA_APLICADO_EXPORTS,
-      PK_CORE_EXPORTS,
-      PROJECT_LOGIC_EXPORTS,
-      PK_TEST_EXPORTS,
-      PK_ENGINE_TEST_EXPORTS,
-      merge_exports
-      = import 'tools/schema/code/exports.lua'
-      {
-        'PK_ADMIN_EXPORTS',
-        'PK_CLIENT_EXPORTS',
-        'PK_ENGINE_EXPORTS',
-        'LUA_NUCLEO_EXPORTS',
-        'LUA_APLICADO_EXPORTS',
-        'PK_CORE_EXPORTS',
-        'PROJECT_LOGIC_EXPORTS',
-        'PK_TEST_EXPORTS',
-        'PK_ENGINE_TEST_EXPORTS',
-        'merge_exports'
-      }
-
-local REQUIRE_GLOBALS
-      = import 'tools/schema/code/requires.lua'
-      {
-        'REQUIRE_GLOBALS',
-      }
-
-local LUA51_GLOBALS,
-      LUAJIT2_GLOBALS,
-      LUA_NUCLEO_GLOBALS
-      = import 'tools/schema/code/globals.lua'
-      {
-        'LUA51_GLOBALS',
-        'LUAJIT2_GLOBALS',
-        'LUA_NUCLEO_GLOBALS'
-      }
-
 --------------------------------------------------------------------------------
 
 local log, dbg, spam, log_error = make_loggers("api_globals", "APG")
-
---------------------------------------------------------------------------------
-
--- TODO: BAD! Allow only exports from modules explicitly mentioned in
---       api:uses { "module1", "path/module2" }
-
--- NOTE: PK_TEST_EXPORTS and TOOLS_LIB_EXPORTS are not allowed for API
-local KNOWN_EXPORTS = merge_exports(
-    PK_ADMIN_EXPORTS, -- TODO: This should be only available for admin code!
-    PK_CLIENT_EXPORTS,
-    PK_ENGINE_EXPORTS,
-    PK_CORE_EXPORTS,
-    LUA_NUCLEO_EXPORTS,
-    LUA_APLICADO_EXPORTS,
-    PROJECT_LOGIC_EXPORTS
-  )
-
-local KNOWN_TEST_EXPORTS = merge_exports(
-    KNOWN_EXPORTS,
-    PK_TEST_EXPORTS,
-    PK_ENGINE_TEST_EXPORTS
-  )
-
--- TODO: Should we allow all requires?
-local ALLOWED_REQUIRES = REQUIRE_GLOBALS
-
--- TODO: Should we allow everything here?
-local ALLOWED_GLOBALS = tset_many(
-    LUA51_GLOBALS,
-    LUAJIT2_GLOBALS,
-    LUA_NUCLEO_GLOBALS
-  )
 
 --------------------------------------------------------------------------------
 
@@ -394,11 +322,6 @@ end
 
 return
 {
-  KNOWN_EXPORTS = KNOWN_EXPORTS;
-  KNOWN_TEST_EXPORTS = KNOWN_TEST_EXPORTS;
-  ALLOWED_REQUIRES = ALLOWED_REQUIRES;
-  ALLOWED_GLOBALS = ALLOWED_GLOBALS;
-  --
   list_globals_in_handler = list_globals_in_handler;
   check_globals = check_globals;
   classify_globals = classify_globals;

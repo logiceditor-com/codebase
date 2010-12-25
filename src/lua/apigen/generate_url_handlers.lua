@@ -50,17 +50,11 @@ local make_loggers
         'make_loggers'
       }
 
-local KNOWN_EXPORTS,
-      ALLOWED_REQUIRES,
-      ALLOWED_GLOBALS,
-      list_globals_in_handler,
+local list_globals_in_handler,
       classify_globals,
       generate_globals_header
       = import 'apigen/api_globals.lua'
       {
-        'KNOWN_EXPORTS',
-        'ALLOWED_REQUIRES',
-        'ALLOWED_GLOBALS',
         'list_globals_in_handler',
         'classify_globals',
         'generate_globals_header'
@@ -274,9 +268,9 @@ end
 ]] (
     generate_globals_header(
         classify_globals(
-            KNOWN_EXPORTS,
-            ALLOWED_REQUIRES,
-            ALLOWED_GLOBALS,
+            walkers.known_exports_,
+            walkers.allowed_requires_,
+            walkers.allowed_globals_,
             walkers.api_globals_ or { },
             global_overrides
           )
@@ -319,12 +313,18 @@ return
   generate_url_handlers = function(
       schema,
       out_file_root,
-      handlers_dir_name
+      handlers_dir_name,
+      known_exports,
+      allowed_requires,
+      allowed_globals
     )
     arguments(
         "table", schema,
         "string", out_file_root,
-        "string", handlers_dir_name
+        "string", handlers_dir_name,
+        "table", known_exports,
+        "table", allowed_requires,
+        "table", allowed_globals
       )
 
     local walkers =
@@ -339,6 +339,10 @@ return
       handlers_dir_name_ = handlers_dir_name;
       api_globals_ = nil;
       global_overrides_ = nil;
+      --
+      known_exports_ = known_exports;
+      allowed_requires_ = allowed_requires;
+      allowed_globals_ = allowed_globals;
     }
 
     for i = 1, #schema do

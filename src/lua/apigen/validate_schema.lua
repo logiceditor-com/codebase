@@ -84,18 +84,10 @@ local walk_tagged_tree
         'walk_tagged_tree'
       }
 
-local KNOWN_EXPORTS,
-      KNOWN_TEST_EXPORTS,
-      ALLOWED_REQUIRES,
-      ALLOWED_GLOBALS,
-      list_globals_in_handler,
+local list_globals_in_handler,
       check_globals
       = import 'apigen/api_globals.lua'
       {
-        'KNOWN_EXPORTS',
-        'KNOWN_TEST_EXPORTS',
-        'ALLOWED_REQUIRES',
-        'ALLOWED_GLOBALS',
         'list_globals_in_handler',
         'check_globals'
       }
@@ -648,9 +640,9 @@ do
     end
 
     validate_handler(
-        KNOWN_EXPORTS,
-        ALLOWED_REQUIRES,
-        ALLOWED_GLOBALS,
+        walkers.known_exports_,
+        walkers.allowed_requires_,
+        walkers.allowed_globals_,
         walkers,
         upvalues_to_be,
         data
@@ -710,9 +702,9 @@ do
       end
 
       validate_handler(
-          KNOWN_EXPORTS,
-          ALLOWED_REQUIRES,
-          ALLOWED_GLOBALS,
+          walkers.known_exports_,
+          walkers.allowed_requires_,
+          walkers.allowed_globals_,
           walkers,
           upvalues_to_be,
           data
@@ -735,9 +727,9 @@ do
       end
 
       validate_handler(
-          KNOWN_TEST_EXPORTS,
-          ALLOWED_REQUIRES,
-          ALLOWED_GLOBALS,
+          walkers.known_exports_, -- TODO: this should be known_test_exports
+          walkers.allowed_requires_,
+          walkers.allowed_globals_,
           walkers,
           upvalues_to_be,
           data
@@ -777,6 +769,10 @@ do
         root_only_first_level_tags_ = (data.id == "api:output");
         number_of_first_level_output_tags_ = 0;
         nesting_ = 0;
+        --
+        known_exports_ = walkers.known_exports_;
+        allowed_requires_ = walkers.allowed_requires_;
+        allowed_globals_ = walkers.allowed_globals_;
       }
 
       for i = 1, #data do
@@ -860,6 +856,10 @@ do
       found_handler_ = false;
       handler_is_dynamic_ = false;
       handler_is_raw_ = false;
+      --
+      known_exports_ = walkers.known_exports_;
+      allowed_requires_ = walkers.allowed_requires_;
+      allowed_globals_ = walkers.allowed_globals_;
     }
 
     for i = 1, #data do
@@ -1065,7 +1065,19 @@ do
         )
     )
 
-  validate_schema = function(api)
+  validate_schema = function(
+      known_exports,
+      allowed_requires,
+      allowed_globals,
+      api
+    )
+    arguments(
+        "table", known_exports,
+        "table", allowed_requires,
+        "table", allowed_globals,
+        "table", api
+      )
+
     -- TODO: Check for duplicate urls (including aliases)
 
     local walkers =
@@ -1073,6 +1085,9 @@ do
       down = api_validators;
       --
       checker_ = make_checker();
+      known_exports_ = known_exports;
+      allowed_requires_ = allowed_requires;
+      allowed_globals_ = allowed_globals;
     }
 
     for i = 1, #api do

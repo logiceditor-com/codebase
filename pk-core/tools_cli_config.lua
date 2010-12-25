@@ -186,6 +186,14 @@ do
         and self:ensure("path string must not be empty", value ~= "")
     end)
 
+    types:up "cfg:optional_path" (function(self, info, value)
+      if value ~= nil then
+        local _ =
+          self:ensure_equals("unexpected type", type(value), "string"):good()
+          and self:ensure("path string must not be empty", value ~= "")
+      end
+    end)
+
     types:up "cfg:url" (function(self, info, value)
       local _ =
         self:ensure_equals("unexpected type", type(value), "string"):good()

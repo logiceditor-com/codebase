@@ -94,6 +94,7 @@ do
     end
 
     log("generating exports to", file_name)
+    assert(create_path_to_file(file_name))
     assert(
         write_file(
             file_name,

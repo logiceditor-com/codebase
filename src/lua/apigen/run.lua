@@ -65,11 +65,13 @@ local make_loggers
       }
 
 local update_file,
-      write_file
+      write_file,
+      create_path_to_file
       = import 'lua-aplicado/filesystem.lua'
       {
         'update_file',
-        'write_file'
+        'write_file',
+        'create_path_to_file'
       }
 
 local load_schema
@@ -193,6 +195,7 @@ local generate_documents = function(
     out_doc_pdf_filename,
     keep_tmp
   )
+  assert(create_path_to_file(out_doc_md_filename))
   assert(
       write_file(
           out_doc_md_filename,
@@ -561,6 +564,7 @@ ACTIONS.update_handlers = function()
 
   -- Note: unconditionally overriding files.
 
+  assert(create_path_to_file(out_file_root .. out_api_version_filename))
   assert(
       write_file(
           out_file_root .. out_api_version_filename,
@@ -570,6 +574,7 @@ ACTIONS.update_handlers = function()
         )
     )
 
+  assert(create_path_to_file(out_file_root .. out_data_formats_filename))
   assert(
       write_file(
           out_file_root .. out_data_formats_filename,
@@ -593,6 +598,7 @@ local create_session_checker
     header = [[]]
   end
 
+  assert(create_path_to_file(out_file_root .. out_handlers_index_filename))
   assert(
       write_file(
           out_file_root .. out_handlers_index_filename,
@@ -618,6 +624,7 @@ local create_session_checker
     )
 
   if have_unity_client then
+    assert(create_path_to_file(out_unity_api_filename))
     assert(
         write_file(
             out_unity_api_filename,
@@ -672,6 +679,7 @@ ACTIONS.update_all = function()
 
   -- Note: unconditionally overriding files.
 
+  assert(create_path_to_file(out_file_root .. out_api_version_filename))
   assert(
       write_file(
           out_file_root .. out_api_version_filename,
@@ -681,6 +689,7 @@ ACTIONS.update_all = function()
         )
     )
 
+  assert(create_path_to_file(out_file_root .. out_data_formats_filename))
   assert(
       write_file(
           out_file_root .. out_data_formats_filename,
@@ -704,6 +713,7 @@ local create_session_checker
     header = [[]]
   end
 
+  assert(create_path_to_file(out_file_root .. out_handlers_index_filename))
   assert(
       write_file(
           out_file_root .. out_handlers_index_filename,
@@ -735,6 +745,7 @@ local create_session_checker
     )
 
   if have_unity_client then
+    assert(create_path_to_file(out_unity_api_filename))
     assert(
         write_file(
             out_unity_api_filename,

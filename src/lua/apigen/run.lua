@@ -317,7 +317,7 @@ local get_exports_requires_globals = function(config)
   end
 
   do
-    local allowed_requires = { }
+    allowed_requires = { }
     local filenames = config.requires
     for i = 1, #filenames do
       local filename = filenames[i].filename
@@ -580,7 +580,8 @@ ACTIONS.update_handlers = function()
     )
 
   local header
-  if MODE_CONFIG.session_checker_file_name then
+  -- TODO: That freeform_table_value is uberhack! Fix tools_cli_config!
+  if freeform_table_value(MODE_CONFIG).session_checker_file_name then
     header = [[
 local create_session_checker
 = import ']] .. MODE_CONFIG.session_checker_file_name .. [['
@@ -690,7 +691,8 @@ ACTIONS.update_all = function()
     )
 
   local header
-  if MODE_CONFIG.session_checker_file_name then
+  -- TODO: That freeform_table_value is uberhack! Fix tools_cli_config!
+  if freeform_table_value(MODE_CONFIG).session_checker_file_name then
     header = [[
 local create_session_checker
 = import ']] .. MODE_CONFIG.session_checker_file_name .. [['

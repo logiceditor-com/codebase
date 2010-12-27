@@ -130,7 +130,7 @@ local git_format_command,
       git_are_branches_different,
       git_is_file_changed_between_revisions,
       git_add_directory,
-      git_commit_with_editable_message,
+      git_commit_with_message,
       git_push_all
       = import 'lua-aplicado/shell/git.lua'
       {
@@ -145,7 +145,7 @@ local git_format_command,
         'git_are_branches_different',
         'git_is_file_changed_between_revisions',
         'git_add_directory',
-        'git_commit_with_editable_message',
+        'git_commit_with_message',
         'git_push_all'
       }
 
@@ -578,7 +578,7 @@ do
         -- TODO: HACK! Add only generated files!
         writeln_flush("----> Committing added rocks...")
         git_add_directory(subproject.local_path, path)
-        git_commit_with_editable_message(
+        git_commit_with_message(
             subproject.local_path,
             subproject.name .. ": updated rocks"
           )
@@ -888,7 +888,7 @@ do
               -- TODO: HACK! Add only generated files!
               writeln_flush("----> Committing changed rocks...")
               git_add_directory(manifest.local_rocks_git_repo_path, manifest.local_rocks_repo_path)
-              git_commit_with_editable_message(
+              git_commit_with_message(
                   manifest.local_rocks_git_repo_path,
                   "rocks/" .. cluster_info.name .. ": updated rocks for " .. name
                 )
@@ -922,7 +922,7 @@ do
         else
           writeln_flush("----> Comitting changed manifest...")
 
-          git_commit_with_editable_message(
+          git_commit_with_message(
               manifest.local_rocks_git_repo_path,
               "rocks/" .. cluster_info.name .. ": updated manifest"
             )
@@ -1316,7 +1316,7 @@ do
         git_add_directory(manifest.local_cluster_versions_git_repo_path, manifest.local_cluster_versions_path)
 
         writeln_flush("----> Committing")
-        git_commit_with_editable_message(
+        git_commit_with_message(
             manifest.local_cluster_versions_git_repo_path,
             "cluster/" .. cluster_info.name .. ": updated versions after deployment"
           )

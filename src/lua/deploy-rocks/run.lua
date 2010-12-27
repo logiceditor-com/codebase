@@ -904,10 +904,10 @@ do
       else
         writeln_flush("----> Rebuilding manifest...")
         luarocks_admin_make_manifest(manifest.local_rocks_repo_path)
-      end
 
-      -- TODO: HACK! Add only generated files!
-      git_add_directory(manifest.local_rocks_git_repo_path, manifest.local_rocks_repo_path)
+        -- TODO: HACK! Add only generated files!
+        git_add_directory(manifest.local_rocks_git_repo_path, manifest.local_rocks_repo_path)
+      end
 
       git_update_index(manifest.local_rocks_git_repo_path)
       if

@@ -9,6 +9,8 @@ LOCALROOT=$4
 
 set -o nounset
 
+set -e
+
 # TODO: Generalize copy-paste!
 green='\033[32m'
 red='\033[31m'

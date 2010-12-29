@@ -3,6 +3,8 @@
 # Based on script by AF:
 # http://gist.github.com/212082
 
+set -e
+
 # TODO: Not very elegant. Cache git tag -l output etc.!
 
 if [ -z "$1" ]; then

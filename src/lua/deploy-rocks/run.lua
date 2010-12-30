@@ -1045,7 +1045,7 @@ do
 
     action_handlers.deploy_rocks = function(manifest, cluster_info, param, machine, role_args, action)
       local rocks_must_be_installed = action
-      assert(#rocks_must_be_installed > 0)
+      assert(#rocks_must_be_installed > 0, "deploy_rocks: no rocks specified")
 
       local dry_run = param.dry_run
 

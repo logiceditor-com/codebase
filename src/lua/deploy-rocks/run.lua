@@ -570,6 +570,19 @@ do
           writeln_flush("----> Rebuilding manifest...")
           luarocks_admin_make_manifest(path)
         end
+
+        -- Needed for foreign-cluster-specific rocks,
+        -- so they do not linger in our system
+        if rockspec.remove_after_pack then
+          if dry_run then
+            writeln_flush(
+                "-!!-> DRY RUN: Want to remove after pack", name
+              )
+          else
+            writeln_flush("----> Removing after pack `", name, "'...")
+            luarocks_ensure_rock_not_installed_forced(name)
+          end
+        end
       end
 
       if dry_run then

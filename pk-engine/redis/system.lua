@@ -98,6 +98,7 @@ local get_next_task_nonblocking = function(conn, service_id)
 
   local list_key = task_queue_key(service_id)
 
+  conn:ping()
   local res, err = conn:lpop(list_key)
   if not res then
     log_error(
@@ -141,6 +142,7 @@ local get_next_task_blocking = function(cache, service_id, timeout)
 
   local list_key = task_queue_key(service_id)
 
+  conn:ping()
   local actual_list_key, value = cache:blpop(list_key, timeout)
   if not actual_list_key then
     local err = value
@@ -187,6 +189,7 @@ local try_get_next_task_blocking = function(api_context, service_id, timeout)
 end
 
 local push_task = function(conn, service_id, task_data)
+  conn:ping()
   local res, err = conn:rpush(task_queue_key(service_id), task_data)
   if res == false and err then -- TODO: Hack. Remove when sidereal is fixed
     res = nil
@@ -220,6 +223,7 @@ local try_flush_tasks = function(api_context, service_id)
     )
   local cache = system_redis(api_context)
   local list_key = task_queue_key(service_id)
+  conn:ping()
   rtry("INTERNAL_ERROR", cache:ltrim(list_key, 1, 0))
 end
 

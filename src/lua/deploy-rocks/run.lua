@@ -519,7 +519,7 @@ do
       local path = assert(subproject.local_path) .. "/" .. assert(rocks_repo.name)
       local manifest_path = assert(action.manifest)
 
-      writeln_flush("----> Adding rocks from ", manifest_path)
+      writeln_flush("----> Adding rocks from rocks manifest ", manifest_path)
 
       local manifest_chunk = assert(loadfile(manifest_path)) -- path should be absolute
 
@@ -808,7 +808,7 @@ do
                   if dry_run then
                     writeln_flush("-!!-> DRY RUN: Want to pack", rockspec)
                   else
-                    writeln_flush("----> Packing `", rockspec, "'...")
+                    writeln_flush("----> Packing `", rockspec, "' to `", manifest.local_rocks_repo_path, "'...")
                     luarocks_pack_to(rock_name, manifest.local_rocks_repo_path)
                     if path ~= manifest.local_rocks_repo_path then
                       copy_file_to_dir(path .. "/" .. rockspec, manifest.local_rocks_repo_path)

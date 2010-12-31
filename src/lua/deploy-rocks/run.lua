@@ -1491,7 +1491,7 @@ actions.deploy_from_versions_file = function(...)
   if not dry_run then
     if ask_user(
         "Do you want to deploy code to `" .. cluster_name .. "'"
-     .. "from version file `" .. version_filename .. "'?",
+     .. " from version file `" .. version_filename .. "'?",
         { "y", "n" },
         "n"
       ) ~= "y"

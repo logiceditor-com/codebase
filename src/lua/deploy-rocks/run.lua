@@ -477,7 +477,7 @@ do
           local rocks_repo = subproject.provides_rocks_repo[i].name
 
           local names = luarocks_get_rocknames_in_manifest( -- TODO: Really Bad! This will trigger full reinstall! Detect changed rocks!
-              subproject.local_path .. "/" .. subproject.rocks_repo .. "/manifest"
+              subproject.local_path .. "/" .. rocks_repo .. "/manifest"
             )
           for i = 1, #names do
             local name = names[i]

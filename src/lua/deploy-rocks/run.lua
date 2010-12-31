@@ -163,7 +163,8 @@ local luarocks_exec,
       luarocks_get_rocknames_in_manifest,
       luarocks_install_from,
       luarocks_parse_installed_rocks,
-      luarocks_load_rockspec
+      luarocks_load_rockspec,
+      luarocks_list_rockspec_files
       = import 'lua-aplicado/shell/luarocks.lua'
       {
         'luarocks_exec',
@@ -180,7 +181,8 @@ local luarocks_exec,
         'luarocks_get_rocknames_in_manifest',
         'luarocks_install_from',
         'luarocks_parse_installed_rocks',
-        'luarocks_load_rockspec'
+        'luarocks_load_rockspec',
+        'luarocks_list_rockspec_files'
       }
 
 local remote_luarocks_remove_forced,
@@ -836,6 +838,20 @@ do
                   end
                 end
               end
+
+              if have_changed_rocks then
+                if dry_run then
+                  writeln_flush("-!!-> DRY RUN: Want to commit changed rocks")
+                else
+                  -- TODO: HACK! Add only generated files!
+                  writeln_flush("----> Committing changed rocks...")
+                  git_add_directory(manifest.local_rocks_git_repo_path, manifest.local_rocks_repo_path)
+                  git_commit_with_message(
+                      manifest.local_rocks_git_repo_path,
+                      "rocks/" .. cluster_info.name .. ": updated rocks for " .. name
+                    )
+                end
+              end
             end
           else
             local rocks = assert(subproject.provides_rocks)
@@ -908,19 +924,19 @@ do
                 end
               end
             end
-          end
 
-          if have_changed_rocks then
-            if dry_run then
-              writeln_flush("-!!-> DRY RUN: Want to commit changed rocks")
-            else
-              -- TODO: HACK! Add only generated files!
-              writeln_flush("----> Committing changed rocks...")
-              git_add_directory(manifest.local_rocks_git_repo_path, manifest.local_rocks_repo_path)
-              git_commit_with_message(
-                  manifest.local_rocks_git_repo_path,
-                  "rocks/" .. cluster_info.name .. ": updated rocks for " .. name
-                )
+            if have_changed_rocks then
+              if dry_run then
+                writeln_flush("-!!-> DRY RUN: Want to commit changed rocks")
+              else
+                -- TODO: HACK! Add only generated files!
+                writeln_flush("----> Committing changed rocks...")
+                git_add_directory(manifest.local_rocks_git_repo_path, manifest.local_rocks_repo_path)
+                git_commit_with_message(
+                    manifest.local_rocks_git_repo_path,
+                    "rocks/" .. cluster_info.name .. ": updated rocks for " .. name
+                  )
+              end
             end
           end
         end

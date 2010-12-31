@@ -597,21 +597,21 @@ do
             end
           end
         end
+      end
 
-        if not have_changed_rocks then
-          writeln_flush("----> No changed rocks for that rocks manifest ", manifest_path)
+      if not have_changed_rocks then
+        writeln_flush("----> No changed rocks for that rocks manifest ", manifest_path)
+      else
+        if dry_run then
+          writeln_flush("-!!-> DRY RUN: Want to commit added rocks from rocks manifest ", manifest_path)
         else
-          if dry_run then
-            writeln_flush("-!!-> DRY RUN: Want to commit added rocks from rocks manifest ", manifest_path)
-          else
-            -- TODO: HACK! Add only generated files!
-            writeln_flush("----> Committing added rocks from rocks manifest ", manifest_path, " (path: ", path, ")...")
-            git_add_directory(subproject.local_path, path)
-            git_commit_with_message(
-                subproject.local_path,
-                subproject.name .. ": updated rocks from " .. name
-              )
-          end
+          -- TODO: HACK! Add only generated files!
+          writeln_flush("----> Committing added rocks from rocks manifest ", manifest_path, " (path: ", path, ")...")
+          git_add_directory(subproject.local_path, path)
+          git_commit_with_message(
+              subproject.local_path,
+              subproject.name .. "/" .. rocks_repo.name .. ": updated rocks"
+            )
         end
       end
     end

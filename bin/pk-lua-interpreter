@@ -16,4 +16,4 @@ if [ -z "$(which ${LUA})" ]; then
   fi
 fi
 
-/usr/bin/env ${LUA} $@
+/usr/bin/env ${LUA} "$@"

@@ -531,8 +531,8 @@ do
       local manifest_chunk = assert(loadfile(manifest_path)) -- path should be absolute
 
       -- TODO: Sandbox it?
-      local manifest = manifest_chunk()
-      local ROCKS = assert(manifest.ROCKS)
+      local rocks_manifest = manifest_chunk()
+      local ROCKS = assert(rocks_manifest.ROCKS)
 
       -- TODO: Rebuild only if rock's file dependencies is changed
 
@@ -545,14 +545,16 @@ do
           rockspec["x-cluster-name"]
           and (rockspec["x-cluster-name"] ~= cluster_info.name)
         then
-          writeln_flush(
-              "----> Skipping cluster-specific rock ", rockspec[1],
-              " (not for our cluster)"
-            )
-
           -- TODO: Hack. Redesign workflow instead.
           manifest.ignore_rocks = manifest.ignore_rocks or { }
-          manifest.ignore_rocks[get_filename_from_path(rockspec[1])] = true
+          local data = luarocks_load_rockspec(action.local_path .. "/" .. assert(rockspec[1]))
+          local name = assert(data.package)
+          manifest.ignore_rocks[get_filename_from_path(name)] = true
+
+          writeln_flush(
+              "----> Skipping cluster-specific rock ", name,
+              " (not for our cluster)"
+            )
         else
           if rockspec.generator then
             if dry_run then
@@ -799,29 +801,27 @@ do
 
                 if
                   manifest.ignore_rocks and manifest.ignore_rocks[
-                      get_filename_from_path(rock_file.filename)
+                      get_filename_from_path(rock_file.name)
                     ]
                 then
-                  writeln_flush("----> Ignoring `", rock_file.filename, "'")
-                else
-                  if
-                    not current_subproject_version
-                    or git_is_file_changed_between_revisions(
-                        subproject.local_path,
-                        rock_file.filename,
-                        current_subproject_version,
-                        "HEAD"
-                      )
-                  then
-                    if not changed_rocks[rock_file.name] then
-                      writeln_flush("Changed or new `", rock_file.name, "'.")
-                    end
-                    changed_rocks[rock_file.name] = true
-                    need_to_reinstall[rock_file.name] = true
-                    have_changed_rocks = true
-                  else
-                    writeln_flush("Not changed `", rock_file.name, "'.")
+                  writeln_flush("--> Ignoring `", rock_file.name, "'")
+                elseif
+                  not current_subproject_version
+                  or git_is_file_changed_between_revisions(
+                      subproject.local_path,
+                      rock_file.filename,
+                      current_subproject_version,
+                      "HEAD"
+                    )
+                then
+                  if not changed_rocks[rock_file.name] then
+                    writeln_flush("--> Changed or new `", rock_file.name, "'.")
                   end
+                  changed_rocks[rock_file.name] = true
+                  need_to_reinstall[rock_file.name] = true
+                  have_changed_rocks = true
+                else
+                  writeln_flush("--> Not changed `", rock_file.name, "'.")
                 end
               end
 
@@ -896,7 +896,7 @@ do
                 local rock = rocks[i]
 
                 if
-                  manifest.ignore_rocks and manifest.ignore_rocks[get_filename_from_path(rock.rockspec)]
+                  manifest.ignore_rocks and manifest.ignore_rocks[get_filename_from_path(rock.name)]
                 then
                   writeln_flush("----> Ignoring `", rock.rockspec, "'")
                 else

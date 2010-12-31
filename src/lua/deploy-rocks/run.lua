@@ -318,6 +318,11 @@ local function splitpath(path)
   end
 end
 
+local get_filename_from_path = function(path)
+  local dirname, filename = splitpath(path)
+  return filename
+end
+
 local remote_ensure_sudo_is_passwordless = function(host)
   -- Hint: To fix do:
   -- $ sudo visudo
@@ -544,6 +549,10 @@ do
               "----> Skipping cluster-specific rock ", rockspec[1],
               " (not for our cluster)"
             )
+
+          -- TODO: Hack. Redesign workflow instead.
+          manifest.ignore_rocks = manifest.ignore_rocks or { }
+          manifest.ignore_rocks[get_filename_from_path(rockspec[1])] = true
         else
           if rockspec.generator then
             if dry_run then
@@ -789,22 +798,30 @@ do
                 local rock_file = rock_files[i]
 
                 if
-                  not current_subproject_version
-                  or git_is_file_changed_between_revisions(
-                      subproject.local_path,
-                      rock_file.filename,
-                      current_subproject_version,
-                      "HEAD"
-                    )
+                  manifest.ignore_rocks and manifest.ignore_rocks[
+                      get_filename_from_path(rock_file.filename)
+                    ]
                 then
-                  if not changed_rocks[rock_file.name] then
-                    writeln_flush("Changed or new `", rock_file.name, "'.")
-                  end
-                  changed_rocks[rock_file.name] = true
-                  need_to_reinstall[rock_file.name] = true
-                  have_changed_rocks = true
+                  writeln_flush("----> Ignoring `", rock_file.filename, "'")
                 else
-                  writeln_flush("Not changed `", rock_file.name, "'.")
+                  if
+                    not current_subproject_version
+                    or git_is_file_changed_between_revisions(
+                        subproject.local_path,
+                        rock_file.filename,
+                        current_subproject_version,
+                        "HEAD"
+                      )
+                  then
+                    if not changed_rocks[rock_file.name] then
+                      writeln_flush("Changed or new `", rock_file.name, "'.")
+                    end
+                    changed_rocks[rock_file.name] = true
+                    need_to_reinstall[rock_file.name] = true
+                    have_changed_rocks = true
+                  else
+                    writeln_flush("Not changed `", rock_file.name, "'.")
+                  end
                 end
               end
 
@@ -877,22 +894,29 @@ do
               writeln_flush("----> Updating rocks...")
               for i = 1, #rocks do
                 local rock = rocks[i]
-                changed_rocks[rock.name] = true
 
-                if rock.rockspec_generator then
-                  if dry_run then
-                    writeln_flush("-!!-> DRY RUN: Want to generate rock for ", rock.name)
-                  else
-                    writeln_flush("----> Generating rock for ", rock.name, "...")
-                    local rockspec_generator = is_table(rock.rockspec_generator)
-                      and rock.rockspec_generator
-                       or { rock.rockspec_generator }
-                    assert(
-                        shell_exec(
-                            "cd", subproject.local_path,
-                            "&&", unpack(rockspec_generator)
-                          ) == 0
-                      )
+                if
+                  manifest.ignore_rocks and manifest.ignore_rocks[get_filename_from_path(rock.rockspec)]
+                then
+                  writeln_flush("----> Ignoring `", rock.rockspec, "'")
+                else
+                  changed_rocks[rock.name] = true
+
+                  if rock.rockspec_generator then
+                    if dry_run then
+                      writeln_flush("-!!-> DRY RUN: Want to generate rock for ", rock.name)
+                    else
+                      writeln_flush("----> Generating rock for ", rock.name, "...")
+                      local rockspec_generator = is_table(rock.rockspec_generator)
+                        and rock.rockspec_generator
+                         or { rock.rockspec_generator }
+                      assert(
+                          shell_exec(
+                              "cd", subproject.local_path,
+                              "&&", unpack(rockspec_generator)
+                            ) == 0
+                        )
+                    end
                   end
                 end
 

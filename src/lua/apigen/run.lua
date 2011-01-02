@@ -48,14 +48,16 @@ local empty_table,
       timap,
       tkeys,
       tappend_many,
-      tset_many
+      tset_many,
+      tijoin_many
       = import 'lua-nucleo/table.lua'
       {
         'empty_table',
         'timap',
         'tkeys',
         'tappend_many',
-        'tset_many'
+        'tset_many',
+        'tijoin_many'
       }
 
 local make_loggers
@@ -333,10 +335,10 @@ local get_exports_requires_globals = function(config)
     local filenames = config.globals
     for i = 1, #filenames do
       local filename = filenames[i].filename
-      data[#data + 1] = import(filename)()
+      data = tijoin_many(data, import(filename) { 'GLOBALS' })
     end
 
-    allowed_globals = tset_many(unpack(data))
+    allowed_globals = tset_many(data)
   end
 
   return known_exports, allowed_requires, allowed_globals

@@ -280,7 +280,12 @@ Usage:
 
     pk-fill-placeholders <template_path> <data_path> <output_path> [options]
 
-Everything with `*_path' suffix may be a file or a directory.
+The `template_path' and/or `data_path` may be either a file or a directory.
+
+If `template_path` is a directory, then `output_path` should also be
+a directory.
+
+If `output_path` is missing, it will be created.
 
 To pass data from command-line use `<()' bash trick:
 

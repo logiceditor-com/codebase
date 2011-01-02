@@ -142,7 +142,7 @@ local get_next_task_blocking = function(cache, service_id, timeout)
 
   local list_key = task_queue_key(service_id)
 
-  conn:ping()
+  cache:ping()
   local actual_list_key, value = cache:blpop(list_key, timeout)
   if not actual_list_key then
     local err = value
@@ -223,7 +223,7 @@ local try_flush_tasks = function(api_context, service_id)
     )
   local cache = system_redis(api_context)
   local list_key = task_queue_key(service_id)
-  conn:ping()
+  cache:ping()
   rtry("INTERNAL_ERROR", cache:ltrim(list_key, 1, 0))
 end
 

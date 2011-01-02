@@ -136,6 +136,10 @@ do
       export = "handle_api_session_with_events";
       wrappers = { "create_session_checker", "create_event_reporter" };
       cat_output_format = cat_static_output_format;
+
+      raw_handler = function(self, walkers, data)
+        walkers.need_event_reporter_ = true
+      end;
     };
     ["api:dynamic_output_format_handler"] =
     {
@@ -152,6 +156,10 @@ do
     assert(walkers.handler_tag_)
 
     local handler_info = assert(handler_info[walkers.handler_tag_])
+
+    if handler_info.raw_handler then
+      handler_info.raw_handler(handler_info, walkers, data)
+    end
 
     walkers.cat_ [[
 do
@@ -330,16 +338,20 @@ end
 
   generate_url_handler_index = function(
       schema,
-      project_specific_data,
+      project_specific_headers,
       handler_path_prefix,
-      data_formats_filename,
+      data_formats_filename, -- TODO: Straighten these out!
+      db_tables_filename,
+      webservice_request_filename,
       base_url
     )
     arguments(
         "table", schema,
-        "table", project_specific_data,
+        "string", project_specific_headers,
         "string", handler_path_prefix,
         "string", data_formats_filename,
+        "string", db_tables_filename,
+        "string", webservice_request_filename,
         "string", base_url
       )
 
@@ -354,10 +366,27 @@ end
       handler_path_prefix_ = handler_path_prefix;
       handler_tag_ = nil;
       base_url_ = base_url;
+      need_event_reporter_ = false;
     }
 
     for i = 1, #schema do
       walk_tagged_tree(schema[i], walkers, "id")
+    end
+
+    -- TODO: Elaborate on this
+    local extra_imports =
+    {
+      assert(project_specific_headers);
+    }
+
+    if walkers.need_event_reporter_ then
+      extra_imports[#extra_imports + 1] = [[
+local create_event_reporter
+      = import 'logic/webservice/db/client_event.lua'
+      {
+        'create_event_reporter'
+      }
+]]
     end
 
     return [[
@@ -406,40 +435,33 @@ local make_luabins_schema_builder
         'make_luabins_schema_builder'
       }
 
-local FORMATS = import ']] .. data_formats_filename .. [[' { 'FORMATS' }
-
---------------------------------------------------------------------------------
-
-]] .. project_specific_data.HEADER .. [[
-
-local create_event_reporter
-      = import 'logic/webservice/db/client_event.lua'
-      {
-        'create_event_reporter'
-      }
-
-local get_www_game_config,
-      get_www_admin_config
-      = import 'logic/webservice/request.lua'
-      {
-        'get_www_game_config',
-        'get_www_admin_config'
-      }
-
-local TABLES = import 'logic/db/tables.lua' ()
-
-local make_output_format_manager
-      = import 'formats.lua'
-      {
-        'make_output_format_manager'
-      }
-
 local make_url_handler_wrapper
       = import 'pk-engine/webservice/client_api/url_handler_wrapper.lua'
       {
         'make_url_handler_wrapper'
       }
 
+--------------------------------------------------------------------------------
+
+local FORMATS,
+      make_output_format_manager
+      = import ']] .. data_formats_filename .. [['
+      {
+        'FORMATS',
+        'make_output_format_manager'
+      }
+
+local TABLES = import ']] .. db_tables_filename .. [[' ()
+
+local get_www_game_config,
+      get_www_admin_config
+      = import ']] .. webservice_request_filename .. [['
+      {
+        'get_www_game_config',
+        'get_www_admin_config'
+      }
+
+]] .. table.concat(extra_imports, '\n') .. [[
 --------------------------------------------------------------------------------
 
 local INTERNAL_CALL_HANDLERS = { }

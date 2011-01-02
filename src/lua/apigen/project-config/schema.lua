@@ -28,7 +28,14 @@ do
           cfg:node "application"
           {
             cfg:url "url";
+
             cfg:optional_path "session_checker_file_name";
+            cfg:path "db_tables_filename" { default = "logic/db/tables.lua" };
+            cfg:path "webservice_request_filename"
+            {
+              default = "logic/webservice/request.lua";
+            };
+
             cfg:existing_path "api_schema_dir";
             cfg:boolean "have_unity_client";
 

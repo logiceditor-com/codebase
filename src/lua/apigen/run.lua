@@ -598,17 +598,21 @@ local create_session_checker
     header = [[]]
   end
 
+  local db_tables_filename = MODE_CONFIG.db_tables_filename
+
+  local webservice_request_filename = MODE_CONFIG.webservice_request_filename
+
   assert(create_path_to_file(out_file_root .. out_handlers_index_filename))
   assert(
       write_file(
           out_file_root .. out_handlers_index_filename,
           generate_url_handler_index(
               api,
-              {
-                HEADER = header;
-              },
+              header,
               out_handlers_dir_name,
               out_data_formats_filename,
+              db_tables_filename,
+              webservice_request_filename,
               out_base_url_prefix
             )
         )

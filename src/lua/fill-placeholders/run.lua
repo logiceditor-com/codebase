@@ -301,20 +301,15 @@ local CONFIG, ARGS
 local run = function(...)
   -- WARNING: Action-less tool. Take care when copy-pasting.
 
-  CONFIG, ARGS = assert(load_tools_cli_config(
+  CONFIG, ARGS = load_tools_cli_config(
       function(args) -- Parse actions
-        if (not args[1]) or (not args[2]) or (not args[3]) then
-          print_tools_cli_config_usage(EXTRA_HELP, CONFIG_SCHEMA)
-          os.exit(1)
-        end
-
         local param = { }
 
         param.template_path = args[1]
         param.data_path = args[2]
         param.output_path = args[3]
 
-        param.template_capture = args["--template-capture"] or nil
+        param.template_capture = args["--template-capture"]
 
         return
         {
@@ -327,7 +322,18 @@ local run = function(...)
       nil, -- Specify primary config file with --base-config cli option
       nil, -- No secondary config file
       ...
-    ))
+    )
+
+  if CONFIG == nil then
+    local err = ARGS
+
+    print_tools_cli_config_usage(EXTRA_HELP, CONFIG_SCHEMA)
+
+    io.stderr:write("Error in tool configuration:\n", err, "\n\n")
+    io.stderr:flush()
+
+    os.exit(1)
+  end
 
   ------------------------------------------------------------------------------
 

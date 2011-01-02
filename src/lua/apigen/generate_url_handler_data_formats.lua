@@ -879,6 +879,8 @@ end
     up["api:output_with_events"] = function(walkers, data)
       walkers.nesting_ = nil
 
+      walkers.need_events_renderer_ = true
+
       walkers.cat_ [[
       };
       build_events_renderer(builder);
@@ -976,10 +978,24 @@ end
       cat_ = cat;
       child_count_ = nil;
       nesting_ = nil;
+      need_events_renderer_ = false;
     }
 
     for i = 1, #schema do
       walk_tagged_tree(schema[i], walkers, "id")
+    end
+
+    -- TODO: Elaborate on this
+    local extra_imports = { }
+
+    if walkers.need_events_renderer_ then
+      extra_imports[#extra_imports + 1] = [[
+local build_events_renderer
+      = import 'logic/webservice/client_events.lua'
+      {
+        'build_events_renderer'
+      }
+]]
     end
 
     return [[
@@ -1034,12 +1050,7 @@ local PARTNER_NAMES
 
 local check = import 'pk-engine/webservice/client_api/check.lua' ()
 
-local build_events_renderer
-      = import 'logic/webservice/client_events.lua'
-      {
-        'build_events_renderer'
-      }
-
+]] .. table.concat(extra_imports, "\n") .. [[
 --------------------------------------------------------------------------------
 
 local xml_schema_builder = make_xml_schema_builder()

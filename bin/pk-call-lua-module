@@ -8,40 +8,10 @@ pcall(require, 'luarocks.require') -- Ignoring errors
 
 --------------------------------------------------------------------------------
 
--- pk-engine
-require 'copas' -- Should be loaded first
-require 'posix'
-require 'socket'
-require 'socket.http'
-require 'luabins'
-require 'socket.url'
-require 'md5'
-require 'luasql.mysql'
-require 'uuid'
-require 'lfs'
-require 'ev'
-require 'ltn12'
-require 'random'
-require 'sidereal'
-
---------------------------------------------------------------------------------
-
--- pk-tools
-if jit == nil then
-  -- NOTE: This actually is used in apigen only,
-  --       all other tools are LJ2-compatible.
-  require 'inspector' -- Actually that's lbci
-else
-  require 'jit.util'
-  require 'jit.vmdef'
-  require 'bit' -- Builtin to LJ2
-end
-
---------------------------------------------------------------------------------
-
 require 'lua-nucleo.module'
 require 'lua-nucleo.strict'
-require 'pk-core.module'
+
+require = import 'lua-nucleo/require_and_declare.lua' { 'require_and_declare' }
 
 --------------------------------------------------------------------------------
 

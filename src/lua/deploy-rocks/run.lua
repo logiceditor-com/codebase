@@ -87,12 +87,18 @@ local make_checker
 
 local write_file,
       read_file,
-      find_all_files
+      find_all_files,
+      does_file_exist,
+      splitpath,
+      get_filename_from_path
       = import 'lua-aplicado/filesystem.lua'
       {
         'write_file',
         'read_file',
-        'find_all_files'
+        'find_all_files',
+        'does_file_exist',
+        'splitpath',
+        'get_filename_from_path'
       }
 
 local shell_exec,
@@ -284,10 +290,6 @@ local copy_file_to_dir = function(filename, dir)
     ) == 0)
 end
 
-local does_file_exist = function(filename)
-  return not not lfs.attributes(filename)
-end
-
 local remove_file = function(filename)
   assert(shell_exec(
       "rm", filename
@@ -298,29 +300,6 @@ local create_symlink_from_to = function(from_filename, to_filename)
   assert(shell_exec(
       "ln", "-s", from_filename, to_filename
     ) == 0)
-end
-
--- From penlight (modified)
---- given a path, return the directory part and a file part.
--- if there's no directory part, the first value will be empty
--- @param path A file path
-local function splitpath(path)
-  local i = #path
-  local ch = path:sub(i, i)
-  while i > 0 and ch ~= "/" do
-    i = i - 1
-    ch = path:sub(i, i)
-  end
-  if i == 0 then
-    return '', path
-  else
-    return path:sub(1, i - 1), path:sub(i + 1)
-  end
-end
-
-local get_filename_from_path = function(path)
-  local dirname, filename = splitpath(path)
-  return filename
 end
 
 local remote_ensure_sudo_is_passwordless = function(host)

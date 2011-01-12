@@ -32,7 +32,7 @@ if extra_path ~= "" then
     package.path = package.path .. ";"
   end
 
-  package.path = package.path .. extra_path
+  package.path = extra_path .. package.path
 end
 
 local module = require(module_name)

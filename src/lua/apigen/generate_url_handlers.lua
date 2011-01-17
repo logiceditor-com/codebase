@@ -53,7 +53,7 @@ local make_loggers
 local list_globals_in_handler,
       classify_globals,
       generate_globals_header
-      = import 'apigen/api_globals.lua'
+      = import 'pk-core/api_globals.lua'
       {
         'list_globals_in_handler',
         'classify_globals',

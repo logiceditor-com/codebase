@@ -86,7 +86,7 @@ local walk_tagged_tree
 
 local list_globals_in_handler,
       check_globals
-      = import 'apigen/api_globals.lua'
+      = import 'pk-core/api_globals.lua'
       {
         'list_globals_in_handler',
         'check_globals'

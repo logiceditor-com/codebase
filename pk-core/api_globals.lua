@@ -100,7 +100,7 @@ local list_globals_in_handler = function(checker, data_id, handler_fn)
   local inspector = make_chunk_inspector(handler_fn)
   if inspector:get_num_upvalues() > 0 then
     checker:fail(
-        "bad " .. data_id .. ": handler has " .. inspector:get_num_upvales()
+        "bad " .. data_id .. ": handler has " .. inspector:get_num_upvalues()
      .. " upvalue(s), must have none"
       )
   end

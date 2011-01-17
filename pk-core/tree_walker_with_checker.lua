@@ -445,8 +445,8 @@ do
     local factory = walkers.factory_ or default_factory
     local mt = setmetatable(updown, prototype_mt)
 
-    return function()
-      local result = factory()
+    return function(...)
+      local result = factory(...)
 
       -- Your walker should provide checker() method.
       -- See default_factory() implementation.

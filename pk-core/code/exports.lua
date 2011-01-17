@@ -8,6 +8,8 @@
 return
 {
   call = { "pk-core/error.lua" };
+  check_globals = { "pk-core/api_globals.lua" };
+  classify_globals = { "pk-core/api_globals.lua" };
   common_init_logging_to_file = { "pk-core/log.lua" };
   common_load_schema = { "pk-core/common_load_schema.lua" };
   create_common_fields_by_tag = { "pk-core/dsl_loader.lua" };
@@ -20,9 +22,11 @@ return
   error_handler_for_call = { "pk-core/error.lua" };
   fail = { "pk-core/error.lua" };
   freeform_table_value = { "pk-core/tools_cli_config.lua" };
+  generate_globals_header = { "pk-core/api_globals.lua" };
   get_common_logging_system = { "pk-core/log.lua" };
   get_current_logsystem_date_microsecond = { "pk-core/log.lua" };
   is_common_logging_system_initialized = { "pk-core/log.lua" };
+  list_globals_in_handler = { "pk-core/api_globals.lua" };
   load_data_schema = { "pk-core/walk_data_with_schema.lua" };
   load_data_walkers = { "pk-core/walk_data_with_schema.lua" };
   load_tools_cli_config = { "pk-core/tools_cli_config.lua" };

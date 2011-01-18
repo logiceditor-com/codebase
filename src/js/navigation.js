@@ -1,5 +1,7 @@
 PK.navigation = new function()
 {
+  var set_doc_title_ = true
+
   var last_topic_;
 
   this.topic_makers = {};
@@ -69,6 +71,13 @@ PK.navigation = new function()
     last_topic_ = topic;
     topic.show(params);
 
-    document.title = I18N('Page title prefix') + (topic.title ? ": " + topic.title : "");
+    if (set_doc_title_)
+      document.title =
+        I18N('Page title prefix') + (topic.title ? ": " + topic.title : "")
   };
+
+  this.must_set_doc_title = function(state)
+  {
+    set_doc_title_ = state
+  }
 };

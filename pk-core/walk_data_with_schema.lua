@@ -154,7 +154,7 @@ local load_data_walkers = function(chunk, extra_env, ...)
       self.context_ = self.factory_(
           self.checker_,
           self.get_current_path_closure_,
-	  ...
+          ...
         )
     end;
 

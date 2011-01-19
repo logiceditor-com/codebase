@@ -119,7 +119,7 @@ end
 
 -- TODO: Lazy! Do not create so many closures!
 -- TODO: Generalize copy-paste
-local load_data_walkers = function(chunk, extra_env)
+local load_data_walkers = function(chunk, extra_env, ...)
   extra_env = extra_env or { }
   arguments(
       "function", chunk,
@@ -145,7 +145,7 @@ local load_data_walkers = function(chunk, extra_env)
       self.data_ = data
     end;
 
-    reset = function(self)
+    reset = function(self, ...)
       method_arguments(self)
       self.data_ = nil
       self.current_path_ = { }
@@ -153,7 +153,8 @@ local load_data_walkers = function(chunk, extra_env)
       self.checker_ = make_prefix_checker(self.get_current_path_closure_);
       self.context_ = self.factory_(
           self.checker_,
-          self.get_current_path_closure_
+          self.get_current_path_closure_,
+	  ...
         )
     end;
 
@@ -648,7 +649,7 @@ local load_data_walkers = function(chunk, extra_env)
     return types:get_current_path()
   end
 
-  types:reset()
+  types:reset(...)
 
   assert(walkers.root_defined_, "types:root must be defined")
 

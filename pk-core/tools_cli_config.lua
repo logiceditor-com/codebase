@@ -354,6 +354,12 @@ local parse_tools_cli_arguments = function(canonicalization_map, ...)
       local value = select(i, ...)
 
       args[canonicalization_map[name] or name] = value
+    elseif arg:match("^%-%-[^%-].*$") then
+      -- TODO: Optimize. Do not do double matching
+      local name, value = arg, true
+      assert(name)
+      assert(value)
+      args[canonicalization_map[name] or name] = value
     else
       local name = canonicalization_map[arg] or arg
       args[#args + 1] = name

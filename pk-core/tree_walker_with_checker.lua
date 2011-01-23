@@ -111,7 +111,7 @@ do
 
       if not data then
         -- TODO: ?!
-        self:checker():fail("(???):", tostring(msg))
+        self:checker():fail("(???): " .. tostring(msg))
       else
         local where = ""
         if data.file_ and data.line_ then

@@ -120,6 +120,31 @@ local get_tools_cli_data_walkers
 do
   -- TODO: Heavy. Initialize on-demand?
   local walkers = load_data_walkers(function()
+    -- Private method
+    local string_to_node = function(self, node)
+      method_arguments(
+          self,
+          "string", node
+        )
+
+      if not node:find("^return%s") then
+        node = "return " .. node
+      end
+
+      local ok, result = dostring_in_environment(
+          node,
+          self.env_,
+          "@" .. (table.concat(self:get_current_path(), "."))
+        )
+      if not ok then
+        -- Caller should call self:fail on failure
+        -- (or wrap call in self:ensure).
+        local err = result
+        return nil, err
+      end
+
+      return result
+    end
 
     --
     -- Use these types to define your config file schema.
@@ -236,6 +261,15 @@ do
     end)
 
     types:node "cfg:node"
+    {
+      loadhook = string_to_node;
+    }
+
+    types:node "cfg:optional_node"
+    {
+      optional = true;
+      loadhook = string_to_node;
+    }
 
     types:root "cfg:root"
 
@@ -268,7 +302,8 @@ do
       return self.checker_:good()
     end
 
-    types:factory (function(checker)
+    types:factory (function(checker, get_current_path_closure, env)
+      env = env or empty_table
 
       return
       {
@@ -277,7 +312,10 @@ do
         fail = fail;
         good = good;
         --
+        get_current_path = get_current_path_closure;
+        --
         checker_ = checker;
+        env_ = env;
       }
     end)
 
@@ -306,7 +344,7 @@ end
 
 local load_tools_cli_data
 do
-  load_tools_cli_data = function(schema, data)
+  load_tools_cli_data = function(schema, data, env)
     if is_function(schema) then
       schema = load_tools_cli_data_schema(schema)
     end
@@ -316,10 +354,13 @@ do
         "table", data
       )
 
-    local checker = get_tools_cli_data_walkers():walk_data_with_schema(
-        schema,
-        data
-      ):get_checker()
+    local checker = get_tools_cli_data_walkers()
+      :walk_data_with_schema(
+          schema,
+          data,
+          data -- use data as environment for string_to_node
+        )
+      :get_checker()
 
     if not checker:good() then
       return checker:result()
@@ -485,7 +526,10 @@ do
 
     -- Hack. Implicitly forcing config schema to have PROJECT_PATH key
     -- Better to do this explicitly somehow?
-    local PROJECT_PATH = assert(args_config.PROJECT_PATH, "missing PROJECT_PATH")
+    local PROJECT_PATH = assert(
+        args_config.PROJECT_PATH,
+        "missing PROJECT_PATH"
+      )
 
     local project_config_filename = args["--config"] or project_config_filename
     local base_config_filename = args["--base-config"] or base_config_filename
@@ -543,8 +587,14 @@ do
       --]]
       local attr = assert(lfs.attributes(project_config_filename))
       if attr.mode == "directory" then
-        local project_config_files = find_all_files(project_config_filename, ".")
-        local project_config_chunks = load_all_files(project_config_filename, ".")
+        local project_config_files = find_all_files(
+            project_config_filename,
+            "."
+          )
+        local project_config_chunks = load_all_files(
+            project_config_filename,
+            "."
+          )
         for i = 1, #project_config_chunks do
           assert(do_in_environment(project_config_chunks[i], config))
         end

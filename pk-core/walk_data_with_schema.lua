@@ -29,10 +29,12 @@ local arguments,
         'method_arguments'
       }
 
-local is_table
+local is_table,
+      is_string
       = import 'lua-nucleo/type.lua'
       {
-        'is_table'
+        'is_table',
+        'is_string'
       }
 
 local assert_is_nil,
@@ -145,7 +147,7 @@ local load_data_walkers = function(chunk, extra_env)
       self.data_ = data
     end;
 
-    reset = function(self)
+    reset = function(self, ...)
       method_arguments(self)
       self.data_ = nil
       self.current_path_ = { }
@@ -153,7 +155,8 @@ local load_data_walkers = function(chunk, extra_env)
       self.checker_ = make_prefix_checker(self.get_current_path_closure_);
       self.context_ = self.factory_(
           self.checker_,
-          self.get_current_path_closure_
+          self.get_current_path_closure_,
+          ...
         )
     end;
 
@@ -189,7 +192,7 @@ local load_data_walkers = function(chunk, extra_env)
       return ...
     end;
 
-    walk_data_with_schema = function(self, schema, data)
+    walk_data_with_schema = function(self, schema, data, ...)
       method_arguments(
           self,
           "table", schema,
@@ -198,7 +201,7 @@ local load_data_walkers = function(chunk, extra_env)
 
       assert(#schema > 0)
 
-      self:reset()
+      self:reset(...)
       self:set_data(data)
 
       self:walk_schema_(schema)
@@ -647,8 +650,6 @@ local load_data_walkers = function(chunk, extra_env)
   types.get_current_path_closure_ = function()
     return types:get_current_path()
   end
-
-  types:reset()
 
   assert(walkers.root_defined_, "types:root must be defined")
 

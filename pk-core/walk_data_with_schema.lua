@@ -270,6 +270,27 @@ local load_data_walkers = function(chunk, extra_env)
     return value
   end
 
+  local update_value = function(
+      self,
+      types_schema,
+      data_schema,
+      data,
+      key,
+      value
+    )
+    method_arguments(
+        self,
+        "table", types_schema,
+        "table", data_schema,
+        "table", data
+        -- key may be of any type
+        -- value may be of any type
+      )
+    assert(key ~= nil)
+
+    data[key] = value
+  end
+
   local walkers =
   {
     up =
@@ -539,11 +560,32 @@ local load_data_walkers = function(chunk, extra_env)
               data.name
             )
           if node == nil then
-            self.checker_:fail("`" .. tostring(data.name) .. "' is missing")
+            if not info.optional then
+              self.checker_:fail("`" .. tostring(data.name) .. "' is missing")
+            end
             return "break"
           end
+
+          -- TODO: this should be supported in other nodes (variant, ilist...)
+          if is_string(node) and info.loadhook then
+            node = self.checker_:ensure(
+                "string to node conversion failed",
+                info.loadhook(self.context_, node)
+              )
+            if node then
+              update_value(
+                  self,
+                  info,
+                  data,
+                  self.current_path_[#self.current_path_].node,
+                  data.name,
+                  node
+                )
+            end
+          end
+
           if not is_table(node) then
-            self.checker_:fail("`" .. tostring(data.name) .. "' is not table")
+            self.checker_:fail("`" .. tostring(data.name) .. "' is not a table")
             return "break"
           end
 

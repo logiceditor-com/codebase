@@ -21,7 +21,7 @@ var LOG = PK.log_system.add
 
 var GUI_ERROR = function(text)
 {
-  if (Ext.Msg.isReady)
+  if (Ext.isReady)
     Ext.Msg.alert('Failure', text)
   else
     LOG('GUI ERROR: ' + text)
@@ -30,6 +30,6 @@ var GUI_ERROR = function(text)
 var CRITICAL_ERROR = function(text)
 {
   LOG('CRITICAL ERROR: ' + text)
-  if (Ext.Msg.isReady)
+  if (Ext.isReady)
     Ext.Msg.alert('Failure', text)
 }

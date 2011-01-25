@@ -11,7 +11,7 @@ PK.override_object_properties = function(properties, rules, data)
   {
     if (rules[name] === true) // just set field using data
     {
-      if (!data[name])
+      if (data[name] !== undefined)
         properties[name] = data[name]
     }
 

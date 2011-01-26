@@ -29,11 +29,11 @@ PK.navigation = new function()
   this.go_to_topic = function(topic, params, must_show_topic)
   {
     var token = (topic)?(topic):("");
-    if(must_show_topic === undefined) { show_topic = false; };
+    if(must_show_topic === undefined) { must_show_topic = false; };
 
     if(params && params.length)
     {
-      for(i=0; i<params.length; i++)
+      for(var i = 0; i < params.length; i++)
         token += "/" + params[i];
     }
 

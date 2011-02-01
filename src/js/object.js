@@ -12,7 +12,9 @@ PK.override_object_properties = function(properties, rules, data)
     if (rules[name] === true) // just set field using data
     {
       if (data[name] !== undefined)
+      {
         properties[name] = data[name]
+      }
     }
 
     else if (typeof(rules[name]) == "function") //set and convert field using data
@@ -24,17 +26,15 @@ PK.override_object_properties = function(properties, rules, data)
 
     else if (typeof(rules[name]) == "object") // set field to const
     {
-      if ( rules[name].value !== undefined ) // value setter or constant
+      if ( rules[name].default_value !== undefined ) // set default value if necessary
       {
-        if (typeof(rules[name].value) == "function") // value maker
+        if (data[name] !== undefined)
         {
-          var value = rules[name].value(data[name])
-          if(value !== undefined)
-            properties[name] = value
+          properties[name] = data[name]
         }
-        else // const value
+        else
         {
-          properties[name] = rules[name].value
+          properties[name] = rules[name].default_value
         }
       }
     }

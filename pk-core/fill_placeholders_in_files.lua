@@ -117,9 +117,10 @@ end
 --------------------------------------------------------------------------------
 
 --[[
-The `template_path` and/or `data_path` may be either a file or a directory.
-
+The `template_path` may be either a file or a directory.
 If `template_path` is a directory, then `output_path` should also be a directory.
+
+The `value_provider_code` is a string containing code somehow setting placeholder values.
 
 If `output_path` is missing, it will be created.
 
@@ -127,14 +128,14 @@ template_capture is a Lua capture used in template files, default: `#{(.-)}'
 ]]
 local fill_placeholders_in_files = function(
     template_path,
-    data_path,
+    value_provider_code,
     output_path,
     template_capture,
     filename_mask
   )
   arguments(
       "string", template_path,
-      "string", data_path,
+      "string", value_provider_code,
       "string", output_path,
       "string", template_capture
     )
@@ -146,19 +147,8 @@ local fill_placeholders_in_files = function(
 
   local dictionary
   do
-    local data_chunks
-    if not assert_not_nil(is_directory(data_path)) then
-      data_chunks = { assert(loadfile(data_path)) }
-    else
-      -- Ensure single trailing slash
-      data_path = data_path:gsub("([^/])/*$", "%1/")
-      data_chunks = assert(load_all_files(data_chunks, filename_mask))
-    end
-
     local data = make_config_environment()
-    for i = 1, #data_chunks do
-      assert(do_in_environment(data_chunks[i], data))
-    end
+    assert(do_in_environment(loadstring(value_provider_code), data))
 
     dictionary = setmetatable(
         { },

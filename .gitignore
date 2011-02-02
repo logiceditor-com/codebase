@@ -7,5 +7,14 @@
 .project
 .settings
 
-/lua-nucleo
-/lua-aplicado
+*.kdevelop.*
+*.kdevelop
+*.kdevses
+*.kdev4
+/Doxyfile
+/tags
+
+/tmp
+
+.idea
+*.iml

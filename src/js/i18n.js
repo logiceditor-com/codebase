@@ -49,7 +49,7 @@ PK.i18n = new function()
 
   //----------------------------------------------------------------------------
 
-  this.text = function(s)
+  this.text = function(s, return_false_if_not_found)
   {
     if (current_language_ === undefined)
     {
@@ -66,6 +66,8 @@ PK.i18n = new function()
     var res = language_packs_[current_language_][s];
     if(res === undefined)
     {
+      if (return_false_if_not_found)
+        return false
       //LOGG("'" + s + "' : '',");
       return '*' + s + '*';
     }

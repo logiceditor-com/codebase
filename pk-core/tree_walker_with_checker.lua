@@ -395,7 +395,6 @@ do
     -- TODO: Overhead! Move this check at metatable level.
     if not rawget(self.up, data[self.tag_field_]) then
       self:fail("unknown language construct")
-      self:pop_node_from_path(data)
       return "break" -- Do not traverse subtree
     end
   end

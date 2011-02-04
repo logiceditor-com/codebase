@@ -476,7 +476,7 @@ end
 
 -- TODO: Hack. Protect only data defined in schema!
 local freeform_table_value = function(t)
-  return tclone(t[raw_config_table_key]())
+  return tclone(assert(t[raw_config_table_key])())
 end
 
 -- TODO: Too rigid. Must be more flexible.

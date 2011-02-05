@@ -21,6 +21,7 @@ return
   dump_nodes = { "pk-core/dump_nodes.lua" };
   error_handler_for_call = { "pk-core/error.lua" };
   fail = { "pk-core/error.lua" };
+  fill_placeholders_in_files = { "pk-core/fill_placeholders_in_files.lua" };
   freeform_table_value = { "pk-core/tools_cli_config.lua" };
   generate_globals_header = { "pk-core/api_globals.lua" };
   get_common_logging_system = { "pk-core/log.lua" };

@@ -522,31 +522,33 @@ do
     end
 
     -- Note tclone()
-    local args_config = arg_to_param_mapper(tclone(args))
+    local CONFIG = arg_to_param_mapper(tclone(args))
+
+    -- TODO: WTF?! Rewrite this whole thing!
+    local CONFIG_OVERRIDE = tclone(CONFIG)
 
     -- Hack. Implicitly forcing config schema to have PROJECT_PATH key
     -- Better to do this explicitly somehow?
     local PROJECT_PATH = assert(
-        args_config.PROJECT_PATH,
+        CONFIG.PROJECT_PATH,
         "missing PROJECT_PATH"
       )
+
+    -- TODO: Uberhack, remove!
+    CONFIG.import = import
+    CONFIG.rawget = rawget
+
+    CONFIG = make_config_environment(CONFIG)
 
     local project_config_filename = args["--config"] or project_config_filename
     local base_config_filename = args["--base-config"] or base_config_filename
 
-    local extra_param = make_config_environment({ PROJECT_PATH = PROJECT_PATH })
     if args["--param"] then
-      assert(dostring_in_environment(args["--param"], extra_param, "@--param"))
+      assert(dostring_in_environment(args["--param"], CONFIG, "@--param"))
     end
 
     -- TODO: Hack? Only base and project configs are allowed import()
     -- TODO: Let user to specify environment explicitly instead.
-    local base_config = make_config_environment(
-        {
-          PROJECT_PATH = PROJECT_PATH;
-          import = import;
-        }
-      )
     if not args["--no-base-config"] and base_config_filename then
       --[[
       io.stdout:write(
@@ -560,24 +562,14 @@ do
         local base_config_files = find_all_files(base_config_filename, ".")
         local base_config_chunks = load_all_files(base_config_filename, ".")
         for i = 1, #base_config_chunks do
-          assert(do_in_environment(base_config_chunks[i], base_config))
+          assert(do_in_environment(base_config_chunks[i], CONFIG))
         end
       else
         local base_config_chunk = assert(loadfile(base_config_filename))
-        assert(do_in_environment(base_config_chunk, base_config))
+        assert(do_in_environment(base_config_chunk, CONFIG))
       end
     end
 
-    if base_config.import == import then
-      base_config.import = nil -- TODO: Hack. Use metatables instead
-    end
-
-    local config = make_config_environment(
-        {
-          PROJECT_PATH = PROJECT_PATH;
-          import = import;
-        }
-      )
     if not args["--no-config"] and project_config_filename then
       --[[
       io.stdout:write(
@@ -596,29 +588,24 @@ do
             "."
           )
         for i = 1, #project_config_chunks do
-          assert(do_in_environment(project_config_chunks[i], config))
+          assert(do_in_environment(project_config_chunks[i], CONFIG))
         end
       else
         local project_config_chunk = assert(loadfile(project_config_filename))
-        assert(do_in_environment(project_config_chunk, config))
+        assert(do_in_environment(project_config_chunk, CONFIG))
       end
     end
 
-    if config.import == import then
-      config.import = nil -- TODO: Hack. Use metatables instead
+    if CONFIG.import == import then
+      CONFIG.import = nil -- TODO: Hack. Use metatables instead
+    end
+
+    if CONFIG.rawget == rawget then
+      CONFIG.rawget = nil -- TODO: Hack. Use metatables instead
     end
 
     -- Hack. Doing tclone() to remove __metatabled metatable
-    config = twithdefaults(
-        args_config,
-        twithdefaults(
-            tclone(extra_param),
-            twithdefaults(
-                tclone(config),
-                tclone(base_config)
-              )
-          )
-      )
+    CONFIG = twithdefaults(CONFIG_OVERRIDE, tclone(CONFIG))
 
     --[[
     io.stdout:write("--> validating cumulative config\n")
@@ -627,12 +614,12 @@ do
 
     local err
 
-    config, err = load_tools_cli_data(schema, config)
-    if config == nil then
+    CONFIG, err = load_tools_cli_data(schema, CONFIG)
+    if CONFIG == nil then
       return nil, err
     end
 
-    return treadonly(config, callbacks, tstr), args
+    return treadonly(CONFIG, callbacks, tstr), args
   end
 end
 

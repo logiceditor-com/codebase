@@ -17,6 +17,7 @@ local REQUIRE_GLOBALS =
   lfs = "lfs";
   base64 = "base64";
   iconv = "iconv";
+  unicode = "unicode";
 }
 
 --------------------------------------------------------------------------------

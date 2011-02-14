@@ -39,6 +39,17 @@ PK.common_custom_editors = new function()
       }));
   };
 
+  this.make_money_editor = function()
+  {
+    return new Ext.grid.GridEditor(new Ext.form.NumberField({
+        selectOnFocus: true,
+        allowBlank: true,
+        style:'text-align:left;',
+        allowDecimals: false,
+        allowNegative: false
+      }));
+  };
+
   this.make_date_editor = function()
   {
     return new Ext.grid.GridEditor(new Ext.form.DateField({
@@ -130,7 +141,7 @@ PK.common_custom_editors = new function()
         break;
 
       case PK.table_element_types.MONEY:
-        return undefined;
+        return this.make_money_editor;
         break;
 
       default:

@@ -120,13 +120,17 @@ PK.split_using_placeholders = function(s, keys)
     for (var i = 0; i < keys.length; i++)
     {
       var placeholder = '${' + keys[i] + '}'
-      if( s.indexOf(placeholder) < 0 )
-        break
-      s = s.replace(placeholder, SEPARATOR + placeholder + SEPARATOR)
+      if( s.indexOf(placeholder) >= 0 )
+      {
+        s = s.replace(placeholder, SEPARATOR + placeholder + SEPARATOR)
+      }
     }
   }
 
   var splitted = s.split(SEPARATOR)
+
+  //LOG("Splitting " + s + " using " + Ext.encode(keys) + " : " + Ext.encode(splitted))
+
 
   var result = []
   for(var i = 0; i < splitted.length; i++)

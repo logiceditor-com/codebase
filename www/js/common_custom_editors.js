@@ -44,10 +44,10 @@ PK.common_custom_editors = new function()
     return new Ext.grid.GridEditor(new Ext.form.NumberField({
         selectOnFocus: true,
         allowBlank: true,
-        style:'text-align:left;',
-        allowDecimals: false,
-        allowNegative: false
-      }));
+        style:'text-align:right;',
+        allowDecimals: true,
+        allowNegative: false,
+    }));
   };
 
   this.make_date_editor = function()

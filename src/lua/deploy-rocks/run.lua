@@ -569,7 +569,6 @@ do
             then
               writeln_flush("------> ", rockspec_files[i], " changed ")
               rockspec_files_changed[#rockspec_files_changed + 1] = rockspec_files[i]
-              writeln_flush("------> Length:", #rockspec_files_changed)
             end
           end
 

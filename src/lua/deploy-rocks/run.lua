@@ -711,7 +711,6 @@ do
         if current_versions[name] and not git_are_branches_different(path, "HEAD", current_versions[name]) then
           writeln_flush("No changes detected, skipping")
         else
-          need_new_versions_for_subprojects[name] = true
 
           if not current_versions[name] then
             writeln_flush("New subproject")
@@ -858,6 +857,7 @@ do
               end
 
               if have_changed_rocks_in_repo then
+                need_new_versions_for_subprojects[name] = true
                 if dry_run then
                   writeln_flush("-!!-> DRY RUN: Want to commit changed rocks")
                 else
@@ -951,6 +951,7 @@ do
             end
 
             if have_changed_rocks then
+              need_new_versions_for_subprojects[name] = true
               if dry_run then
                 writeln_flush("-!!-> DRY RUN: Want to commit changed rocks")
               else

@@ -18,6 +18,7 @@ local REQUIRE_GLOBALS =
   base64 = "base64";
   iconv = "iconv";
   unicode = "unicode";
+  sidereal = "sidereal";
 }
 
 --------------------------------------------------------------------------------

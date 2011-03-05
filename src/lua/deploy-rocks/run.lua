@@ -732,7 +732,7 @@ do
             end
 
             for i = 1, #subproject.provides_rocks_repo do
-
+              local have_changed_rocks_in_repo = false
               local rocks_repo = subproject.provides_rocks_repo[i].name
 
               if not subproject.provides_rocks_repo[i].pre_deploy_actions then
@@ -820,6 +820,7 @@ do
                   changed_rocks[rock_file.name] = true
                   need_to_reinstall[rock_file.name] = true
                   have_changed_rocks = true
+                  have_changed_rocks_in_repo = true
                 else
                   writeln_flush("--> Not changed `", rock_file.name, "'.")
                 end
@@ -856,7 +857,7 @@ do
                 end
               end
 
-              if have_changed_rocks then
+              if have_changed_rocks_in_repo then
                 if dry_run then
                   writeln_flush("-!!-> DRY RUN: Want to commit changed rocks")
                 else

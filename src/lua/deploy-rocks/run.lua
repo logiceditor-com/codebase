@@ -556,34 +556,56 @@ do
           local data = luarocks_load_rockspec(action.local_path .. "/" .. filename)
           local name = assert(data.package)
 
-          if dry_run then
-            writeln_flush("-!!-> DRY RUN: Want to rebuild ", filename)
-          else
-            writeln_flush("----> Rebuilding `", filename, "'...")
-            luarocks_ensure_rock_not_installed_forced(name)
-            luarocks_make_in(filename, action.local_path)
+          local rockspec_files = luarocks_list_rockspec_files(action.local_path .. "/" .. assert(rockspec[1]), action.local_path)
+          local rockspec_files_changed = { }
+
+          for i = 1, #rockspec_files do
+            if git_is_file_changed_between_revisions(
+                                action.local_path,
+                                rockspec_files[i],
+                                current_versions["pk-logiceditor-com"],
+                                "HEAD"
+                              )
+            then
+              writeln_flush("------> ", rockspec_files[i], " changed ")
+              rockspec_files_changed[#rockspec_files_changed + 1] = rockspec_files[i]
+              writeln_flush("------> Length:", #rockspec_files_changed)
+            end
           end
 
-          if dry_run then
-            writeln_flush("-!!-> DRY RUN: Want to pack ", filename)
+          if #rockspec_files_changed == 0 then
+            writeln_flush("------> No files changed in ", filename)
           else
-            writeln_flush("----> Packing `", filename, "' to `", path, "'...")
-            luarocks_pack_to(name, path)
-            copy_file_to_dir(action.local_path .. "/" .. filename, path)
-            writeln_flush("----> Rebuilding manifest...")
-            luarocks_admin_make_manifest(path)
 
-            have_changed_rocks = true
-          end
-
-          if rockspec["x-cluster-name"] then
             if dry_run then
-              writeln_flush(
-                  "-!!-> DRY RUN: Want to remove cluster-specific rock after pack", name
-                )
+              writeln_flush("-!!-> DRY RUN: Want to rebuild ", filename)
             else
-              writeln_flush("----> Removing after cluster-specific rock pack `", name, "'...")
+              writeln_flush("----> Rebuilding `", filename, "'...")
               luarocks_ensure_rock_not_installed_forced(name)
+              luarocks_make_in(filename, action.local_path)
+            end
+
+            if dry_run then
+              writeln_flush("-!!-> DRY RUN: Want to pack ", filename)
+            else
+              writeln_flush("----> Packing `", filename, "' to `", path, "'...")
+              luarocks_pack_to(name, path)
+              copy_file_to_dir(action.local_path .. "/" .. filename, path)
+              writeln_flush("----> Rebuilding manifest...")
+              luarocks_admin_make_manifest(path)
+
+              have_changed_rocks = true
+            end
+
+            if rockspec["x-cluster-name"] then
+              if dry_run then
+                writeln_flush(
+                    "-!!-> DRY RUN: Want to remove cluster-specific rock after pack", name
+                  )
+              else
+                writeln_flush("----> Removing after cluster-specific rock pack `", name, "'...")
+                luarocks_ensure_rock_not_installed_forced(name)
+              end
             end
           end
         end

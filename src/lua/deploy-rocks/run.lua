@@ -560,7 +560,9 @@ do
           local rockspec_files_changed = { }
 
           for i = 1, #rockspec_files do
-            if git_is_file_changed_between_revisions(
+            -- TODO: REMOVE "pk-logiceditor-com" with some PROJECT_NAME variable!
+            if not current_versions["pk-logiceditor-com"]
+              or git_is_file_changed_between_revisions(
                                 action.local_path,
                                 rockspec_files[i],
                                 current_versions["pk-logiceditor-com"],

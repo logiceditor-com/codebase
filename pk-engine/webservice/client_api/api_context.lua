@@ -155,7 +155,25 @@ do
     --       or starts with '127', '10.' or '192',
     --       try to look into X-Forwarded-For header.
 
-    return self.context_.wsapi_env.REMOTE_ADDR or ""
+    local wsapi_env = self.context_.wsapi_env
+    local ip = wsapi_env["X-REAL-IP"]
+
+    if not ip or ip == "" then
+      ip = wsapi_env["X-FORWARDED-FOR"]
+      if ip then
+        ip = ip:match("^(.-),.*$")
+      end
+    end
+
+    if not ip or ip == "" then
+      ip = wsapi_env["REMOTE_ADDR"]
+    end
+
+    if not ip then
+      ip = ""
+    end
+
+    return ip
   end
 
   -- Note that we do not have anything destroyable (yet)

@@ -19,6 +19,7 @@ local REQUIRE_GLOBALS =
   iconv = "iconv";
   unicode = "unicode";
   sidereal = "sidereal";
+  geoip = "geoip";
 }
 
 --------------------------------------------------------------------------------

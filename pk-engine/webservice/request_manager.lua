@@ -144,6 +144,34 @@ do
   -- Private function.
   local get_context -- NOTE: When changing this, remember to change api_context_stub.lua as well!
   do
+    local extend = function(self, key, factory)
+      method_arguments(
+          self,
+          --"any", key,
+          "function", factory
+        )
+      assert(key ~= nil)
+
+      assert(self.ext_factories_[key] == nil)
+      self.ext_factories_[key] = factory
+    end
+
+    local ext = function(self, key)
+      method_arguments(
+          self
+          --"any", key
+        )
+      local v = self.extensions_[key]
+
+      -- TODO: Use metatable!
+      if not v then
+        v = assert(self.ext_factories_[key](self))
+        self.extensions_[key] = v
+      end
+
+      return v
+    end
+
     local create_common_context = function(wsapi_env, config_manager_maker)
       arguments(
           "table", wsapi_env,
@@ -171,6 +199,12 @@ do
         net_connection_manager = make_net_connection_manager();
         db_manager = make_db_manager(config_manager, make_db_connection_manager());
         redis_manager = make_redis_manager(config_manager, make_redis_connection_manager());
+        --
+        extend = extend;
+        ext = ext;
+        --
+        extensions_ = { };
+        ext_factories_ = { };
       }
     end
 
@@ -186,7 +220,10 @@ do
       if not self.common_context_mt_ then
         self.common_context_mt_ =
         {
-          __index = create_common_context(wsapi_env, self.config_manager_maker_);
+          __index = create_common_context(
+              wsapi_env,
+              self.config_manager_maker_
+            );
           __metatable = true;
         }
       end
@@ -203,6 +240,14 @@ do
 
       return context
     end
+  end
+
+  local extend_context = function(self, wsapi_env, key, factory)
+    return get_context(
+        self, wsapi_env
+      ):extend(
+        key, factory
+      )
   end
 
   local handle_request
@@ -275,6 +320,7 @@ do
     return
     {
       handle_request = handle_request;
+      extend_context = extend_context;
       --
       request_handler_ = request_handler;
       common_context_mt_ = nil;

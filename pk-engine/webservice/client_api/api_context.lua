@@ -259,6 +259,14 @@ do
     return table.remove(self.param_stack_)
   end
 
+  local extend = function(self, key, factory)
+    return self.context_:ext(key, factory)
+  end
+
+  local ext = function(self, key)
+    return self.context_:ext(key)
+  end
+
   make_api_context = function(
       context,
       db_tables,
@@ -288,6 +296,9 @@ do
       post_request = post_request;
       get_request = get_request;
       --
+      extend = extend;
+      ext = ext;
+      --
       push_param = push_param; -- Private
       pop_param = pop_param; -- Private
       --
@@ -306,6 +317,9 @@ do
       www_game_config_getter_ = www_game_config_getter;
       www_admin_config_getter_ = www_admin_config_getter;
       internal_call_handlers_ = internal_call_handlers;
+      --
+      extensions_ = { };
+      ext_factories_ = { };
       --
       param_stack_ = { };
     }

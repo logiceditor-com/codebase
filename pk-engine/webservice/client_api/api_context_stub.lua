@@ -276,6 +276,34 @@ do
     return table.remove(self.param_stack_)
   end
 
+  local extend = function(self, key, factory)
+    method_arguments(
+        self,
+        --"any", key,
+        "function", factory
+      )
+    assert(key ~= nil)
+
+    assert(self.ext_factories_[key] == nil)
+    self.ext_factories_[key] = factory
+  end
+
+  local ext = function(self, key)
+    method_arguments(
+        self
+        --"any", key
+      )
+    local v = self.extensions_[key]
+
+    -- TODO: Use metatable!
+    if not v then
+      v = assert(self.ext_factories_[key](self))
+      self.extensions_[key] = v
+    end
+
+    return v
+  end
+
   make_api_context_stub = function(
       internal_config_manager,
       db_tables,
@@ -318,6 +346,9 @@ do
       cached_admin_config_ = nil;
       cached_db_ = nil;
       cached_redis_ = nil;
+      --
+      extensions_ = { };
+      ext_factories_ = { };
       --
       tables_ = db_tables;
       www_game_config_getter_ = www_game_config_getter;

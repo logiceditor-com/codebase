@@ -1252,8 +1252,9 @@ do
       )
 
       local dry_run = param.dry_run
+      local run_deploy_without_question = param.run_deploy_without_question
 
-      if not dry_run then
+      if (not dry_run) and (not run_deploy_without_question) then
         if ask_user( -- TODO: Make interactivity configurable, don't want to press this on developer machine each time
             "\n\nABOUT TO DEPLOY TO `" .. cluster_info.name .. "'. ARE YOU SURE?",
             { "y", "n" },
@@ -1359,7 +1360,8 @@ do
       changed_rocks_set,
       new_versions_filename,
       commit_new_versions,
-      dry_run
+      dry_run,
+      run_deploy_without_question
     )
 
     deploy_to_cluster(
@@ -1368,6 +1370,7 @@ do
         {
           dry_run = dry_run;
           changed_rocks_set = changed_rocks_set;
+          run_deploy_without_question = run_deploy_without_question;
         }
       )
 
@@ -1415,11 +1418,21 @@ do
     local changed_rocks_set, subprojects_to_be_given_new_versions_set = update_rocks(
         manifest, cluster_info, current_versions, dry_run
       )
+    local run_deploy_without_question = nil
 
     if not next(subprojects_to_be_given_new_versions_set) then
       assert(not next(changed_rocks_set)) -- TODO: ?!
-      writeln_flush("----> Nothing to deploy, bailing out.")
-      return
+      writeln_flush("----> Nothing to deploy, you can deploy to check system integrity.")
+      if ask_user(
+          "\n\nDO YOU WANT TO DEPLOY TO `" .. cluster_info.name .. "'? (Not recommended!)",
+          { "y", "n" },
+          "n"
+        ) ~= "y"
+      then
+        return
+      else
+        run_deploy_without_question = true
+      end
     end
 
     local new_versions = twithdefaults(
@@ -1443,7 +1456,8 @@ do
         changed_rocks_set,
         new_versions_filename,
         true, -- Commit new versions
-        dry_run
+        dry_run,
+        run_deploy_without_question
       )
   end
 

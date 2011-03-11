@@ -250,6 +250,14 @@ do
       )
   end
 
+  local get_context_extension = function(self, wsapi_env, key)
+    return get_context(
+        self, wsapi_env
+      ):ext(
+        key
+      )
+  end
+
   local handle_request
   do
     local error_handler = function(msg)
@@ -321,6 +329,7 @@ do
     {
       handle_request = handle_request;
       extend_context = extend_context;
+      get_context_extension = get_context_extension;
       --
       request_handler_ = request_handler;
       common_context_mt_ = nil;

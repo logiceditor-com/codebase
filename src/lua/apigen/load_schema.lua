@@ -258,6 +258,12 @@ do
           torderedset_insert(positions, name)
         elseif tag == "version" then
           api.version = assert_is_string(name) -- TODO: ?! HACK!
+        else
+          -- TODO: This is too early to throw this error!
+          --       See pkle for the real way to handle this!
+          error(
+              'unexpected tag at root api:'..tag .. ' "' .. data.name .. '"'
+            )
         end
         return common_patch_data(namespace, tag, data)
       end

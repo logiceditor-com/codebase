@@ -165,7 +165,7 @@ do
 
       -- TODO: Use metatable!
       if not v then
-        v = assert(self.ext_factories_[key](self))
+        v = assert(self.ext_factories_[key])()
         self.extensions_[key] = v
       end
 

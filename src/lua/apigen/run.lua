@@ -326,7 +326,13 @@ local get_exports_requires_globals = function(config)
     local filenames = config.requires
     for i = 1, #filenames do
       local filename = filenames[i].filename
-      allowed_requires = tappend_many(allowed_requires, import(filename)())
+      allowed_requires = tappend_many(
+          allowed_requires,
+          import(filename)
+          {
+            'REQUIRE_GLOBALS'
+          }
+        )
     end
   end
 

@@ -262,7 +262,7 @@ do
           -- TODO: This is too early to throw this error!
           --       See pkle for the real way to handle this!
           error(
-              'unexpected tag at root api:'..tag .. ' "' .. data.name .. '"'
+              'unexpected tag at root: `api:'..tag .. ' "' .. data.name .. '"\''
             )
         end
         return common_patch_data(namespace, tag, data)

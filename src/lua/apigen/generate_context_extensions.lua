@@ -199,10 +199,10 @@ local log, dbg, spam, log_error
 ]] (
     generate_globals_header(
         classify_globals(
-            { },
+            walkers.known_exports_,
             walkers.allowed_requires_,
             walkers.allowed_globals_,
-            { },
+            api_globals or { },
             global_overrides
           )
       )
@@ -226,7 +226,7 @@ local log, dbg, spam, log_error
       schema,
       out_file_root,
       handlers_dir_name,
-      known_context_extensions,
+      known_exports,
       allowed_requires,
       allowed_globals
     )
@@ -234,7 +234,7 @@ local log, dbg, spam, log_error
         "table", schema,
         "string", out_file_root,
         "string", handlers_dir_name,
-        "table", known_context_extensions,
+        "table", known_exports,
         "table", allowed_requires,
         "table", allowed_globals
       )
@@ -253,6 +253,7 @@ local log, dbg, spam, log_error
       handlers_dir_name_ = handlers_dir_name;
       returns_ = "";
       --
+      known_exports_ = known_exports;
       allowed_requires_ = allowed_requires;
       allowed_globals_ = allowed_globals;
     }

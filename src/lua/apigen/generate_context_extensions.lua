@@ -207,7 +207,7 @@ local log, dbg, spam, log_error
           )
       )
   ) [[
-]] (handler_text)
+]] (handler_text:gsub("\n+$", "\n"))
 
       assert(create_path_to_file(filename))
       assert(

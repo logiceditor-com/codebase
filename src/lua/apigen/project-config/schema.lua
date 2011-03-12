@@ -120,6 +120,11 @@ do
               -- No parameters
             };
 
+            ["update_exports"] =
+            {
+              -- No parameters
+            };
+
             ["update_handlers"] =
             {
               -- No parameters

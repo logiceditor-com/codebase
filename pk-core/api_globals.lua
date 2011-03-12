@@ -251,7 +251,9 @@ local classify_globals = function(
       aliases[name] = name
     end
 
-    assert(known_global or export_file or require_name or global_alias)
+    if not (known_global or export_file or require_name or global_alias) then
+      error("can't classify global: `" .. name .. "'")
+    end
   end
 
   return aliases, requires, imports

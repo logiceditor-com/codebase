@@ -46,7 +46,7 @@ do
 
   local up = { }
   do
-    local url_up = function(walkers, data)
+    up["api:export"] = function(walkers, data)
       if data.filename then
         local filename = --[[walkers.out_file_root_ ..]] walkers.handlers_dir_name_ ..
           "/" .. data.filename
@@ -58,9 +58,7 @@ do
 ]]
         end
       end
-      walkers.export_names_ = nil;
     end
-    up["api:export"] = url_up
   end
 
   generate_exports_list = function(

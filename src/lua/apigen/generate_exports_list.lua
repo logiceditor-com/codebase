@@ -54,7 +54,7 @@ do
         assert(create_path_to_file(filename))
         for i = 1, #data.exports do
           walkers.cat_ [[
-  ]](data.exports[i])[[ = { "]](filename)[[" };
+  ]](data.exports[i])[[ = { ]](("%q"):format(filename)) [[ };
 ]]
         end
       end

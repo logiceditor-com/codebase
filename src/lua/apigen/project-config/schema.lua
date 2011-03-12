@@ -73,6 +73,8 @@ do
               cfg:path   "doc_pdf_filename";
               cfg:path   "exports_dir_name";
               cfg:path   "exports_list_name";
+              cfg:path   "context_extensions_dir_name";
+              cfg:path   "context_extensions_list_name";
             };
           };
         };
@@ -121,6 +123,11 @@ do
             };
 
             ["update_exports"] =
+            {
+              -- No parameters
+            };
+
+            ["update_context_extensions"] =
             {
               -- No parameters
             };

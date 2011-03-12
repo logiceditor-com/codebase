@@ -657,6 +657,44 @@ do
     end
   end
 
+  local validate_extend_context = function(walkers, data)
+
+    common_check_url_node(walkers, data)
+
+    if not data.handler then
+      wfail(
+          walkers, data,
+          "missing extend_context handler section"
+        )
+    end
+
+    local upvalues_to_be = { }
+    do
+      -- TODO: Hack!
+      upvalues_to_be["log"] = true
+      upvalues_to_be["dbg"] = true
+      upvalues_to_be["spam"] = true
+      upvalues_to_be["log_error"] = true
+    end
+
+    validate_handler(
+        walkers.known_exports_,
+        walkers.allowed_requires_,
+        walkers.allowed_globals_,
+        walkers,
+        upvalues_to_be,
+        data
+      )
+
+    if not data.have_tests then -- TODO: This should be error, not warning!
+      log("WARNING: Missing tests for", data.id, data.name)
+    end
+
+    if not data.have_docs then -- TODO: This should be error, not warning?
+      log("WARNING: Missing docs for", data.id, data.name)
+    end
+  end
+
   local validate_api_section = function(walkers, data)
     common_check_node(walkers, data)
 
@@ -1044,6 +1082,12 @@ do
               validate_export,
               {
                 "api:export";
+              }
+            ),
+          tsetof(
+              validate_extend_context,
+              {
+                "api:extend_context";
               }
             ),
           tsetof(

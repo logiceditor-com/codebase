@@ -201,6 +201,7 @@ do
     "url_with_dynamic_output_format";
     "raw_url";
     "export";
+    "extend_context";
   }
 
   load_schema = function(directory_name)

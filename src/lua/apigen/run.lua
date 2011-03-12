@@ -148,6 +148,18 @@ local generate_exports_list
         'generate_exports_list'
       }
 
+local generate_context_extensions
+      = import 'apigen/generate_context_extensions.lua'
+      {
+        'generate_context_extensions'
+      }
+
+local generate_context_extensions_list
+      = import 'apigen/generate_context_extensions_list.lua'
+      {
+        'generate_context_extensions_list'
+      }
+
 local load_tools_cli_data_schema,
       load_tools_cli_config,
       print_tools_cli_config_usage,
@@ -526,6 +538,37 @@ ACTIONS.update_exports = function()
   log("OK")
 end
 
+ACTIONS.update_context_extensions = function()
+  local MODE_CONFIG = CONFIG.common.www.application
+
+  local OUT_CONFIG = MODE_CONFIG.generated
+
+  local api_schema_dir = MODE_CONFIG.api_schema_dir
+  local out_file_root = OUT_CONFIG.file_root
+  local out_context_extensions_dir_name = OUT_CONFIG.context_extensions_dir_name
+  local out_context_extensions_list_name
+    = OUT_CONFIG.context_extensions_list_name
+
+  local known_exports, allowed_requires, allowed_globals
+      = get_exports_requires_globals(freeform_table_value(MODE_CONFIG.code))
+
+  local api = load_schema(api_schema_dir)
+  validate_schema(known_exports, allowed_requires, allowed_globals, api)
+
+  generate_context_extensions_list(
+      api,
+      out_context_extensions_list_name,
+      out_file_root,
+      out_context_extensions_dir_name
+    )
+  generate_context_extensions(
+      api, out_file_root, out_context_extensions_dir_name,
+      known_exports, allowed_requires, allowed_globals
+    )
+
+  log("OK")
+end
+
 ACTIONS.update_handlers = function()
   local MODE_CONFIG = CONFIG.common.www.application
 
@@ -541,6 +584,9 @@ ACTIONS.update_handlers = function()
   local out_handlers_dir_name = OUT_CONFIG.handlers_dir_name
   local out_exports_dir_name = OUT_CONFIG.exports_dir_name
   local out_exports_list_name = OUT_CONFIG.exports_list_name
+  local out_context_extensions_dir_name = OUT_CONFIG.context_extensions_dir_name
+  local out_context_extensions_list_name
+    = OUT_CONFIG.context_extensions_list_name
   local out_base_url_prefix = OUT_CONFIG.base_url_prefix
   local out_unity_api_filename = OUT_CONFIG.unity_api_filename
   local out_test_dir_name = OUT_CONFIG.test_dir_name
@@ -630,6 +676,18 @@ local create_session_checker
       api, out_file_root, out_exports_dir_name,
       known_exports, allowed_requires, allowed_globals
     )
+
+  generate_context_extensions_list(
+      api,
+      out_context_extensions_list_name,
+      out_file_root,
+      out_context_extensions_dir_name
+    )
+  generate_context_extensions(
+      api, out_file_root, out_context_extensions_dir_name,
+      known_exports, allowed_requires, allowed_globals
+    )
+
   generate_url_handlers(
       api, out_file_root, out_handlers_dir_name,
       known_exports, allowed_requires, allowed_globals
@@ -668,6 +726,9 @@ ACTIONS.update_all = function()
   local out_handlers_dir_name = OUT_CONFIG.handlers_dir_name
   local out_exports_dir_name = OUT_CONFIG.exports_dir_name
   local out_exports_list_name = OUT_CONFIG.exports_list_name
+  local out_context_extensions_dir_name = OUT_CONFIG.context_extensions_dir_name
+  local out_context_extensions_list_name
+    = OUT_CONFIG.context_extensions_list_name
   local out_base_url_prefix = OUT_CONFIG.base_url_prefix
   local out_unity_api_filename = OUT_CONFIG.unity_api_filename
   local out_test_dir_name = OUT_CONFIG.test_dir_name
@@ -751,6 +812,18 @@ local create_session_checker
       api, out_file_root, out_exports_dir_name,
       known_exports, allowed_requires, allowed_globals
     )
+
+  generate_context_extensions_list(
+      api,
+      out_context_extensions_list_name,
+      out_file_root,
+      out_context_extensions_dir_name
+    )
+  generate_context_extensions(
+      api, out_file_root, out_context_extensions_dir_name,
+      known_exports, allowed_requires, allowed_globals
+    )
+
   generate_url_handlers(
       api, out_file_root, out_handlers_dir_name,
       known_exports, allowed_requires, allowed_globals

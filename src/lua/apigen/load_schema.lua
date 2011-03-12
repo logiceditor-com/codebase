@@ -243,9 +243,9 @@ do
           --       (base_url in particular).
           if name:sub(#name) == "/" then
             data.urls[#data.urls + 1] = name .. "index"
-            data.filename = name .. "index.lua"
+            data.filename = name:gsub("%.", "/") .. "index.lua"
           else
-            data.filename = name .. ".lua"
+            data.filename = name:gsub("%.", "/") .. ".lua"
           end
 
           -- TODO: Remove this limitation

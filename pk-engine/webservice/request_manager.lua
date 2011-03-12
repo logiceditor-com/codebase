@@ -30,6 +30,12 @@ local assert_is_number,
         'assert_is_function'
       }
 
+local invariant
+      = import 'lua-nucleo/functional.lua'
+      {
+        'invariant'
+      }
+
 local make_net_connection_manager
       = import 'pk-engine/net/net_connection_manager.lua'
       {

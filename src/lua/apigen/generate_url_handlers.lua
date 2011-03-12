@@ -204,7 +204,7 @@ local log, dbg, spam, log_error
         .. walkers.handlers_dir_name_
         .. data.filename
 
-      log("generating", data.filename, "to", filename)
+      log("generating", data.name, "to", filename)
 
       assert(create_path_to_file(filename))
       assert(

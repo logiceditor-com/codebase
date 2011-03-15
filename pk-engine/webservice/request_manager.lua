@@ -208,7 +208,7 @@ do
 
       local config_manager = config_manager_maker(config_host, config_port)
 
-      return
+      local self =
       {
         config_manager = config_manager;
         net_connection_manager = make_net_connection_manager();
@@ -220,8 +220,15 @@ do
         --
         extensions_ = { };
         ext_factories_ = { };
-        ext_getter_ = invariant(ext);
+        ext_getter_ = nil;
       }
+
+      -- TODO: Ugly.
+      self.ext_getter_ = function(...)
+        return self:ext(...)
+      end
+
+      return self
     end
 
     -- Returned context is guaranteed to be single-use data.

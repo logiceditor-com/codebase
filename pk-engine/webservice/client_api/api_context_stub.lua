@@ -284,6 +284,8 @@ do
       )
     assert(key ~= nil)
 
+    log("registering context extension:", key)
+
     assert(self.ext_factories_[key] == nil)
     self.ext_factories_[key] = factory
   end
@@ -297,7 +299,14 @@ do
 
     -- TODO: Use metatable!
     if not v then
-      v = assert(self.ext_factories_[key](self))
+      log("creating context extension object", key)
+
+      local factory = self.ext_factories_[key]
+      if not factory then
+        error("unknown context extension: " .. tostring(key), 2)
+      end
+
+      v = factory(self.ext_getter_)
       self.extensions_[key] = v
     end
 
@@ -319,7 +328,7 @@ do
         "table",    internal_call_handlers
       )
 
-    return
+    local self =
     {
       raw_internal_config_manager = raw_internal_config_manager;
       handle_url = handle_url;
@@ -349,6 +358,7 @@ do
       --
       extensions_ = { };
       ext_factories_ = { };
+      ext_getter_ = nil;
       --
       tables_ = db_tables;
       www_game_config_getter_ = www_game_config_getter;
@@ -357,6 +367,13 @@ do
       --
       param_stack_ = { };
     }
+
+    -- TODO: Ugly.
+    self.ext_getter_ = function(...)
+      return self:ext(...)
+    end
+
+    return self
   end
 end
 

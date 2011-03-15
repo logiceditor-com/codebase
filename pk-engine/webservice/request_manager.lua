@@ -158,6 +158,8 @@ do
         )
       assert(key ~= nil)
 
+      log("registering context extension:", key)
+
       assert(self.ext_factories_[key] == nil)
       self.ext_factories_[key] = factory
     end
@@ -171,7 +173,14 @@ do
 
       -- TODO: Use metatable!
       if not v then
-        v = assert(self.ext_factories_[key])(self.ext_getter_)
+        log("creating context extension object", key)
+
+        local factory = self.ext_factories_[key]
+        if not factory then
+          error("unknown context extension: " .. tostring(key), 2)
+        end
+
+        v = factory(self.ext_getter_)
         self.extensions_[key] = v
       end
 

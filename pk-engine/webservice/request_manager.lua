@@ -13,11 +13,15 @@ local arguments,
       }
 
 local is_number,
-      is_string
+      is_string,
+      is_function,
+      is_table
       = import 'lua-nucleo/type.lua'
       {
         'is_number',
-        'is_string'
+        'is_string',
+        'is_function',
+        'is_table'
       }
 
 local assert_is_number,
@@ -296,7 +300,20 @@ do
 
       local context = get_context(self, wsapi_env)
       local ok, status, body, headers = xpcall(
-          function() return self.request_handler_:handle_request(context) end,
+          function()
+            local status, body, headers = self.request_handler_:handle_request(
+                context
+              )
+
+            assert_is_number(status, "bad response status code")
+            assert(is_function(body) or is_string(body), "bad response body")
+            assert(
+                is_table(headers) or is_string(headers),
+                "bad response headers"
+              )
+
+            return status, body, headers
+          end,
           error_handler
         )
 
@@ -330,10 +347,7 @@ do
       -- WARNING! Do not uncomment! Too much spamming on heavy load!
       -- log(status, context.wsapi_env.PATH_INFO)
 
-      return
-        assert_is_number(status),
-        assert_is_table(headers),
-        assert_is_function(body)
+      return status, headers, body
     end
   end
 

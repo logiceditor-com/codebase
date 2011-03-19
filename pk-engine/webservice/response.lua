@@ -109,6 +109,25 @@ local luabins_response = function(body, headers, status)
   return status or 200, body, headers or 'application/octet-stream'
 end
 
+local gif_response = function(body, headers, status)
+  if is_table(headers) then
+    headers["Content-type"] = headers["Content-type"] or 'image/gif'
+  end
+  return status or 200, body, headers or 'image/gif'
+end
+
+--------------------------------------------------------------------------------
+
+local common_http_redirect = function(target_url)
+  return html_response( -- Note that target_url is not escaped.
+      '<a href="' .. target_url .. '">Redirecting...</a>',
+      {
+        ["Location"] = target_url;
+      },
+      302 -- TODO: make configurable, 301 is also viable sometimes.
+    )
+end
+
 --------------------------------------------------------------------------------
 
 return
@@ -124,4 +143,7 @@ return
   text_response = text_response;
   json_response = json_response;
   luabins_response = luabins_response;
+  gif_response = gif_response;
+  --
+  common_http_redirect = common_http_redirect;
 }

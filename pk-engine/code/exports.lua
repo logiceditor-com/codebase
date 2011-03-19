@@ -58,6 +58,7 @@ return
   args_load = { "pk-engine/task_processor/task_processor.lua" };
   args_save = { "pk-engine/task_processor/task_processor.lua" };
   common_html_error = { "pk-engine/webservice/response.lua" };
+  common_http_redirect = { "pk-engine/webservice/response.lua" };
   common_json_error = { "pk-engine/webservice/response.lua" };
   common_luabins_error = { "pk-engine/webservice/response.lua" };
   common_text_error = { "pk-engine/webservice/response.lua" };
@@ -90,6 +91,7 @@ return
   get_next_task_nonblocking = { "pk-engine/redis/system.lua" };
   get_session_checker = { "pk-engine/webservice/partner.lua" };
   get_top_db_changeset_uuid = { "pk-engine/db/changeset.lua" };
+  gif_response = { "pk-engine/webservice/response.lua" };
   handle_command = { "pk-engine/srv/channel/manager.lua" };
   handler_404 = { "pk-engine/webservice/request_manager.lua" };
   hgetall_workaround = { "pk-engine/redis/workarounds.lua" };

@@ -10,6 +10,8 @@ local PROFILE = { }
 
 --------------------------------------------------------------------------------
 
+declare 'copcall' -- TODO: Uberhack! :(
+require 'copas' -- TODO: Uberhack! :(
 declare 'wsapi' -- TODO: Uberhack! :(
 
 PROFILE.skip = setmetatable(tset

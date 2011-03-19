@@ -84,9 +84,15 @@ local Q = function(v) return ("%q"):format(tostring(v)) end
 
 --------------------------------------------------------------------------------
 
-local list = function(sources_dir, root_dir_only, profile_filename, out_filename)
-  sources_dir = sources_dir:gsub("/+$", "") -- Remove trailing slashes
-  root_dir_only = root_dir_only and root_dir_only:gsub("/+$", "") -- Remove trailing slashes
+local list = function(
+    sources_dir,
+    root_dir_only,
+    profile_filename,
+    out_filename
+  )
+  -- Remove trailing slashes
+  sources_dir = sources_dir:gsub("/+$", "")
+  root_dir_only = root_dir_only and root_dir_only:gsub("/+$", "")
 
   log(
       "listing all exports in ", sources_dir .. "/",

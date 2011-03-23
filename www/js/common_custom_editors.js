@@ -44,7 +44,7 @@ PK.common_custom_editors = new function()
     return new Ext.grid.GridEditor(new Ext.form.NumberField({
         selectOnFocus: true,
         allowBlank: true,
-        style:'text-align:right;',
+        style:'text-align:left;',
         allowDecimals: true,
         allowNegative: false,
     }));

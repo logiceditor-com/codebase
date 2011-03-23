@@ -77,7 +77,7 @@ PK.common_custom_renderers = new function()
     var suffix = suffix_in ? suffix_in : 'rub'
     return function(v)
     {
-      return (Number(v)) + " " + I18N(suffix);
+      return (Number(v) / 100) + " " + I18N(suffix);
     }
   };
 

@@ -238,7 +238,7 @@ for (var i = 0; i < ]] (name) [[.length; ++i) {
 
       -- API 3.0 TODO: check and remove comment
       context.boolean = registerer("String")
-
+      context.file = registerer("String")
       context.string = registerer("String")
       context.identifier = registerer("String")
       context.url = registerer("String")

@@ -507,6 +507,7 @@ ${fmt:additional_errors.comment:]] (data.name) [[}
       context.list_node = node
       context.int_enum = leaf
       context.string_enum = leaf
+      context.file = leaf
 
       context.optional = function(data)
         data.optional = true

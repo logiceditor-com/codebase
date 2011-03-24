@@ -240,6 +240,9 @@ do
       "TIMEOFDAY",
       "WEEKDAYS",
 
+      "FILE",
+      "OPTIONAL_FILE",
+
       "OPTIONAL_DB_ID",
       "OPTIONAL_INTEGER",
       "OPTIONAL_IP",

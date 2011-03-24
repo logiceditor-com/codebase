@@ -250,6 +250,8 @@ end
       context.text = common_format("text", "leaf", "named_cdata")
       context.uuid = common_format("uuid", "leaf", "leaf")
 
+      context.file = common_format("file", "leaf", "leaf")
+
       context.ilist = function()
         return
         {

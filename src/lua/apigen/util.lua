@@ -55,6 +55,9 @@ do
       TIMEOFDAY = context.integer(); -- TODO: Not integer, integer(11)!
       WEEKDAYS = context.integer(); -- TODO: Not integer, integer(11)!
 
+      FILE = context.file();
+      OPTIONAL_FILE = context.optional(context.file());
+
       OPTIONAL_DB_ID = context.optional(context.db_id());
       OPTIONAL_INTEGER = context.optional(context.integer());
       OPTIONAL_IP = context.optional(context.string(1, 15));

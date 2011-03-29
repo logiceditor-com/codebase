@@ -55,6 +55,14 @@ local make_api_redis,
         'destroy_api_redis'
       }
 
+local make_api_hiredis,
+      destroy_api_hiredis
+      = import 'pk-engine/webservice/client_api/api_hiredis.lua'
+      {
+        'make_api_hiredis',
+        'destroy_api_hiredis'
+      }
+
 --------------------------------------------------------------------------------
 
 local log, dbg, spam, log_error = make_loggers(
@@ -95,6 +103,15 @@ do
       self.cached_redis_ = make_api_redis(self.context_.redis_manager)
     end
     return self.cached_redis_
+  end
+
+  -- Private method
+  local get_cached_hiredis = function(self)
+    method_arguments(self)
+    if not self.cached_hiredis_ then
+      self.cached_hiredis_ = make_api_hiredis(self.context_.hiredis_manager)
+    end
+    return self.cached_hiredis_
   end
 
   local post_request = function(self)
@@ -198,6 +215,13 @@ do
       self.cached_redis_ = nil
     end
 
+    -- Not using get_cached_hiredis() since we don't want to create hiredis
+    -- if it was not used
+    if self.cached_hiredis_ then
+      destroy_api_hiredis(self.cached_hiredis_)
+      self.cached_hiredis_ = nil
+    end
+
     assert(#self.param_stack_ == 0, "unbalanced param stack on destroy")
   end
 
@@ -209,6 +233,11 @@ do
   local redis = function(self)
     method_arguments(self)
     return get_cached_redis(self)
+  end
+
+  local hiredis = function(self)
+    method_arguments(self)
+    return get_cached_hiredis(self)
   end
 
   local handle_url = function(self, url, param)
@@ -293,6 +322,7 @@ do
       admin_config = admin_config;
       db = db;
       redis = redis;
+      hiredis = hiredis;
       --
       request_ip = request_ip;
       post_request = post_request;
@@ -314,6 +344,7 @@ do
       cached_admin_config_ = nil;
       cached_db_ = nil;
       cached_redis_ = nil;
+      cached_hiredis_ = nil;
       --
       tables_ = db_tables;
       www_game_config_getter_ = www_game_config_getter;

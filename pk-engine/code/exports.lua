@@ -75,6 +75,7 @@ return
   delete_by_id = { "pk-engine/db/query.lua" };
   delete_many = { "pk-engine/db/query.lua" };
   destroy_api_db = { "pk-engine/webservice/client_api/api_db.lua" };
+  destroy_api_hiredis = { "pk-engine/webservice/client_api/api_hiredis.lua" };
   destroy_api_redis = { "pk-engine/webservice/client_api/api_redis.lua" };
   do_with_redis_lock = { "pk-engine/redis/lock.lua" };
   do_with_redis_lock_ttl = { "pk-engine/redis/lock.lua" };
@@ -83,6 +84,7 @@ return
   ev_protect = { "pk-engine/net/ev-server.lua" };
   ev_tcp_server_loop = { "pk-engine/srv/channel/server.lua" };
   fetch = { "pk-engine/srv/channel/client.lua" };
+  file = { "pk-engine/webservice/client_api/check.lua" };
   find_id = { "pk-engine/srv/dictionary/client.lua" };
   find_key = { "pk-engine/srv/dictionary/client.lua" };
   get_by_data = { "pk-engine/db/query.lua" };
@@ -117,6 +119,7 @@ return
   make_api_context = { "pk-engine/webservice/client_api/api_context.lua" };
   make_api_context_stub = { "pk-engine/webservice/client_api/api_context_stub.lua" };
   make_api_db = { "pk-engine/webservice/client_api/api_db.lua" };
+  make_api_hiredis = { "pk-engine/webservice/client_api/api_hiredis.lua" };
   make_api_redis = { "pk-engine/webservice/client_api/api_redis.lua" };
   make_buffer = { "pk-engine/buffer.lua" };
   make_buffered_connection = { "pk-engine/net/buffered_connection.lua" };
@@ -139,6 +142,8 @@ return
   make_form_validator = { "pk-engine/form_handler_builder/validator.lua" };
   make_generic_connection_manager = { "pk-engine/generic_connection_manager.lua" };
   make_heartbeat_controller = { "pk-engine/srv/heartbeat/controller.lua" };
+  make_hiredis_connection_manager = { "pk-engine/hiredis/hiredis_manager.lua" };
+  make_hiredis_manager = { "pk-engine/hiredis/hiredis_manager.lua" };
   make_history = { "pk-engine/history.lua" };
   make_json_schema_builder = { "pk-engine/json_schema_builder.lua" };
   make_luabins_schema_builder = { "pk-engine/luabins_schema_builder.lua" };

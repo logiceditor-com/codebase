@@ -66,6 +66,14 @@ local make_redis_manager,
         'make_redis_connection_manager'
       }
 
+local make_hiredis_manager,
+      make_hiredis_connection_manager
+      = import 'pk-engine/hiredis/hiredis_manager.lua'
+      {
+        'make_hiredis_manager',
+        'make_hiredis_connection_manager'
+      }
+
 local make_default_config_manager
       = import 'pk-engine/srv/internal_config/client.lua'
       {
@@ -223,6 +231,10 @@ do
         redis_manager = make_redis_manager(
             config_manager,
             make_redis_connection_manager()
+          );
+        hiredis_manager = make_hiredis_manager(
+            config_manager,
+            make_hiredis_connection_manager()
           );
         --
         extend = extend;

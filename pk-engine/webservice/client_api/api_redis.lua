@@ -4,8 +4,8 @@
 --
 -- WARNING: To be used inside call().
 --
--- TODO: Prevent calling make_api_redis_mt() and make_redis_databases_mt() each time
---       when creating api_redis
+-- TODO: Prevent calling make_api_redis_mt() and
+--       make_redis_databases_mt() each time when creating api_redis
 --
 --------------------------------------------------------------------------------
 

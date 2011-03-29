@@ -1,10 +1,24 @@
 PK.browser_dom = new function()
 {
-  var id_prefix = "pk_", id_num = 0;
+  var id_prefix = "pk_"
+
+  var last_id_ = 0
+  var MAX_ID_VALUE = Number.MAX_VALUE
+
+  this.reset_id_generation = function()
+  {
+    last_id_ = 0
+  }
 
   this.generated_id = function()
   {
-    return id_prefix + (++id_num)
+    if (last_id_ === MAX_ID_VALUE)
+    {
+      LOG("Warning: PK.browser_dom.last_id_ was reset")
+      this.reset_id_generation()
+    }
+
+    return id_prefix + (++last_id_)
   }
 
   this.get_object_by_id = function(id)

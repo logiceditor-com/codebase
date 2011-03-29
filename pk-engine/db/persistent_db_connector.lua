@@ -28,12 +28,6 @@ local make_loggers
         'make_loggers'
       }
 
-local make_persistent_connection
-      = import 'pk-engine/persistent_connection.lua'
-      {
-        'make_persistent_connection'
-      }
-
 --------------------------------------------------------------------------------
 
 local log, dbg, spam, log_error = make_loggers(

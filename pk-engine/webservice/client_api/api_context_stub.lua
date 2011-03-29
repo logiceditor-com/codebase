@@ -82,7 +82,9 @@ local make_api_redis,
 
 --------------------------------------------------------------------------------
 
-local log, dbg, spam, log_error = make_loggers("webservice/client_api/api_context_stub", "APS")
+local log, dbg, spam, log_error = make_loggers(
+    "webservice/client_api/api_context_stub", "APS"
+  )
 
 --------------------------------------------------------------------------------
 
@@ -90,7 +92,8 @@ local log, dbg, spam, log_error = make_loggers("webservice/client_api/api_contex
 -- NOTE: It is OK to create context object outside of call() protection.
 local make_api_context_stub
 do
-  local get_context_stub = function(config_manager) -- NOTE: When changing this, remember to change request_manager.lua as well!
+  -- NOTE: When changing this, remember to change request_manager.lua as well!
+  local get_context_stub = function(config_manager)
     arguments(
         "table", config_manager
       )
@@ -102,8 +105,14 @@ do
           {
             config_manager = config_manager;
             net_connection_manager = make_net_connection_manager();
-            db_manager = make_db_manager(config_manager, make_db_connection_manager());
-            redis_manager = make_redis_manager(config_manager, make_redis_connection_manager());
+            db_manager = make_db_manager(
+                config_manager,
+                make_db_connection_manager()
+              );
+            redis_manager = make_redis_manager(
+                config_manager,
+                make_redis_connection_manager()
+              );
           };
           __metatable = "context_stub";
         }
@@ -145,7 +154,8 @@ do
 
   local get_request = function(self)
     method_arguments(self)
-    return self.param_stack_[#self.param_stack_] -- TODO: Should this use param_stack?!
+    -- TODO: Should this use param_stack?!
+    return self.param_stack_[#self.param_stack_]
         or get_cached_request(self).GET
   end
 

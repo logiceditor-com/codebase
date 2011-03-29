@@ -57,7 +57,9 @@ local make_api_redis,
 
 --------------------------------------------------------------------------------
 
-local log, dbg, spam, log_error = make_loggers("webservice/client_api/api_context", "APC")
+local log, dbg, spam, log_error = make_loggers(
+    "webservice/client_api/api_context", "APC"
+  )
 
 --------------------------------------------------------------------------------
 

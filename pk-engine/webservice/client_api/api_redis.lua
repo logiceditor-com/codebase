@@ -51,7 +51,9 @@ local try
 
 --------------------------------------------------------------------------------
 
-local log, dbg, spam, log_error = make_loggers("webservice/client_api/api_redis", "ARE")
+local log, dbg, spam, log_error = make_loggers(
+    "webservice/client_api/api_redis", "ARE"
+  )
 
 --------------------------------------------------------------------------------
 

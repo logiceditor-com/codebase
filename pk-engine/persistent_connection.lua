@@ -116,7 +116,7 @@ do
 
     local conn, err = get_connection(self)
     if not conn then
-      log_error("receive failed:", err)
+      log_error("get_connection failed:", err)
       return nil, err
     end
 
@@ -147,7 +147,7 @@ do
 
     local conn, err = get_connection(self)
     if not conn then
-      log_error("receive failed:", err)
+      log_error("get_connection failed:", err)
       return nil, err
     end
 

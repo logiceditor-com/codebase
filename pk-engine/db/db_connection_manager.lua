@@ -48,7 +48,9 @@ local make_persistent_db_connector,
 
 --------------------------------------------------------------------------------
 
-local log, dbg, spam, log_error = make_loggers("db/db_connection_manager", "DCM")
+local log, dbg, spam, log_error = make_loggers(
+    "db/db_connection_manager", "DCM"
+  )
 
 --------------------------------------------------------------------------------
 

@@ -216,8 +216,14 @@ do
       {
         config_manager = config_manager;
         net_connection_manager = make_net_connection_manager();
-        db_manager = make_db_manager(config_manager, make_db_connection_manager());
-        redis_manager = make_redis_manager(config_manager, make_redis_connection_manager());
+        db_manager = make_db_manager(
+            config_manager,
+            make_db_connection_manager()
+          );
+        redis_manager = make_redis_manager(
+            config_manager,
+            make_redis_connection_manager()
+          );
         --
         extend = extend;
         ext = ext;

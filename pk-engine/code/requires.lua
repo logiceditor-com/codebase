@@ -18,8 +18,9 @@ local REQUIRE_GLOBALS =
   base64 = "base64";
   iconv = "iconv";
   unicode = "unicode";
-  sidereal = "sidereal";
+  sidereal = "sidereal"; -- TODO: Remove this
   geoip = "geoip";
+  hiredis = "hiredis";
 }
 
 --------------------------------------------------------------------------------

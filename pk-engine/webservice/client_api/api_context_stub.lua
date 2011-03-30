@@ -188,6 +188,38 @@ do
         or get_cached_request(self).GET
   end
 
+  local get_cookie = function(self, name)
+    method_arguments(
+        self,
+        "string", name
+      )
+    -- TODO: ?!
+    error("no cookies, this is a stub context")
+  end
+
+  local set_cookie = function(self, name, value)
+    method_arguments(
+        self,
+        "string", name
+        -- value may be string or table
+      )
+    -- TODO: ?!
+    error("no cookies, this is a stub context")
+  end
+
+  local delete_cookie = function(self, name, path)
+    method_arguments(
+        self,
+        "string", name
+      )
+    optional_arguments(
+        "string", path
+      )
+
+    -- TODO: ?!
+    error("no cookies, this is a stub context")
+  end
+
   local raw_internal_config_manager = function(self)
     method_arguments(self)
     return self.context_.config_manager
@@ -393,6 +425,10 @@ do
       request_ip = request_ip;
       post_request = post_request;
       get_request = get_request;
+      --
+      get_cookie = get_cookie;
+      set_cookie = set_cookie;
+      delete_cookie = delete_cookie;
       --
       push_param = push_param; -- Private
       pop_param = pop_param; -- Private

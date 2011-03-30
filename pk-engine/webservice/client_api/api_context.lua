@@ -298,6 +298,37 @@ do
     return self.context_:ext(key)
   end
 
+  local get_cookie = function(self, name)
+    method_arguments(
+        self,
+        "string", name
+      )
+    -- TODO: How should this interact with param_stack?
+    return get_cached_request(self).cookies[name]
+  end
+
+  local set_cookie = function(self, name, value)
+    method_arguments(
+        self,
+        "string", name
+        -- value may be string or table
+      )
+    -- TODO: How should this interact with param_stack?
+    self.context_.wsapi_response:set_cookie(name, value)
+  end
+
+  local delete_cookie = function(self, name, path)
+    method_arguments(
+        self,
+        "string", name
+      )
+    optional_arguments(
+        "string", path
+      )
+    -- TODO: How should this interact with param_stack?
+    self.context_.wsapi_response:delete_cookie(name, path)
+  end
+
   make_api_context = function(
       context,
       db_tables,
@@ -327,6 +358,10 @@ do
       request_ip = request_ip;
       post_request = post_request;
       get_request = get_request;
+      --
+      get_cookie = get_cookie;
+      set_cookie = set_cookie;
+      delete_cookie = delete_cookie;
       --
       extend = extend;
       ext = ext;

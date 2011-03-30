@@ -201,6 +201,7 @@ return
   try_get_next_task_blocking = { "pk-engine/redis/system.lua" };
   try_get_next_task_nonblocking = { "pk-engine/redis/system.lua" };
   try_push_task = { "pk-engine/redis/system.lua" };
+  try_unwrap = { "pk-engine/hiredis/util.lua" };
   update_one = { "pk-engine/db/query.lua" };
   update_or_insert_one = { "pk-engine/db/query.lua" };
   uuid = { "pk-engine/webservice/client_api/check.lua" };

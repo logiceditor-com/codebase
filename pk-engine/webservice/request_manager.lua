@@ -364,8 +364,7 @@ do
       end
 
       for k, v in pairs(headers) do
-        -- TODO: Lazy. Fix this.
-        assert(context.wsapi_response.headers[k] == nil)
+        -- TODO: Normalize header capitalization!
         context.wsapi_response.headers[k] = v
       end
 

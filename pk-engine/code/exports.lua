@@ -14,6 +14,7 @@ return
   DB_INFO_URL = { "pk-engine/srv/internal_config/client.lua" };
   DELIM = { "pk-engine/history.lua" };
   DICTIONARY_NODES_URL = { "pk-engine/srv/internal_config/client.lua" };
+  EMPTY_GIF = { "pk-engine/webservice/response.lua" };
   HEARTBEAT_NODES_URL = { "pk-engine/srv/internal_config/client.lua" };
   PARTNER = { "pk-engine/webservice/partner.lua" };
   PARTNER_CONFIG_URL = { "pk-engine/srv/internal_config/client.lua" };
@@ -81,6 +82,7 @@ return
   do_with_redis_lock_ttl = { "pk-engine/redis/lock.lua" };
   does_changeset_table_exist = { "pk-engine/db/changeset.lua" };
   drop_changeset_table = { "pk-engine/db/changeset.lua" };
+  empty_gif_response = { "pk-engine/webservice/response.lua" };
   ev_protect = { "pk-engine/net/ev-server.lua" };
   ev_tcp_server_loop = { "pk-engine/srv/channel/server.lua" };
   fetch = { "pk-engine/srv/channel/client.lua" };

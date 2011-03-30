@@ -101,6 +101,14 @@ local json_response = function(body, headers, status)
   return status or 200, body, headers or 'application/json'
 end
 
+local javascript_response = function(body, headers, status)
+  if is_table(headers) then
+    headers["Content-type"] = headers["Content-type"]
+        or 'text/javascript'
+  end
+  return status or 200, body, headers or 'text/javascript'
+end
+
 local luabins_response = function(body, headers, status)
   if is_table(headers) then
     headers["Content-type"] = headers["Content-type"]
@@ -142,6 +150,7 @@ return
   xml_response = xml_response;
   text_response = text_response;
   json_response = json_response;
+  javascript_response = javascript_response;
   luabins_response = luabins_response;
   gif_response = gif_response;
   --

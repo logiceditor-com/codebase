@@ -109,6 +109,7 @@ return
   int_enum = { "pk-engine/webservice/client_api/check.lua" };
   integer = { "pk-engine/webservice/client_api/check.lua" };
   is_changeset_installed = { "pk-engine/db/changeset.lua" };
+  javascript_response = { "pk-engine/webservice/response.lua" };
   json_response = { "pk-engine/webservice/response.lua" };
   list = { "pk-engine/db/query.lua" };
   list_db_tables = { "pk-engine/db/info.lua" };

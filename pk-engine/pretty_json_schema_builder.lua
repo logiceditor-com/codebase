@@ -50,6 +50,12 @@ local tijoin_many,
         'tclone'
       }
 
+local escape_for_json
+      = import 'lua-nucleo/string.lua'
+      {
+        'escape_for_json'
+      }
+
 local make_call_tracer = import 'pk-engine/call_tracer.lua' { 'make_call_tracer' }
 
 -- TODO: NOT for public consumption! Port to lua-nucleo.
@@ -82,10 +88,7 @@ local is_good_node_name = function(v)
   return true
 end
 
-local js_escape = function(value)
-  -- TODO: Use proper escape!
-  return ("%q"):format(value)
-end
+local js_escape = escape_for_json
 
 local js_escape_num = function(value)
   if is_number(value) then

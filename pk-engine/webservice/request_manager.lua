@@ -359,7 +359,7 @@ do
       if is_string(headers) then
         headers = append_no_cache_headers
         {
-          ["Content-type"] = headers;
+          ["Content-Type"] = headers;
         }
       end
 

@@ -75,35 +75,35 @@ end
 
 local html_response = function(body, headers, status)
   if is_table(headers) then
-    headers["Content-type"] = headers["Content-type"] or 'text/html'
+    headers["Content-Type"] = headers["Content-Type"] or 'text/html'
   end
   return status or 200, body, headers or 'text/html'
 end
 
 local xml_response = function(body, headers, status)
   if is_table(headers) then
-    headers["Content-type"] = headers["Content-type"] or 'text/xml'
+    headers["Content-Type"] = headers["Content-Type"] or 'text/xml'
   end
   return status or 200, body, headers or 'text/xml'
 end
 
 local text_response = function(body, headers, status)
   if is_table(headers) then
-    headers["Content-type"] = headers["Content-type"] or 'text/plain'
+    headers["Content-Type"] = headers["Content-Type"] or 'text/plain'
   end
   return status or 200, body, headers or 'text/plain'
 end
 
 local json_response = function(body, headers, status)
   if is_table(headers) then
-    headers["Content-type"] = headers["Content-type"] or 'application/json'
+    headers["Content-Type"] = headers["Content-Type"] or 'application/json'
   end
   return status or 200, body, headers or 'application/json'
 end
 
 local javascript_response = function(body, headers, status)
   if is_table(headers) then
-    headers["Content-type"] = headers["Content-type"]
+    headers["Content-Type"] = headers["Content-Type"]
         or 'text/javascript'
   end
   return status or 200, body, headers or 'text/javascript'
@@ -111,7 +111,7 @@ end
 
 local luabins_response = function(body, headers, status)
   if is_table(headers) then
-    headers["Content-type"] = headers["Content-type"]
+    headers["Content-Type"] = headers["Content-Type"]
       or 'application/octet-stream'
   end
   return status or 200, body, headers or 'application/octet-stream'
@@ -119,7 +119,7 @@ end
 
 local gif_response = function(body, headers, status)
   if is_table(headers) then
-    headers["Content-type"] = headers["Content-type"] or 'image/gif'
+    headers["Content-Type"] = headers["Content-Type"] or 'image/gif'
   end
   return status or 200, body, headers or 'image/gif'
 end

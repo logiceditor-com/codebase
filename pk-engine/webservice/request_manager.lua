@@ -2,6 +2,11 @@
 -- request_manager.lua: wsapi request manager
 --------------------------------------------------------------------------------
 
+require 'wsapi.request'
+require 'wsapi.response'
+
+--------------------------------------------------------------------------------
+
 local arguments,
       optional_arguments,
       method_arguments
@@ -276,6 +281,7 @@ do
       local context = setmetatable(
           {
             wsapi_env = wsapi_env;
+            wsapi_response = wsapi.response.new();
           },
           self.common_context_mt_
         )
@@ -347,11 +353,6 @@ do
           )
       end
 
-      if is_string(body) then
-        local body_string = body
-        body = coroutine.wrap(function() wsapi_send(body_string) end)
-      end
-
       -- WARNING: If body is a function, provided by handler,
       --          it MUST NOT crash, or user will see error message!
 
@@ -362,10 +363,21 @@ do
         }
       end
 
+      for k, v in pairs(headers) do
+        -- TODO: Lazy. Fix this.
+        assert(context.wsapi_response.headers[k] == nil)
+        context.wsapi_response.headers[k] = v
+      end
+
       -- WARNING! Do not uncomment! Too much spamming on heavy load!
       -- log(status, context.wsapi_env.PATH_INFO)
 
-      return status, headers, body
+      -- TODO: Set these through response instead?
+      --       This response object is here only because of cookies.
+      context.wsapi_response.status = status
+      context.wsapi_response:write(body)
+
+      return context.wsapi_response:finish()
     end
   end
 

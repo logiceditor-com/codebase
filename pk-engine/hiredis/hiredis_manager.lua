@@ -144,7 +144,7 @@ do
         return nil, err, err_id
       end
 
-      local res, err, err_id = conn:get_reply(cmd)
+      local res, err, err_id = conn:get_reply()
       if res == nil then
         -- In current lua-hiredis implementation all 'nil, err' errors
         -- are to be resolved by reconnection.

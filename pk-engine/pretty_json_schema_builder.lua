@@ -88,14 +88,15 @@ local is_good_node_name = function(v)
   return true
 end
 
-local js_escape = escape_for_json
-
 local js_escape_num = function(value)
   if is_number(value) then
     return tostring(value)
   end
-  return js_escape(value)
+  return escape_for_json(value)
 end
+
+-- TODO: Why numbers are acceptable here?
+local js_escape = js_escape_num
 
 -- TODO: Move more branching into building time.
 --       Return different closures for each static branch.

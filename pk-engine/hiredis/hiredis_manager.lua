@@ -217,6 +217,8 @@ do
       local res, err = conn:command("SELECT", info.database)
       if not res then
         log_error("hiredis: failed to select database", info.database, err)
+        conn:close()
+        conn = nil
         return nil, err
       end
 

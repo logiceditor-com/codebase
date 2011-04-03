@@ -211,6 +211,8 @@ do
         return nil, err
       end
 
+      log("hiredis: connected to", info)
+
       return conn
     end
 

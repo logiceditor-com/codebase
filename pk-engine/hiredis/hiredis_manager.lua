@@ -222,7 +222,7 @@ do
         return nil, err
       end
 
-      local res_unwrapped, err = hiredis.unwrap(res)
+      local res_unwrapped, err = hiredis.unwrap_reply(res)
       if res_unwrapped == nil then
         log_error("hiredis: server error on SELECT ", info.database, err)
         conn:close()

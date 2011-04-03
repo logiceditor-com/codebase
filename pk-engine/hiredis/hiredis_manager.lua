@@ -33,6 +33,12 @@ local assert_is_table,
         'assert_is_number'
       }
 
+local tstr
+      = import 'lua-nucleo/tstr.lua'
+      {
+        'tstr'
+      }
+
 local make_generic_connection_manager
       = import 'pk-engine/generic_connection_manager.lua'
       {
@@ -82,6 +88,9 @@ do
       if self.conn_ then
         self.conn_:close()
         self.conn_ = nil
+        log("close_connection: closed:", self.connector_:describe())
+      else
+        log("close_connection: already closed for:", self.connector_:describe())
       end
     end
 
@@ -216,11 +225,16 @@ do
       return conn
     end
 
+    local describe = function(self)
+      return "hiredis connector " .. tstr(self.info_)
+    end
+
     make_connector = function(info)
 
       return
       {
         connect = connect;
+        describe = describe;
         --
         info_ = info;
       }
@@ -235,6 +249,14 @@ do
       return make_persistent_connection(self.connector_)
     end
 
+    local describe = function(self)
+      return "persistent "
+        .. (self.connector_.describe
+            and self.connector_:describe()
+             or "(unknown)"
+          )
+    end
+
     make_persistent_connector = function(connector)
       arguments(
           "table", connector
@@ -243,6 +265,7 @@ do
       return
       {
         connect = connect;
+        describe = describe;
         --
         connector_ = connector;
       }

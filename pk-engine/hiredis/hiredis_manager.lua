@@ -222,6 +222,19 @@ do
         return nil, err
       end
 
+      local res_unwrapped, err = hiredis.unwrap(res)
+      if res_unwrapped == nil then
+        log_error("hiredis: server error on SELECT ", info.database, err)
+        conn:close()
+        conn = nil
+        return nil, err
+      end
+
+      if res ~= hiredis.OK then
+        -- TODO: ?!
+        dbg("hiredis: weird SELECT result:", res)
+      end
+
       log("hiredis: connected to", info)
 
       return conn

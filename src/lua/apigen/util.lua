@@ -60,6 +60,7 @@ do
 
       OPTIONAL_DB_ID = context.optional(context.db_id());
       OPTIONAL_INTEGER = context.optional(context.integer());
+      OPTIONAL_NUMBER = context.optional(context.number());
       OPTIONAL_IP = context.optional(context.string(1, 15));
       OPTIONAL_STRING256 = context.optional(context.string(1, 256));  -- Not recommended to use.
       OPTIONAL_STRING128 = context.optional(context.string(1, 128));  -- Not recommended to use.
@@ -85,6 +86,7 @@ do
       GARDEN_SLOT_ID = context.db_id();
       GARDEN_SLOT_TYPE_ID = context.db_id(); -- TODO: Enum?
       INTEGER = context.integer();
+      NUMBER = context.number();
       LIST = context.ilist();
       LIST_NODE = context.root(context.list_node());
       MONEY_GAME = context.nonnegative_integer();

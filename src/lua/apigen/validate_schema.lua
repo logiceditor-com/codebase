@@ -245,6 +245,7 @@ do
 
       "OPTIONAL_DB_ID",
       "OPTIONAL_INTEGER",
+      "OPTIONAL_NUMBER",
       "OPTIONAL_IP",
       "OPTIONAL_STRING256",
       "OPTIONAL_STRING128",
@@ -267,6 +268,7 @@ do
       "GARDEN_SLOT_ID";
       "GARDEN_SLOT_TYPE_ID";
       "INTEGER";
+      "NUMBER";
       "MONEY_GAME";
       "MONEY_REAL";
       "NICKNAME";

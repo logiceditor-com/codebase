@@ -897,59 +897,86 @@ do
               for i = 1, #rocks do
                 local rock = rocks[i]
 
-                if
-                  manifest.ignore_rocks and manifest.ignore_rocks[get_filename_from_path(rock.name)]
-                then
-                  writeln_flush("----> Ignoring `", rock.rockspec, "'")
-                else
-                  changed_rocks[rock.name] = true
+                local rockspec_files = luarocks_list_rockspec_files(
+                    subproject.local_path .. "/" .. assert(rock.rockspec),
+                    subproject.local_path  .. "/"
+                  )
+                local rockspec_files_changed = { }
 
-                  if rock.rockspec_generator then
-                    if dry_run then
-                      writeln_flush("-!!-> DRY RUN: Want to generate rock for ", rock.name)
-                    else
-                      writeln_flush("----> Generating rock for ", rock.name, "...")
-                      local rockspec_generator = is_table(rock.rockspec_generator)
-                        and rock.rockspec_generator
-                         or { rock.rockspec_generator }
-                      assert(
-                          shell_exec(
-                              "cd", subproject.local_path,
-                              "&&", unpack(rockspec_generator)
-                            ) == 0
-                        )
+                for i = 1, #rockspec_files do
+                  if not current_versions[subproject.name]
+                    or git_is_file_changed_between_revisions(
+                        subproject.local_path,
+                        rockspec_files[i],
+                        current_versions[subproject.name],
+                        "HEAD"
+                      )
+                  then
+                    writeln_flush("------> Changed file found: ", rockspec_files[i])
+                    rockspec_files_changed[#rockspec_files_changed + 1] = rockspec_files[i]
+                  end
+                end
+
+                if #rockspec_files_changed == 0 then
+                  writeln_flush("------> No files changed in ", rock.rockspec)
+                else
+
+                  if
+                    manifest.ignore_rocks and
+                    manifest.ignore_rocks[get_filename_from_path(rock.name)]
+                  then
+                    writeln_flush("----> Ignoring `", rock.rockspec, "'")
+                  else
+                    changed_rocks[rock.name] = true
+
+                    if rock.rockspec_generator then
+                      if dry_run then
+                        writeln_flush("-!!-> DRY RUN: Want to generate rock for ", rock.name)
+                      else
+                        writeln_flush("----> Generating rock for ", rock.name, "...")
+                        local rockspec_generator = is_table(rock.rockspec_generator)
+                          and rock.rockspec_generator
+                           or { rock.rockspec_generator }
+                        assert(
+                            shell_exec(
+                                "cd", subproject.local_path,
+                                "&&", unpack(rockspec_generator)
+                              ) == 0
+                          )
+                      end
                     end
                   end
-                end
 
-                if dry_run then
-                  writeln_flush("-!!-> DRY RUN: Want to rebuild", rock.rockspec)
-                else
-                  writeln_flush("----> Rebuilding `", rock.rockspec, "'...")
-                  luarocks_ensure_rock_not_installed_forced(rock.name)
-                  luarocks_make_in(rock.rockspec, path)
-                end
-
-                if dry_run then
-                  writeln_flush("-!!-> DRY RUN: Want to pack", rock.rockspec)
-                else
-                  writeln_flush("----> Packing `", rock.rockspec, "'...")
-                  luarocks_pack_to(rock.name, manifest.local_rocks_repo_path)
-                  copy_file_to_dir(path .. "/" .. rock.rockspec, manifest.local_rocks_repo_path)
-                  writeln_flush("----> Rebuilding manifest...")
-                  luarocks_admin_make_manifest(manifest.local_rocks_repo_path)
-                end
-
-                if rock.remove_after_pack then -- Needed for foreign-cluster-specific rocks, so they are not linger in our system
                   if dry_run then
-                    writeln_flush("-!!-> DRY RUN: Want to remove after pack", rock.rockspec)
+                    writeln_flush("-!!-> DRY RUN: Want to rebuild", rock.rockspec)
                   else
-                    writeln_flush("----> Removing after pack `", rock.rockspec, "'...")
+                    writeln_flush("----> Rebuilding `", rock.rockspec, "'...")
                     luarocks_ensure_rock_not_installed_forced(rock.name)
+                    luarocks_make_in(rock.rockspec, path)
                   end
-                end
-              end
-            end
+
+                  if dry_run then
+                    writeln_flush("-!!-> DRY RUN: Want to pack", rock.rockspec)
+                  else
+                    writeln_flush("----> Packing `", rock.rockspec, "'...")
+                    luarocks_pack_to(rock.name, manifest.local_rocks_repo_path)
+                    copy_file_to_dir(path .. "/" .. rock.rockspec, manifest.local_rocks_repo_path)
+                    writeln_flush("----> Rebuilding manifest...")
+                    luarocks_admin_make_manifest(manifest.local_rocks_repo_path)
+                  end
+
+                  if rock.remove_after_pack then 
+                  -- Needed for foreign-cluster-specific rocks, so they are not linger in our system
+                    if dry_run then
+                      writeln_flush("-!!-> DRY RUN: Want to remove after pack", rock.rockspec)
+                    else
+                      writeln_flush("----> Removing after pack `", rock.rockspec, "'...")
+                      luarocks_ensure_rock_not_installed_forced(rock.name)
+                    end
+                  end
+                end -- if #rockspec_files_changed == 0 else
+              end -- for i = 1, #rocks do
+            end -- if #rocks > 0 then
 
             if have_changed_rocks then
               need_new_versions_for_subprojects[name] = true

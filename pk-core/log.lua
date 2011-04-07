@@ -3,6 +3,7 @@
 --------------------------------------------------------------------------------
 
 local socket = require 'socket'
+local posix = require 'posix'
 
 --------------------------------------------------------------------------------
 
@@ -141,7 +142,7 @@ do
       end
 
       create_common_logging_system(
-          "",
+          "{"..("%05d"):format(posix.getpid("pid")).."} ",
           sink,
           logging_config
         )

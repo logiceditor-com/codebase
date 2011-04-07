@@ -144,7 +144,8 @@ do
       create_common_logging_system(
           "{"..("%05d"):format(posix.getpid("pid")).."} ",
           sink,
-          logging_config
+          logging_config,
+          get_current_logsystem_date_microsecond
         )
 
       return true, reopen_log

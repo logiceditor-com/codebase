@@ -875,7 +875,6 @@ do
           else
             local rocks = assert(subproject.provides_rocks)
             if #rocks > 0 then
-              have_changed_rocks = true
               if subproject.rockspec_generator then
                 if dry_run then
                   writeln_flush("-!!-> DRY RUN: Want to generate rockspecs")
@@ -920,7 +919,7 @@ do
                 if #rockspec_files_changed == 0 then
                   writeln_flush("------> No files changed in ", rock.rockspec)
                 else
-
+                  have_changed_rocks = true
                   if
                     manifest.ignore_rocks and
                     manifest.ignore_rocks[get_filename_from_path(rock.name)]

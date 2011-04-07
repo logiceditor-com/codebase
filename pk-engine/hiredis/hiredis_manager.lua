@@ -179,7 +179,7 @@ do
 
       -- TODO: Make limit configurable
       local time_end = socket.gettime()
-      if time_end - time_start > 0.0 then
+      if time_end - time_start > 0.2 then
         log_error(
             "WARNING: slow hiredis get_reply",
             self.connector_:describe(),

@@ -406,8 +406,6 @@ do
         0.1 * time_in_request +
         0.9 * self.time_per_request_rolling_avg_
 
-      log("XXX", self.info_getter_())
-
       -- TODO: Make limit configurable!
       if time_end - time_start > 0.5 then
         log_error(

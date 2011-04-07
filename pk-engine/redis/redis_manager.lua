@@ -130,7 +130,7 @@ do
       return make_slowlog_proxy(
           "sidereal " .. info.address.host .. ":" .. info.address.port
           .. " db " .. info.database,
-          conn, 0.3 -- TODO: Make limit configurable
+          conn, 1 -- TODO: Make limit configurable
         )
     end
 

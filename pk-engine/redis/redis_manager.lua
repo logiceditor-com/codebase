@@ -79,12 +79,11 @@ do
               .. name .. " %04.2fs: " .. tostring(k)
 
             v = function(self, ...)
-              assert(self == t)
               return maybe_log(
                   socket.gettime(),
                   time_limit,
                   msg,
-                  fn(obj, ...)
+                  fn(self == t and obj or self, ...)
                 )
             end
 

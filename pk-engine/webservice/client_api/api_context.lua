@@ -329,6 +329,12 @@ do
     self.context_.wsapi_response:delete_cookie(name, path)
   end
 
+  local get_service_info = function(self)
+    method_arguments(self)
+
+    return self.context_:get_service_info()
+  end
+
   make_api_context = function(
       context,
       db_tables,
@@ -365,6 +371,8 @@ do
       --
       extend = extend;
       ext = ext;
+      --
+      get_service_info = get_service_info;
       --
       push_param = push_param; -- Private
       pop_param = pop_param; -- Private

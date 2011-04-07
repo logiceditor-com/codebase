@@ -2,6 +2,7 @@
 -- request_manager.lua: wsapi request manager
 --------------------------------------------------------------------------------
 
+local socket = require 'socket'
 require 'wsapi.request'
 require 'wsapi.response'
 
@@ -204,10 +205,15 @@ do
       return v
     end
 
-    local create_common_context = function(wsapi_env, config_manager_maker)
+    local create_common_context = function(
+        wsapi_env,
+        config_manager_maker,
+        info_getter
+      )
       arguments(
           "table", wsapi_env,
-          "function", config_manager_maker
+          "function", config_manager_maker,
+          "function", info_getter
         )
 
       local config_host = wsapi_env.PK_CONFIG_HOST
@@ -241,6 +247,7 @@ do
             config_manager,
             make_hiredis_connection_manager()
           );
+        get_service_info = info_getter;
         --
         extend = extend;
         ext = ext;
@@ -272,7 +279,8 @@ do
         {
           __index = create_common_context(
               wsapi_env,
-              self.config_manager_maker_
+              self.config_manager_maker_,
+              self.info_getter_
             );
           __metatable = true;
         }
@@ -322,6 +330,8 @@ do
           "table", wsapi_env
         )
 
+      self.requests_total_ = self.requests_total_ + 1
+
       local time_start = socket.gettime()
 
       local context = get_context(self, wsapi_env)
@@ -345,6 +355,7 @@ do
 
       if not ok then
         -- NOTE: Error is already logged in error_handler.
+        self.requests_fails_ = self.requests_fails_ + 1
 
         -- Using text_response()
         -- only because it is used everywhere else
@@ -380,6 +391,23 @@ do
 
       local time_end = socket.gettime()
 
+      local time_in_request = time_end - time_start
+
+      self.time_in_requests_ = self.time_in_requests_ + time_in_request
+      self.time_per_request_min_ = math.min(
+          self.time_per_request_min_,
+          time_in_request
+        )
+      self.time_per_request_max_ = math.max(
+          self.time_per_request_max_,
+          time_in_request
+        )
+      self.time_per_request_rolling_avg_ =
+        0.1 * time_in_request +
+        0.9 * self.time_per_request_rolling_avg_
+
+      log("XXX", self.info_getter_())
+
       -- TODO: Make limit configurable!
       if time_end - time_start > 0.5 then
         log_error(
@@ -393,18 +421,24 @@ do
     end
   end
 
-  make_request_manager = function(request_handler, config_manager_maker)
+  make_request_manager = function(
+      request_handler,
+      config_manager_maker,
+      service_name
+    )
+    service_name = service_name or "(unknown)"
+
     arguments(
         "table", request_handler,
-        "function", config_manager_maker
-      )
-    optional_arguments(
-        "function", config_manager_maker
+        "function", config_manager_maker,
+        "string", service_name
       )
 
     config_manager_maker = config_manager_maker or make_default_config_manager
 
-    return
+    local time_start = socket.gettime()
+
+    local self =
     {
       handle_request = handle_request;
       extend_context = extend_context;
@@ -413,7 +447,41 @@ do
       request_handler_ = request_handler;
       common_context_mt_ = nil;
       config_manager_maker_ = config_manager_maker;
+      --
+      requests_total_ = 0;
+      requests_fails_ = 0;
+      time_in_requests_ = 0;
+      time_per_request_rolling_avg_ = 0;
+      time_per_request_max_ = -1;
+      time_per_request_min_ = math.huge;
     }
+
+    -- TODO: Ugly. Lazy. Hack.
+    self.info_getter_ = function()
+      local now = socket.gettime()
+
+      return
+      {
+        -- Single node only
+        {
+          name = service_name;
+          pid = posix.getpid("pid"); -- Not caching, may fork.
+          time_start = time_start;
+          time_now = now;
+          uptime = now - time_start;
+          gc_count = collectgarbage("count");
+          requests_total = self.requests_total_;
+          requests_fails = self.requests_fails_;
+          time_in_requests = self.time_in_requests_;
+          time_idle = (now - time_start) - self.time_in_requests_;
+          time_per_request_rolling_avg = self.time_per_request_rolling_avg_;
+          time_per_request_max = self.time_per_request_max_;
+          time_per_request_min = self.time_per_request_min_;
+        };
+      }
+    end
+
+    return self
   end
 end
 
@@ -442,15 +510,24 @@ do
     }
   end
 
-  make_request_manager_using_handlers = function(handlers, config_manager_maker)
+  make_request_manager_using_handlers = function(
+      handlers,
+      config_manager_maker,
+      service_name
+    )
     arguments(
         "table", handlers
       )
     optional_arguments(
-        "function", config_manager_maker
+        "function", config_manager_maker,
+        "string", service_name
       )
 
-    return make_request_manager(make_request_handler(handlers), config_manager_maker)
+    return make_request_manager(
+        make_request_handler(handlers),
+        config_manager_maker,
+        service_name
+      )
   end
 end
 

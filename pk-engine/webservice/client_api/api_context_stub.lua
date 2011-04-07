@@ -4,7 +4,9 @@
 -- NOTE: When changing, remember to change api_context as well
 --------------------------------------------------------------------------------
 
+local socket = require 'socket'
 require 'socket.url'
+local posix = require 'posix'
 
 --------------------------------------------------------------------------------
 
@@ -396,6 +398,32 @@ do
     return v
   end
 
+  local get_service_info = function(self)
+    method_arguments(self)
+
+    local now = socket.gettime()
+
+    return
+    {
+      -- Single node.
+      {
+        name = "(api-context-stub)"; -- TODO: Provide means to configure this
+        pid = posix.getpid("pid"); -- Not caching, may fork.
+        time_start = self.time_start_;
+        time_now = now;
+        uptime = now - self.time_start_;
+        gc_count = collectgarbage("count");
+        requests_total = -1; -- TODO: ?!
+        requests_fails = -1; -- TODO: ?!
+        time_in_requests = -1;
+        time_idle = -1;
+        time_per_request_rolling_avg = -1;
+        time_per_request_max = -1;
+        time_per_request_min = -1;
+      };
+    }
+  end
+
   make_api_context_stub = function(
       internal_config_manager,
       db_tables,
@@ -430,6 +458,8 @@ do
       set_cookie = set_cookie;
       delete_cookie = delete_cookie;
       --
+      get_service_info = get_service_info;
+      --
       push_param = push_param; -- Private
       pop_param = pop_param; -- Private
       --
@@ -455,6 +485,8 @@ do
       internal_call_handlers_ = internal_call_handlers;
       --
       param_stack_ = { };
+      --
+      time_start_ = socket.gettime();
     }
 
     -- TODO: Ugly.

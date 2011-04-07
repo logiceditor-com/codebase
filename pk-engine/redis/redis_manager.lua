@@ -127,11 +127,16 @@ do
         return nil, err
       end
 
+      return conn
+
+      -- TODO: Fix this ASAP
+      --[[
       return make_slowlog_proxy(
           "sidereal " .. info.address.host .. ":" .. info.address.port
           .. " db " .. info.database,
           conn, 1 -- TODO: Make limit configurable
         )
+      --]]
     end
 
     create_persistent_connector = function(info)

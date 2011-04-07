@@ -3,6 +3,7 @@
 --------------------------------------------------------------------------------
 
 local sidereal = require 'sidereal'
+local socket = require 'socket'
 
 --------------------------------------------------------------------------------
 
@@ -33,11 +34,71 @@ local assert_is_table,
         'assert_is_number'
       }
 
+local is_function
+      = import 'lua-nucleo/type.lua'
+      {
+        'is_function'
+      }
+
 local make_generic_connection_manager
       = import 'pk-engine/generic_connection_manager.lua'
       {
         'make_generic_connection_manager'
       }
+
+--------------------------------------------------------------------------------
+
+-- TODO: Generalize?
+local make_slowlog_proxy
+do
+  local maybe_log = function(time_start, time_limit, msg, ...)
+    local time_passed = socket.gettime() - time_start
+    if time_passed > time_limit then
+      log_error((msg):format(time_passed))
+    end
+    return ...
+  end
+
+  make_slowlog_proxy = function(name, obj, time_limit)
+    return setmetatable(
+        { },
+        {
+          -- TODO: Proxy __tostring?
+          __metatable = "slowlogger:"..name;
+
+          __index = function(t, k)
+            local v = obj[k]
+            if not is_function(v) then
+              return v
+            end
+
+            local fn = v
+
+            -- TODO: This is not enough. Need to print arguments.
+            local msg = "WARNING: slow "
+              .. name .. " %04.2fs: " .. tostring(k)
+
+            v = function(...)
+              return maybe_log(
+                  socket.gettime(),
+                  time_limit,
+                  msg,
+                  fn(...)
+                )
+            end
+
+            t[k] = v
+
+            return v
+          end;
+
+          __newindex = function(t, k, v)
+            obj[k] = v
+          end;
+        }
+      )
+  end
+end
 
 --------------------------------------------------------------------------------
 
@@ -66,7 +127,11 @@ do
         return nil, err
       end
 
-      return conn
+      return make_slowlog_proxy(
+          "sidereal " .. info.address.host .. ":" .. info.address.port
+          .. " db " .. info.database,
+          conn, 0.3 -- TODO: Make limit configurable
+        )
     end
 
     create_persistent_connector = function(info)

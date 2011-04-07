@@ -78,12 +78,13 @@ do
             local msg = "WARNING: slow "
               .. name .. " %04.2fs: " .. tostring(k)
 
-            v = function(...)
+            v = function(self, ...)
+              assert(self == t)
               return maybe_log(
                   socket.gettime(),
                   time_limit,
                   msg,
-                  fn(...)
+                  fn(obj, ...)
                 )
             end
 

@@ -110,7 +110,20 @@ do
         return nil, err, err_id
       end
 
+      local time_start = socket.gettime()
+
       local res, err, err_id = conn:command(cmd, ...)
+
+      -- TODO: Make limit configurable
+      local time_end = socket.gettime()
+      if time_end - time_start > 0.01 then
+        log_error(
+            "WARNING: slow hiredis command",
+            ("%04.2fs:"):format(time_end - time_start),
+            cmd, ...
+          )
+      end
+
       if res == nil then
         -- In current lua-hiredis implementation all 'nil, err' errors
         -- are to be resolved by reconnection.
@@ -153,7 +166,19 @@ do
         return nil, err, err_id
       end
 
+      local time_start = socket.gettime()
+
       local res, err, err_id = conn:get_reply()
+
+      -- TODO: Make limit configurable
+      local time_end = socket.gettime()
+      if time_end - time_start > 0.01 then
+        log_error(
+            "WARNING: slow hiredis get_reply",
+            ("%04.2fs:"):format(time_end - time_start)
+          )
+      end
+
       if res == nil then
         -- In current lua-hiredis implementation all 'nil, err' errors
         -- are to be resolved by reconnection.

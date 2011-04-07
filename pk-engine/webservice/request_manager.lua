@@ -384,7 +384,7 @@ do
       if time_end - time_start > 0.5 then
         log_error(
             "WARNING: slow request",
-            ("(%04.2f s):"):format(time_end - time_start),
+            ("%04.2fs:"):format(time_end - time_start),
             context.wsapi_env.PATH_INFO, context.wsapi_env
           )
       end

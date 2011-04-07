@@ -95,6 +95,8 @@ do
     end
 
     local command = function(self, cmd, ...)
+      self.buf_ = { }
+
       if banned[cmd] then
         -- Have to ban SELECT, or the reconnection logic will go bad.
         -- SELECT will also break api_context:hiredis():<db_name>() stuff,
@@ -155,12 +157,16 @@ do
         return nil, err, err_id
       end
 
+      self.buf_[#self.buf_ + 1] = { cmd, ... }
+
       conn:append_command(cmd, ...) -- Does not return any meaningful value
 
       return true
     end
 
     local get_reply = function(self)
+      local buf = table.remove(self.buf_, 1)
+
       local conn, err, err_id = get_connection(self)
       if not conn then
         log_error("get_connection failed:", err, err_id)
@@ -173,12 +179,12 @@ do
 
       -- TODO: Make limit configurable
       local time_end = socket.gettime()
-      if time_end - time_start > 0.2 then
+      if time_end - time_start > 0.0 then
         log_error(
             "WARNING: slow hiredis get_reply",
             self.connector_:describe(),
             ("%04.2fs"):format(time_end - time_start),
-            debug.traceback() -- no other means to figure out what it was :-(
+            buf, "buffered:", self.buf_
           )
       end
 
@@ -222,6 +228,9 @@ do
         --
         connector_ = connector;
         conn_ = nil;
+        --
+        -- TODO: Overhead. Needed for slow append_command/get_reply debugging.
+        buf_ = { };
       }
     end
   end

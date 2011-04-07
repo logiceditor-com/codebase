@@ -322,6 +322,8 @@ do
           "table", wsapi_env
         )
 
+      local time_start = socket.gettime()
+
       local context = get_context(self, wsapi_env)
       local ok, status, body, headers = xpcall(
           function()
@@ -375,6 +377,17 @@ do
       --       This response object is here only because of cookies.
       context.wsapi_response.status = status
       context.wsapi_response:write(body)
+
+      local time_end = socket.gettime()
+
+      -- TODO: Make limit configurable!
+      if time_end - time_start > 0.5 then
+        log_error(
+            "WARNING: slow request",
+            ("(%04.2f s):"):format(time_end - time_start),
+            context.wsapi_env.PATH_INFO, context.wsapi_env
+          )
+      end
 
       return context.wsapi_response:finish()
     end

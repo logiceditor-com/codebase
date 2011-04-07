@@ -118,7 +118,7 @@ do
 
       -- TODO: Make limit configurable
       local time_end = socket.gettime()
-      if time_end - time_start > 0.1 then
+      if time_end - time_start > 0.3 then
         log_error(
             "WARNING: slow hiredis command",
             ("%04.2fs:"):format(time_end - time_start),
@@ -179,7 +179,7 @@ do
 
       -- TODO: Make limit configurable
       local time_end = socket.gettime()
-      if time_end - time_start > 0.2 then
+      if time_end - time_start > 0.3 then
         log_error(
             "WARNING: slow hiredis get_reply",
             self.connector_:describe(),

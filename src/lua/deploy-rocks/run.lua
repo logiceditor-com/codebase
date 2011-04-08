@@ -222,7 +222,8 @@ local load_project_manifest
 --local PROJECT_PATH = os.getenv("HOME") .. "/projects/pk-postcards"
 --local MANIFEST_PATH = PROJECT_PATH .. "/system/manifest"
 
- -- TODO: Uberhack! Must be in path. Wrap to a rock and install. (Or, better, replace with Lua code)
+ -- TODO: Uberhack! Must be in path. Wrap to a rock and install.
+ --       (Or, better, replace with Lua code)
 local GIT_TAG_TOOL_PATH = "pk-git-tag-version"
 
 --------------------------------------------------------------------------------
@@ -319,22 +320,29 @@ end
 
 --------------------------------------------------------------------------------
 
-local remote_ensure_sudo_is_passwordless_cached =
-  function(
-      project_name,
-      cluster_name,
-      machine_name,
-      machine_url
-    )
+local remote_ensure_sudo_is_passwordless_cached = function(
+    project_name,
+    cluster_name,
+    machine_name,
+    machine_url
+  )
 
-  local sudo_is_passwordless_cache_file = os_getenv("HOME") .. "/.deploy-rocks.cache"
+  local sudo_is_passwordless_cache_file =
+    os_getenv("HOME") .. "/.deploy-rocks.cache"
 
   local cache_tables = make_config_environment({ })
 
   if does_file_exist(sudo_is_passwordless_cache_file) then
-    cache_tables = make_config_environment(load_table_from_file(sudo_is_passwordless_cache_file))
+    cache_tables =
+      make_config_environment(
+          load_table_from_file(sudo_is_passwordless_cache_file)
+        )
     if
-      cache_tables.projects[project_name].clusters[cluster_name].machines[machine_name].sudo_is_passwordless == true
+      cache_tables
+        .projects[project_name]
+        .clusters[cluster_name]
+        .machines[machine_name]
+        .sudo_is_passwordless == true
     then
       return
     end
@@ -349,11 +357,17 @@ local remote_ensure_sudo_is_passwordless_cached =
       "remote sudo is not passwordless (or some obscure error occured)"
     )
 
-  cache_tables.projects[project_name].clusters[cluster_name].machines[machine_name].sudo_is_passwordless = true
+  cache_tables
+    .projects[project_name]
+    .clusters[cluster_name]
+    .machines[machine_name]
+    .sudo_is_passwordless = true
 
-  assert(write_file(
-      sudo_is_passwordless_cache_file,
-      "return\n" .. tpretty(cache_tables, "  ", 80))
+  assert(
+      write_file(
+          sudo_is_passwordless_cache_file,
+          "return\n" .. tpretty(cache_tables, "  ", 80)
+        )
     )
 end
 
@@ -394,7 +408,11 @@ local write_current_versions = function(manifest, cluster_info, new_versions)
   return filename
 end
 
-local update_version_symlink = function(manifest, cluster_info, new_versions_filename)
+local update_version_symlink = function(
+    manifest,
+    cluster_info,
+    new_versions_filename
+  )
   local expected_path = manifest.local_cluster_versions_path
   local versions_current_filename = expected_path .. "/versions-current.lua"
 
@@ -419,7 +437,7 @@ do
     writeln_flush("----> Checking Git repository sanity...")
     git_update_index(path)
 
-    if not (manifest.debug_mode) then
+    if not manifest.debug_mode then
       checker:ensure(
           "must have clean working copy (hint: do commit or reset)",
           not git_is_dirty(path)
@@ -447,7 +465,10 @@ do
   end
 
   local calculate_update_rocks_from_versions = function(
-      manifest, current_versions, new_versions, dry_run
+      manifest,
+      current_versions,
+      new_versions,
+      dry_run
     )
     arguments(
         "table", manifest,
@@ -492,12 +513,14 @@ do
           subproject.provides_rocks_repo = { name = subproject.provides_rocks_repo }
         end
 
-        subproject.local_path = subproject.local_path or manifest.project_path .. "/" .. name
+        subproject.local_path =
+          subproject.local_path or manifest.project_path .. "/" .. name
 
         for i = 1, #subproject.provides_rocks_repo do
           local rocks_repo = subproject.provides_rocks_repo[i].name
 
-          local names = luarocks_get_rocknames_in_manifest( -- TODO: Really Bad! This will trigger full reinstall! Detect changed rocks!
+          local names = luarocks_get_rocknames_in_manifest(
+  -- TODO: Really Bad! This will trigger full reinstall! Detect changed rocks!
               subproject.local_path .. "/" .. rocks_repo .. "/manifest"
             )
           for i = 1, #names do
@@ -561,7 +584,10 @@ do
         then
           -- TODO: Hack. Redesign workflow instead.
           manifest.ignore_rocks = manifest.ignore_rocks or { }
-          local data = luarocks_load_rockspec(action.local_path .. "/" .. assert(rockspec[1]))
+          local data =
+            luarocks_load_rockspec(
+                action.local_path .. "/" .. assert(rockspec[1])
+              )
           local name = assert(data.package)
           manifest.ignore_rocks[get_filename_from_path(name)] = true
 
@@ -574,7 +600,11 @@ do
             if dry_run then
               writeln_flush("-!!-> DRY RUN: Want to generate rockspecs")
             else
-              writeln_flush("--> Generating rockspecs with ", tstr(rockspec.generator), "...")
+              writeln_flush(
+                  "--> Generating rockspecs with ",
+                  tstr(rockspec.generator),
+                  "..."
+                )
               local rockspec_generator = is_table(rockspec.generator)
                 and rockspec.generator
                  or { rockspec.generator }
@@ -591,7 +621,11 @@ do
           local data = luarocks_load_rockspec(action.local_path .. "/" .. filename)
           local name = assert(data.package)
 
-          local rockspec_files = luarocks_list_rockspec_files(action.local_path .. "/" .. assert(rockspec[1]), action.local_path)
+          local rockspec_files =
+            luarocks_list_rockspec_files(
+                action.local_path .. "/" .. assert(rockspec[1]),
+                action.local_path
+              )
           local rockspec_files_changed = { }
 
           for i = 1, #rockspec_files do
@@ -636,7 +670,8 @@ do
             if rockspec["x-cluster-name"] then
               if dry_run then
                 writeln_flush(
-                    "-!!-> DRY RUN: Want to remove cluster-specific rock after pack", name
+                    "-!!-> DRY RUN: Want to remove cluster-specific rock after pack",
+                    name
                   )
               else
                 writeln_flush("----> Removing after cluster-specific rock pack `", name, "'...")
@@ -651,10 +686,17 @@ do
         writeln_flush("----> No changed rocks for that rocks manifest ", manifest_path)
       else
         if dry_run then
-          writeln_flush("-!!-> DRY RUN: Want to commit added rocks from rocks manifest ", manifest_path)
+          writeln_flush(
+              "-!!-> DRY RUN: Want to commit added rocks from rocks manifest ",
+              manifest_path
+            )
         else
           -- TODO: HACK! Add only generated files!
-          writeln_flush("----> Committing added rocks from rocks manifest ", manifest_path, " (path: ", path, ")...")
+          writeln_flush(
+              "----> Committing added rocks from rocks manifest ",
+              manifest_path,
+              " (path: ", path, ")..."
+            )
           git_add_directory(subproject.local_path, path)
           git_commit_with_message(
               subproject.local_path,
@@ -729,7 +771,8 @@ do
       writeln_flush("----> Checking subproject git repo sanity for `", name, "'...")
 
       -- TODO: HACK! Do this at load stage.
-      subproject.local_path = subproject.local_path or manifest.project_path .. "/" .. name
+      subproject.local_path = subproject.local_path
+        or manifest.project_path .. "/" .. name
       check_git_repo_sanity(manifest, name, subproject.local_path)
     end
 
@@ -745,7 +788,10 @@ do
         writeln_flush("----> Collecting data from `", name, "'...")
 
         local path = assert(subproject.local_path)
-        if current_versions[name] and not git_are_branches_different(path, "HEAD", current_versions[name]) then
+        if
+          current_versions[name] and
+          not git_are_branches_different(path, "HEAD", current_versions[name])
+        then
           writeln_flush("No changes detected, skipping")
         else
 
@@ -868,7 +914,11 @@ do
                 writeln_flush("----> Reinstalling changed rocks...")
 
                 for rock_name, _ in pairs(need_to_reinstall) do
-                  local rockspec = assert(rockspec_files[rock_name], "rock without rockspec "..rock_name)
+                  local rockspec =
+                    assert(
+                        rockspec_files[rock_name],
+                        "rock without rockspec "..rock_name
+                      )
                   if dry_run then
                     writeln_flush("-!!-> DRY RUN: Want to reinstall", rockspec)
                   else
@@ -880,12 +930,18 @@ do
                   if dry_run then
                     writeln_flush("-!!-> DRY RUN: Want to pack", rockspec)
                   else
-                    writeln_flush("----> Packing `", rockspec, "' to `", manifest.local_rocks_repo_path, "'...")
+                    writeln_flush(
+                        "----> Packing `", rockspec, "' to `",
+                        manifest.local_rocks_repo_path, "'..."
+                      )
                     luarocks_pack_to(rock_name, manifest.local_rocks_repo_path)
                     if path ~= manifest.local_rocks_repo_path then
                       copy_file_to_dir(path .. "/" .. rockspec, manifest.local_rocks_repo_path)
                     else
-                      writeln_flush("Path " .. path .. " is the same as local repository path", rockspec)
+                      writeln_flush(
+                          "Path " .. path .. " is the same as local repository path",
+                          rockspec
+                        )
                     end
                     writeln_flush("----> Rebuilding manifest...")
                     luarocks_admin_make_manifest(manifest.local_rocks_repo_path)
@@ -900,7 +956,10 @@ do
                 else
                   -- TODO: HACK! Add only generated files!
                   writeln_flush("----> Committing changed rocks...")
-                  git_add_directory(manifest.local_rocks_git_repo_path, manifest.local_rocks_repo_path)
+                  git_add_directory(
+                      manifest.local_rocks_git_repo_path,
+                      manifest.local_rocks_repo_path
+                    )
                   git_commit_with_message(
                       manifest.local_rocks_git_repo_path,
                       "rocks/" .. cluster_info.name .. ": updated rocks for " .. name
@@ -1001,7 +1060,8 @@ do
                   end
 
                   if rock.remove_after_pack then
-                  -- Needed for foreign-cluster-specific rocks, so they are not linger in our system
+                  -- Needed for foreign-cluster-specific rocks,
+                  -- so they are not linger in our system
                     if dry_run then
                       writeln_flush("-!!-> DRY RUN: Want to remove after pack", rock.rockspec)
                     else
@@ -1020,7 +1080,10 @@ do
               else
                 -- TODO: HACK! Add only generated files!
                 writeln_flush("----> Committing changed rocks...")
-                git_add_directory(manifest.local_rocks_git_repo_path, manifest.local_rocks_repo_path)
+                git_add_directory(
+                    manifest.local_rocks_git_repo_path,
+                    manifest.local_rocks_repo_path
+                  )
                 git_commit_with_message(
                     manifest.local_rocks_git_repo_path,
                     "rocks/" .. cluster_info.name .. ": updated rocks for " .. name
@@ -1040,14 +1103,18 @@ do
         luarocks_admin_make_manifest(manifest.local_rocks_repo_path)
 
         -- TODO: HACK! Add only generated files!
-        git_add_directory(manifest.local_rocks_git_repo_path, manifest.local_rocks_repo_path)
+        git_add_directory(
+            manifest.local_rocks_git_repo_path,
+            manifest.local_rocks_repo_path
+          )
       end
 
       git_update_index(manifest.local_rocks_git_repo_path)
       if
-        not (
-            git_is_directory_dirty(manifest.local_rocks_git_repo_path, manifest.local_rocks_repo_path)
-          )
+        not git_is_directory_dirty(
+            manifest.local_rocks_git_repo_path,
+            manifest.local_rocks_repo_path
+         )
       then
         writeln_flush("----> Manifest not changed")
       else
@@ -1089,10 +1156,23 @@ do
         local version
 
         if dry_run then
-          version = git_get_version_increment(subproject.local_path, cluster_info.version_tag_suffix, "build") -- TODO: Do not hardcode "build".
-          writeln_flush("-!!-> DRY RUN: Want to tag subproject `", name, "' with `", version, "'")
+          version =
+            git_get_version_increment(
+                subproject.local_path,
+                cluster_info.version_tag_suffix,
+                "build"  -- TODO: Do not hardcode "build".
+              )
+          writeln_flush(
+              "-!!-> DRY RUN: Want to tag subproject `", name,
+              "' with `", version, "'"
+            )
         else
-          version = git_tag_version_increment(subproject.local_path, cluster_info.version_tag_suffix, "build") -- TODO: Do not hardcode "build".
+          version =
+            git_tag_version_increment(
+                subproject.local_path,
+                cluster_info.version_tag_suffix,
+                "build" -- TODO: Do not hardcode "build".
+              )
           writeln_flush("----> Subproject `", name, "' tagged `", version, "'")
         end
 
@@ -1119,7 +1199,15 @@ do
   do
     local action_handlers = { }
 
-    action_handlers.local_exec = function(manifest, cluster_info, param, machine, role_args, action)
+    action_handlers.local_exec =
+      function(
+          manifest,
+          cluster_info,
+          param,
+          machine,
+          role_args,
+          action
+        )
       local commands = action
       assert(#commands > 0)
 
@@ -1143,12 +1231,20 @@ do
         else
           writeln_flush("-> Running locally: `" .. command_str .. "'")
 
-          assert(shell_exec(unpack(command)) == 0) -- TODO: Hack! Run something lower-level then, don't format command twice
+          -- TODO: Hack! Run something lower-level then, don't format command twice
+          assert(shell_exec(unpack(command)) == 0)
         end
       end
     end
 
-    action_handlers.remote_exec = function(manifest, cluster_info, param, machine, role_args, action)
+    action_handlers.remote_exec = function(
+        manifest,
+        cluster_info,
+        param,
+        machine,
+        role_args,
+        action
+      )
       local commands = action
       assert(#commands > 0)
 
@@ -1168,16 +1264,29 @@ do
         local command_str = shell_format_command(unpack(command))
 
         if param.dry_run then
-          writeln_flush("-!!-> DRY RUN: Want to run remotely: `" .. command_str .. "' on `" .. machine.name .. "'")
+          writeln_flush(
+              "-!!-> DRY RUN: Want to run remotely: `" .. command_str ..
+              "' on `" .. machine.name .. "'"
+            )
         else
-          writeln_flush("-> Running remotely: `" .. command_str .. "' on `" .. machine.name .. "'")
+          writeln_flush(
+              "-> Running remotely: `" .. command_str ..
+              "' on `" .. machine.name .. "'"
+            )
 
           assert(shell_exec_remote(machine.external_url, unpack(command)) == 0)
         end
       end
     end
 
-    action_handlers.deploy_rocks = function(manifest, cluster_info, param, machine, role_args, action)
+    action_handlers.deploy_rocks = function(
+        manifest,
+        cluster_info,
+        param,
+        machine,
+        role_args,
+        action
+      )
       local rocks_must_be_installed = action
       assert(#rocks_must_be_installed > 0, "deploy_rocks: no rocks specified")
 
@@ -1187,7 +1296,10 @@ do
       machine.deployed_rocks_set = machine.deployed_rocks_set or { }
       if not machine.installed_rocks_set then
         assert(not machine.duplicate_rocks_set)
-        writeln_flush("-> Reading remote list of installed rocks from `", machine.external_url, "'")
+        writeln_flush(
+            "-> Reading remote list of installed rocks from `",
+            machine.external_url, "'"
+          )
         machine.installed_rocks_set, machine.duplicate_rocks_set = luarocks_parse_installed_rocks(
             remote_luarocks_list_installed_rocks(
                 machine.external_url
@@ -1195,10 +1307,14 @@ do
           )
       else
         assert(machine.duplicate_rocks_set)
-        writeln_flush("-> Using cached remote list of installed rocks for `", machine.external_url, "'")
+        writeln_flush(
+            "-> Using cached remote list of installed rocks for `",
+            machine.external_url, "'"
+          )
       end
 
-      local installed_rocks_set, duplicate_rocks_set = machine.installed_rocks_set, machine.duplicate_rocks_set
+      local installed_rocks_set, duplicate_rocks_set =
+        machine.installed_rocks_set, machine.duplicate_rocks_set
 
       -- TODO: HACK! Don't rely on this, rely on description in role! (?!)
       --       But what about third-party rocks then?
@@ -1281,7 +1397,14 @@ do
       end
     end
 
-    action_handlers.ensure_file_access_rights = function(manifest, cluster_info, param, machine, role_args, action)
+    action_handlers.ensure_file_access_rights = function(
+        manifest,
+        cluster_info,
+        param,
+        machine,
+        role_args,
+        action
+      )
       local dry_run = param.dry_run
 
       if dry_run then
@@ -1316,7 +1439,8 @@ do
       local dry_run = param.dry_run
 
       if not dry_run then
-        if ask_user( -- TODO: Make interactivity configurable, don't want to press this on developer machine each time
+        if ask_user( -- TODO: Make interactivity configurable,
+                     --       don't want to press this on developer machine each time
             "\n\nABOUT TO DEPLOY TO `" .. cluster_info.name .. "'. ARE YOU SURE?",
             { "y", "n" },
             "n"
@@ -1331,9 +1455,7 @@ do
       local roles = timapofrecords(manifest.roles, "name")
 
       local machines = cluster_info.machines
---writeln_flush("manifest: " .. tpretty(manifest, "  ", 80))
---writeln_flush("cluster_info: " .. tpretty(cluster_info, "  ", 80))
---error()
+
       for i = 1, #machines do
         local machine = machines[i]
 
@@ -1534,7 +1656,13 @@ do
       )
   end
 
-  deploy_rocks_from_versions_filename = function(manifest, cluster_name, new_versions_filename, commit_new_versions, dry_run)
+  deploy_rocks_from_versions_filename = function(
+      manifest,
+      cluster_name,
+      new_versions_filename,
+      commit_new_versions,
+      dry_run
+    )
     arguments(
         "table", manifest,
         "string", cluster_name,

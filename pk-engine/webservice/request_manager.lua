@@ -333,6 +333,7 @@ do
       self.requests_total_ = self.requests_total_ + 1
 
       local time_start = socket.gettime()
+      local gc_start = collectgarbage("count")
 
       local context = get_context(self, wsapi_env)
       local ok, status, body, headers = xpcall(
@@ -390,6 +391,7 @@ do
       context.wsapi_response:write(body)
 
       local time_end = socket.gettime()
+      local gc_end = collectgarbage("count")
 
       local time_in_request = time_end - time_start
 
@@ -406,11 +408,14 @@ do
         0.01 * time_in_request +
         0.99 * self.time_per_request_rolling_avg_
 
+      -- TODO: Add GC to stats!
+
       -- TODO: Make limit configurable!
       if time_end - time_start > 0.5 then
         log_error(
             "WARNING: slow request",
             ("%04.2fs:"):format(time_end - time_start),
+            "GC", gc_end - gc_start, "=", gc_end, "-", gc_start, "KB",
             context.wsapi_env.PATH_INFO, context.wsapi_env
           )
       end

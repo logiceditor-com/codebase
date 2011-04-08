@@ -403,8 +403,8 @@ do
           time_in_request
         )
       self.time_per_request_rolling_avg_ =
-        0.1 * time_in_request +
-        0.9 * self.time_per_request_rolling_avg_
+        0.01 * time_in_request +
+        0.99 * self.time_per_request_rolling_avg_
 
       -- TODO: Make limit configurable!
       if time_end - time_start > 0.5 then

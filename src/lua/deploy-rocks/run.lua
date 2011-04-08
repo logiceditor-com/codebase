@@ -73,6 +73,12 @@ local fill_curly_placeholders,
         'trim'
       }
 
+local make_config_environment
+      = import 'lua-nucleo/sandbox.lua'
+      {
+        'make_config_environment'
+      }
+
 local do_in_environment
       = import 'lua-nucleo/sandbox.lua'
       {
@@ -323,15 +329,12 @@ local remote_ensure_sudo_is_passwordless_cached =
 
   local sudo_is_passwordless_cache_file = os_getenv("HOME") .. "/.deploy-rocks.cache"
 
-  local cache_tables = { }
+  local cache_tables = make_config_environment({ })
+
   if does_file_exist(sudo_is_passwordless_cache_file) then
-    cache_tables = load_table_from_file(sudo_is_passwordless_cache_file)
+    cache_tables = make_config_environment(load_table_from_file(sudo_is_passwordless_cache_file))
     if
-      cache_tables.projects ~= nil and
-      cache_tables.projects[project_name] ~= nil and
-      cache_tables.projects[project_name].clusters[cluster_name] ~= nil and
-      cache_tables.projects[project_name].clusters[cluster_name].machines[machine_name] ~= nil and
-      cache_tables.projects[project_name].clusters[cluster_name].machines[machine_name].sudo_is_passwordless
+      cache_tables.projects[project_name].clusters[cluster_name].machines[machine_name].sudo_is_passwordless == true
     then
       return
     end
@@ -346,25 +349,8 @@ local remote_ensure_sudo_is_passwordless_cached =
       "remote sudo is not passwordless (or some obscure error occured)"
     )
 
-  if cache_tables.projects == nil then
-    cache_tables.projects = { }
-  end
-  if cache_tables.projects[project_name] == nil then
-    cache_tables.projects[project_name] = { }
-  end
-  if cache_tables.projects[project_name].clusters == nil then
-    cache_tables.projects[project_name].clusters = { }
-  end
-  if cache_tables.projects[project_name].clusters[cluster_name] == nil then
-    cache_tables.projects[project_name].clusters[cluster_name] = { }
-  end
-  if cache_tables.projects[project_name].clusters[cluster_name].machines == nil then
-    cache_tables.projects[project_name].clusters[cluster_name].machines = { }
-  end
-  if cache_tables.projects[project_name].clusters[cluster_name].machines[machine_name] == nil then
-    cache_tables.projects[project_name].clusters[cluster_name].machines[machine_name] =
-      { sudo_is_passwordless = true }
-  end
+  cache_tables.projects[project_name].clusters[cluster_name].machines[machine_name].sudo_is_passwordless = true
+
   assert(write_file(
       sudo_is_passwordless_cache_file,
       "return\n" .. tpretty(cache_tables, "  ", 80))

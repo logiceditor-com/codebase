@@ -9,7 +9,7 @@ local pairs, pcall, assert, error, select, next, loadfile, loadstring
     = pairs, pcall, assert, error, select, next, loadfile, loadstring
 
 local table_concat = table.concat
-
+local os_getenv = os.getenv
 local io = io
 local os = os
 
@@ -302,30 +302,85 @@ local create_symlink_from_to = function(from_filename, to_filename)
     ) == 0)
 end
 
-local remote_ensure_sudo_is_passwordless = function(host)
+-- TODO: Move these somewhere to lua-nucleo?
+
+local load_table_from_file = function(path)
+  local chunk = assert(loadfile(path))
+  local ok, table_from_file = assert(do_in_environment(chunk, { }))
+  assert_is_table(table_from_file)
+  return table_from_file
+end
+
+--------------------------------------------------------------------------------
+
+local remote_ensure_sudo_is_passwordless_cached =
+  function(
+      project_name,
+      cluster_name,
+      machine_name,
+      machine_url
+    )
+
+  local sudo_is_passwordless_cache_file = os_getenv("HOME") .. "/.deploy-rocks.cache"
+
+  local cache_tables = { }
+  if does_file_exist(sudo_is_passwordless_cache_file) then
+    cache_tables = load_table_from_file(sudo_is_passwordless_cache_file)
+    if
+      cache_tables.projects ~= nil and
+      cache_tables.projects[project_name] ~= nil and
+      cache_tables.projects[project_name].clusters[cluster_name] ~= nil and
+      cache_tables.projects[project_name].clusters[cluster_name].machines[machine_name] ~= nil and
+      cache_tables.projects[project_name].clusters[cluster_name].machines[machine_name].sudo_is_passwordless
+    then
+      return
+    end
+  end
+
   -- Hint: To fix do:
   -- $ sudo visudo
   -- Replace %sudo ALL=(ALL) ALL
   -- with %sudo ALL=NOPASSWD: ALL
   assert(
-      shell_read_remote(host, "sudo", "echo", "-n", "yo") == "yo",
+      shell_read_remote(machine_url, "sudo", "echo", "-n", "yo") == "yo",
       "remote sudo is not passwordless (or some obscure error occured)"
     )
-end
 
---------------------------------------------------------------------------------
+  if cache_tables.projects == nil then
+    cache_tables.projects = { }
+  end
+  if cache_tables.projects[project_name] == nil then
+    cache_tables.projects[project_name] = { }
+  end
+  if cache_tables.projects[project_name].clusters == nil then
+    cache_tables.projects[project_name].clusters = { }
+  end
+  if cache_tables.projects[project_name].clusters[cluster_name] == nil then
+    cache_tables.projects[project_name].clusters[cluster_name] = { }
+  end
+  if cache_tables.projects[project_name].clusters[cluster_name].machines == nil then
+    cache_tables.projects[project_name].clusters[cluster_name].machines = { }
+  end
+  if cache_tables.projects[project_name].clusters[cluster_name].machines[machine_name] == nil then
+    cache_tables.projects[project_name].clusters[cluster_name].machines[machine_name] =
+      { sudo_is_passwordless = true }
+  end
+  assert(write_file(
+      sudo_is_passwordless_cache_file,
+      "return\n" .. tpretty(cache_tables, "  ", 80))
+    )
+end
 
 local get_cluster_info = function(manifest, cluster_name)
   local clusters = timapofrecords(manifest.clusters, "name")
   return assert(clusters[cluster_name], "cluster not found")
 end
 
-local load_custom_versions = function(manifest, path)
+local load_current_versions = function(manifest, cluster_info)
+  local path = manifest.local_cluster_versions_path .. "/versions-current.lua"
   writeln_flush("----> Loading versions from `", path, "'...")
 
-  local versions_chunk = assert(loadfile(path))
-  local ok, versions = assert(do_in_environment(versions_chunk, { }))
-  assert_is_table(versions)
+  local versions = load_table_from_file(path)
 
   for k, v in pairs(versions) do
     -- TODO: Validate that all repositories are known.
@@ -333,12 +388,6 @@ local load_custom_versions = function(manifest, path)
   end
 
   return versions
-end
-
-local load_current_versions = function(manifest, cluster_info)
-  local path = manifest.local_cluster_versions_path .. "/versions-current.lua"
-
-  return load_custom_versions(manifest, path)
 end
 
 -- Assuming we're operating under atomic lock
@@ -560,6 +609,7 @@ do
           local rockspec_files_changed = { }
 
           for i = 1, #rockspec_files do
+            -- TODO: REMOVE "pk-logiceditor-com" with some PROJECT_NAME variable!
             if not current_versions[subproject.name]
               or git_is_file_changed_between_revisions(
                                 action.local_path,
@@ -873,7 +923,7 @@ do
               end
             end
           else
-            local rocks = assert(subproject.provides_rocks)
+             local rocks = assert(subproject.provides_rocks)
             if #rocks > 0 then
               if subproject.rockspec_generator then
                 if dry_run then
@@ -964,7 +1014,7 @@ do
                     luarocks_admin_make_manifest(manifest.local_rocks_repo_path)
                   end
 
-                  if rock.remove_after_pack then 
+                  if rock.remove_after_pack then
                   -- Needed for foreign-cluster-specific rocks, so they are not linger in our system
                     if dry_run then
                       writeln_flush("-!!-> DRY RUN: Want to remove after pack", rock.rockspec)
@@ -1278,9 +1328,8 @@ do
       )
 
       local dry_run = param.dry_run
-      local run_deploy_without_question = param.run_deploy_without_question
 
-      if (not dry_run) and (not run_deploy_without_question) then
+      if not dry_run then
         if ask_user( -- TODO: Make interactivity configurable, don't want to press this on developer machine each time
             "\n\nABOUT TO DEPLOY TO `" .. cluster_info.name .. "'. ARE YOU SURE?",
             { "y", "n" },
@@ -1296,7 +1345,9 @@ do
       local roles = timapofrecords(manifest.roles, "name")
 
       local machines = cluster_info.machines
-
+--writeln_flush("manifest: " .. tpretty(manifest, "  ", 80))
+--writeln_flush("cluster_info: " .. tpretty(cluster_info, "  ", 80))
+--error()
       for i = 1, #machines do
         local machine = machines[i]
 
@@ -1317,7 +1368,12 @@ do
             if not machine.sudo_checked then -- TODO: Hack. Store state elsewhere
               -- TODO: Do this only if there is an action that requires remote sudo!
               writeln_flush("--> Checking that sudo is passwordless on `", machine.name, "'...")
-              remote_ensure_sudo_is_passwordless(assert(machine.external_url))
+              remote_ensure_sudo_is_passwordless_cached(
+                    manifest.PROJECT_TITLE,
+                    cluster_info.name,
+                    machine.name,
+                    assert(machine.external_url)
+                  )
               machine.sudo_checked = true
             end
 
@@ -1357,7 +1413,12 @@ do
               if not machine.sudo_checked then
                 -- TODO: Do this only if there is an action that requires remote sudo!
                 writeln_flush("--> Checking that sudo is passwordless on `", machine.name, "'...")
-                remote_ensure_sudo_is_passwordless(assert(machine.external_url))
+                remote_ensure_sudo_is_passwordless_cached(
+                    manifest.PROJECT_TITLE,
+                    cluster_info.name,
+                    machine.name,
+                    assert(machine.external_url)
+                  )
                 machine.sudo_checked = true
               end
 
@@ -1501,7 +1562,7 @@ do
     local cluster_info = get_cluster_info(manifest, cluster_name)
 
     local current_versions = load_current_versions(manifest, cluster_info)
-    local new_versions = load_custom_versions(manifest, new_versions_filename)
+    local new_versions = load_table_from_file(new_versions_filename)
 
     local changed_rocks_set, changed_subprojects_set
       = calculate_update_rocks_from_versions(

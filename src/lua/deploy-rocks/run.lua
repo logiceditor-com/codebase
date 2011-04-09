@@ -728,7 +728,7 @@ do
             assert(not subproject.rockspec_generator)
 
             if not is_table(subproject.provides_rocks_repo) then
-              subproject.provides_rocks_repo = { name = subproject.provides_rocks_repo }
+              subproject.provides_rocks_repo = { { name = subproject.provides_rocks_repo } }
             end
 
             for i = 1, #subproject.provides_rocks_repo do

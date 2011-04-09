@@ -60,14 +60,18 @@ local load_tools_cli_data_schema,
       }
 
 local deploy_rocks_from_versions_filename,
-      deploy_rocks_from_code,
-      writeln_flush,
-      write_flush,
-      ask_user
+      deploy_rocks_from_code
       = import 'deploy-rocks/deploy_rocks.lua'
       {
         'deploy_rocks_from_versions_filename',
-        'deploy_rocks_from_code',
+        'deploy_rocks_from_code'
+      }
+
+local writeln_flush,
+      write_flush,
+      ask_user
+      = import 'deploy-rocks/common_functions.lua'
+      {
         'writeln_flush',
         'write_flush',
         'ask_user'

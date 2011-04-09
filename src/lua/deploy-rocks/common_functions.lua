@@ -209,24 +209,6 @@ local remote_luarocks_remove_forced,
         'remote_luarocks_list_installed_rocks'
       }
 
-local writeln_flush,
-      write_flush,
-      ask_user,
-      copy_file_to_dir,
-      remove_file,
-      create_symlink_from_to,
-      load_table_from_file
-      = import 'deploy-rocks/common_functions.lua'
-      {
-        'writeln_flush',
-        'write_flush',
-        'ask_user',
-        'copy_file_to_dir',
-        'remove_file',
-        'create_symlink_from_to',
-        'load_table_from_file'
-      }
-
 --------------------------------------------------------------------------------
  -- TODO: Uberhack! Must be in path. Wrap to a rock and install.
  --       (Or, better, replace with Lua code)
@@ -246,6 +228,81 @@ local git_tag_version_increment = function(path, suffix, majority)
       "cd", path,
       "&&", GIT_TAG_TOOL_PATH, suffix, majority
     ))
+end
+
+--------------------------------------------------------------------------------
+-- TODO: Move these somewhere to lua-aplicado?
+
+local write_flush = function(...)
+  io.stdout:write(...)
+  io.stdout:flush()
+  return io.stdout
+end
+
+local writeln_flush = function(...)
+  io.stdout:write(...)
+  io.stdout:write("\n")
+  io.stdout:flush()
+  return io.stdout
+end
+
+local ask_user = function(prompt, choices, default)
+  arguments(
+      "string", prompt,
+      "table", choices
+    )
+  assert(#choices > 0)
+
+  local choices_set = tset(choices)
+
+  writeln_flush(
+      prompt, " [", table_concat(choices, ","), "]",
+      default and ("=" .. default) or ""
+    )
+
+  for line in io.lines() do
+    if (default and line == "") then
+      return default
+    end
+
+    if choices_set[line] then
+      return line
+    end
+
+    writeln_flush(
+        prompt, " [", table_concat(choices, ","), "]",
+        default and ("=" .. default) or ""
+      )
+  end
+
+  return default -- May be nil if no default and user pressed ^D
+end
+
+local copy_file_to_dir = function(filename, dir)
+  assert(shell_exec(
+      "cp", filename, dir .. "/"
+    ) == 0)
+end
+
+local remove_file = function(filename)
+  assert(shell_exec(
+      "rm", filename
+    ) == 0)
+end
+
+local create_symlink_from_to = function(from_filename, to_filename)
+  assert(shell_exec(
+      "ln", "-s", from_filename, to_filename
+    ) == 0)
+end
+
+-- TODO: Move these somewhere to lua-nucleo?
+
+local load_table_from_file = function(path)
+  local chunk = assert(loadfile(path))
+  local ok, table_from_file = assert(do_in_environment(chunk, { }))
+  assert_is_table(table_from_file)
+  return table_from_file
 end
 
 --------------------------------------------------------------------------------
@@ -1774,4 +1831,7 @@ return
 {
   deploy_rocks_from_versions_filename = deploy_rocks_from_versions_filename;
   deploy_rocks_from_code = deploy_rocks_from_code;
+  writeln_flush = writeln_flush;
+  write_flush = write_flush;
+  ask_user = ask_user;
 }

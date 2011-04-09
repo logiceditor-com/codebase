@@ -1322,15 +1322,25 @@ do
           if changed_rocks_set[rock_name] then
             writeln_flush("-> Delaying reinstall of remote duplicate rock " .. rock_name .. "'")
           elseif machine.deployed_rocks_set[rock_name] then
-            writeln_flush("-> Skipping reinstall of remote duplicate rock " .. rock_name .. "': marked as reinstalled by someone else")
+            writeln_flush(
+                "-> Skipping reinstall of remote duplicate rock " .. rock_name
+             .. "': marked as reinstalled by someone else"
+              )
           else
             if dry_run then
-              writeln_flush("-!!-> DRY RUN: Want to reinstall remote duplicate rock: `" .. rock_name .. "'")
+              writeln_flush(
+                  "-!!-> DRY RUN: Want to reinstall remote duplicate rock: `"
+               .. rock_name .. "'"
+                )
             else
               writeln_flush("-> Removing remote duplicate rock " .. rock_name .. "'")
               remote_luarocks_remove_forced(machine.external_url, rock_name)
               writeln_flush("-> Installing remote duplicate rock " .. rock_name .. "'")
-              remote_luarocks_install_from(machine.external_url, rock_name, cluster_info.rocks_repo_url)
+              remote_luarocks_install_from(
+                  machine.external_url,
+                  rock_name,
+                  cluster_info.rocks_repo_url
+                )
               machine.deployed_rocks_set[rock_name] = true
               rocks_changed = true
             end
@@ -1342,14 +1352,27 @@ do
         local rock_name = assert_is_string(rocks_must_be_installed[i])
         if not installed_rocks_set[rock_name] then
           if machine.deployed_rocks_set[rock_name] then
-            writeln_flush("-> Skipping mandatory rock `" .. rock_name .. "': marked as installed by someone else")
+            writeln_flush(
+                "-> Skipping mandatory rock `".. rock_name
+             .. "': marked as installed by someone else"
+              )
           else
-            writeln_flush("-> WARNING! Not installed mandatory rock `" .. rock_name .. "' detected")
+            writeln_flush(
+                "-> WARNING! Not installed mandatory rock `" .. rock_name
+             .. "' detected"
+              )
             if dry_run then
-              writeln_flush("-!!-> DRY RUN: Want to install missing rock: `" .. rock_name .. "'")
+              writeln_flush(
+                  "-!!-> DRY RUN: Want to install missing rock: `"
+               .. rock_name .. "'"
+                )
             else
               writeln_flush("-> Installing missing rock " .. rock_name .. "'")
-              remote_luarocks_install_from(machine.external_url, rock_name, cluster_info.rocks_repo_url)
+              remote_luarocks_install_from(
+                  machine.external_url,
+                  rock_name,
+                  cluster_info.rocks_repo_url
+                )
               machine.deployed_rocks_set[rock_name] = true
               rocks_changed = true
             end
@@ -1361,17 +1384,29 @@ do
       for i = 1, #changed_rocks_list do
         local rock_name = changed_rocks_list[i]
         if not installed_rocks_set[rock_name] then
-          writeln_flush("-> Skipping changed rock " .. rock_name .. "': not installed here")
+          writeln_flush(
+              "-> Skipping changed rock ".. rock_name
+           .. "': not installed here"
+            )
         elseif machine.deployed_rocks_set[rock_name] then
-          writeln_flush("-> Skipping changed rock `" .. rock_name .. "': marked as updated by someone else")
+          writeln_flush(
+              "-> Skipping changed rock `" .. rock_name
+           .. "': marked as updated by someone else")
         else
           if dry_run then
-            writeln_flush("-!!-> DRY RUN: Want to reinstall remote changed rock: `" .. rock_name .. "'")
+            writeln_flush(
+                "-!!-> DRY RUN: Want to reinstall remote changed rock: `"
+             .. rock_name .. "'"
+              )
           else
             writeln_flush("-> Removing remote changed rock " .. rock_name .. "'")
             remote_luarocks_remove_forced(machine.external_url, rock_name)
             writeln_flush("-> Installing remote changed rock " .. rock_name .. "'")
-            remote_luarocks_install_from(machine.external_url, rock_name, cluster_info.rocks_repo_url)
+            remote_luarocks_install_from(
+                machine.external_url,
+                rock_name,
+                cluster_info.rocks_repo_url
+              )
             machine.deployed_rocks_set[rock_name] = true
             rocks_changed = true
           end
@@ -1397,7 +1432,10 @@ do
       local dry_run = param.dry_run
 
       if dry_run then
-        writeln_flush("-!!-> DRY RUN: Want to ensure file access rights `", action.file, "' on `" .. machine.name .. "'")
+        writeln_flush(
+            "-!!-> DRY RUN: Want to ensure file access rights `", action.file,
+            "' on `" .. machine.name .. "'"
+          )
       else
         -- TODO: Not flexible enough?
         writeln_flush("-> Touching `", action.file, "' on `" .. machine.name .. "'")
@@ -1405,14 +1443,21 @@ do
             machine.external_url, "sudo", "touch", assert(action.file)
           ) == 0)
 
-        writeln_flush("-> Chmodding `", action.file, "' to ", action.mode, " on `" .. machine.name .. "'")
+        writeln_flush(
+            "-> Chmodding `", action.file,
+            "' to ", action.mode,
+            " on `" .. machine.name .. "'"
+          )
         assert(shell_exec_remote(
             machine.external_url, "sudo", "chmod", assert(action.mode), assert(action.file)
           ) == 0)
 
         local owner = assert(action.owner_user) .. ":" .. assert(action.owner_group)
 
-        writeln_flush("-> Chowning `", action.file, "' to `", owner, "' on `" .. machine.name .. "'")
+        writeln_flush(
+            "-> Chowning `", action.file,
+            "' to `", owner, "' on `" .. machine.name .. "'"
+          )
         assert(shell_exec_remote(
             machine.external_url, "sudo", "chown", owner, assert(action.file)
           ) == 0)
@@ -1448,12 +1493,18 @@ do
       for i = 1, #machines do
         local machine = machines[i]
 
-        writeln_flush("---> DEPLOYING TO MACHINE `", machine.name, "' from `", cluster_info.name, "'...")
+        writeln_flush(
+            "---> DEPLOYING TO MACHINE `", machine.name,
+            "' from `", cluster_info.name, "'..."
+          )
 
         local machine_roles = machine.roles
         for i = 1, #machine_roles do
           local role_args = machine_roles[i]
-          writeln_flush("--> Deploying role `", role_args.name, "' to `", machine.name, "'...")
+          writeln_flush(
+              "--> Deploying role `", role_args.name,
+              "' to `", machine.name, "'..."
+            )
 
           local role_info = assert(roles[role_args.name], "unknown role")
           local deployment_actions = role_info.deployment_actions
@@ -1464,7 +1515,10 @@ do
             -- TODO: Hack? Fix error handling instead!
             if not machine.sudo_checked then -- TODO: Hack. Store state elsewhere
               -- TODO: Do this only if there is an action that requires remote sudo!
-              writeln_flush("--> Checking that sudo is passwordless on `", machine.name, "'...")
+              writeln_flush(
+                  "--> Checking that sudo is passwordless on `",
+                  machine.name, "'..."
+                )
               remote_ensure_sudo_is_passwordless_cached(
                     manifest.PROJECT_TITLE,
                     cluster_info.name,
@@ -1476,30 +1530,55 @@ do
 
             for i = 1, #deployment_actions do
               local action = deployment_actions[i]
-              writeln_flush("--> Running role `", role_args.name, "' action ", i, ":, ", action.tool, "...")
+              writeln_flush(
+                  "--> Running role `", role_args.name,
+                  "' action ", i, ":, ", action.tool, "..."
+                )
 
-              assert(action_handlers[action.tool], "unknown tool")(manifest, cluster_info, param, machine, role_args, action)
+              assert(action_handlers[action.tool], "unknown tool")(
+                  manifest,
+                  cluster_info,
+                  param,
+                  machine,
+                  role_args,
+                  action
+                )
             end
           end
 
-          writeln_flush("--> Done deploying role `", role_args.name, "' to `", machine.name, "'...")
+          writeln_flush(
+              "--> Done deploying role `", role_args.name,
+              "' to `", machine.name, "'..."
+            )
         end
 
-        writeln_flush("---> DONE DEPLOYING TO MACHINE `", machine.name, "' from `", cluster_info.name, "'...")
+        writeln_flush(
+            "---> DONE DEPLOYING TO MACHINE `", machine.name,
+            "' from `", cluster_info.name, "'..."
+          )
       end
 
       for i = 1, #machines do
         local machine = machines[i]
 
         if not machine.need_post_deploy then
-          writeln_flush("---> Machine `", machine.name, "' from `", cluster_info.name, "' does not need post-deploy.")
+          writeln_flush(
+              "---> Machine `", machine.name,
+              "' from `", cluster_info.name, "' does not need post-deploy."
+            )
         else
-          writeln_flush("---> RUNNING POST-DEPLOY ON `", machine.name, "' from `", cluster_info.name, "'...")
+          writeln_flush(
+              "---> RUNNING POST-DEPLOY ON `", machine.name,
+              "' from `", cluster_info.name, "'..."
+            )
 
           local machine_roles = machine.roles
           for i = 1, #machine_roles do
             local role_args = machine_roles[i]
-            writeln_flush("--> Post-deploying role `", role_args.name, "' to `", machine.name, "'...")
+            writeln_flush(
+                "--> Post-deploying role `", role_args.name,
+                "' to `", machine.name, "'..."
+              )
 
             local role_info = assert(roles[role_args.name], "unknown role")
             local post_deploy_actions = role_info.post_deploy_actions
@@ -1509,7 +1588,10 @@ do
             else
               if not machine.sudo_checked then
                 -- TODO: Do this only if there is an action that requires remote sudo!
-                writeln_flush("--> Checking that sudo is passwordless on `", machine.name, "'...")
+                writeln_flush(
+                    "--> Checking that sudo is passwordless on `",
+                    machine.name, "'..."
+                  )
                 remote_ensure_sudo_is_passwordless_cached(
                     manifest.PROJECT_TITLE,
                     cluster_info.name,
@@ -1521,17 +1603,28 @@ do
 
               for i = 1, #post_deploy_actions do
                 local action = post_deploy_actions[i]
-                writeln_flush("--> Running role `", role_args.name, "' post-deploy action ", i, ":, ", action.tool, "...")
+                writeln_flush(
+                    "--> Running role `", role_args.name,
+                    "' post-deploy action ", i, ":, ", action.tool, "...")
 
-                assert(action_handlers[action.tool], "unknown tool")(manifest, cluster_info, param, machine, role_args, action)
+                assert(
+                    action_handlers[action.tool],
+                    "unknown tool"
+                  )(manifest, cluster_info, param, machine, role_args, action)
               end
             end
 
-            writeln_flush("--> Done post-deploying role `", role_args.name, "' to `", machine.name, "'...")
+            writeln_flush(
+                "--> Done post-deploying role `", role_args.name,
+                "' to `", machine.name, "'..."
+              )
           end
         end
 
-        writeln_flush("---> DONE POST-DEPLOY ON `", machine.name, "' from `", cluster_info.name, "'...")
+        writeln_flush(
+            "---> DONE POST-DEPLOY ON `", machine.name,
+            "' from `", cluster_info.name, "'..."
+          )
       end
 
       writeln_flush("----> DONE DEPLOYING TO `", cluster_info.name, "'...")
@@ -1572,7 +1665,10 @@ do
         writeln_flush("-!!-> DRY RUN: Want to commit versions and push")
       else
         writeln_flush("----> Adding versions")
-        git_add_directory(manifest.local_cluster_versions_git_repo_path, manifest.local_cluster_versions_path)
+        git_add_directory(
+            manifest.local_cluster_versions_git_repo_path,
+            manifest.local_cluster_versions_path
+          )
 
         writeln_flush("----> Committing")
         git_commit_with_message(
@@ -1608,7 +1704,8 @@ do
       assert(not next(changed_rocks_set)) -- TODO: ?!
       writeln_flush("----> Nothing to deploy, you can deploy to check system integrity.")
       if ask_user(
-          "\n\nDO YOU WANT TO DEPLOY TO `" .. cluster_info.name .. "'? (Not recommended!)",
+          "\n\nDO YOU WANT TO DEPLOY TO `"
+       .. cluster_info.name .. "'? (Not recommended!)",
           { "y", "n" },
           "n"
         ) ~= "y"
@@ -1620,7 +1717,12 @@ do
     end
 
     local new_versions = twithdefaults(
-        tag_new_versions(manifest, cluster_info, subprojects_to_be_given_new_versions_set, dry_run),
+        tag_new_versions(
+            manifest,
+            cluster_info,
+            subprojects_to_be_given_new_versions_set,
+            dry_run
+          ),
         current_versions
       )
 
@@ -1630,7 +1732,8 @@ do
       writeln_flush("-!!-> DRY RUN: Want to write versions file:")
       writeln_flush("return\n" .. tpretty(new_versions, '  ', 80))
     else
-      -- Note that updated file is not linked as current and committed until deployment succeeds
+      -- Note that updated file is not linked as current and
+      -- committed until deployment succeeds
       new_versions_filename = write_current_versions(manifest, cluster_info, new_versions)
     end
 

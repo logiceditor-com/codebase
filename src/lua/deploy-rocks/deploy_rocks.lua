@@ -210,7 +210,6 @@ local remote_luarocks_remove_forced,
       }
 
 --------------------------------------------------------------------------------
-
  -- TODO: Uberhack! Must be in path. Wrap to a rock and install.
  --       (Or, better, replace with Lua code)
 local GIT_TAG_TOOL_PATH = "pk-git-tag-version"
@@ -232,7 +231,6 @@ local git_tag_version_increment = function(path, suffix, majority)
 end
 
 --------------------------------------------------------------------------------
-
 -- TODO: Move these somewhere to lua-aplicado?
 
 local write_flush = function(...)
@@ -308,6 +306,7 @@ local load_table_from_file = function(path)
 end
 
 --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local remote_ensure_sudo_is_passwordless_cached = function(
     project_name,
@@ -360,10 +359,14 @@ local remote_ensure_sudo_is_passwordless_cached = function(
     )
 end
 
+--------------------------------------------------------------------------------
+
 local get_cluster_info = function(manifest, cluster_name)
   local clusters = timapofrecords(manifest.clusters, "name")
   return assert(clusters[cluster_name], "cluster not found")
 end
+
+--------------------------------------------------------------------------------
 
 local load_current_versions = function(manifest, cluster_info)
   local path = manifest.local_cluster_versions_path .. "/versions-current.lua"
@@ -379,6 +382,7 @@ local load_current_versions = function(manifest, cluster_info)
   return versions
 end
 
+--------------------------------------------------------------------------------
 -- Assuming we're operating under atomic lock
 local write_current_versions = function(manifest, cluster_info, new_versions)
   local filename = manifest.local_cluster_versions_path
@@ -396,6 +400,8 @@ local write_current_versions = function(manifest, cluster_info, new_versions)
 
   return filename
 end
+
+--------------------------------------------------------------------------------
 
 local update_version_symlink = function(
     manifest,
@@ -416,6 +422,7 @@ local update_version_symlink = function(
   create_symlink_from_to(filename, versions_current_filename)
 end
 
+--------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 local deploy_rocks_from_code, deploy_rocks_from_versions_filename
@@ -452,6 +459,8 @@ do
 
     assert(checker:result("repository `" .. name .. "' "))
   end
+
+--------------------------------------------------------------------------------
 
   local calculate_update_rocks_from_versions = function(
       manifest,
@@ -536,6 +545,9 @@ do
     return changed_rocks_set, tset(changed_subprojects)
   end
 
+--------------------------------------------------------------------------------
+-- TODO: move to separate file
+
   local run_pre_deploy_actions
   do
     local handlers = { }
@@ -618,8 +630,8 @@ do
           local rockspec_files_changed = { }
 
           for i = 1, #rockspec_files do
-            -- TODO: REMOVE "pk-logiceditor-com" with some PROJECT_NAME variable!
-            if not current_versions[subproject.name]
+            if
+              not current_versions[subproject.name]
               or git_is_file_changed_between_revisions(
                                 action.local_path,
                                 rockspec_files[i],
@@ -667,9 +679,10 @@ do
                 luarocks_ensure_rock_not_installed_forced(name)
               end
             end
-          end
-        end
-      end
+
+          end -- if #rockspec_files_changed == 0 else
+        end -- if rockspec["x-cluster-name"] ~= cluster_info.name else
+      end -- for i = 1, #ROCKS do
 
       if not have_changed_rocks then
         writeln_flush("----> No changed rocks for that rocks manifest ", manifest_path)
@@ -693,7 +706,8 @@ do
             )
         end
       end
-    end
+
+    end -- handlers.add_rocks_from_pk_rocks_manifest = function
 
     run_pre_deploy_actions = function(
         manifest,
@@ -736,6 +750,9 @@ do
       writeln_flush("----> Done dunning pre-deploy actions.")
     end
   end
+
+--------------------------------------------------------------------------------
+-- TODO: move to separate file?
 
   local update_rocks = function(manifest, cluster_info, current_versions, dry_run)
     arguments(
@@ -956,7 +973,7 @@ do
                 end
               end
             end
-          else
+          else -- if subproject.provides_rocks_repo then
              local rocks = assert(subproject.provides_rocks)
             if #rocks > 0 then
               if subproject.rockspec_generator then
@@ -1079,10 +1096,12 @@ do
                   )
               end
             end
-          end
-        end
-      end
-    end
+
+          end -- if subproject.provides_rocks_repo else
+
+        end -- if git_are_branches_different("HEAD", current_versions[name])
+      end -- if subproject.no_deploy else
+    end -- for i = 1, #subprojects do
 
     if next(changed_rocks) then
       if dry_run then
@@ -1130,6 +1149,8 @@ do
     return changed_rocks, need_new_versions_for_subprojects
   end
 
+--------------------------------------------------------------------------------
+
   local tag_new_versions = function(manifest, cluster_info, subprojects_set, dry_run)
     writeln_flush("----> Tagging new versions...")
 
@@ -1172,6 +1193,8 @@ do
     return new_versions
   end
 
+--------------------------------------------------------------------------------
+
   local fill_cluster_info_placeholders = function(manifest, cluster_info, template)
     return fill_curly_placeholders( -- TODO: Add more?
         template,
@@ -1183,6 +1206,9 @@ do
         }
       )
   end
+
+--------------------------------------------------------------------------------
+-- TODO: move to separate file
 
   local deploy_to_cluster
   do
@@ -1631,6 +1657,8 @@ do
     end
   end
 
+--------------------------------------------------------------------------------
+
   local deploy_new_versions = function(
       manifest,
       cluster_info,
@@ -1681,6 +1709,8 @@ do
       end
     end
   end
+
+--------------------------------------------------------------------------------
 
   deploy_rocks_from_code = function(manifest, cluster_name, dry_run)
     arguments(
@@ -1747,6 +1777,8 @@ do
         run_deploy_without_question
       )
   end
+
+--------------------------------------------------------------------------------
 
   deploy_rocks_from_versions_filename = function(
       manifest,

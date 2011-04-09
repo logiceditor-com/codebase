@@ -1,6 +1,6 @@
 local log, dbg, spam, log_error
       = import 'pk-core/log.lua' { 'make_loggers' } (
-          "deploy-rocks", "DRO"
+          "deploy-to-cluster", "DTC"
         )
 
 --------------------------------------------------------------------------------

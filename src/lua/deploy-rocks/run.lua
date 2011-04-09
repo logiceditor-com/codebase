@@ -215,6 +215,18 @@ local load_project_manifest
         'load_project_manifest'
       }
 
+local load_tools_cli_data_schema,
+      load_tools_cli_config,
+      print_tools_cli_config_usage,
+      freeform_table_value
+      = import 'pk-core/tools_cli_config.lua'
+      {
+        'load_tools_cli_data_schema',
+        'load_tools_cli_config',
+        'print_tools_cli_config_usage',
+        'freeform_table_value'
+      }
+
 --------------------------------------------------------------------------------
 
  -- TODO: DO NOT HARDCODE PATHS!
@@ -1702,12 +1714,69 @@ do
 end
 
 --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Config-related constants
+--
 
-local actions = { }
+local TOOL_NAME = "deploy_rocks"
+
+local EXTRA_HELP = [[
+
+deploy-rocks: deployment tool
+--TODO: insert some description here and clean up
+
+Usage:
+
+    deploy-rocks <action> <cluster> [<version_file>] [<machine_name>] [options]
+
+Actions:
+
+    deploy_from_code               If 'deploy_from_code' is used <version_file>
+                                   and <machine_name> must not be defined.
+
+    deploy_from_versions_file      If 'deploy_from_versions_file' is used
+                                   <version_file> must be defined.
+
+    partial_deploy_from_versions_file
+                                   If 'partial_deploy_from_versions_file' is
+                                   used both <version_file> and <machine_name>
+                                   must be defined.
+
+Options:
+
+    --debug                        Perceive nonclean git repositories noncriticaly
+
+    --dry-run                      Go through algorythm but do nothing
+
+Example:
+
+     deploy-rocks deploy_from_code localhost --debug
+
+]]
+
+local CONFIG_SCHEMA = create_config_schema()
+
+local CONFIG, ARGS
+
+local ACTIONS = { }
 
 --------------------------------------------------------------------------------
 
-actions.deploy_from_code = function(...)
+ACTIONS.help = function()
+  print_tools_cli_config_usage(EXTRA_HELP, CONFIG_SCHEMA)
+end
+
+ACTIONS.check_config = function()
+  io.stdout:write("config OK\n")
+  io.stdout:flush()
+end
+
+ACTIONS.dump_config = function()
+  io.stdout:write(tpretty(freeform_table_value(CONFIG), "  ", 80), "\n")
+  io.stdout:flush()
+end
+
+ACTIONS.deploy_from_code = function(...)
   local cluster_name = assert(select(1, ...), "need cluster name")
   local project_path = assert(select(2, ...), "need project path")
   local manifest_path = assert(select(3, ...), "need manifest path")
@@ -1754,7 +1823,7 @@ actions.deploy_from_code = function(...)
   end
 end
 
-actions.deploy_from_versions_file = function(...)
+ACTIONS.deploy_from_versions_file = function(...)
   local cluster_name = assert(select(1, ...), "need cluster name")
   local project_path = assert(select(2, ...), "need project path")
   local manifest_path = assert(select(3, ...), "need manifest path")
@@ -1807,7 +1876,7 @@ actions.deploy_from_versions_file = function(...)
   end
 end
 
-actions.partial_deploy_from_versions_file = function(...)
+ACTIONS.partial_deploy_from_versions_file = function(...)
   local cluster_name = assert(select(1, ...), "need cluster name")
   local project_path = assert(select(2, ...), "need project path")
   local manifest_path = assert(select(3, ...), "need manifest path")
@@ -1889,13 +1958,15 @@ end
 -- TODO: Do with lock file
 -- TODO: ALSO LOCK REMOTELY!
 -- TODO: Handle rock REMOVAL!
-
+--[[
 local run = function(...)
   -- TODO: WTF?!
   local project_path = select(1, ...)
   local manifest_path = select(2, ...)
   local action_name = select(3, ...)
   local cluster_name = select(4, ...)
+
+writeln_flush("Table:" .. tpretty({ ... }, "  ", 80))
 
   assert(
       actions[action_name],
@@ -1906,6 +1977,66 @@ local run = function(...)
       manifest_path,
       select(5, ...)
     )
+end
+]]
+local run = function(...)
+  local CODE_ROOT = assert(select(1, ...), "code root missing")
+
+  ------------------------------------------------------------------------------
+  -- Handle command-line options
+  --
+
+  CONFIG, ARGS = assert(load_tools_cli_config(
+      function(args) -- Parse actions
+        local param = { }
+
+        local project_path = { name = args[1] or ""; param = param }
+        local manifest_path = { name = args[2] or ""; param = param }
+        local action_name = { name = args[3] or "help"; param = param }
+        local cluster_name = { name = args[4] or ""; param = param }
+
+        local config =
+        {
+          PROJECT_PATH = project_path;
+          [TOOL_NAME] =
+          {
+            action = action_name;
+            manifest_path = manifest_path;
+            cluster_name = cluster_name;
+          };
+        }
+--[[
+        if args["--data-root"] then
+          local path = args["--data-root"]
+          if not path:find("/$") then -- Ensure trailing slash
+            path = path .. "/"
+          end
+          config.common = { le = { data_root = path } }
+        end
+
+        if action.name == "generate_upgrade_hooks" then
+          param.node_schema_from_filename = args[2]
+          param.node_schema_to_filename = args[3]
+          param.upgrade_hooks_filename = args[4] or nil
+        elseif action.name == "generate_default_data" then
+          param.title = args[2] or nil
+        end
+]]
+        return config
+      end,
+      EXTRA_HELP,
+      CONFIG_SCHEMA,
+      nil, -- Specify primary config file with --base-config cli option
+      nil, -- No secondary config file
+      select(6, ...) -- First argument is CODE_ROOT, eating it
+    ))
+writeln_flush("CONFIG:" .. tpretty(CONFIG, "  ", 80))
+writeln_flush("ARGS:" .. tpretty(ARGS, "  ", 80))
+  ------------------------------------------------------------------------------
+  -- Run the action that user requested
+  --
+
+  ACTIONS[CONFIG[TOOL_NAME].action.name]()
 end
 
 --------------------------------------------------------------------------------

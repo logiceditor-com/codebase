@@ -33,6 +33,12 @@ local tpretty
         'tpretty'
       }
 
+local fill_curly_placeholders
+      = import 'lua-nucleo/string.lua'
+      {
+        'fill_curly_placeholders'
+      }
+
 local timapofrecords,
       tkeys,
       tclone
@@ -211,6 +217,18 @@ end
 
 local deploy_to_cluster
 do
+  local fill_cluster_info_placeholders = function(manifest, cluster_info, template)
+    return fill_curly_placeholders( -- TODO: Add more?
+        template,
+        {
+          INTERNAL_CONFIG_HOST = cluster_info.internal_config_host;
+          INTERNAL_CONFIG_PORT = cluster_info.internal_config_port;
+          INTERNAL_CONFIG_DEPLOY_HOST = cluster_info.internal_config_deploy_host;
+          INTERNAL_CONFIG_DEPLOY_PORT = cluster_info.internal_config_deploy_port;
+        }
+      )
+  end
+
   local action_handlers = { }
 
 --local_exec--------------------------------------------------------------------

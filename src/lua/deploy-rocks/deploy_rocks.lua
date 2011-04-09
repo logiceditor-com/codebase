@@ -59,11 +59,9 @@ local tset,
         'tclone'
       }
 
-local fill_curly_placeholders,
-      trim
+local trim
       = import 'lua-nucleo/string.lua'
       {
-        'fill_curly_placeholders',
         'trim'
       }
 
@@ -147,12 +145,6 @@ local deploy_to_cluster
       = import 'deploy-rocks/deploy_to_cluster.lua'
       {
         'deploy_to_cluster'
-      }
-
-local run_pre_deploy_actions
-      = import 'deploy-rocks/run_pre_deploy_actions.lua'
-      {
-        'run_pre_deploy_actions'
       }
 
 local update_rocks
@@ -378,19 +370,6 @@ do
     return new_versions
   end
 
---------------------------------------------------------------------------------
-
-  local fill_cluster_info_placeholders = function(manifest, cluster_info, template)
-    return fill_curly_placeholders( -- TODO: Add more?
-        template,
-        {
-          INTERNAL_CONFIG_HOST = cluster_info.internal_config_host;
-          INTERNAL_CONFIG_PORT = cluster_info.internal_config_port;
-          INTERNAL_CONFIG_DEPLOY_HOST = cluster_info.internal_config_deploy_host;
-          INTERNAL_CONFIG_DEPLOY_PORT = cluster_info.internal_config_deploy_port;
-        }
-      )
-  end
 
 --------------------------------------------------------------------------------
 

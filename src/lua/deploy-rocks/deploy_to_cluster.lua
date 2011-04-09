@@ -15,27 +15,15 @@ local os = os
 
 --------------------------------------------------------------------------------
 
-local arguments,
-      optional_arguments,
-      method_arguments
-      = import 'lua-nucleo/args.lua'
-      {
-        'arguments',
-        'optional_arguments',
-        'method_arguments'
-      }
-
 local is_table
       = import 'lua-nucleo/type.lua'
       {
         'is_table'
       }
 
-local assert_is_table,
-      assert_is_string
+local assert_is_string
       = import 'lua-nucleo/typeassert.lua'
       {
-        'assert_is_table',
         'assert_is_string'
       }
 
@@ -45,32 +33,14 @@ local tpretty
         'tpretty'
       }
 
-local tstr
-      = import 'lua-nucleo/tstr.lua'
-      {
-        'tstr'
-      }
-
-local tset,
-      timapofrecords,
-      twithdefaults,
+local timapofrecords
       tkeys,
       tclone
       = import 'lua-nucleo/table-utils.lua'
       {
-        'tset',
         'timapofrecords',
-        'twithdefaults',
         'tkeys',
         'tclone'
-      }
-
-local fill_curly_placeholders,
-      trim
-      = import 'lua-nucleo/string.lua'
-      {
-        'fill_curly_placeholders',
-        'trim'
       }
 
 local make_config_environment
@@ -79,32 +49,12 @@ local make_config_environment
         'make_config_environment'
       }
 
-local do_in_environment
-      = import 'lua-nucleo/sandbox.lua'
-      {
-        'do_in_environment'
-      }
-
-local make_checker
-      = import 'lua-nucleo/checker.lua'
-      {
-        'make_checker'
-      }
-
 local write_file,
-      read_file,
-      find_all_files,
-      does_file_exist,
-      splitpath,
-      get_filename_from_path
+      does_file_exist
       = import 'lua-aplicado/filesystem.lua'
       {
         'write_file',
-        'read_file',
-        'find_all_files',
-        'does_file_exist',
-        'splitpath',
-        'get_filename_from_path'
+        'does_file_exist'
       }
 
 local shell_exec,
@@ -129,36 +79,6 @@ local shell_exec_remote,
       {
         'shell_exec_remote',
         'shell_read_remote'
-      }
-
-local git_format_command,
-      git_exec,
-      git_read,
-      git_get_tracking_branch_name_of_HEAD,
-      git_update_index,
-      git_is_dirty,
-      git_is_directory_dirty,
-      git_has_untracked_files,
-      git_are_branches_different,
-      git_is_file_changed_between_revisions,
-      git_add_directory,
-      git_commit_with_message,
-      git_push_all
-      = import 'lua-aplicado/shell/git.lua'
-      {
-        'git_format_command',
-        'git_exec',
-        'git_read',
-        'git_get_tracking_branch_name_of_HEAD',
-        'git_update_index',
-        'git_is_dirty',
-        'git_is_directory_dirty',
-        'git_has_untracked_files',
-        'git_are_branches_different',
-        'git_is_file_changed_between_revisions',
-        'git_add_directory',
-        'git_commit_with_message',
-        'git_push_all'
       }
 
 local luarocks_exec,

@@ -17,9 +17,6 @@ do
   {
     cfg:node "deploy_rocks"
     {
-      cfg:existing_path "project_path";
-      cfg:existing_path "manifest_path";
-      cfg:string "cluster";
       cfg:variant "action"
       {
         variants =
@@ -28,20 +25,31 @@ do
           ["check_config"] = { };
           ["dump_config"] = { };
 
-          ["deploy_from_code"] = { };
+          ["deploy_from_code"] = {
+            cfg:string "cluster_name";
+            cfg:existing_path "manifest_path";
+            cfg:boolean "debug" { default = false };
+            cfg:boolean "dry_run" { default = false };
+          };
 
           ["deploy_from_versions_file"] = {
-            cfg:existing_path "version_file";
+            cfg:string "cluster_name";
+            cfg:existing_path "manifest_path";
+            cfg:boolean "debug" { default = false };
+            cfg:boolean "dry_run" { default = false };
+            cfg:existing_path "version_filename";
           };
 
           ["partial_deploy_from_versions_file"] = {
-            cfg:existing_path "version_file";
+            cfg:string "cluster_name";
+            cfg:existing_path "manifest_path";
+            cfg:boolean "debug" { default = false };
+            cfg:boolean "dry_run" { default = false };
+            cfg:existing_path "version_filename";
             cfg:string "machine_name";
           };
         };
       };
-      cfg:boolean "debug" { default = false };
-      cfg:boolean "dry-run" { default = false };
     };
   }
   end

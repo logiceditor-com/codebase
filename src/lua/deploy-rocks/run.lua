@@ -229,6 +229,14 @@ local load_tools_cli_data_schema,
 
 --------------------------------------------------------------------------------
 
+local create_config_schema
+      = import 'deploy-rocks/project-config/schema.lua'
+      {
+        'create_config_schema'
+      }
+
+--------------------------------------------------------------------------------
+
  -- TODO: DO NOT HARDCODE PATHS!
 --local PROJECT_TITLE = "pk-postcards"
 --local PROJECT_PATH = os.getenv("HOME") .. "/projects/pk-postcards"
@@ -1744,7 +1752,7 @@ Actions:
 
 Options:
 
-    --debug                        Perceive nonclean git repositories noncriticaly
+    --debug                        Allow not clean git repositories
 
     --dry-run                      Go through algorythm but do nothing
 
@@ -1761,6 +1769,9 @@ local CONFIG, ARGS
 local ACTIONS = { }
 
 --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Auxiliary actions
+--
 
 ACTIONS.help = function()
   print_tools_cli_config_usage(EXTRA_HELP, CONFIG_SCHEMA)
@@ -1776,16 +1787,17 @@ ACTIONS.dump_config = function()
   io.stdout:flush()
 end
 
-ACTIONS.deploy_from_code = function(...)
-  local cluster_name = assert(select(1, ...), "need cluster name")
-  local project_path = assert(select(2, ...), "need project path")
-  local manifest_path = assert(select(3, ...), "need manifest path")
-  local dry_run = (select(4, ...) == "--dry-run" or select(5, ...) == "--dry-run")
-  local debug = (select(4, ...) == "--debug" or select(5, ...) == "--debug")
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Main deploy actions
+--
 
-  if not dry_run then
+ACTIONS.deploy_from_code = function()
+  local param = CONFIG.deploy_rocks.action.param
+
+  if not param.dry_run then
     if ask_user(
-        "Do you want to deploy code to `" .. cluster_name .. "'?",
+        "Do you want to deploy code to `" .. param.cluster_name .. "'?",
         { "y", "n" },
         "n"
       ) ~= "y"
@@ -1795,46 +1807,43 @@ ACTIONS.deploy_from_code = function(...)
   end
 
   local manifest = load_project_manifest(
-      manifest_path,
-      project_path,
-      cluster_name
+      param.manifest_path,
+      CONFIG.PROJECT_PATH,
+      param.cluster_name
     )
 
-  if debug then
+  if param.debug then
     writeln_flush("-!!-> DEBUG MODE ON")
     manifest.debug_mode = true -- TODO: HACK! Store state elsewhere!
   end
 
-  if dry_run then
+  if param.dry_run then
     writeln_flush("-!!-> DRY RUN BEGIN <----")
   end
 
   deploy_rocks_from_code(
       manifest,
-      cluster_name,
-      dry_run
+      param.cluster_name,
+      param.dry_run
     )
 
   writeln_flush("----> OK")
 
-  if dry_run then
+  if param.dry_run then
     writeln_flush("-!!-> DRY RUN END <----")
     return
   end
 end
 
-ACTIONS.deploy_from_versions_file = function(...)
-  local cluster_name = assert(select(1, ...), "need cluster name")
-  local project_path = assert(select(2, ...), "need project path")
-  local manifest_path = assert(select(3, ...), "need manifest path")
-  local version_filename = assert(select(4, ...), "need version filename")
-  local dry_run = (select(5, ...) == "--dry-run" or select(6, ...) == "--dry-run")
-  local debug = (select(5, ...) == "--debug" or select(6, ...) == "--dry-run")
+--------------------------------------------------------------------------------
 
-  if not dry_run then
+ACTIONS.deploy_from_versions_file = function()
+  local param = CONFIG.deploy_rocks.action.param
+
+  if not param.dry_run then
     if ask_user(
-        "Do you want to deploy code to `" .. cluster_name .. "'"
-     .. " from version file `" .. version_filename .. "'?",
+        "Do you want to deploy code to `" .. param.cluster_name .. "'"
+     .. " from version file `" .. param.version_filename .. "'?",
         { "y", "n" },
         "n"
       ) ~= "y"
@@ -1846,50 +1855,46 @@ ACTIONS.deploy_from_versions_file = function(...)
   -- TODO: Should we copy versions file to get a new timestamp?
 
   local manifest = load_project_manifest(
-      manifest_path,
-      project_path,
-      cluster_name
+      param.manifest_path,
+      CONFIG.PROJECT_PATH,
+      param.cluster_name
     )
 
-  if debug then
+  if param.debug then
     writeln_flush("-!!-> DEBUG MODE ON")
     manifest.debug_mode = true -- TODO: HACK! Store state elsewhere!
   end
 
-  if dry_run then
+  if param.dry_run then
     writeln_flush("-!!-> DRY RUN BEGIN <----")
   end
 
   deploy_rocks_from_versions_filename(
       manifest,
-      cluster_name,
-      version_filename,
+      param.cluster_name,
+      param.version_filename,
       true,
-      dry_run
+      param.dry_run
     )
 
   writeln_flush("----> OK")
 
-  if dry_run then
+  if param.dry_run then
     writeln_flush("-!!-> DRY RUN END <----")
     return
   end
 end
 
-ACTIONS.partial_deploy_from_versions_file = function(...)
-  local cluster_name = assert(select(1, ...), "need cluster name")
-  local project_path = assert(select(2, ...), "need project path")
-  local manifest_path = assert(select(3, ...), "need manifest path")
-  local machine_name = assert(select(4, ...), "need machine name")
-  local version_filename = assert(select(5, ...), "need version filename")
-  local dry_run = (select(6, ...) == "--dry-run" or select(7, ...) == "--dry-run")
-  local debug = (select(6, ...) == "--debug" or select(7, ...) == "--debug")
+--------------------------------------------------------------------------------
 
-  if not dry_run then
+ACTIONS.partial_deploy_from_versions_file = function()
+  local param = CONFIG.deploy_rocks.action.param
+
+  if not param.dry_run then
     if ask_user(
         "(Not recommended!) Do you want to deploy code to cluster `"
-     .. cluster_name .. "' ONE machine `" .. machine_name .. "' "
-     .. "from version file `" .. version_filename .. "'?"
+     .. param.cluster_name .. "' ONE machine `" .. param.machine_name .. "' "
+     .. "from version file `" .. param.version_filename .. "'?"
      .. " (WARNING: Ensure you pushed changes to cluster's LR repository.)",
         { "y", "n" },
         "n"
@@ -1902,28 +1907,29 @@ ACTIONS.partial_deploy_from_versions_file = function(...)
   -- TODO: Should we copy versions file to get a new timestamp?
 
   local manifest = load_project_manifest(
-      manifest_path,
-      project_path,
-      cluster_name
+      param.manifest_path,
+      CONFIG.PROJECT_PATH,
+      param.cluster_name
     )
 
-  if debug then
+  if param.debug then
     writeln_flush("-!!-> DEBUG MODE ON")
     manifest.debug_mode = true -- TODO: HACK! Store state elsewhere!
   end
 
-  if dry_run then
+  if param.dry_run then
     writeln_flush("-!!-> DRY RUN BEGIN <----")
   end
 
   -- TODO: HACK
   do
     local clusters_by_name = timapofrecords(manifest.clusters, "name")
-    local machines = assert(clusters_by_name[cluster_name], "cluster not found").machines
+    local machines =
+      assert(clusters_by_name[param.cluster_name], "cluster not found").machines
     local found = false
     for i = 1, #machines do
       local machine = machines[i]
-      if machine.name ~= machine_name then
+      if machine.name ~= param.machine_name then
         writeln_flush("----> Ignoring machine `", machine.name, "'")
         machines[i] = nil
       else
@@ -1937,15 +1943,15 @@ ACTIONS.partial_deploy_from_versions_file = function(...)
 
   deploy_rocks_from_versions_filename(
       manifest,
-      cluster_name,
-      version_filename,
+      param.cluster_name,
+      param.version_filename,
       false,
-      dry_run
+      param.dry_run
     )
 
   writeln_flush("----> OK")
 
-  if dry_run then
+  if param.dry_run then
     writeln_flush("-!!-> DRY RUN END <----")
     return
   end
@@ -1958,84 +1964,53 @@ end
 -- TODO: Do with lock file
 -- TODO: ALSO LOCK REMOTELY!
 -- TODO: Handle rock REMOVAL!
---[[
-local run = function(...)
-  -- TODO: WTF?!
-  local project_path = select(1, ...)
-  local manifest_path = select(2, ...)
-  local action_name = select(3, ...)
-  local cluster_name = select(4, ...)
-
-writeln_flush("Table:" .. tpretty({ ... }, "  ", 80))
-
-  assert(
-      actions[action_name],
-      "unknown action"
-    )(
-      cluster_name,
-      project_path,
-      manifest_path,
-      select(5, ...)
-    )
-end
-]]
 local run = function(...)
   local CODE_ROOT = assert(select(1, ...), "code root missing")
 
   ------------------------------------------------------------------------------
   -- Handle command-line options
   --
-
   CONFIG, ARGS = assert(load_tools_cli_config(
       function(args) -- Parse actions
         local param = { }
 
-        local project_path = { name = args[1] or ""; param = param }
-        local manifest_path = { name = args[2] or ""; param = param }
-        local action_name = { name = args[3] or "help"; param = param }
-        local cluster_name = { name = args[4] or ""; param = param }
+        local action_name   = args[2] or "help"
+
+        param.manifest_path = args[1]
+        param.cluster_name  = args[3]
+        param.debug         = args["--debug"]
+        param.dry_run       = args["--dry-run"]
+
+        if action_name     == "deploy_from_versions_file" then
+          param.version_filename = args[4]
+        elseif action_name == "partial_deploy_from_versions_file" then
+          param.version_filename = args[4]
+          param.machine_name     = args[5]
+        end
 
         local config =
         {
-          PROJECT_PATH = project_path;
-          [TOOL_NAME] =
-          {
-            action = action_name;
-            manifest_path = manifest_path;
-            cluster_name = cluster_name;
-          };
+          PROJECT_PATH = CODE_ROOT;
+          [TOOL_NAME] = {
+            action = {
+              name = action_name;
+              param = param;
+            };
+          }
         }
---[[
-        if args["--data-root"] then
-          local path = args["--data-root"]
-          if not path:find("/$") then -- Ensure trailing slash
-            path = path .. "/"
-          end
-          config.common = { le = { data_root = path } }
-        end
 
-        if action.name == "generate_upgrade_hooks" then
-          param.node_schema_from_filename = args[2]
-          param.node_schema_to_filename = args[3]
-          param.upgrade_hooks_filename = args[4] or nil
-        elseif action.name == "generate_default_data" then
-          param.title = args[2] or nil
-        end
-]]
         return config
       end,
       EXTRA_HELP,
       CONFIG_SCHEMA,
       nil, -- Specify primary config file with --base-config cli option
       nil, -- No secondary config file
-      select(6, ...) -- First argument is CODE_ROOT, eating it
+      select(2, ...) -- First argument is CODE_ROOT, eating it
     ))
-writeln_flush("CONFIG:" .. tpretty(CONFIG, "  ", 80))
-writeln_flush("ARGS:" .. tpretty(ARGS, "  ", 80))
+
   ------------------------------------------------------------------------------
   -- Run the action that user requested
   --
-
   ACTIONS[CONFIG[TOOL_NAME].action.name]()
 end
 

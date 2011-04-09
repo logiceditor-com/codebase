@@ -33,7 +33,7 @@ local tpretty
         'tpretty'
       }
 
-local timapofrecords
+local timapofrecords,
       tkeys,
       tclone
       = import 'lua-nucleo/table-utils.lua'

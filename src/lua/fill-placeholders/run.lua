@@ -90,6 +90,18 @@ local do_in_environment,
         'make_config_environment'
       }
 
+local tgetpath
+      = import 'lua-nucleo/table-utils.lua'
+      {
+        'tgetpath'
+      }
+
+local assert_not_nil
+      = import 'lua-nucleo/typeassert.lua'
+      {
+        'assert_not_nil'
+      }
+
 --------------------------------------------------------------------------------
 
 local create_config_schema
@@ -97,30 +109,6 @@ local create_config_schema
       {
         'create_config_schema'
       }
-
---------------------------------------------------------------------------------
-
--- TODO: To lua-nucleo/typeassert.lua
-local assert_not_nil = function(v, m, ...)
-  if v == nil then
-    error(m, 2)
-  end
-  return v, m, ...
-end
-
--- TODO: To lua-nucleo/table-utils.lua
-local function tgetpath(t, k, nextk, ...)
-  if k == nil then
-    return nil
-  end
-
-  local v = t[k]
-  if not is_table(v) or nextk == nil then
-    return v
-  end
-
-  return tgetpath(v, nextk, ...)
-end
 
 --------------------------------------------------------------------------------
 

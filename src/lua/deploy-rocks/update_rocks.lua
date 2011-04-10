@@ -165,6 +165,12 @@ local writeln_flush,
         'load_table_from_file'
       }
 
+local run_pre_deploy_actions
+      = import 'deploy-rocks/run_pre_deploy_actions.lua'
+      {
+        'run_pre_deploy_actions'
+      }
+
 --------------------------------------------------------------------------------
 
 local update_rocks
@@ -200,6 +206,311 @@ do
     end
 
     assert(checker:result("repository `" .. name .. "' "))
+  end
+
+--------------------------------------------------------------------------------
+
+  local update_subproject_is_not_rocks_repo = function(
+       manifest,
+       cluster_info,
+       subproject,
+       current_versions,
+       dry_run
+    )
+    local rocks = assert(subproject.provides_rocks)
+    if #rocks > 0 then
+      if subproject.rockspec_generator then
+        if dry_run then
+          writeln_flush("-!!-> DRY RUN: Want to generate rockspecs")
+        else
+          writeln_flush("----> Generating rockspecs...")
+          local rockspec_generator = is_table(subproject.rockspec_generator)
+            and subproject.rockspec_generator
+             or { subproject.rockspec_generator }
+          assert(
+              shell_exec(
+                  "cd", subproject.local_path,
+                  "&&", unpack(rockspec_generator)
+                ) == 0
+            )
+        end
+      end
+
+      writeln_flush("----> Updating rocks...")
+      for i = 1, #rocks do
+        local rock = rocks[i]
+
+        local rockspec_files = luarocks_list_rockspec_files(
+            subproject.local_path .. "/" .. assert(rock.rockspec),
+            subproject.local_path  .. "/"
+          )
+        local rockspec_files_changed = { }
+
+        for i = 1, #rockspec_files do
+          if not current_versions[subproject.name]
+            or git_is_file_changed_between_revisions(
+                subproject.local_path,
+                rockspec_files[i],
+                current_versions[subproject.name],
+                "HEAD"
+              )
+          then
+            writeln_flush("------> Changed file found: ", rockspec_files[i])
+            rockspec_files_changed[#rockspec_files_changed + 1] = rockspec_files[i]
+          end
+        end
+
+        if #rockspec_files_changed == 0 then
+          writeln_flush("------> No files changed in ", rock.rockspec)
+        else
+          have_changed_rocks = true
+          if
+            manifest.ignore_rocks and
+            manifest.ignore_rocks[get_filename_from_path(rock.name)]
+          then
+            writeln_flush("----> Ignoring `", rock.rockspec, "'")
+          else
+            changed_rocks[rock.name] = true
+
+            if rock.rockspec_generator then
+              if dry_run then
+                writeln_flush("-!!-> DRY RUN: Want to generate rock for ", rock.name)
+              else
+                writeln_flush("----> Generating rock for ", rock.name, "...")
+                local rockspec_generator = is_table(rock.rockspec_generator)
+                  and rock.rockspec_generator
+                   or { rock.rockspec_generator }
+                assert(
+                    shell_exec(
+                        "cd", subproject.local_path,
+                        "&&", unpack(rockspec_generator)
+                      ) == 0
+                  )
+              end
+            end
+          end
+
+          if dry_run then
+            writeln_flush("-!!-> DRY RUN: Want to rebuild", rock.rockspec)
+          else
+            writeln_flush("----> Rebuilding `", rock.rockspec, "'...")
+            luarocks_ensure_rock_not_installed_forced(rock.name)
+            luarocks_make_in(rock.rockspec, path)
+          end
+
+          if dry_run then
+            writeln_flush("-!!-> DRY RUN: Want to pack", rock.rockspec)
+          else
+            writeln_flush("----> Packing `", rock.rockspec, "'...")
+            luarocks_pack_to(rock.name, manifest.local_rocks_repo_path)
+            copy_file_to_dir(path .. "/" .. rock.rockspec, manifest.local_rocks_repo_path)
+            writeln_flush("----> Rebuilding manifest...")
+            luarocks_admin_make_manifest(manifest.local_rocks_repo_path)
+          end
+
+          if rock.remove_after_pack then
+          -- Needed for foreign-cluster-specific rocks,
+          -- so they are not linger in our system
+            if dry_run then
+              writeln_flush("-!!-> DRY RUN: Want to remove after pack", rock.rockspec)
+            else
+              writeln_flush("----> Removing after pack `", rock.rockspec, "'...")
+              luarocks_ensure_rock_not_installed_forced(rock.name)
+            end
+          end
+        end -- if #rockspec_files_changed == 0 else
+      end -- for i = 1, #rocks do
+    end -- if #rocks > 0 then
+
+    if have_changed_rocks then
+      need_new_versions_for_subprojects[name] = true
+      if dry_run then
+        writeln_flush("-!!-> DRY RUN: Want to commit changed rocks")
+      else
+        -- TODO: HACK! Add only generated files!
+        writeln_flush("----> Committing changed rocks...")
+        git_add_directory(
+            manifest.local_rocks_git_repo_path,
+            manifest.local_rocks_repo_path
+          )
+        git_commit_with_message(
+            manifest.local_rocks_git_repo_path,
+            "rocks/" .. cluster_info.name .. ": updated rocks for " .. name
+          )
+      end
+    end
+  end
+
+--------------------------------------------------------------------------------
+
+  local update_subproject_is_rocks_repo = function(
+       manifest,
+       cluster_info,
+       subproject,
+       current_versions,
+       dry_run
+    )
+    assert(not subproject.provides_rocks)
+    assert(not subproject.rockspec_generator)
+
+    if not is_table(subproject.provides_rocks_repo) then
+      subproject.provides_rocks_repo = { { name = subproject.provides_rocks_repo } }
+    end
+
+    for i = 1, #subproject.provides_rocks_repo do
+      local have_changed_rocks_in_repo = false
+      local rocks_repo = subproject.provides_rocks_repo[i].name
+
+      if not subproject.provides_rocks_repo[i].pre_deploy_actions then
+        writeln_flush("----> No pre-deploy actions for ", name, rocks_repo)
+      else
+        writeln_flush("----> Running pre-deploy actions for ", name, rocks_repo)
+
+        run_pre_deploy_actions(
+            manifest,
+            cluster_info,
+            subproject,
+            subproject.provides_rocks_repo[i],
+            subproject.provides_rocks_repo[i].pre_deploy_actions,
+            current_versions,
+            dry_run
+          )
+      end
+
+      writeln_flush("----> Searching for rocks in repo `", rocks_repo, "'...")
+
+      local rocks = assert(luarocks_load_manifest(
+          subproject.local_path .. "/" .. rocks_repo .. "/manifest"
+        ).repository)
+
+      -- TODO: Generalize
+      local rock_files, rockspec_files = { }, { }
+      for rock_name, versions in pairs(rocks) do
+        local have_version = false
+        for version_name, infos in pairs(versions) do
+          assert(have_version == false, "duplicate rock " .. rock_name
+            .. " versions " .. version_name .. " in manifest")
+          have_version = true
+
+          for i = 1, #infos do
+            local info = infos[i]
+            local arch = assert(info.arch)
+
+            local filename = rock_name .. "-" .. version_name .. "." .. arch
+            if arch ~= "rockspec" then
+              filename = filename .. ".rock"
+            end
+
+            filename = rocks_repo .. "/" .. filename;
+
+            if arch == "rockspec" then
+              rockspec_files[rock_name] = filename
+            end
+
+            writeln_flush("Found `", rock_name, "' at `", filename, "'")
+
+            rock_files[#rock_files + 1] =
+            {
+              name = rock_name;
+              filename = filename;
+            }
+          end
+        end
+        assert(have_version == true, "bad rock manifest")
+      end
+
+      writeln_flush("----> Determining changed rocks...")
+
+      local need_to_reinstall = { }
+      for i = 1, #rock_files do
+        local rock_file = rock_files[i]
+
+        if
+          manifest.ignore_rocks and manifest.ignore_rocks[
+              get_filename_from_path(rock_file.name)
+            ]
+        then
+          writeln_flush("--> Ignoring `", rock_file.name, "'")
+        elseif
+          not current_subproject_version
+          or git_is_file_changed_between_revisions(
+              subproject.local_path,
+              rock_file.filename,
+              current_subproject_version,
+              "HEAD"
+            )
+        then
+          if not changed_rocks[rock_file.name] then
+            writeln_flush("--> Changed or new `", rock_file.name, "'.")
+          end
+          changed_rocks[rock_file.name] = true
+          need_to_reinstall[rock_file.name] = true
+          have_changed_rocks = true
+          have_changed_rocks_in_repo = true
+        else
+          writeln_flush("--> Not changed `", rock_file.name, "'.")
+        end
+      end
+
+      if not next(need_to_reinstall) then
+        writeln_flush("----> No changed rocks detected.")
+      else
+        writeln_flush("----> Reinstalling changed rocks...")
+
+        for rock_name, _ in pairs(need_to_reinstall) do
+          local rockspec =
+            assert(
+                rockspec_files[rock_name],
+                "rock without rockspec "..rock_name
+              )
+          if dry_run then
+            writeln_flush("-!!-> DRY RUN: Want to reinstall", rockspec)
+          else
+            writeln_flush("----> Reinstalling `", rockspec, "'...")
+            luarocks_ensure_rock_not_installed_forced(rock_name)
+            luarocks_install_from(rock_name, subproject.local_path .. "/" .. rocks_repo)
+          end
+
+          if dry_run then
+            writeln_flush("-!!-> DRY RUN: Want to pack", rockspec)
+          else
+            writeln_flush(
+                "----> Packing `", rockspec, "' to `",
+                manifest.local_rocks_repo_path, "'..."
+              )
+            luarocks_pack_to(rock_name, manifest.local_rocks_repo_path)
+            if path ~= manifest.local_rocks_repo_path then
+              copy_file_to_dir(path .. "/" .. rockspec, manifest.local_rocks_repo_path)
+            else
+              writeln_flush(
+                  "Path " .. path .. " is the same as local repository path",
+                  rockspec
+                )
+            end
+            writeln_flush("----> Rebuilding manifest...")
+            luarocks_admin_make_manifest(manifest.local_rocks_repo_path)
+          end
+        end
+      end
+
+      if have_changed_rocks_in_repo then
+        need_new_versions_for_subprojects[name] = true
+        if dry_run then
+          writeln_flush("-!!-> DRY RUN: Want to commit changed rocks")
+        else
+          -- TODO: HACK! Add only generated files!
+          writeln_flush("----> Committing changed rocks...")
+          git_add_directory(
+              manifest.local_rocks_git_repo_path,
+              manifest.local_rocks_repo_path
+            )
+          git_commit_with_message(
+              manifest.local_rocks_git_repo_path,
+              "rocks/" .. cluster_info.name .. ": updated rocks for " .. name
+            )
+        end
+      end
+    end
   end
 
 --------------------------------------------------------------------------------
@@ -262,291 +573,21 @@ do
           local have_changed_rocks = false
 
           if subproject.provides_rocks_repo then
-            assert(not subproject.provides_rocks)
-            assert(not subproject.rockspec_generator)
-
-            if not is_table(subproject.provides_rocks_repo) then
-              subproject.provides_rocks_repo = { { name = subproject.provides_rocks_repo } }
-            end
-
-            for i = 1, #subproject.provides_rocks_repo do
-              local have_changed_rocks_in_repo = false
-              local rocks_repo = subproject.provides_rocks_repo[i].name
-
-              if not subproject.provides_rocks_repo[i].pre_deploy_actions then
-                writeln_flush("----> No pre-deploy actions for ", name, rocks_repo)
-              else
-                writeln_flush("----> Running pre-deploy actions for ", name, rocks_repo)
-
-                run_pre_deploy_actions(
-                    manifest,
-                    cluster_info,
-                    subproject,
-                    subproject.provides_rocks_repo[i],
-                    subproject.provides_rocks_repo[i].pre_deploy_actions,
-                    current_versions,
-                    dry_run
-                  )
-              end
-
-              writeln_flush("----> Searching for rocks in repo `", rocks_repo, "'...")
-
-              local rocks = assert(luarocks_load_manifest(
-                  subproject.local_path .. "/" .. rocks_repo .. "/manifest"
-                ).repository)
-
-              -- TODO: Generalize
-              local rock_files, rockspec_files = { }, { }
-              for rock_name, versions in pairs(rocks) do
-                local have_version = false
-                for version_name, infos in pairs(versions) do
-                  assert(have_version == false, "duplicate rock " .. rock_name
-                    .. " versions " .. version_name .. " in manifest")
-                  have_version = true
-
-                  for i = 1, #infos do
-                    local info = infos[i]
-                    local arch = assert(info.arch)
-
-                    local filename = rock_name .. "-" .. version_name .. "." .. arch
-                    if arch ~= "rockspec" then
-                      filename = filename .. ".rock"
-                    end
-
-                    filename = rocks_repo .. "/" .. filename;
-
-                    if arch == "rockspec" then
-                      rockspec_files[rock_name] = filename
-                    end
-
-                    writeln_flush("Found `", rock_name, "' at `", filename, "'")
-
-                    rock_files[#rock_files + 1] =
-                    {
-                      name = rock_name;
-                      filename = filename;
-                    }
-                  end
-                end
-                assert(have_version == true, "bad rock manifest")
-              end
-
-              writeln_flush("----> Determining changed rocks...")
-
-              local need_to_reinstall = { }
-              for i = 1, #rock_files do
-                local rock_file = rock_files[i]
-
-                if
-                  manifest.ignore_rocks and manifest.ignore_rocks[
-                      get_filename_from_path(rock_file.name)
-                    ]
-                then
-                  writeln_flush("--> Ignoring `", rock_file.name, "'")
-                elseif
-                  not current_subproject_version
-                  or git_is_file_changed_between_revisions(
-                      subproject.local_path,
-                      rock_file.filename,
-                      current_subproject_version,
-                      "HEAD"
-                    )
-                then
-                  if not changed_rocks[rock_file.name] then
-                    writeln_flush("--> Changed or new `", rock_file.name, "'.")
-                  end
-                  changed_rocks[rock_file.name] = true
-                  need_to_reinstall[rock_file.name] = true
-                  have_changed_rocks = true
-                  have_changed_rocks_in_repo = true
-                else
-                  writeln_flush("--> Not changed `", rock_file.name, "'.")
-                end
-              end
-
-              if not next(need_to_reinstall) then
-                writeln_flush("----> No changed rocks detected.")
-              else
-                writeln_flush("----> Reinstalling changed rocks...")
-
-                for rock_name, _ in pairs(need_to_reinstall) do
-                  local rockspec =
-                    assert(
-                        rockspec_files[rock_name],
-                        "rock without rockspec "..rock_name
-                      )
-                  if dry_run then
-                    writeln_flush("-!!-> DRY RUN: Want to reinstall", rockspec)
-                  else
-                    writeln_flush("----> Reinstalling `", rockspec, "'...")
-                    luarocks_ensure_rock_not_installed_forced(rock_name)
-                    luarocks_install_from(rock_name, subproject.local_path .. "/" .. rocks_repo)
-                  end
-
-                  if dry_run then
-                    writeln_flush("-!!-> DRY RUN: Want to pack", rockspec)
-                  else
-                    writeln_flush(
-                        "----> Packing `", rockspec, "' to `",
-                        manifest.local_rocks_repo_path, "'..."
-                      )
-                    luarocks_pack_to(rock_name, manifest.local_rocks_repo_path)
-                    if path ~= manifest.local_rocks_repo_path then
-                      copy_file_to_dir(path .. "/" .. rockspec, manifest.local_rocks_repo_path)
-                    else
-                      writeln_flush(
-                          "Path " .. path .. " is the same as local repository path",
-                          rockspec
-                        )
-                    end
-                    writeln_flush("----> Rebuilding manifest...")
-                    luarocks_admin_make_manifest(manifest.local_rocks_repo_path)
-                  end
-                end
-              end
-
-              if have_changed_rocks_in_repo then
-                need_new_versions_for_subprojects[name] = true
-                if dry_run then
-                  writeln_flush("-!!-> DRY RUN: Want to commit changed rocks")
-                else
-                  -- TODO: HACK! Add only generated files!
-                  writeln_flush("----> Committing changed rocks...")
-                  git_add_directory(
-                      manifest.local_rocks_git_repo_path,
-                      manifest.local_rocks_repo_path
-                    )
-                  git_commit_with_message(
-                      manifest.local_rocks_git_repo_path,
-                      "rocks/" .. cluster_info.name .. ": updated rocks for " .. name
-                    )
-                end
-              end
-            end
+            update_subproject_is_rocks_repo(
+                manifest,
+                cluster_info,
+                subproject,
+                current_versions,
+                dry_run
+              )
           else -- if subproject.provides_rocks_repo then
-             local rocks = assert(subproject.provides_rocks)
-            if #rocks > 0 then
-              if subproject.rockspec_generator then
-                if dry_run then
-                  writeln_flush("-!!-> DRY RUN: Want to generate rockspecs")
-                else
-                  writeln_flush("----> Generating rockspecs...")
-                  local rockspec_generator = is_table(subproject.rockspec_generator)
-                    and subproject.rockspec_generator
-                     or { subproject.rockspec_generator }
-                  assert(
-                      shell_exec(
-                          "cd", subproject.local_path,
-                          "&&", unpack(rockspec_generator)
-                        ) == 0
-                    )
-                end
-              end
-
-              writeln_flush("----> Updating rocks...")
-              for i = 1, #rocks do
-                local rock = rocks[i]
-
-                local rockspec_files = luarocks_list_rockspec_files(
-                    subproject.local_path .. "/" .. assert(rock.rockspec),
-                    subproject.local_path  .. "/"
-                  )
-                local rockspec_files_changed = { }
-
-                for i = 1, #rockspec_files do
-                  if not current_versions[subproject.name]
-                    or git_is_file_changed_between_revisions(
-                        subproject.local_path,
-                        rockspec_files[i],
-                        current_versions[subproject.name],
-                        "HEAD"
-                      )
-                  then
-                    writeln_flush("------> Changed file found: ", rockspec_files[i])
-                    rockspec_files_changed[#rockspec_files_changed + 1] = rockspec_files[i]
-                  end
-                end
-
-                if #rockspec_files_changed == 0 then
-                  writeln_flush("------> No files changed in ", rock.rockspec)
-                else
-                  have_changed_rocks = true
-                  if
-                    manifest.ignore_rocks and
-                    manifest.ignore_rocks[get_filename_from_path(rock.name)]
-                  then
-                    writeln_flush("----> Ignoring `", rock.rockspec, "'")
-                  else
-                    changed_rocks[rock.name] = true
-
-                    if rock.rockspec_generator then
-                      if dry_run then
-                        writeln_flush("-!!-> DRY RUN: Want to generate rock for ", rock.name)
-                      else
-                        writeln_flush("----> Generating rock for ", rock.name, "...")
-                        local rockspec_generator = is_table(rock.rockspec_generator)
-                          and rock.rockspec_generator
-                           or { rock.rockspec_generator }
-                        assert(
-                            shell_exec(
-                                "cd", subproject.local_path,
-                                "&&", unpack(rockspec_generator)
-                              ) == 0
-                          )
-                      end
-                    end
-                  end
-
-                  if dry_run then
-                    writeln_flush("-!!-> DRY RUN: Want to rebuild", rock.rockspec)
-                  else
-                    writeln_flush("----> Rebuilding `", rock.rockspec, "'...")
-                    luarocks_ensure_rock_not_installed_forced(rock.name)
-                    luarocks_make_in(rock.rockspec, path)
-                  end
-
-                  if dry_run then
-                    writeln_flush("-!!-> DRY RUN: Want to pack", rock.rockspec)
-                  else
-                    writeln_flush("----> Packing `", rock.rockspec, "'...")
-                    luarocks_pack_to(rock.name, manifest.local_rocks_repo_path)
-                    copy_file_to_dir(path .. "/" .. rock.rockspec, manifest.local_rocks_repo_path)
-                    writeln_flush("----> Rebuilding manifest...")
-                    luarocks_admin_make_manifest(manifest.local_rocks_repo_path)
-                  end
-
-                  if rock.remove_after_pack then
-                  -- Needed for foreign-cluster-specific rocks,
-                  -- so they are not linger in our system
-                    if dry_run then
-                      writeln_flush("-!!-> DRY RUN: Want to remove after pack", rock.rockspec)
-                    else
-                      writeln_flush("----> Removing after pack `", rock.rockspec, "'...")
-                      luarocks_ensure_rock_not_installed_forced(rock.name)
-                    end
-                  end
-                end -- if #rockspec_files_changed == 0 else
-              end -- for i = 1, #rocks do
-            end -- if #rocks > 0 then
-
-            if have_changed_rocks then
-              need_new_versions_for_subprojects[name] = true
-              if dry_run then
-                writeln_flush("-!!-> DRY RUN: Want to commit changed rocks")
-              else
-                -- TODO: HACK! Add only generated files!
-                writeln_flush("----> Committing changed rocks...")
-                git_add_directory(
-                    manifest.local_rocks_git_repo_path,
-                    manifest.local_rocks_repo_path
-                  )
-                git_commit_with_message(
-                    manifest.local_rocks_git_repo_path,
-                    "rocks/" .. cluster_info.name .. ": updated rocks for " .. name
-                  )
-              end
-            end
-
+            update_subproject_is_not_rocks_repo(
+                manifest,
+                cluster_info,
+                subproject,
+                current_versions,
+                dry_run
+              )
           end -- if subproject.provides_rocks_repo else
 
         end -- if git_are_branches_different("HEAD", current_versions[name])

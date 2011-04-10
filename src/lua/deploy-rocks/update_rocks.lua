@@ -181,7 +181,7 @@ do
     writeln_flush("----> Checking Git repository sanity...")
     git_update_index(path)
 
-    if not manifest.debug_mode then
+    if not manifest.cli_param.debug_mode then
       checker:ensure(
           "must have clean working copy (hint: do commit or reset)",
           not git_is_dirty(path)

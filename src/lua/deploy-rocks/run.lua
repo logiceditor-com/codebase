@@ -6,6 +6,7 @@ local log, dbg, spam, log_error
 --------------------------------------------------------------------------------
 
 local pcall, assert, error, select, next = pcall, assert, error, select, next
+local os_getenv = os.getenv
 
 --------------------------------------------------------------------------------
 
@@ -92,10 +93,10 @@ local create_config_schema
 
 local TOOL_NAME = "deploy_rocks"
 
+--TODO: insert some description here and clean up
 local EXTRA_HELP = [[
 
 deploy-rocks: deployment tool
---TODO: insert some description here and clean up
 
 Usage:
 
@@ -173,10 +174,10 @@ do
         CONFIG.PROJECT_PATH,
         param.cluster_name
       )
+    manifest.cli_param = param
 
     if param.debug then
       writeln_flush("-!!-> DEBUG MODE ON")
-      manifest.debug_mode = true -- TODO: HACK! Store state elsewhere!
     end
 
     if param.dry_run then

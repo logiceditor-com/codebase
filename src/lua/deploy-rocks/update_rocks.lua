@@ -215,9 +215,13 @@ do
        cluster_info,
        subproject,
        current_versions,
-       dry_run
+       dry_run,
+       changed_rocks,
+       have_changed_rocks,
+       need_new_versions_for_subprojects
     )
     local rocks = assert(subproject.provides_rocks)
+
     if #rocks > 0 then
       if subproject.rockspec_generator then
         if dry_run then
@@ -295,7 +299,7 @@ do
           else
             writeln_flush("----> Rebuilding `", rock.rockspec, "'...")
             luarocks_ensure_rock_not_installed_forced(rock.name)
-            luarocks_make_in(rock.rockspec, path)
+            luarocks_make_in(rock.rockspec, subproject.local_path)
           end
 
           if dry_run then
@@ -303,7 +307,10 @@ do
           else
             writeln_flush("----> Packing `", rock.rockspec, "'...")
             luarocks_pack_to(rock.name, manifest.local_rocks_repo_path)
-            copy_file_to_dir(path .. "/" .. rock.rockspec, manifest.local_rocks_repo_path)
+            copy_file_to_dir(
+                subproject.local_path .. "/" .. rock.rockspec,
+                manifest.local_rocks_repo_path
+              )
             writeln_flush("----> Rebuilding manifest...")
             luarocks_admin_make_manifest(manifest.local_rocks_repo_path)
           end
@@ -323,7 +330,7 @@ do
     end -- if #rocks > 0 then
 
     if have_changed_rocks then
-      need_new_versions_for_subprojects[name] = true
+      need_new_versions_for_subprojects[subproject.name] = true
       if dry_run then
         writeln_flush("-!!-> DRY RUN: Want to commit changed rocks")
       else
@@ -335,10 +342,12 @@ do
           )
         git_commit_with_message(
             manifest.local_rocks_git_repo_path,
-            "rocks/" .. cluster_info.name .. ": updated rocks for " .. name
+            "rocks/" .. cluster_info.name
+         .. ": updated rocks for " .. subproject.name
           )
       end
     end
+    return have_changed_rocks
   end
 
 --------------------------------------------------------------------------------
@@ -348,10 +357,15 @@ do
        cluster_info,
        subproject,
        current_versions,
-       dry_run
+       dry_run,
+       changed_rocks,
+       have_changed_rocks,
+       need_new_versions_for_subprojects
     )
     assert(not subproject.provides_rocks)
     assert(not subproject.rockspec_generator)
+    local name = subproject.name
+    local path = assert(subproject.local_path)
 
     if not is_table(subproject.provides_rocks_repo) then
       subproject.provides_rocks_repo = { { name = subproject.provides_rocks_repo } }
@@ -380,7 +394,7 @@ do
       writeln_flush("----> Searching for rocks in repo `", rocks_repo, "'...")
 
       local rocks = assert(luarocks_load_manifest(
-          subproject.local_path .. "/" .. rocks_repo .. "/manifest"
+          path .. "/" .. rocks_repo .. "/manifest"
         ).repository)
 
       -- TODO: Generalize
@@ -432,11 +446,11 @@ do
         then
           writeln_flush("--> Ignoring `", rock_file.name, "'")
         elseif
-          not current_subproject_version
+          not current_versions[name]
           or git_is_file_changed_between_revisions(
-              subproject.local_path,
+              path,
               rock_file.filename,
-              current_subproject_version,
+              current_versions[name],
               "HEAD"
             )
         then
@@ -468,7 +482,7 @@ do
           else
             writeln_flush("----> Reinstalling `", rockspec, "'...")
             luarocks_ensure_rock_not_installed_forced(rock_name)
-            luarocks_install_from(rock_name, subproject.local_path .. "/" .. rocks_repo)
+            luarocks_install_from(rock_name, path .. "/" .. rocks_repo)
           end
 
           if dry_run then
@@ -511,6 +525,7 @@ do
         end
       end
     end
+    return have_changed_rocks, changed_rocks
   end
 
 --------------------------------------------------------------------------------
@@ -568,25 +583,29 @@ do
             writeln_flush("Changes are detected")
           end
 
-          local current_subproject_version = current_versions[name]
-
           local have_changed_rocks = false
 
           if subproject.provides_rocks_repo then
-            update_subproject_is_rocks_repo(
+            have_changed_rocks = update_subproject_is_rocks_repo(
                 manifest,
                 cluster_info,
                 subproject,
                 current_versions,
-                dry_run
+                dry_run,
+                changed_rocks,
+                have_changed_rocks,
+                need_new_versions_for_subprojects
               )
           else -- if subproject.provides_rocks_repo then
-            update_subproject_is_not_rocks_repo(
+            have_changed_rocks = update_subproject_is_not_rocks_repo(
                 manifest,
                 cluster_info,
                 subproject,
                 current_versions,
-                dry_run
+                dry_run,
+                changed_rocks,
+                have_changed_rocks,
+                need_new_versions_for_subprojects
               )
           end -- if subproject.provides_rocks_repo else
 

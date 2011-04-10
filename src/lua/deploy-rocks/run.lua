@@ -5,9 +5,11 @@ local log, dbg, spam, log_error
 
 --------------------------------------------------------------------------------
 
-local pcall, assert, error, select, next = pcall, assert, error, select, next
+local pcall, assert, error, select, next, loadfile
+    = pcall, assert, error, select, next, loadfile
 local os_getenv = os.getenv
-
+local io_open = io.open
+local lfs = require 'lfs'
 --------------------------------------------------------------------------------
 
 local tpretty
@@ -58,6 +60,18 @@ local load_tools_cli_data_schema,
         'load_tools_cli_config',
         'print_tools_cli_config_usage',
         'freeform_table_value'
+      }
+
+local assert_is_table
+      = import 'lua-nucleo/typeassert.lua'
+      {
+        'assert_is_table'
+      }
+
+local do_in_environment
+      = import 'lua-nucleo/sandbox.lua'
+      {
+        'do_in_environment'
       }
 
 local load_table_from_file
@@ -164,6 +178,8 @@ end
 -- Main deploy actions
 --
 do
+  local cache_file
+
   local common_actions = function(ask_string)
     local param = CONFIG.deploy_rocks.action.param
 
@@ -185,9 +201,34 @@ do
       )
     manifest.cli_param = param
 
--- TODO: read or create cache file here and lock it
---    if does_file_exist(CACHE_PATH) then
---      cache_tables = load_table_from_file(sudo_is_passwordless_cache_file)
+    -- TODO: move to separate cache handling function
+    local cache = { }
+
+    -- if cachefile exists in CACHE_PATH, load it to cache variable
+    if does_file_exist(CACHE_PATH) then
+      local chunk = assert(loadfile(CACHE_PATH))
+      local ok
+      ok, cache = assert(do_in_environment(chunk, { }))
+      assert_is_table(cache)
+      writeln_flush("----> Cache file loaded `", CACHE_PATH, "'")
+    -- if no file exists - create file with "return { }"
+    else
+      assert(
+          write_file(CACHE_PATH, "return\n" .. tpretty({ }, "  ", 80))
+        )
+      writeln_flush("----> Cache file created `", CACHE_PATH, "'")
+    end
+
+    -- open CACHE_PATH file and lock it
+    local err
+    cache_file, err = io.open(CACHE_PATH, "w")
+    if not cache_file then
+      error("Cache file open fails: " .. err)
+    end
+    lfs.lock(cache_file, "w")
+    writeln_flush("----> Cache file locked `", CACHE_PATH, "'")
+
+    manifest.cache = cache
 
     if param.debug then
       writeln_flush("-!!-> DEBUG MODE ON")
@@ -199,8 +240,27 @@ do
     return manifest
   end
 
+  ------------------------------------------------------------------------------
+
   local common_finish_actions = function(manifest)
--- TODO: write cache file here and unlock it
+
+    -- TODO: may be move to separate cache handling function
+    -- unlock cache file
+    local res, err = lfs.unlock(cache_file)
+    cache_file:close()
+    cache_file = nil
+
+    if not res then
+      error("Cache file unlock fails: " .. err)
+    end
+    writeln_flush("----> Cache file unlocked `", CACHE_PATH, "'")
+
+    -- write cache file
+    assert(
+        write_file(CACHE_PATH, "return\n" .. tpretty(manifest.cache, "  ", 80))
+      )
+    writeln_flush("----> Cache file wrote `", CACHE_PATH, "'")
+
     if manifest.cli_param.dry_run then
       writeln_flush("-!!-> DRY RUN END <----")
     else

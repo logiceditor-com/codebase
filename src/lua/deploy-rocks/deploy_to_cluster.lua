@@ -15,6 +15,12 @@ local os = os
 
 --------------------------------------------------------------------------------
 
+local arguments
+      = import 'lua-nucleo/args.lua'
+      {
+        'arguments'
+      }
+
 local is_table
       = import 'lua-nucleo/type.lua'
       {
@@ -41,12 +47,16 @@ local fill_curly_placeholders
 
 local timapofrecords,
       tkeys,
-      tclone
+      tclone,
+      tsetpath,
+      tgetpath
       = import 'lua-nucleo/table-utils.lua'
       {
         'timapofrecords',
         'tkeys',
-        'tclone'
+        'tclone',
+        'tsetpath',
+        'tgetpath'
       }
 
 local make_config_environment
@@ -155,59 +165,6 @@ local writeln_flush,
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
-local remote_ensure_sudo_is_passwordless_cached = function(
-    project_name,
-    cluster_name,
-    machine_name,
-    machine_url
-  )
-
-  local sudo_is_passwordless_cache_file =
-    os_getenv("HOME") .. "/.deploy-rocks.cache"
-
-  local cache_tables = make_config_environment({ })
-
-  if does_file_exist(sudo_is_passwordless_cache_file) then
-    cache_tables =
-      make_config_environment(
-          load_table_from_file(sudo_is_passwordless_cache_file)
-        )
-    if
-      cache_tables
-        .projects[project_name]
-        .clusters[cluster_name]
-        .machines[machine_name]
-        .sudo_is_passwordless == true
-    then
-      return
-    end
-  end
-
-  -- Hint: To fix do:
-  -- $ sudo visudo
-  -- Replace %sudo ALL=(ALL) ALL
-  -- with %sudo ALL=NOPASSWD: ALL
-  assert(
-      shell_read_remote(machine_url, "sudo", "echo", "-n", "yo") == "yo",
-      "remote sudo is not passwordless (or some obscure error occured)"
-    )
-
-  cache_tables
-    .projects[project_name]
-    .clusters[cluster_name]
-    .machines[machine_name]
-    .sudo_is_passwordless = true
-
-  assert(
-      write_file(
-          sudo_is_passwordless_cache_file,
-          "return\n" .. tpretty(cache_tables, "  ", 80)
-        )
-    )
-end
-
---------------------------------------------------------------------------------
 -- Actions:
 --   local_exec
 --   remote_exec
@@ -217,6 +174,57 @@ end
 
 local deploy_to_cluster
 do
+
+  local remote_ensure_sudo_is_passwordless_cached = function(
+      project_name,
+      cluster_name,
+      machine_name,
+      machine_url,
+      cache
+    )
+    arguments(
+        "string", project_name,
+        "string", cluster_name,
+        "string", machine_name,
+        "string", machine_url,
+        "table", cache
+      )
+
+    if
+      tgetpath(
+          cache,
+          "projects", project_name,
+          "clusters", cluster_name,
+          "machines", machine_name,
+          "sudo_is_passwordless")
+    then
+      return
+    end
+
+    -- Hint: To fix do:
+    -- $ sudo visudo
+    -- Replace %sudo ALL=(ALL) ALL
+    -- with %sudo ALL=NOPASSWD: ALL
+    assert(
+        shell_read_remote(machine_url, "sudo", "echo", "-n", "yo") == "yo",
+        "remote sudo is not passwordless (or some obscure error occured)"
+      )
+
+    tsetpath(
+        cache,
+        "projects", project_name,
+        "clusters", cluster_name,
+        "machines", machine_name,
+        "sudo_is_passwordless")
+     cache
+       .projects[project_name]
+       .clusters[cluster_name]
+       .machines[machine_name]
+       .sudo_is_passwordless = true
+  end
+
+--------------------------------------------------------------------------------
+
   local fill_cluster_info_placeholders = function(manifest, cluster_info, template)
     return fill_curly_placeholders( -- TODO: Add more?
         template,
@@ -576,7 +584,8 @@ do
                   manifest.PROJECT_TITLE,
                   cluster_info.name,
                   machine.name,
-                  assert(machine.external_url)
+                  assert(machine.external_url),
+                  manifest.cache
                 )
             machine.sudo_checked = true
           end
@@ -649,7 +658,8 @@ do
                   manifest.PROJECT_TITLE,
                   cluster_info.name,
                   machine.name,
-                  assert(machine.external_url)
+                  assert(machine.external_url),
+                  manifest.cache
                 )
               machine.sudo_checked = true
             end

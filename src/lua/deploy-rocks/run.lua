@@ -153,169 +153,133 @@ end
 --------------------------------------------------------------------------------
 -- Main deploy actions
 --
+do
+  local common_actions = function(ask_string)
+    local param = CONFIG.deploy_rocks.action.param
 
-ACTIONS.deploy_from_code = function()
-  local param = CONFIG.deploy_rocks.action.param
-
-  if not param.dry_run then
-    if ask_user(
-        "Do you want to deploy code to `" .. param.cluster_name .. "'?",
-        { "y", "n" },
-        "n"
-      ) ~= "y"
-    then
-      error("Aborted.")
-    end
-  end
-
-  local manifest = load_project_manifest(
-      param.manifest_path,
-      CONFIG.PROJECT_PATH,
-      param.cluster_name
-    )
-
-  if param.debug then
-    writeln_flush("-!!-> DEBUG MODE ON")
-    manifest.debug_mode = true -- TODO: HACK! Store state elsewhere!
-  end
-
-  if param.dry_run then
-    writeln_flush("-!!-> DRY RUN BEGIN <----")
-  end
-
-  deploy_rocks_from_code(
-      manifest,
-      param.cluster_name,
-      param.dry_run
-    )
-
-  writeln_flush("----> OK")
-
-  if param.dry_run then
-    writeln_flush("-!!-> DRY RUN END <----")
-    return
-  end
-end
-
---------------------------------------------------------------------------------
-
-ACTIONS.deploy_from_versions_file = function()
-  local param = CONFIG.deploy_rocks.action.param
-
-  if not param.dry_run then
-    if ask_user(
-        "Do you want to deploy code to `" .. param.cluster_name .. "'"
-     .. " from version file `" .. param.version_filename .. "'?",
-        { "y", "n" },
-        "n"
-      ) ~= "y"
-    then
-      error("Aborted.")
-    end
-  end
-
-  -- TODO: Should we copy versions file to get a new timestamp?
-
-  local manifest = load_project_manifest(
-      param.manifest_path,
-      CONFIG.PROJECT_PATH,
-      param.cluster_name
-    )
-
-  if param.debug then
-    writeln_flush("-!!-> DEBUG MODE ON")
-    manifest.debug_mode = true -- TODO: HACK! Store state elsewhere!
-  end
-
-  if param.dry_run then
-    writeln_flush("-!!-> DRY RUN BEGIN <----")
-  end
-
-  deploy_rocks_from_versions_filename(
-      manifest,
-      param.cluster_name,
-      param.version_filename,
-      true,
-      param.dry_run
-    )
-
-  writeln_flush("----> OK")
-
-  if param.dry_run then
-    writeln_flush("-!!-> DRY RUN END <----")
-    return
-  end
-end
-
---------------------------------------------------------------------------------
-
-ACTIONS.partial_deploy_from_versions_file = function()
-  local param = CONFIG.deploy_rocks.action.param
-
-  if not param.dry_run then
-    if ask_user(
-        "(Not recommended!) Do you want to deploy code to cluster `"
-     .. param.cluster_name .. "' ONE machine `" .. param.machine_name .. "' "
-     .. "from version file `" .. param.version_filename .. "'?"
-     .. " (WARNING: Ensure you pushed changes to cluster's LR repository.)",
-        { "y", "n" },
-        "n"
-      ) ~= "y"
-    then
-      error("Aborted.")
-    end
-  end
-
-  -- TODO: Should we copy versions file to get a new timestamp?
-
-  local manifest = load_project_manifest(
-      param.manifest_path,
-      CONFIG.PROJECT_PATH,
-      param.cluster_name
-    )
-
-  if param.debug then
-    writeln_flush("-!!-> DEBUG MODE ON")
-    manifest.debug_mode = true -- TODO: HACK! Store state elsewhere!
-  end
-
-  if param.dry_run then
-    writeln_flush("-!!-> DRY RUN BEGIN <----")
-  end
-
-  -- TODO: HACK
-  do
-    local clusters_by_name = timapofrecords(manifest.clusters, "name")
-    local machines =
-      assert(clusters_by_name[param.cluster_name], "cluster not found").machines
-    local found = false
-    for i = 1, #machines do
-      local machine = machines[i]
-      if machine.name ~= param.machine_name then
-        writeln_flush("----> Ignoring machine `", machine.name, "'")
-        machines[i] = nil
-      else
-        found = true
-        writeln_flush("----> Deploying to machine `", machine.name, "'")
+    if not param.dry_run then
+      if ask_user(
+          ask_string,
+          { "y", "n" },
+          "n"
+        ) ~= "y"
+      then
+        error("Aborted.")
       end
     end
 
-    assert(found == true, "machine not found")
+    local manifest = load_project_manifest(
+        param.manifest_path,
+        CONFIG.PROJECT_PATH,
+        param.cluster_name
+      )
+
+    if param.debug then
+      writeln_flush("-!!-> DEBUG MODE ON")
+      manifest.debug_mode = true -- TODO: HACK! Store state elsewhere!
+    end
+
+    if param.dry_run then
+      writeln_flush("-!!-> DRY RUN BEGIN <----")
+    end
+    return manifest
   end
 
-  deploy_rocks_from_versions_filename(
-      manifest,
-      param.cluster_name,
-      param.version_filename,
-      false,
-      param.dry_run
-    )
+  ------------------------------------------------------------------------------
 
-  writeln_flush("----> OK")
+  ACTIONS.deploy_from_code = function()
+    local param = CONFIG.deploy_rocks.action.param
 
-  if param.dry_run then
-    writeln_flush("-!!-> DRY RUN END <----")
-    return
+    local manifest = common_actions(
+        "Do you want to deploy code to `" .. param.cluster_name .. "'?"
+      )
+
+    deploy_rocks_from_code(
+        manifest,
+        param.cluster_name,
+        param.dry_run
+      )
+
+    writeln_flush("----> OK")
+
+    if param.dry_run then
+      writeln_flush("-!!-> DRY RUN END <----")
+      return
+    end
+  end
+
+  ------------------------------------------------------------------------------
+
+  ACTIONS.deploy_from_versions_file = function()
+    local param = CONFIG.deploy_rocks.action.param
+
+    local manifest = common_actions(
+        "Do you want to deploy code to `" .. param.cluster_name .. "'"
+     .. " from version file `" .. param.version_filename .. "'?"
+      )
+
+    deploy_rocks_from_versions_filename(
+        manifest,
+        param.cluster_name,
+        param.version_filename,
+        true,
+        param.dry_run
+      )
+
+    writeln_flush("----> OK")
+
+    if param.dry_run then
+      writeln_flush("-!!-> DRY RUN END <----")
+      return
+    end
+  end
+
+  ------------------------------------------------------------------------------
+
+  ACTIONS.partial_deploy_from_versions_file = function()
+    local param = CONFIG.deploy_rocks.action.param
+
+    local manifest = common_actions(
+        "(Not recommended!) Do you want to deploy code to cluster `"
+     .. param.cluster_name .. "' ONE machine `" .. param.machine_name .. "' "
+     .. "from version file `" .. param.version_filename .. "'?"
+     .. " (WARNING: Ensure you pushed changes to cluster's LR repository.)"
+      )
+
+    -- TODO: HACK
+    do
+      local clusters_by_name = timapofrecords(manifest.clusters, "name")
+      local machines =
+        assert(clusters_by_name[param.cluster_name], "cluster not found").machines
+      local found = false
+      for i = 1, #machines do
+        local machine = machines[i]
+        if machine.name ~= param.machine_name then
+          writeln_flush("----> Ignoring machine `", machine.name, "'")
+          machines[i] = nil
+        else
+          found = true
+          writeln_flush("----> Deploying to machine `", machine.name, "'")
+        end
+      end
+
+      assert(found == true, "machine not found")
+    end
+
+    deploy_rocks_from_versions_filename(
+        manifest,
+        param.cluster_name,
+        param.version_filename,
+        false,
+        param.dry_run
+      )
+
+    writeln_flush("----> OK")
+
+    if param.dry_run then
+      writeln_flush("-!!-> DRY RUN END <----")
+      return
+    end
   end
 end
 

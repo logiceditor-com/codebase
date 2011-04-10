@@ -60,6 +60,12 @@ local load_tools_cli_data_schema,
         'freeform_table_value'
       }
 
+local load_table_from_file
+      = import 'deploy-rocks/common_functions.lua'
+      {
+        'load_table_from_file'
+      }
+
 local deploy_rocks_from_versions_filename,
       deploy_rocks_from_code
       = import 'deploy-rocks/deploy_rocks.lua'
@@ -90,6 +96,9 @@ local create_config_schema
 --------------------------------------------------------------------------------
 -- Config-related constants
 --
+
+-- TODO: move to some actual config
+local CACHE_PATH = os_getenv("HOME") .. "/.deploy-rocks.cache"
 
 local TOOL_NAME = "deploy_rocks"
 
@@ -176,6 +185,10 @@ do
       )
     manifest.cli_param = param
 
+-- TODO: read or create cache file here and lock it
+--    if does_file_exist(CACHE_PATH) then
+--      cache_tables = load_table_from_file(sudo_is_passwordless_cache_file)
+
     if param.debug then
       writeln_flush("-!!-> DEBUG MODE ON")
     end
@@ -184,6 +197,15 @@ do
       writeln_flush("-!!-> DRY RUN BEGIN <----")
     end
     return manifest
+  end
+
+  local common_finish_actions = function(manifest)
+-- TODO: write cache file here and unlock it
+    if manifest.cli_param.dry_run then
+      writeln_flush("-!!-> DRY RUN END <----")
+    else
+      writeln_flush("----> OK")
+    end
   end
 
   ------------------------------------------------------------------------------
@@ -201,12 +223,7 @@ do
         param.dry_run
       )
 
-    writeln_flush("----> OK")
-
-    if param.dry_run then
-      writeln_flush("-!!-> DRY RUN END <----")
-      return
-    end
+    common_finish_actions(manifest)
   end
 
   ------------------------------------------------------------------------------
@@ -227,12 +244,7 @@ do
         param.dry_run
       )
 
-    writeln_flush("----> OK")
-
-    if param.dry_run then
-      writeln_flush("-!!-> DRY RUN END <----")
-      return
-    end
+    common_finish_actions(manifest)
   end
 
   ------------------------------------------------------------------------------
@@ -275,12 +287,7 @@ do
         param.dry_run
       )
 
-    writeln_flush("----> OK")
-
-    if param.dry_run then
-      writeln_flush("-!!-> DRY RUN END <----")
-      return
-    end
+    common_finish_actions(manifest)
   end
 end
 

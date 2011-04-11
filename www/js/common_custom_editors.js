@@ -54,7 +54,7 @@ PK.common_custom_editors = new function()
         {
           if(value && value != startValue)
           {
-            this_ge.setValue(value * 100);
+            this_ge.setValue(Math.floor(value * 100));
           }
           return true;
         }

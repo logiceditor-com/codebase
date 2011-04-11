@@ -5,17 +5,24 @@ local log, dbg, spam, log_error
 
 --------------------------------------------------------------------------------
 
-local pcall, assert, error, select, next, loadfile
-    = pcall, assert, error, select, next, loadfile
+local pcall, assert, error, select, next, loadfile, loadstring
+    = pcall, assert, error, select, next, loadfile, loadstring
 local os_getenv = os.getenv
 local io_open = io.open
 local lfs = require 'lfs'
+
 --------------------------------------------------------------------------------
 
 local tpretty
       = import 'lua-nucleo/tpretty.lua'
       {
         'tpretty'
+      }
+
+local require_and_declare
+      = import 'lua-nucleo/require_and_declare.lua'
+      {
+        'require_and_declare'
       }
 
 local tstr
@@ -25,23 +32,29 @@ local tstr
       }
 
 local timapofrecords,
-      twithdefaults
+      twithdefaults,
+      tgetpath,
+      tclone
       = import 'lua-nucleo/table-utils.lua'
       {
         'timapofrecords',
-        'twithdefaults'
+        'twithdefaults',
+        'tgetpath',
+        'tclone'
       }
 
 local write_file,
       read_file,
       find_all_files,
-      does_file_exist
+      does_file_exist,
+      do_atomic_op_with_file
       = import 'lua-aplicado/filesystem.lua'
       {
         'write_file',
         'read_file',
         'find_all_files',
-        'does_file_exist'
+        'does_file_exist',
+        'do_atomic_op_with_file'
       }
 
 local load_project_manifest
@@ -113,6 +126,7 @@ local create_config_schema
 
 -- TODO: move to some actual config
 local CACHE_PATH = os_getenv("HOME") .. "/.deploy-rocks.cache"
+local CACHE_FILE
 
 local TOOL_NAME = "deploy_rocks"
 
@@ -178,177 +192,145 @@ end
 -- Main deploy actions
 --
 do
-  local cache_file
+  local common_action = function(handler)
+    return function()
+      local param = freeform_table_value(CONFIG.deploy_rocks.action.param)
 
-  local common_actions = function(ask_string)
-    local param = CONFIG.deploy_rocks.action.param
+      param.version_filename = param.version_filename or ""
+      param.machine_name = param.machine_name or ""
+      local messages =
+      {
+        deploy_from_code =
+          "Do you want to deploy code to `" .. param.cluster_name .. "'?";
+        deploy_from_versions_file =
+          "Do you want to deploy code to `" .. param.cluster_name .. "'"
+       .. " from version file `" .. param.version_filename or "" .. "'?";
+        deploy_from_versions_file =
+          "(Not recommended!) Do you want to deploy code to cluster `"
+       .. param.cluster_name .. "' ONE machine `"
+       .. param.machine_name .. "' "
+       .. "from version file `" .. param.version_filename .. "'?"
+       .. " (WARNING: Ensure you pushed changes to cluster's LR repository.)";
+      }
 
-    if not param.dry_run then
-      if ask_user(
-          ask_string,
-          { "y", "n" },
-          "n"
-        ) ~= "y"
-      then
-        error("Aborted.")
-      end
-    end
 
-    local manifest = load_project_manifest(
-        param.manifest_path,
-        CONFIG.PROJECT_PATH,
-        param.cluster_name
-      )
-    manifest.cli_param = param
-
-    -- TODO: move to separate cache handling function
-    local cache = { }
-
-    -- if cachefile exists in CACHE_PATH, load it to cache variable
-    if does_file_exist(CACHE_PATH) then
-      local chunk = assert(loadfile(CACHE_PATH))
-      local ok
-      ok, cache = assert(do_in_environment(chunk, { }))
-      assert_is_table(cache)
-      writeln_flush("----> Cache file loaded `", CACHE_PATH, "'")
-    -- if no file exists - create file with "return { }"
-    else
-      assert(
-          write_file(CACHE_PATH, "return\n" .. tpretty({ }, "  ", 80))
-        )
-      writeln_flush("----> Cache file created `", CACHE_PATH, "'")
-    end
-
-    -- open CACHE_PATH file and lock it
-    local err
-    cache_file, err = io.open(CACHE_PATH, "w")
-    if not cache_file then
-      error("Cache file open fails: " .. err)
-    end
-    lfs.lock(cache_file, "w")
-    writeln_flush("----> Cache file locked `", CACHE_PATH, "'")
-
-    manifest.cache = cache
-
-    if param.debug then
-      writeln_flush("-!!-> DEBUG MODE ON")
-    end
-
-    if param.dry_run then
-      writeln_flush("-!!-> DRY RUN BEGIN <----")
-    end
-    return manifest
-  end
-
-  ------------------------------------------------------------------------------
-
-  local common_finish_actions = function(manifest)
-
-    -- TODO: may be move to separate cache handling function
-    -- unlock cache file
-    local res, err = lfs.unlock(cache_file)
-    cache_file:close()
-    cache_file = nil
-
-    if not res then
-      error("Cache file unlock fails: " .. err)
-    end
-    writeln_flush("----> Cache file unlocked `", CACHE_PATH, "'")
-
-    -- write cache file
-    assert(
-        write_file(CACHE_PATH, "return\n" .. tpretty(manifest.cache, "  ", 80))
-      )
-    writeln_flush("----> Cache file wrote `", CACHE_PATH, "'")
-
-    if manifest.cli_param.dry_run then
-      writeln_flush("-!!-> DRY RUN END <----")
-    else
-      writeln_flush("----> OK")
-    end
-  end
-
-  ------------------------------------------------------------------------------
-
-  ACTIONS.deploy_from_code = function()
-    local param = CONFIG.deploy_rocks.action.param
-
-    local manifest = common_actions(
-        "Do you want to deploy code to `" .. param.cluster_name .. "'?"
-      )
-
-    deploy_rocks_from_code(
-        manifest,
-        param.cluster_name,
-        param.dry_run
-      )
-
-    common_finish_actions(manifest)
-  end
-
-  ------------------------------------------------------------------------------
-
-  ACTIONS.deploy_from_versions_file = function()
-    local param = CONFIG.deploy_rocks.action.param
-
-    local manifest = common_actions(
-        "Do you want to deploy code to `" .. param.cluster_name .. "'"
-     .. " from version file `" .. param.version_filename .. "'?"
-      )
-
-    deploy_rocks_from_versions_filename(
-        manifest,
-        param.cluster_name,
-        param.version_filename,
-        true,
-        param.dry_run
-      )
-
-    common_finish_actions(manifest)
-  end
-
-  ------------------------------------------------------------------------------
-
-  ACTIONS.partial_deploy_from_versions_file = function()
-    local param = CONFIG.deploy_rocks.action.param
-
-    local manifest = common_actions(
-        "(Not recommended!) Do you want to deploy code to cluster `"
-     .. param.cluster_name .. "' ONE machine `" .. param.machine_name .. "' "
-     .. "from version file `" .. param.version_filename .. "'?"
-     .. " (WARNING: Ensure you pushed changes to cluster's LR repository.)"
-      )
-
-    -- TODO: HACK
-    do
-      local clusters_by_name = timapofrecords(manifest.clusters, "name")
-      local machines =
-        assert(clusters_by_name[param.cluster_name], "cluster not found").machines
-      local found = false
-      for i = 1, #machines do
-        local machine = machines[i]
-        if machine.name ~= param.machine_name then
-          writeln_flush("----> Ignoring machine `", machine.name, "'")
-          machines[i] = nil
-        else
-          found = true
-          writeln_flush("----> Deploying to machine `", machine.name, "'")
+      if not param.dry_run then
+        if ask_user(
+            messages[CONFIG[TOOL_NAME].action.name],
+            { "y", "n" },
+            "n"
+          ) ~= "y"
+        then
+          error("Aborted.")
         end
       end
 
-      assert(found == true, "machine not found")
+      -- check if cachefile exists in CACHE_PATH, load it to cache variable
+      assert(does_file_exist(CACHE_PATH))
+      local file_string = CACHE_FILE:read("*all")
+print("file_string: ", file_string)
+      local chunk = assert(loadstring(file_string))
+      local ok, cache = assert(do_in_environment(chunk, { }))
+      assert_is_table(cache)
+      writeln_flush("----> Cache file loaded `", CACHE_PATH, "'")
+
+      local manifest = load_project_manifest(
+          param.manifest_path,
+          CONFIG.PROJECT_PATH,
+          param.cluster_name
+        )
+
+      manifest.cli_param = param
+      manifest.cache = cache
+
+      if param.debug   then writeln_flush("-!!-> DEBUG MODE ON") end
+      if param.dry_run then writeln_flush("-!!-> DRY RUN BEGIN <----") end
+
+      handler(manifest, param)
+
+      -- write cache file
+      assert(
+          CACHE_FILE:write("return\n" .. tpretty(manifest.cache, "  ", 80))
+        )
+      writeln_flush("----> Cache file wrote `", CACHE_PATH, "'")
+
+      if param.dry_run then
+        writeln_flush("-!!-> DRY RUN END <----")
+      else
+        writeln_flush("----> OK")
+      end
     end
-
-    deploy_rocks_from_versions_filename(
-        manifest,
-        param.cluster_name,
-        param.version_filename,
-        false,
-        param.dry_run
-      )
-
-    common_finish_actions(manifest)
   end
+
+  ------------------------------------------------------------------------------
+
+  ACTIONS.deploy_from_code = common_action(
+      function(
+          manifest,
+          param
+        )
+        deploy_rocks_from_code(
+            manifest,
+            param.cluster_name,
+            param.dry_run
+         )
+      end
+    )
+
+  ------------------------------------------------------------------------------
+
+  ACTIONS.deploy_from_versions_file = common_action(
+      function(
+          manifest,
+          param
+        )
+        deploy_rocks_from_versions_filename(
+            manifest,
+            param.cluster_name,
+            param.version_filename,
+            true,
+            param.dry_run
+          )
+      end
+    )
+
+  ------------------------------------------------------------------------------
+
+  ACTIONS.partial_deploy_from_versions_file = common_action(
+      function(
+          manifest,
+          param
+        )
+        -- TODO: HACK
+        do
+          local clusters_by_name = timapofrecords(manifest.clusters, "name")
+          local machines =
+            assert(clusters_by_name[param.cluster_name], "cluster not found").machines
+          local found = false
+          for i = 1, #machines do
+            local machine = machines[i]
+            if machine.name ~= param.machine_name then
+              writeln_flush("----> Ignoring machine `", machine.name, "'")
+              machines[i] = nil
+            else
+              found = true
+              writeln_flush("----> Deploying to machine `", machine.name, "'")
+            end
+          end
+
+          assert(found == true, "machine not found")
+        end
+
+        deploy_rocks_from_versions_filename(
+            manifest,
+            param.cluster_name,
+            param.version_filename,
+            false,
+            param.dry_run
+          )
+      end
+    )
+
 end
 
 --------------------------------------------------------------------------------
@@ -359,53 +341,73 @@ end
 -- TODO: ALSO LOCK REMOTELY!
 -- TODO: Handle rock REMOVAL!
 local run = function(...)
-  local CODE_ROOT = assert(select(1, ...), "code root missing")
 
-  ------------------------------------------------------------------------------
-  -- Handle command-line options
-  --
-  CONFIG, ARGS = assert(load_tools_cli_config(
-      function(args) -- Parse actions
-        local param = { }
+  if not does_file_exist(CACHE_PATH) then
+    assert(
+        write_file(CACHE_PATH, "return " .. tpretty({ }, "  ", 80) .. "\n")
+      )
+    writeln_flush("----> Cache file created `", CACHE_PATH, "'")
+  end
 
-        local action_name   = args[2] or "help"
+  local nargs = select("#", ...)
+  local variables = { n = nargs, ... }
+  print(tpretty(variables, "  ", 80))
 
-        param.manifest_path = args[1]
-        param.cluster_name  = args[3]
-        param.debug         = args["--debug"]
-        param.dry_run       = args["--dry-run"]
+  -- Lock cache file
+  do_atomic_op_with_file(
+      CACHE_PATH,
+      function(file, ...)
+        local CODE_ROOT = assert(select(1, ...), "code root missing")
+        CACHE_FILE = file
+        writeln_flush("----> Cache file locked `", CACHE_PATH, "'")
+        ------------------------------------------------------------------------
+        -- Handle command-line options
+        --
+        CONFIG, ARGS = assert(load_tools_cli_config(
+            function(args) -- Parse actions
+              local param = { }
 
-        if action_name     == "deploy_from_versions_file" then
-          param.version_filename = args[4]
-        elseif action_name == "partial_deploy_from_versions_file" then
-          param.version_filename = args[4]
-          param.machine_name     = args[5]
-        end
+              local action_name   = args[2] or "help"
 
-        local config =
-        {
-          PROJECT_PATH = CODE_ROOT;
-          [TOOL_NAME] = {
-            action = {
-              name = action_name;
-              param = param;
-            };
-          }
-        }
+              param.manifest_path = args[1]
+              param.cluster_name  = args[3]
+              param.debug         = args["--debug"]
+              param.dry_run       = args["--dry-run"]
 
-        return config
+              if action_name     == "deploy_from_versions_file" then
+                param.version_filename = args[4]
+              elseif action_name == "partial_deploy_from_versions_file" then
+                param.version_filename = args[4]
+                param.machine_name     = args[5]
+              end
+
+              local config =
+              {
+                PROJECT_PATH = CODE_ROOT;
+                [TOOL_NAME] = {
+                  action = {
+                    name = action_name;
+                    param = param;
+                  };
+                }
+              }
+
+              return config
+            end,
+            EXTRA_HELP,
+            CONFIG_SCHEMA,
+            nil, -- Specify primary config file with --base-config cli option
+            nil, -- No secondary config file
+            select(2, ...) -- First argument is CODE_ROOT, eating it
+          ))
+
+        ------------------------------------------------------------------------------
+        -- Run the action that user requested
+        --
+        ACTIONS[CONFIG[TOOL_NAME].action.name]()
       end,
-      EXTRA_HELP,
-      CONFIG_SCHEMA,
-      nil, -- Specify primary config file with --base-config cli option
-      nil, -- No secondary config file
-      select(2, ...) -- First argument is CODE_ROOT, eating it
-    ))
-
-  ------------------------------------------------------------------------------
-  -- Run the action that user requested
-  --
-  ACTIONS[CONFIG[TOOL_NAME].action.name]()
+      ...
+    )
 end
 
 --------------------------------------------------------------------------------

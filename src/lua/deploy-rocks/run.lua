@@ -228,7 +228,7 @@ do
       -- check if cachefile exists in CACHE_PATH, load it to cache variable
       assert(does_file_exist(CACHE_PATH))
       local file_string = CACHE_FILE:read("*all")
-print("file_string: ", file_string)
+
       local chunk = assert(loadstring(file_string))
       local ok, cache = assert(do_in_environment(chunk, { }))
       assert_is_table(cache)
@@ -348,10 +348,6 @@ local run = function(...)
       )
     writeln_flush("----> Cache file created `", CACHE_PATH, "'")
   end
-
-  local nargs = select("#", ...)
-  local variables = { n = nargs, ... }
-  print(tpretty(variables, "  ", 80))
 
   -- Lock cache file
   do_atomic_op_with_file(

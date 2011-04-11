@@ -41,13 +41,35 @@ PK.common_custom_editors = new function()
 
   this.make_money_editor = function()
   {
-    return new Ext.grid.GridEditor(new Ext.form.NumberField({
+    var grid_editor =  new Ext.grid.GridEditor(new Ext.form.NumberField({
         selectOnFocus: true,
         allowBlank: true,
         style:'text-align:left;',
         allowDecimals: true,
         allowNegative: false,
     }));
+    grid_editor.on(
+        'beforecomplete',
+        function(this_ge, value, startValue)
+        {
+          if(value && value != startValue)
+          {
+            this_ge.setValue(value * 100);
+          }
+          return true;
+        }
+      );
+    grid_editor.on(
+        'beforeshow',
+        function(editor)
+        {
+          if (editor.getValue())
+            editor.setValue(editor.getValue()/ 100);
+          return true;
+        }
+      );
+
+    return grid_editor;
   };
 
   this.make_date_editor = function()

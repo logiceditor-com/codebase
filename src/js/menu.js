@@ -28,7 +28,7 @@ PK.override_menu_item_to_enable_tooltips = function()
         {
           this.tooltip = new Ext.ToolTip(Ext.apply({
                 target: this.el,
-                dismissDelay: DISMISS_DELAY_FOR_MENU_ITEM_TOOLTIP,
+                dismissDelay: DISMISS_DELAY_FOR_MENU_ITEM_TOOLTIP
                 }, Ext.isObject(this.tooltip) ? this.tooltip : { html: this.tooltip } ));
         }
         Ext.menu.Item.superclass.onRender.call(this, container, position);

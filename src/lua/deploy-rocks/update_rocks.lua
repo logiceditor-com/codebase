@@ -37,14 +37,16 @@ local tset,
       timapofrecords,
       twithdefaults,
       tkeys,
-      tclone
+      tclone,
+      tequals
       = import 'lua-nucleo/table-utils.lua'
       {
         'tset',
         'timapofrecords',
         'twithdefaults',
         'tkeys',
-        'tclone'
+        'tclone',
+        'tequals'
       }
 
 local write_file,
@@ -596,7 +598,10 @@ do
                 have_changed_rocks,
                 need_new_versions_for_subprojects
               )
-          else -- if subproject.provides_rocks_repo then
+          elseif
+            subproject.provides_rocks and
+            not tequals(subproject.provides_rocks, { })
+          then
             have_changed_rocks = update_subproject_is_not_rocks_repo(
                 manifest,
                 cluster_info,
@@ -607,7 +612,9 @@ do
                 have_changed_rocks,
                 need_new_versions_for_subprojects
               )
-          end -- if subproject.provides_rocks_repo else
+          else
+            error("Empty subproject without no-deploy mark found: " .. name)
+          end
 
         end -- if git_are_branches_different("HEAD", current_versions[name])
       end -- if subproject.no_deploy else

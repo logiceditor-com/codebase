@@ -249,6 +249,7 @@ do
       handler(manifest, param)
 
       -- write cache file
+      CACHE_FILE:seek("set")
       assert(
           CACHE_FILE:write("return\n" .. tpretty(manifest.cache, "  ", 80))
         )

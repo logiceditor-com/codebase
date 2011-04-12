@@ -195,6 +195,14 @@ do
     return ip
   end
 
+  local request_user_agent = function(self)
+    method_arguments(self)
+
+    -- WARNING: This function should not fail even if UA is unknown!
+
+    return self.context_.wsapi_env["HTTP_USER_AGENT"] or ""
+  end
+
   -- Note that we do not have anything destroyable (yet)
   -- that is not destroys itself in __gc. So no __gc here.
   -- All is done on lower level if user forgets to call destroy().
@@ -362,6 +370,7 @@ do
       hiredis = hiredis;
       --
       request_ip = request_ip;
+      request_user_agent = request_user_agent;
       post_request = post_request;
       get_request = get_request;
       --

@@ -1,0 +1,41 @@
+#! /bin/bash
+
+set -e
+
+ROOT="${BASH_SOURCE[0]}";
+if([ -h "${ROOT}" ]) then
+  while([ -h "${ROOT}" ]) do ROOT=`readlink "${ROOT}"`; done
+fi
+ROOT=$(cd `dirname "${ROOT}"` && cd .. && pwd) # Up one level
+
+SCHEMA_PROJECTS=(
+    "tutorial-01"
+    "tutorial-02"
+    "tutorial-03"
+    "tutorial-04"
+    "tutorial-05"
+    "tutorial-06"
+    "tutorial-07"
+    "tutorial-08"
+
+    "mini"
+    "af_targets"
+    "glavbot"
+  )
+APIGEN_PROJECTS=( "api" )
+
+echo "------> GENERATE ALL BEGIN..."
+for schema_project in ${SCHEMA_PROJECTS[@]} ; do
+  echo "----> Generating schema for '${schema_project}'..."
+  ${ROOT}/bin/schema-tool ${schema_project} update
+
+  echo "----> Generating api handlers for '${schema_project}'..."
+  ${ROOT}/bin/gen-api-handlers ${schema_project}
+done
+
+for apigen_project in ${APIGEN_PROJECTS[@]} ; do
+  echo "----> Generating api implementation for '${apigen_project}'..."
+  ${ROOT}/bin/apigen ${apigen_project} update_handlers
+done
+
+echo "------> GENERATE ALL OK"

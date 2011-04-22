@@ -1,6 +1,6 @@
 // Based on webtoolkit's implementation. See http://www.webtoolkit.info/
 
-if (window.Base64)
+if (!window.Base64)
 {
 
   var Base64 = {

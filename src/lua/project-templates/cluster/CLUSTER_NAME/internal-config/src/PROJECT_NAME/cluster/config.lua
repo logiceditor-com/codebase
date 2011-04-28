@@ -1,0 +1,14 @@
+--------------------------------------------------------------------------------
+-- config.lua: basic cluster configuration
+--------------------------------------------------------------------------------
+-- WARNING: Avoid putting information here at all costs.
+--          Use internal-config whenever possible!
+--------------------------------------------------------------------------------
+
+return
+{
+  INTERNAL_CONFIG_HOST = "pk-logiceditor-com-internal-config";
+  INTERNAL_CONFIG_PORT = 80;
+  INTERNAL_CONFIG_DEPLOY_HOST = "pk-logiceditor-com-internal-config-deploy";
+  INTERNAL_CONFIG_DEPLOY_PORT = 80;
+}

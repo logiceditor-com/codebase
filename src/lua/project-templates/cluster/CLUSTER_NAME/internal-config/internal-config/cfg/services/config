@@ -1,0 +1,16 @@
+api =
+{
+  prefix = "pk-logiceditor-com-demo:api:";
+  actions =
+  {
+    ["reopen_log_file"] = true;
+    ["shutdown"] = true;
+  };
+  nodes =
+  {
+    [1] =
+    {
+      url = "http://pk-logiceditor-com-demo/api/sys/pk-logiceditor-com-demo-api/1/ec7719ce-0fea-11e0-af19-00219bd18c14";
+    };
+  };
+}

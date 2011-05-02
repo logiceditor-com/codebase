@@ -225,7 +225,9 @@ do
 
 --------------------------------------------------------------------------------
 
-  local fill_cluster_info_placeholders = function(manifest, cluster_info, template)
+  local fill_cluster_info_placeholders = function(
+      manifest, cluster_info, machine, template
+    )
     return fill_curly_placeholders( -- TODO: Add more?
         template,
         {
@@ -233,6 +235,7 @@ do
           INTERNAL_CONFIG_PORT = cluster_info.internal_config_port;
           INTERNAL_CONFIG_DEPLOY_HOST = cluster_info.internal_config_deploy_host;
           INTERNAL_CONFIG_DEPLOY_PORT = cluster_info.internal_config_deploy_port;
+          MACHINE_NODE_ID = assert(machine.node_id);
         }
       )
   end
@@ -262,7 +265,9 @@ do
       end
 
       for i = 1, #command do
-        command[i] = fill_cluster_info_placeholders(manifest, cluster_info, command[i])
+        command[i] = fill_cluster_info_placeholders(
+            manifest, cluster_info, machine, command[i]
+          )
       end
 
       -- Overhead to print the command to user.
@@ -301,7 +306,9 @@ do
       end
 
       for i = 1, #command do
-        command[i] = fill_cluster_info_placeholders(manifest, cluster_info, command[i])
+        command[i] = fill_cluster_info_placeholders(
+            manifest, cluster_info, machine, command[i]
+          )
       end
 
       -- Overhead to print the command to user.

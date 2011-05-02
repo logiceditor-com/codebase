@@ -21,6 +21,12 @@ local arguments,
         'method_arguments'
       }
 
+local tset
+      = import 'lua-nucleo/table-utils.lua'
+      {
+        'tset'
+      }
+
 local do_in_environment
       = import 'lua-nucleo/sandbox.lua'
       {
@@ -44,9 +50,23 @@ local fill_curly_placeholders
 -- TODO: Add validation, reuse tools_cli_config stuff.
 local load_project_manifest
 do
+  -- We can not fill these right now:
+  local ignored_placeholders = tset
+  {
+    "MACHINE_NODE_ID";
+  }
+
   local mt =
   {
     __index = function(t, k)
+      if ignored_placeholders[k] then
+        -- Put it back
+        -- TODO: Hack.
+        local v = "${" .. k .. "}"
+        t[k] = v
+        return v
+      end
+
       error(
           "unknown placeholder: ${" .. (tostring(k) or "(not-a-string)") .. "}"
         )

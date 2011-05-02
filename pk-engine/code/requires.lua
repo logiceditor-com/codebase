@@ -21,6 +21,7 @@ local REQUIRE_GLOBALS =
   sidereal = "sidereal"; -- TODO: Remove this
   geoip = "geoip";
   hiredis = "hiredis";
+  zmq = "zmq";
 }
 
 --------------------------------------------------------------------------------

@@ -16,4 +16,4 @@ if [ -z "${LUA}" ]; then
   fi
 fi
 
-/usr/bin/env ${LUA} "$@"
+exec /usr/bin/env ${LUA} "$@"

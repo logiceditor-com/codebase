@@ -149,7 +149,7 @@ local try_send_system_message = function(
       local answer = try(
           "INTERNAL_ERROR",
           http_request(
-              try("INTERNAL_ERROR", NODE_INFO.url, "missing NODE_INFO.url")
+              (try("INTERNAL_ERROR", NODE_INFO.url, "missing NODE_INFO.url"))
             )
         )
 

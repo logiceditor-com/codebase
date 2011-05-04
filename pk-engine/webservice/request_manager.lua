@@ -165,7 +165,6 @@ end
 
 local make_request_manager
 do
-  -- Private function.
   local get_context -- NOTE: When changing this, remember to change api_context_stub.lua as well!
   do
     local extend = function(self, key, factory)
@@ -207,13 +206,11 @@ do
 
     local create_common_context = function(
         wsapi_env,
-        config_manager_maker,
-        info_getter
+        config_manager_maker
       )
       arguments(
           "table", wsapi_env,
-          "function", config_manager_maker,
-          "function", info_getter
+          "function", config_manager_maker
         )
 
       local config_host = wsapi_env.PK_CONFIG_HOST
@@ -247,7 +244,6 @@ do
             config_manager,
             make_hiredis_connection_manager()
           );
-        get_service_info = info_getter;
         --
         extend = extend;
         ext = ext;
@@ -279,8 +275,7 @@ do
         {
           __index = create_common_context(
               wsapi_env,
-              self.config_manager_maker_,
-              self.info_getter_
+              self.config_manager_maker_
             );
           __metatable = true;
         }
@@ -424,6 +419,29 @@ do
     end
   end
 
+  local get_service_info = function(self)
+    method_arguments(self)
+
+    local now = socket.gettime()
+
+    return
+    {
+      name = self.service_name_;
+      pid = posix.getpid("pid"); -- Not caching in self, may fork.
+      time_start = self.time_start_;
+      time_now = now;
+      uptime = now - self.time_start_;
+      gc_count = collectgarbage("count");
+      requests_total = self.requests_total_;
+      requests_fails = self.requests_fails_;
+      time_in_requests = self.time_in_requests_;
+      time_idle = (now - self.time_start_) - self.time_in_requests_;
+      time_per_request_rolling_avg = self.time_per_request_rolling_avg_;
+      time_per_request_max = self.time_per_request_max_;
+      time_per_request_min = self.time_per_request_min_;
+    }
+  end
+
   make_request_manager = function(
       request_handler,
       config_manager_maker,
@@ -439,52 +457,30 @@ do
 
     config_manager_maker = config_manager_maker or make_default_config_manager
 
-    local time_start = socket.gettime()
-
-    local self =
+    return
     {
+       -- TODO: Why this suddenly became a public function?
+      get_context = get_context;
+      --
       handle_request = handle_request;
       extend_context = extend_context;
       get_context_extension = get_context_extension;
+      get_service_info = get_service_info;
       --
       request_handler_ = request_handler;
       common_context_mt_ = nil;
       config_manager_maker_ = config_manager_maker;
       --
+      service_name_ = service_name;
+      --
       requests_total_ = 0;
       requests_fails_ = 0;
+      time_start_ = socket.gettime();
       time_in_requests_ = 0;
       time_per_request_rolling_avg_ = 0;
       time_per_request_max_ = -1;
       time_per_request_min_ = math.huge;
     }
-
-    -- TODO: Ugly. Lazy. Hack.
-    self.info_getter_ = function()
-      local now = socket.gettime()
-
-      return
-      {
-        -- Single node only
-        {
-          name = service_name;
-          pid = posix.getpid("pid"); -- Not caching, may fork.
-          time_start = time_start;
-          time_now = now;
-          uptime = now - time_start;
-          gc_count = collectgarbage("count");
-          requests_total = self.requests_total_;
-          requests_fails = self.requests_fails_;
-          time_in_requests = self.time_in_requests_;
-          time_idle = (now - time_start) - self.time_in_requests_;
-          time_per_request_rolling_avg = self.time_per_request_rolling_avg_;
-          time_per_request_max = self.time_per_request_max_;
-          time_per_request_min = self.time_per_request_min_;
-        };
-      }
-    end
-
-    return self
   end
 end
 

@@ -343,7 +343,26 @@ do
         "string", action
       )
     -- TODO: Lazy hack.
-    return self:ext("current_node_system_action_executor"):execute(action, ...)
+
+    local res, err = self:ext(
+        "current_node_system_action_executor"
+      ):execute(action, ...)
+    if res == nil then
+      return
+          nil,
+          "failed to execute current node system action: " .. tostring(err)
+    end
+
+    local res, err = self:ext(
+        "current_process_system_action_executor"
+      ):execute(action, ...)
+    if res == nil then
+      return
+          nil,
+          "failed to execute current process system action: " .. tostring(err)
+    end
+
+    return res -- TODO: Support multiple return values?
   end
 
   -- TODO: Hack. Should not be available to public.

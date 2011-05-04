@@ -194,6 +194,41 @@ do
     end
   end
 
+  local do_with_api_context
+  do
+    local destroy_context = function(api_context, ...)
+      api_context:destroy()
+      return ...
+    end
+
+    do_with_api_context = function(
+        self, context, handler_fn, ...
+      )
+      method_arguments(
+          self,
+          "table", context,
+          "function", handler_fn
+        )
+
+      local api_context = make_api_context(
+          context,
+          self.db_tables_,
+          self.www_game_config_getter_,
+          self.www_admin_config_getter_,
+          self.internal_call_handlers_
+        )
+
+      return destroy_context(
+          api_context,
+          call(
+              handler_fn,
+              api_context,
+              ...
+            )
+        )
+    end
+  end
+
   -- TODO: Generalize with above.
   local raw = function(
       self,
@@ -313,6 +348,8 @@ do
       raw = raw;
       --
       internal_call = internal_call;
+      --
+      do_with_api_context = do_with_api_context;
       --
       db_tables_ = db_tables;
       www_game_config_getter_ = www_game_config_getter;

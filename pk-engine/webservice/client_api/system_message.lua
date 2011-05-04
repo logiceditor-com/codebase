@@ -111,7 +111,8 @@ local try_send_system_message = function(
       "unknown service"
     )
 
-  try("INTERNAL_ERROR", SERVICE.actions[action_name], "unknown action")
+  -- TODO: ?! CLI tools need this! (But actions are extensible in run-time!)
+  -- try("INTERNAL_ERROR", SERVICE.actions[action_name], "unknown action")
 
   if not SERVICE.zmq then
     -- Redis-based system messages are deprecated!

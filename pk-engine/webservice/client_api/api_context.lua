@@ -337,10 +337,18 @@ do
     self.context_.wsapi_response:delete_cookie(name, path)
   end
 
-  local get_service_info = function(self)
-    method_arguments(self)
+  local execute_system_action_on_current_node = function(self, action, ...)
+    method_arguments(
+        self,
+        "string", action
+      )
+    -- TODO: Lazy hack.
+    return self:ext("current_node_system_action_executor"):execute(action, ...)
+  end
 
-    return self.context_:get_service_info()
+  -- TODO: Hack. Should not be available to public.
+  local raw_redis_manager = function(self)
+    return self.context_.redis_manager
   end
 
   make_api_context = function(
@@ -355,12 +363,13 @@ do
         "table",    db_tables,
         "function", www_admin_config_getter,
         "function", www_game_config_getter,
-        "table", internal_call_handlers
+        "table",    internal_call_handlers
       )
 
     return
     {
       raw_internal_config_manager = raw_internal_config_manager;
+      raw_redis_manager = raw_redis_manager;
       handle_url = handle_url;
       --
       game_config = game_config;
@@ -381,7 +390,8 @@ do
       extend = extend;
       ext = ext;
       --
-      get_service_info = get_service_info;
+      execute_system_action_on_current_node
+        = execute_system_action_on_current_node;
       --
       push_param = push_param; -- Private
       pop_param = pop_param; -- Private

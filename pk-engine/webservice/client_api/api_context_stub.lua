@@ -403,30 +403,8 @@ do
     return v
   end
 
-  local get_service_info = function(self)
-    method_arguments(self)
-
-    local now = socket.gettime()
-
-    return
-    {
-      -- Single node.
-      {
-        name = "(api-context-stub)"; -- TODO: Provide means to configure this
-        pid = posix.getpid("pid"); -- Not caching, may fork.
-        time_start = self.time_start_;
-        time_now = now;
-        uptime = now - self.time_start_;
-        gc_count = collectgarbage("count");
-        requests_total = -1; -- TODO: ?!
-        requests_fails = -1; -- TODO: ?!
-        time_in_requests = -1;
-        time_idle = -1;
-        time_per_request_rolling_avg = -1;
-        time_per_request_max = -1;
-        time_per_request_min = -1;
-      };
-    }
+  local execute_system_action_on_current_node = function()
+    error("TODO: Implement execute_system_action_on_current_node if needed")
   end
 
   make_api_context_stub = function(
@@ -464,7 +442,11 @@ do
       set_cookie = set_cookie;
       delete_cookie = delete_cookie;
       --
-      get_service_info = get_service_info;
+      extend = extend;
+      ext = ext;
+      --
+      execute_system_action_on_current_node =
+        execute_system_action_on_current_node;
       --
       push_param = push_param; -- Private
       pop_param = pop_param; -- Private

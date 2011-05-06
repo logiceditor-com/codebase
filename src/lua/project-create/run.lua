@@ -1,0 +1,322 @@
+--------------------------------------------------------------------------------
+-- run.lua: project-create runner
+--------------------------------------------------------------------------------
+
+-- Create module loggers
+local log, dbg, spam, log_error
+      = import 'pk-core/log.lua' { 'make_loggers' } (
+          "project-create", "PRC"
+        )
+
+--------------------------------------------------------------------------------
+
+local table_sort = table.sort
+
+--------------------------------------------------------------------------------
+
+local lfs = require 'lfs'
+
+--------------------------------------------------------------------------------
+
+local arguments,
+      optional_arguments,
+      method_arguments
+      = import 'lua-nucleo/args.lua'
+      {
+        'arguments',
+        'optional_arguments',
+        'method_arguments'
+      }
+
+local is_table,
+      is_function,
+      is_string,
+      is_number
+      = import 'lua-nucleo/type.lua'
+      {
+        'is_table',
+        'is_function',
+        'is_string',
+        'is_number'
+      }
+
+local split_by_char,
+      fill_placeholders_ex
+      = import 'lua-nucleo/string.lua'
+      {
+        'split_by_char',
+        'fill_placeholders_ex'
+      }
+
+local timap
+      = import 'lua-nucleo/table-utils.lua'
+      {
+        'timap'
+      }
+
+local load_tools_cli_data_schema,
+      load_tools_cli_config,
+      print_tools_cli_config_usage,
+      freeform_table_value
+      = import 'pk-core/tools_cli_config.lua'
+      {
+        'load_tools_cli_data_schema',
+        'load_tools_cli_config',
+        'print_tools_cli_config_usage',
+        'freeform_table_value'
+      }
+
+local load_all_files,
+      write_file,
+      read_file,
+      create_path_to_file,
+      find_all_files,
+      is_directory
+      = import 'lua-aplicado/filesystem.lua'
+      {
+        'load_all_files',
+        'write_file',
+        'read_file',
+        'create_path_to_file',
+        'find_all_files',
+        'is_directory'
+      }
+
+local do_in_environment,
+      make_config_environment
+      = import 'lua-nucleo/sandbox.lua'
+      {
+        'do_in_environment',
+        'make_config_environment'
+      }
+
+local tgetpath
+      = import 'lua-nucleo/table-utils.lua'
+      {
+        'tgetpath'
+      }
+
+local assert_not_nil
+      = import 'lua-nucleo/typeassert.lua'
+      {
+        'assert_not_nil'
+      }
+
+--------------------------------------------------------------------------------
+
+local create_config_schema
+      = import 'fill-placeholders/project-config/schema.lua'
+      {
+        'create_config_schema'
+      }
+
+--------------------------------------------------------------------------------
+
+local create_project = function(
+    meatmanifest_path,
+    project_path
+  )
+  arguments(
+      "string", meatmanifest_path,
+      "string", project_path
+    )
+--[[
+  local dictionary
+  do
+    local data_chunks
+    if not assert_not_nil(is_directory(data_path)) then
+      data_chunks = { assert(loadfile(data_path)) }
+    else
+      -- Ensure single trailing slash
+      data_path = data_path:gsub("([^/])/*$", "%1/")
+      data_chunks = assert(
+          load_all_files(
+              data_chunks,
+              ".*%.lua$" -- TODO: make this configurable
+            )
+        )
+    end
+
+    local data = make_config_environment()
+    for i = 1, #data_chunks do
+      assert(do_in_environment(data_chunks[i], data))
+    end
+
+    dictionary = setmetatable(
+        { },
+        {
+          __index = function(t, k)
+            local v = rawget(data, k) -- Note rawget
+            if v == nil and is_string(k) then -- Not found, maybe k is path?
+              v = tgetpath(data, unpack(split_by_char(k, ".")))
+            end
+
+            local may_cache = true
+            if is_function(v) then -- A handler
+              v = v(dictionary)
+              if v == nil then
+                error("handler failed for `" .. tostring(k) .. "'")
+              end
+              may_cache = false -- Handler results are not cached
+            end
+
+            if v == nil then
+              error("unknown placeholder `" .. tostring(k) .. "'")
+            end
+
+            if not (is_string(v) or is_number(v)) then
+              error("wrong data type for placeholder `" .. tostring(k) .. "'")
+            end
+
+            v = tostring(v)
+
+            if may_cache then
+              t[k] = v
+            end
+
+            return v
+          end;
+        }
+      )
+  end
+
+  local single_file_mode = true
+
+  local template_filenames
+  do
+    if not assert_not_nil(is_directory(template_path)) then
+      template_filenames = { template_path }
+    else
+      single_file_mode = false
+
+      -- Ensure single trailing slash
+      template_path = template_path:gsub("([^/])/*$", "%1/")
+      template_filenames = assert(
+          find_all_files(
+              template_path,
+              ".*" -- TODO: make this configurable
+            )
+        )
+    end
+    template_filenames = timap(
+        function(s) return s:sub(#template_path + 1) end,
+        template_filenames
+      )
+    table.sort(template_filenames)
+  end
+
+  if single_file_mode then
+    assert(#template_filenames == 1)
+
+    assert(create_path_to_file(output_path))
+    assert(
+        write_file(
+            output_path,
+            fill_placeholders_ex(
+                template_capture,
+                assert(
+                    read_file(template_path .. template_filenames[1])
+                  ),
+                dictionary
+              )
+          )
+      )
+  else
+    -- Ensure single trailing slash
+    output_path = output_path:gsub("([^/])/*$", "%1/")
+
+    for i = 1, #template_filenames do
+      local filename = template_filenames[i]
+
+      local in_filename = template_path .. filename
+      local out_filename = output_path .. filename
+
+      assert(create_path_to_file(out_filename))
+      assert(
+          write_file(
+              out_filename,
+              fill_placeholders_ex(
+                  template_capture,
+                  assert(
+                      read_file(in_filename)
+                    ),
+                  dictionary
+                )
+            )
+        )
+    end
+  end
+]]
+  log("create project stub works")
+  return true
+end
+
+--------------------------------------------------------------------------------
+
+local TOOL_NAME = "project_create"
+
+--------------------------------------------------------------------------------
+
+local EXTRA_HELP = [[
+
+pk-project-create: fast project creation tool
+
+Usage:
+
+    pk-project-create <metamanifest_directory_path> <project_root_dir> [options]
+
+Options: no options yet defined
+]]
+
+local CONFIG_SCHEMA = create_config_schema()
+
+local CONFIG, ARGS
+
+--------------------------------------------------------------------------------
+
+local run = function(...)
+  -- WARNING: Action-less tool. Take care when copy-pasting.
+
+  CONFIG, ARGS = load_tools_cli_config(
+      function(args) -- Parse actions
+        local param = { }
+
+        param.metamanifest_path = args[1]
+        param.root_project_path = args[2]
+
+        return
+        {
+          PROJECT_PATH = ""; -- TODO: Remove
+          [TOOL_NAME] = param;
+        }
+      end,
+      EXTRA_HELP,
+      CONFIG_SCHEMA,
+      nil, -- Specify primary config file with --base-config cli option
+      nil, -- No secondary config file
+      ...
+    )
+
+  if CONFIG == nil then
+    local err = ARGS
+
+    print_tools_cli_config_usage(EXTRA_HELP, CONFIG_SCHEMA)
+
+    io.stderr:write("Error in tool configuration:\n", err, "\n\n")
+    io.stderr:flush()
+
+    os.exit(1)
+  end
+
+  ------------------------------------------------------------------------------
+
+  create_project(
+      CONFIG[TOOL_NAME].metamanifest_path,
+      CONFIG[TOOL_NAME].root_project_path
+    )
+end
+
+return
+{
+  run = run;
+}

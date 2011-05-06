@@ -9,10 +9,10 @@ local localhost_config = function(name)
     version_tag_suffix = name;
     rocks_repo_url = local_rocks_repo_path;
 
---    internal_config_host = PROJECT_TITLE .. "-internal-config";
---    internal_config_port = 80;
---    internal_config_deploy_host = PROJECT_TITLE .. "-internal-config-deploy";
---    internal_config_deploy_port = 80;
+    internal_config_host = "pk-banner-internal-config";
+    internal_config_port = 80;
+    internal_config_deploy_host = "pk-banner-internal-config-deploy";
+    internal_config_deploy_port = 80;
 
     machines =
     {
@@ -21,18 +21,20 @@ local localhost_config = function(name)
         external_url = "localhost";
         internal_url = "localhost";
 
+        -- TODO: Make sure this works, should result in call to $ hostname.
+        node_id = "$(hostname)";
+
         roles =
         {
           { name = "rocks-repo-localhost" }; -- WARNING: Must be the first
           --
-          { name = "developer-machine-schema-tool" };
-          --
           { name = "cluster-member" };
-          { name = "internal-config" };
           { name = "internal-config-deploy" };
-          { name = "pk-logiceditor-com" };
-          { name = "pk-logiceditor-com-demo" };
-          { name = "pk-logiceditor-com-demo-api" };
+          { name = "internal-config" };
+          { name = "#{PROJECT_NAME}" };
+          { name = "#{PROJECT_NAME}-api" };
+          { name = "redis-system" };
+          { name = "mysql-db" };
         };
       };
     };
@@ -41,9 +43,6 @@ end
 
 clusters = clusters or { }
 
-clusters[#clusters + 1] = localhost_config "localhost-ag"
-clusters[#clusters + 1] = localhost_config "localhost-dp"
-clusters[#clusters + 1] = localhost_config "localhost-mn"
-clusters[#clusters + 1] = localhost_config "localhost-vf"
+clusters[#clusters + 1] = localhost_config "#{CLUSTER_NAME}"
 
 -- Add more as needed

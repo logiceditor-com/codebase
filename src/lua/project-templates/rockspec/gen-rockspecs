@@ -72,13 +72,13 @@ local TARGETS =
 
 local MODULES
 do
-  local filenames = find_all_files(ROOT .. "/../src/lua/pk-logiceditor-com", ".*%.lua$")
+  local filenames = find_all_files(ROOT .. "/../src/lua/#{PROJECT_NAME}", ".*%.lua$")
   table.sort(filenames)
 
   local cat, concat = make_concatter()
 
   for i = 1, #filenames do
-    local name = assert(filenames[i]:match(".*/src/lua/(pk%-logiceditor%-com/.*)$"), "bad path")
+    local name = assert(filenames[i]:match(".*/src/lua/(pk%-hb%-server/.*)$"), "bad path")
     cat [[
       []] (Q(name:gsub("%.lua$", ""):gsub("/", "."))) [[] = ]] (Q("src/lua/" .. name)) [[;
 ]]
@@ -97,7 +97,7 @@ for i = 1, #TARGETS do
 
   assert(
       write_file(
-          ROOT .. "/../rockspec/pk-logiceditor-com.lib-"
+          ROOT .. "/../rockspec/#{PROJECT_NAME}.lib-"
        .. TARGET.name .. "-" .. TARGET.version
        .. ".rockspec",
           fill_curly_placeholders(

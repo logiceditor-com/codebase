@@ -1,6 +1,6 @@
 api =
 {
-  prefix = "pk-logiceditor-com-demo:api:";
+  prefix = "#{PROJECT_NAME}:api:";
   actions =
   {
     ["reopen_log_file"] = true;
@@ -10,7 +10,7 @@ api =
   {
     [1] =
     {
-      url = "http://pk-logiceditor-com-demo/api/sys/pk-logiceditor-com-demo-api/1/ec7719ce-0fea-11e0-af19-00219bd18c14";
+      url = "http://#{PROJECT_NAME}/api/sys/#{PROJECT_NAME}-api/1/ec7719ce-0fea-11e0-af19-00219bd18c14";
     };
   };
 }

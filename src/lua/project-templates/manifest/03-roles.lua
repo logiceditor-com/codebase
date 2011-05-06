@@ -76,7 +76,7 @@ local wsapi_service_role = function(param)
     "pk-tools.pk-ensure-runit-service-enabled";
     "pk-tools.pk-ensure-nginx-site-enabled";
     "pk-tools.pk-ensure-logrotate-enabled";
-    "pk-logiceditor-com.tools.pk-logiceditor-com-execute-system-action";
+    "#{PROJECT_NAME}.tools.#{PROJECT_NAME}-execute-system-action";
     nginx_rock_name;
   }
 
@@ -116,7 +116,7 @@ local wsapi_service_role = function(param)
       {
         tool = "remote_exec";
         {
-          'pk-logiceditor-com-execute-system-action',
+          '#{PROJECT_NAME}-execute-system-action',
           system_service_name, system_service_node,
           'shutdown' -- Assuming runit will restart us at once
            ;
@@ -153,8 +153,16 @@ roles =
     deployment_actions =
     {
       {
+        -- Check if machine node ID is, in fact, the hostname.
+        tool = "remote_exec"; -- TODO: Cache this!
+        {
+          -- TODO: Hack.
+          "test", "${MACHINE_NODE_ID}", "=", "$(hostname)"
+        }
+      };
+      {
         tool = "deploy_rocks";
-        "pk-logiceditor-com.cluster-config.${CLUSTER_NAME}"; -- TODO: Do not list dependencies here, they are should be listed in rockspecs as needed
+        "#{PROJECT_NAME}.cluster-config.${CLUSTER_NAME}"; -- TODO: Do not list dependencies here, they are should be listed in rockspecs as needed
         "pk-tools.pk-lua-interpreter";
         "pk-tools.pk-call-lua-module";
       };
@@ -170,19 +178,6 @@ roles =
   };
   --
   {
-    name = "developer-machine-schema-tool";
-    deployment_actions =
-    {
-      {
-        tool = "deploy_rocks";
-        "pk-tools.tools-lib"; -- TODO: That's a dependency, don't list it explicitly
-        "pk-logiceditor.schema-lib"; -- TODO: That's a dependency, don't list it explicitly
-        "pk-logiceditor.schema-tool";
-      };
-    };
-  };
-  --
-  {
     name = "rocks-repo-release";
     deployment_actions = -- TODO: BAD! rsync system/rocks/cluster-name repo instead!
     {
@@ -190,7 +185,7 @@ roles =
         tool = "local_exec";
         {
           "pk-git-reset-branch-to-head",
-          "deploy/logiceditor.com", -- remotebranch
+          "deploy/#{PROJECT_NAME}", -- remotebranch
           "origin",                 -- destremote
           "HEAD",                   -- localbranch
           PROJECT_PATH              -- localroot
@@ -201,11 +196,11 @@ roles =
         tool = "local_exec";
         {
           "pk-git-update-host",
-          "logiceditor.com",        -- host
-          "deploy/logiceditor.com", -- localbranch
-          "origin",                 -- destremote
-          "deploy/logiceditor.com", -- remotebranch
-          "/srv/logiceditor.com"    -- remoteroot
+          "#{PROJECT_NAME}",        -- host
+          "deploy/#{PROJECT_NAME}", -- localbranch
+          "origin",              -- destremote
+          "deploy/#{PROJECT_NAME}", -- remotebranch
+          "/srv/#{PROJECT_NAME}"    -- remoteroot
         };
       };
     }
@@ -214,61 +209,51 @@ roles =
   static_nginx_role
   {
     name = "internal-config";
-    rock_name = "pk-logiceditor-com.internal-config.${CLUSTER_NAME}";
+    rock_name = "#{PROJECT_NAME}.internal-config.${CLUSTER_NAME}";
     deploy_rocks = false; -- No extra rocks
-    nginx_config_name = "cluster/${CLUSTER_NAME}/internal-config/nginx/pk-logiceditor-com-internal-config";
+    nginx_config_name = "cluster/${CLUSTER_NAME}/internal-config/nginx/#{PROJECT_NAME}-internal-config";
   };
   --
   static_nginx_role
   {
     name = "internal-config-deploy";
-    rock_name = "pk-logiceditor-com.internal-config-deploy.${CLUSTER_NAME}";
+    rock_name = "#{PROJECT_NAME}.internal-config-deploy.${CLUSTER_NAME}";
     deploy_rocks = false; -- No extra rocks
-    nginx_config_name = "cluster/${CLUSTER_NAME}/internal-config/nginx/pk-logiceditor-com-internal-config-deploy";
+    nginx_config_name = "cluster/${CLUSTER_NAME}/internal-config/nginx/#{PROJECT_NAME}-internal-config-deploy";
   };
   --
   static_nginx_role
   {
-    name = "pk-logiceditor-com";
-    rock_name = "pk-logiceditor-com.nginx.${CLUSTER_NAME}";
+    name = "#{PROJECT_NAME}";
+    rock_name = "#{PROJECT_NAME}.nginx.${CLUSTER_NAME}";
     deploy_rocks =
     {
-      "pk-logiceditor-com.www.static"
-    };
-  };
-  --
-  static_nginx_role
-  {
-    name = "pk-logiceditor-com-demo";
-    rock_name = "pk-logiceditor-com.nginx.${CLUSTER_NAME}";
-    deploy_rocks =
-    {
-      "pk-logiceditor-com.demo.static"
+      "#{PROJECT_NAME}.www.static"
     };
   };
   --
   wsapi_service_role
   {
-    name = "pk-logiceditor-com-demo-api";
+    name = "#{PROJECT_NAME}-api";
     wsapi =
     {
-      service_name = "pk-logiceditor-com.demo.api";
-      log_file = "/var/log/pk-logiceditor-com-demo-api-wsapi.log";
+      service_name = "#{PROJECT_NAME}.api";
+      log_file = "/var/log/#{PROJECT_NAME}-api-wsapi.log";
     };
     nginx =
     {
-      rock_name = "pk-logiceditor-com.nginx.${CLUSTER_NAME}";
-      config_path = "cluster/${CLUSTER_NAME}/nginx/pk-logiceditor-com-demo";
+      rock_name = "#{PROJECT_NAME}.nginx.${CLUSTER_NAME}";
+      config_path = "cluster/${CLUSTER_NAME}/nginx/#{PROJECT_NAME}";
     };
     logrotate =
     {
-      rock_name = "pk-logiceditor-com.nginx.${CLUSTER_NAME}";
-      config_path = "cluster/${CLUSTER_NAME}/logrotate/pk-logiceditor-com-demo-api";
+      rock_name = "#{PROJECT_NAME}.nginx.${CLUSTER_NAME}";
+      config_path = "cluster/${CLUSTER_NAME}/logrotate/#{PROJECT_NAME}-api";
     };
     runit =
     {
-      service_name = "pk-logiceditor-com.demo.api";
-      run_path = "www/demo.logiceditor.com/api/service/run";
+      service_name = "#{PROJECT_NAME}.api";
+      run_path = "www/#{PROJECT_NAME}/api/service/run";
     };
     system_service =
     {
@@ -277,9 +262,18 @@ roles =
     };
     deploy_rocks =
     {
-      "pk-logiceditor.data-lib";
-      "pk-logiceditor-com.demo.api";
-      "pk-logiceditor-com.lib"; -- TODO: This is a dependency, do not list it explicitly
+      "#{PROJECT_NAME}.api";
+      "#{PROJECT_NAME}.lib"; -- TODO: This is a dependency, do not list it explicitly
     };
+  };
+  --
+  {
+    name = "mysql-db"; -- TODO: stub mysql rock
+    deployment_actions = { };
+  };
+  --
+  {
+    name = "redis-system"; -- TODO: stub redis rock
+    deployment_actions = { };
   };
 }

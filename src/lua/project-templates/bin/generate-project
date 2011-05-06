@@ -1,0 +1,30 @@
+#! /bin/bash
+
+# set -e
+
+ROOT="${BASH_SOURCE[0]}";
+if([ -h "${ROOT}" ]) then
+  while([ -h "${ROOT}" ]) do ROOT=`readlink "${ROOT}"`; done
+fi
+ROOT=$(cd `dirname "${ROOT}"` && cd .. && pwd) # Up one level
+
+SHORT_NAME="fill-placeholders"
+NAME="pk-${SHORT_NAME}"
+MANIFEST_PATH="${ROOT}/metamanifest"
+
+MODULE="${SHORT_NAME}.run"
+ROCK="pk-tools.${NAME}"
+PRIVATE_MODULES_PATH="$(luarocks show --rock-dir ${ROCK})/src/lua/?.lua"
+TEMPLATE_PATH="$(luarocks show --rock-dir pk-tools.project-templates)/src/lua/?.lua"
+
+echo "Template path: ${TEMPLATE_PATH}"
+echo "Data path: ${MANIFEST_PATH}"
+echo "output path: ${ROOT}"
+
+pk-call-lua-module \
+  "${PRIVATE_MODULES_PATH}" \
+  "${MODULE}" \
+  "run" \
+  "${TEMPLATE_PATH}" \
+  "${MANIFEST_PATH}" \
+  "${ROOT}"

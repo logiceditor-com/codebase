@@ -79,7 +79,7 @@ assert(
             TEMPLATE,
             {
               NAME = "pk-logiceditor-com.nginx." .. CLUSTER_NAME;
-              TITLE = "#{PROJECT_NAME}";
+              TITLE = "#{#{PROJECT_NAME}}";
               VERSION = "scm-1";
               CLUSTER_NAME = CLUSTER_NAME;
             }

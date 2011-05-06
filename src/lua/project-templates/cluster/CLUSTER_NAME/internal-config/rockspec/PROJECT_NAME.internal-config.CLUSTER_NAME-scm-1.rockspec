@@ -1,11 +1,11 @@
-package = "pk-logiceditor-com.internal-config.localhost-ag"
+package = "#{PROJECT_NAME}.internal-config.#{CLUSTER_NAME}"
 version = "scm-1"
 source = {
    url = ""
 }
 description = {
-   summary = "pk-logiceditor-com Internal Config",
-   homepage = "http://logiceditor.com",
+   summary = "#{PROJECT_NAME} Internal Config",
+   homepage = "http://#{PROJECT_NAME}.com",
    license = "Unpublished closed-source!",
    maintainer = "Alexander Gladysh <agladysh@gmail.com>"
 }
@@ -18,7 +18,7 @@ dependencies = {
 build = {
    type = "none",
    copy_directories = {
-      "cluster/localhost-ag/internal-config/nginx",
-      "cluster/localhost-ag/internal-config/internal-config"
+      "cluster/#{CLUSTER_NAME}/internal-config/nginx",
+      "cluster/#{CLUSTER_NAME}/internal-config/internal-config"
    },
 }

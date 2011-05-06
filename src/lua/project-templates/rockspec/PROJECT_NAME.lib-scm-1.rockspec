@@ -1,5 +1,5 @@
 package = "#{PROJECT_NAME}.lib"
-version = "${VERSION}"
+version = "scm-1"
 source = {
    url = ""
 }
@@ -23,6 +23,9 @@ dependencies = {
 build = {
    type = "builtin",
    modules = {
-${MODULES}
+      ["#{PROJECT_NAME}.db.tables"] = "src/lua/#{PROJECT_NAME}/db/tables.lua";
+      ["#{PROJECT_NAME}.internal_config_client"] = "src/lua/#{PROJECT_NAME}/internal_config_client.lua";
+      ["#{PROJECT_NAME}.webservice.request"] = "src/lua/#{PROJECT_NAME}/webservice/request.lua";
+
    }
 }

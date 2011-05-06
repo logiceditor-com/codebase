@@ -1,33 +1,27 @@
 local ROCKS =
 {
   {
-    "www/logiceditor.com/rockspec/"
-     .. "pk-logiceditor-com.www.static-scm-1.rockspec";
+    "www/#{PROJECT_NAME}/rockspec/"
+     .. "#{PROJECT_NAME}.www.static-scm-1.rockspec";
   };
   {
-    "www/demo.logiceditor.com/rockspec/"
-     .. "pk-logiceditor-com.demo.static-scm-1.rockspec";
-  };
-  {
-    "www/demo.logiceditor.com/api/rockspec/"
-     .. "pk-logiceditor-com.demo.api-scm-1.rockspec";
+    "www/#{PROJECT_NAME}/api/rockspec/"
+     .. "#{PROJECT_NAME}.api-scm-1.rockspec";
   };
   {
     "tools/rockspec/"
-     .. "pk-logiceditor-com.tools."
-     .. "pk-logiceditor-com-execute-system-action-scm-1.rockspec";
+     .. "#{PROJECT_NAME}.tools."
+     .. "#{PROJECT_NAME}-execute-system-action-scm-1.rockspec";
   };
   {
     generator = { "rockspec/gen-rockspecs" };
-    "rockspec/pk-logiceditor-com.lib-scm-1.rockspec";
+    "rockspec/#{PROJECT_NAME}.lib-scm-1.rockspec";
   };
 }
 
 local CLUSTERS =
 {
-  { name = "localhost-ag" };
-  { name = "localhost-dp" };
-  { name = "logiceditor.com" };
+  { name = "localhost" };
 }
 
 for i = 1, #CLUSTERS do
@@ -39,7 +33,7 @@ for i = 1, #CLUSTERS do
 
     generator = { "cluster/gen-rockspec", name };
     "cluster/"
-      .. name .. "/rockspec/pk-logiceditor-com.nginx."
+      .. name .. "/rockspec/#{PROJECT_NAME}.nginx."
       .. name .. "-scm-1.rockspec"
       ;
   }
@@ -49,7 +43,7 @@ for i = 1, #CLUSTERS do
     ["x-cluster-name"] = name;
 
     "cluster/" .. name .. "/internal-config/rockspec/"
-     .. "pk-logiceditor-com.internal-config." .. name .. "-scm-1.rockspec"
+     .. "#{PROJECT_NAME}.internal-config." .. name .. "-scm-1.rockspec"
      ;
   }
 
@@ -58,7 +52,7 @@ for i = 1, #CLUSTERS do
     ["x-cluster-name"] = name;
 
     "cluster/" .. name .. "/internal-config/rockspec/"
-     .. "pk-logiceditor-com.internal-config-deploy."
+     .. "#{PROJECT_NAME}.internal-config-deploy."
      .. name .. "-scm-1.rockspec"
      ;
   }
@@ -68,7 +62,7 @@ for i = 1, #CLUSTERS do
     ["x-cluster-name"] = name;
 
     "cluster/" .. name .. "/internal-config/rockspec/"
-     .. "pk-logiceditor-com.cluster-config." .. name .. "-scm-1.rockspec"
+     .. "#{PROJECT_NAME}.cluster-config." .. name .. "-scm-1.rockspec"
      ;
   }
 end

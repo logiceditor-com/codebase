@@ -1,11 +1,11 @@
-package = "pk-logiceditor-com.cluster-config.localhost-ag"
+package = "#{PROJECT_NAME}.cluster-config.#{CLUSTER_NAME}"
 version = "scm-1"
 source = {
    url = "" -- Use luarocks make
 }
 description = {
-   summary = "pk-logiceditor-com Cluster Configuration for localhost-ag",
-   homepage = "http://logiceditor.com",
+   summary = "#{PROJECT_NAME} Cluster Configuration for #{CLUSTER_NAME}",
+   homepage = "http://#{PROJECT_NAME}.com",
    license = "Unpublished closed-source!",
    maintainer = "Alexander Gladysh <agladysh@gmail.com>"
 }
@@ -18,6 +18,6 @@ dependencies = {
 build = {
    type = "builtin",
    modules = {
-      ["pk-logiceditor-com.cluster.config"] = "cluster/localhost-ag/internal-config/src/pk-logiceditor-com/cluster/config.lua";
+      ["#{PROJECT_NAME}.cluster.config"] = "cluster/#{CLUSTER_NAME}/internal-config/src/#{PROJECT_NAME}/cluster/config.lua";
    },
 }

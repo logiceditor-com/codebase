@@ -40,20 +40,6 @@ local is_table,
         'is_number'
       }
 
-local split_by_char,
-      fill_placeholders_ex
-      = import 'lua-nucleo/string.lua'
-      {
-        'split_by_char',
-        'fill_placeholders_ex'
-      }
-
-local timap
-      = import 'lua-nucleo/table-utils.lua'
-      {
-        'timap'
-      }
-
 local load_tools_cli_data_schema,
       load_tools_cli_config,
       print_tools_cli_config_usage,
@@ -301,7 +287,6 @@ do
     end
     local process_replication_recursively
     do
-
       local add_string = function(path, pattern, replace)
         assert(
             shell_exec(
@@ -330,7 +315,7 @@ do
         )
         if attr.mode == "directory" then
           create_path_to_file(created_path .. "/.")
-          DEBUG_print("dir exists: ", created_path)
+          DEBUG_print("dir checked: ", created_path)
           process_replication_recursively(
              {
                existed_path = filepath,
@@ -340,7 +325,10 @@ do
              metamanifest
            )
         else
-          copy_if_not_exist(filepath, created_path)
+          if filepath ~= created_path then
+            copy_if_not_exist(filepath, created_path)
+          end
+          -- TODO: check if pattern exists in file
           -- replace universal pattern to replicated
           for k, v in pairs(replaces_used) do
             replace_string_in_file(
@@ -354,21 +342,19 @@ do
             -- "some string val1"
             -- "some string val2"
             -- based on simple sed commands
-            -- TODO: check if pattern exists in file
             for i = 1, (#v - 1) do
               add_string(
-                  filepath,
+                  created_path,
                   metamanifest.data_wrapper.left .. k .. metamanifest.data_wrapper.right,
                   metamanifest.data_wrapper.left .. v[i] .. metamanifest.data_wrapper.right
                 )
             end
             replace_string(
-                  filepath,
+                  created_path,
                   metamanifest.data_wrapper.left .. k .. metamanifest.data_wrapper.right,
                   metamanifest.data_wrapper.left .. v[#v] .. metamanifest.data_wrapper.right
                 )
           end
--- TODO: replicate in file if needed
         end
       end
 
@@ -518,6 +504,42 @@ do
   end
 
   ------------------------------------------------------------------------------
+  local chmod_bin
+  do
+    local chmod_files = function(bin_path)
+     for filename in lfs.dir(bin_path) do
+        if filename ~= "." and filename ~= ".." and filename ~= ".git" then
+          local filepath = bin_path .. "/" .. filename
+          local attr = lfs.attributes(filepath)
+          if attr.mode == "directory" then
+            chmod_files(filepath)
+          else
+            DEBUG_print("Chmodding " .. filepath .. " 755")
+            assert(shell_exec("sudo", "chmod", "755", filepath) == 0)
+          end
+        end -- if filename ~= "." and filename ~= ".." and filename ~= ".git" then
+      end -- for filename in lfs.dir(path_data.existed_path) do
+    end
+
+    chmod_bin = function(project_path)
+      for filename in lfs.dir(project_path) do
+        if filename ~= "." and filename ~= ".." and filename ~= ".git" then
+          local filepath = project_path .. "/" .. filename
+          local attr = lfs.attributes(filepath)
+          if attr.mode == "directory" then
+            if filename == "bin" then
+              chmod_files(filepath)
+            else
+              chmod_bin(filepath)
+            end
+          end
+        end -- if filename ~= "." and filename ~= ".." and filename ~= ".git" then
+      end -- for filename in lfs.dir(path_data.existed_path) do
+    end
+  end
+
+
+  ------------------------------------------------------------------------------
 
   local run_scripts = function(
       metamanifest,
@@ -559,6 +581,9 @@ do
     DEBUG_print("\n\n\27[1mFilling placeholders\27[0m")
     fill_placeholders(metamanifest, project_path)
 
+    DEBUG_print("\n\n\27[1mChmodding\27[0m")
+    chmod_bin(project_path)
+
     DEBUG_print("\n\n\27[1mRun project generative and deployment scripts\27[0m")
     run_scripts(metamanifest, project_path)
 
@@ -579,8 +604,7 @@ Usage:
 
 Options:
 
-    --debug                        Verbose output
-
+    --debug                    Verbose output
 ]]
 
 local CONFIG_SCHEMA = create_config_schema()

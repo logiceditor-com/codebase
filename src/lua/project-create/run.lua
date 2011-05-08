@@ -577,6 +577,10 @@ Usage:
 
     pk-project-create <metamanifest_directory_path> <project_root_dir> [options]
 
+Options:
+
+    --debug                        Verbose output
+
 ]]
 
 local CONFIG_SCHEMA = create_config_schema()

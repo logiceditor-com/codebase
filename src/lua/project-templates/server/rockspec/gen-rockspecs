@@ -78,7 +78,7 @@ do
   local cat, concat = make_concatter()
 
   for i = 1, #filenames do
-    local name = assert(filenames[i]:match(".*/src/lua/(#{PROJ_NAME_WITH_PERCENT}server/.*)$"), "bad path")
+    local name = assert(filenames[i]:match(".*/src/lua/(#{PROJ_NAME_WITH_PERCENT}/.*)$"), "bad path")
     cat [[
       []] (Q(name:gsub("%.lua$", ""):gsub("/", "."))) [[] = ]] (Q("src/lua/" .. name)) [[;
 ]]

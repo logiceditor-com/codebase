@@ -21,7 +21,7 @@ local ROCKS =
 
 local CLUSTERS =
 {
-  { name = "localhost" };
+  { name = "#{CLUSTER_NAME}" };
 }
 
 for i = 1, #CLUSTERS do

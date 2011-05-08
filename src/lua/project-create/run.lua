@@ -96,10 +96,12 @@ local luarocks_show_rock_dir
         'luarocks_show_rock_dir'
       }
 
-local shell_read
+local shell_read,
+      shell_exec
       = import 'lua-aplicado/shell.lua'
       {
-        'shell_read'
+        'shell_read',
+        'shell_exec'
       }
 
 local do_in_environment,
@@ -143,6 +145,7 @@ local CONFIG, ARGS
 
 local create_project
 do
+  --common stuff----------------------------------------------------------------
   local DEBUG_print = function(...)
     if CONFIG[TOOL_NAME].debug then
       print(...)
@@ -165,11 +168,57 @@ do
       copy_file(path_from, path_to)
       return true
     else
-      DEBUG_print("file already exists :" .. path_to)
+      DEBUG_print("\27[31mfile already exists\27[0m :" .. path_to)
       return false
     end
   end
-  ------------------------------------------------------------------------------
+
+  local get_replacement_pattern = function(filename, metamanifest)
+    local pattern = { }
+    for k, _ in pairs(metamanifest.replicate_data) do
+      if filename:find(k) then
+        pattern[#pattern + 1] = k
+      end
+    end
+    return pattern
+  end
+
+  local replace_string_in_file = function(filename, string, replace)
+    assert(
+        shell_exec(
+            "sed",
+            "-i",
+            "s/" .. string .. "/" .. replace .. "/g",
+            filename
+          ) == 0
+      )
+  end
+
+  local replace_dictionary_in_file = function(filename, metamanifest)
+    for k, v in pairs(metamanifest.dictionary) do
+      replace_string_in_file(
+          filename,
+          metamanifest.data_wrapper.left .. k .. metamanifest.data_wrapper.right,
+          v
+        )
+    end
+  end
+
+  local function remove_recursively(path)
+    local attr = assert(lfs.attributes(path))
+    if attr.mode == "directory" then
+      for filename in lfs.dir(path) do
+        if filename ~= "." and filename ~= ".." and filename ~= ".git" then
+          local filepath = path .. "/" .. filename
+          remove_recursively(filepath)
+        end
+      end
+    end
+    os.remove(path)
+  end
+
+  --copy_files------------------------------------------------------------------
+
   local copy_files = function(project_path)
     local template_path = assert(luarocks_show_rock_dir("pk-tools.project-templates"))
     template_path = string.sub(template_path, 1, -2) .. "/src/lua/project-templates"
@@ -191,39 +240,28 @@ do
       end
     end
 
-    -- TODO: do we really need this info?
     return new_files
   end
 
-  ------------------------------------------------------------------------------
+  --replicate_data--------------------------------------------------------------
 
   local replicate_data
   do
     local make_plain_dictionary = function(metamanifest)
       metamanifest.processed = {}
       for i = 1, #metamanifest.replicate_data do
-        local replicate = metamanifest.dictionary[metamanifest.replicate_data[i]]
-        metamanifest.replicate_data[metamanifest.replicate_data[i]] = { }
+        local data = metamanifest.replicate_data[i]
+        local replicate = metamanifest.dictionary[data]
+        metamanifest.replicate_data[data] = { }
         for j = 1, #replicate do
-          metamanifest.dictionary[metamanifest.replicate_data[i] .. j] = replicate[j]
-          metamanifest.replicate_data[metamanifest.replicate_data[i]][j] =
-            metamanifest.replicate_data[i] .. j
+          metamanifest.dictionary[string.sub(data, 1, -2) .. "_" .. j] = replicate[j]
+          metamanifest.replicate_data[data][j] = string.sub(data, 1, -2) .. "_" ..  j
         end
-        metamanifest.processed[metamanifest.replicate_data[i]] =
-          tclone(metamanifest.dictionary[metamanifest.replicate_data[i]])
-        metamanifest.dictionary[metamanifest.replicate_data[i]] = nil
+        metamanifest.processed[data] = tclone(metamanifest.dictionary[data])
+        metamanifest.dictionary[data] = nil
+        metamanifest.replicate_data[i] = nil
       end
       return metamanifest
-    end
-
-    local get_replacement_pattern = function(filename, metamanifest)
-      local pattern = { }
-      for i = 1, #metamanifest.replicate_data do
-        if filename:find(metamanifest.replicate_data[i]) then
-          pattern[#pattern + 1] = metamanifest.replicate_data[i]
-        end
-      end
-      return pattern
     end
 
     local process_pattern_combination = function(pattern, filenames, metamanifest)
@@ -263,12 +301,36 @@ do
     end
     local process_replication_recursively
     do
+
+      local add_string = function(path, pattern, replace)
+        assert(
+            shell_exec(
+                "sed",
+                "-i",
+                "s/" .. pattern .. "/" .. pattern .. "/p;"
+             .. "s/" .. pattern .. "/" .. replace .. "/",
+                path
+              ) == 0
+          )
+      end
+
+      local replace_string = function(path, pattern, replace)
+        assert(
+            shell_exec(
+                "sed",
+                "-i",
+                "s/" .. pattern .. "/" .. replace .. "/",
+                path
+              ) == 0
+          )
+      end
+
       local process_curr_path = function(
           attr, created_path, filepath, replaces_used, metamanifest
         )
         if attr.mode == "directory" then
           create_path_to_file(created_path .. "/.")
-          DEBUG_print("created dir: ", created_path)
+          DEBUG_print("dir exists: ", created_path)
           process_replication_recursively(
              {
                existed_path = filepath,
@@ -279,25 +341,59 @@ do
            )
         else
           copy_if_not_exist(filepath, created_path)
-          -- TODO: inner replaces as replaces_used state
+          -- replace universal pattern to replicated
+          for k, v in pairs(replaces_used) do
+            replace_string_in_file(
+                created_path,
+                metamanifest.data_wrapper.left .. k .. metamanifest.data_wrapper.right,
+                metamanifest.data_wrapper.left .. v .. metamanifest.data_wrapper.right
+              )
+          end
+          for k, v in pairs(metamanifest.replicate_data) do
+            -- magic that makes "some string SOME_PATTERN" :
+            -- "some string val1"
+            -- "some string val2"
+            -- based on simple sed commands
+            -- TODO: check if pattern exists in file
+            for i = 1, (#v - 1) do
+              add_string(
+                  filepath,
+                  metamanifest.data_wrapper.left .. k .. metamanifest.data_wrapper.right,
+                  metamanifest.data_wrapper.left .. v[i] .. metamanifest.data_wrapper.right
+                )
+            end
+            replace_string(
+                  filepath,
+                  metamanifest.data_wrapper.left .. k .. metamanifest.data_wrapper.right,
+                  metamanifest.data_wrapper.left .. v[#v] .. metamanifest.data_wrapper.right
+                )
+          end
+-- TODO: replicate in file if needed
         end
       end
 
       process_replication_recursively = function(path_data, metamanifest)
-        DEBUG_print("\nPATH DATA: ", tpretty(path_data, "  ", 80))
+        if path_data.existed_path ~= path_data.created_path then
+          DEBUG_print("\nPATH DATA: ", tpretty(path_data, "  ", 80))
+        end
         for filename in lfs.dir(path_data.existed_path) do
           if filename ~= "." and filename ~= ".." and filename ~= ".git" then
-            DEBUG_print("FILENAME: ", filename)
             local filepath = path_data.existed_path .. "/" .. filename
             local attr = lfs.attributes(filepath)
             local pattern_used = get_replacement_pattern(filename, metamanifest)
-            DEBUG_print("  pattern used: ", tpretty(pattern_used, "  ", 80))
 
             -- filename have patterns to replicate
             if #pattern_used > 0 then
+              DEBUG_print("FILENAME: ", filename)
+              DEBUG_print("  pattern used: ", tpretty(pattern_used, "  ", 80))
               local pattern_combinations = process_pattern_combinations(
                   pattern_used,
-                  { { filename = filename, replaces_used = path_data.replaces_used } },
+                  {
+                    {
+                      filename = filename;
+                      replaces_used = path_data.replaces_used;
+                    };
+                  },
                   metamanifest
                 )
               DEBUG_print("  pattern combinations: ", tpretty(pattern_combinations, "  ", 80))
@@ -348,14 +444,31 @@ do
     end
   end
 
-  ------------------------------------------------------------------------------
+  --clean_up_replicate_data-----------------------------------------------------
 
   local clean_up_replicate_data
   do
-    clean_up_replicate_data = function(filepath, metamanifest)
+    clean_up_replicate_data = function(metamanifest, path)
+      for filename in lfs.dir(path) do
+        if filename ~= "." and filename ~= ".." and filename ~= ".git" then
+          local filepath = path .. "/" .. filename
+          local attr = assert(lfs.attributes(filepath))
+          local pattern_used = get_replacement_pattern(filename, metamanifest)
+          if #pattern_used > 0 then
+            DEBUG_print("removing: " .. filepath)
+            remove_recursively(filepath)
+          else
+            local attr = assert(lfs.attributes(filepath))
+            if attr.mode == "directory" then
+              clean_up_replicate_data(metamanifest, filepath)
+            end
+          end
+        end
+      end
     end
   end
-  ------------------------------------------------------------------------------
+
+  --fill_placeholders-----------------------------------------------------------
 
   local fill_placeholders
   do
@@ -366,10 +479,18 @@ do
           new_filepath = string.gsub(new_filepath, k, v);
         end
       end
-      --TODO: vaible way?
+      -- TODO: vaible way?
       if filepath ~= new_filepath then
-        os.rename(filepath, new_filepath)
-        DEBUG_print("renamed: \n   " .. filepath .. "\nto " .. new_filepath)
+        local res, err = os.rename(filepath, new_filepath)
+        if res == nil then
+          DEBUG_print(
+              "\27[31mcan't rename\27[0m: " .. err
+            )
+          remove_recursively(filepath)
+          DEBUG_print("removed")
+        else
+          DEBUG_print("renamed: \n   " .. filepath .. "\nto " .. new_filepath)
+        end
       end
       --copy_if_not_exist(all_template_files[i], new_filename)
       return new_filepath
@@ -387,7 +508,8 @@ do
           if attr.mode == "directory" then
             fill_placeholders(metamanifest, filepath)
           else
-            --TODO: fill file placeholders
+            -- replace dictionary patterns
+            replace_dictionary_in_file(filepath, metamanifest)
           end
 
         end -- if filename ~= "." and filename ~= ".." and filename ~= ".git" then
@@ -401,6 +523,7 @@ do
       metamanifest,
       project_path
     )
+    DEBUG_print("run_scripts NYI")
   end
 
   ------------------------------------------------------------------------------
@@ -414,6 +537,7 @@ do
         "string", project_path
       )
 
+    DEBUG_print("\n\n\27[1mLoading metamanifest\27[0m")
     local metamanifest = load_project_manifest(
         metamanifest_path,
         project_path,
@@ -422,21 +546,23 @@ do
     DEBUG_print("metamanifest :" .. tpretty(metamanifest, "  ", 80))
 
     -- TODO: handle overwriting with flag, now overwriting prohibited
+    DEBUG_print("\n\n\27[1mCopy template files\27[0m")
     local new_files = copy_files(project_path)
     DEBUG_print("new files :" .. tpretty(new_files, "  ", 80))
 
-    DEBUG_print("\n\nReplicating data")
+    DEBUG_print("\n\n\27[1mReplicating data\27[0m")
     replicate_data(metamanifest, project_path)
 
-    DEBUG_print("\n\nCleanup replication data")
+    DEBUG_print("\n\n\27[1mCleanup replication data\27[0m")
     clean_up_replicate_data(metamanifest, project_path)
 
-    DEBUG_print("\n\nFilling placeholders")
+    DEBUG_print("\n\n\27[1mFilling placeholders\27[0m")
     fill_placeholders(metamanifest, project_path)
 
+    DEBUG_print("\n\n\27[1mRun project generative and deployment scripts\27[0m")
     run_scripts(metamanifest, project_path)
 
-    log("create project stub works")
+    log("project created")
     return true
   end
 end

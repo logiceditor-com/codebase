@@ -20,6 +20,7 @@ do
       {
         cfg:existing_path "metamanifest_path";
         cfg:path "root_project_path";
+        cfg:boolean "debug" { default = false };
       };
     }
   end

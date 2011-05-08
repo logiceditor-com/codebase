@@ -73,13 +73,13 @@ local TEMPLATE = assert(read_file(ROOT .. "/../cluster/rockspec.template"))
 assert(
     write_file(
         ROOT .. "/../cluster/" .. CLUSTER_NAME
-     .. "/rockspec/pk-logiceditor-com.nginx." .. CLUSTER_NAME .. "-scm-1"
+     .. "/rockspec/#{PROJECT_NAME}.nginx." .. CLUSTER_NAME .. "-scm-1"
      .. ".rockspec",
         fill_curly_placeholders(
             TEMPLATE,
             {
-              NAME = "pk-logiceditor-com.nginx." .. CLUSTER_NAME;
-              TITLE = "#{#{PROJECT_NAME}}";
+              NAME = "#{PROJECT_NAME}.nginx." .. CLUSTER_NAME;
+              TITLE = "#{PROJECT_NAME}";
               VERSION = "scm-1";
               CLUSTER_NAME = CLUSTER_NAME;
             }

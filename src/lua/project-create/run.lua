@@ -532,6 +532,9 @@ do
             else
               chmod_bin(filepath)
             end
+          elseif filename == "gen-rockspec" or filename == "gen-rockspecs" then
+            DEBUG_print("Chmodding " .. filepath .. " 755")
+            assert(shell_exec("sudo", "chmod", "755", filepath) == 0)
           end
         end -- if filename ~= "." and filename ~= ".." and filename ~= ".git" then
       end -- for filename in lfs.dir(path_data.existed_path) do
@@ -549,7 +552,7 @@ do
   end
 
   ------------------------------------------------------------------------------
-
+  -- TODO: ignore lib dir
   create_project = function(
       metamanifest_path,
       project_path
@@ -567,7 +570,7 @@ do
       )
     DEBUG_print("metamanifest :" .. tpretty(metamanifest, "  ", 80))
 
-    -- TODO: handle overwriting with flag, now overwriting prohibited
+    -- TODO: handle overwriting with flag, now overwriting is prohibited
     DEBUG_print("\n\n\27[1mCopy template files\27[0m")
     local new_files = copy_files(project_path)
     DEBUG_print("new files :" .. tpretty(new_files, "  ", 80))
@@ -581,6 +584,7 @@ do
     DEBUG_print("\n\n\27[1mFilling placeholders\27[0m")
     fill_placeholders(metamanifest, project_path)
 
+    -- TODO: WRONG, copy chmod from template
     DEBUG_print("\n\n\27[1mChmodding\27[0m")
     chmod_bin(project_path)
 

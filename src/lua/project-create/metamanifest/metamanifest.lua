@@ -1,0 +1,36 @@
+-- TODO: use this metamanifest as default
+
+dictionary =
+{
+  PROJECT_NAME = "project-name";
+
+  -- TODO: add syntax, remove this
+  PROJ_NAME_WITH_PERCENT = "project%-name";
+
+  CLUSTER_NAME =
+  {
+    "localhost-vf";
+    "localhost-ag";
+    "localhost-dp";
+    "localhost-mn";
+  };
+
+  -- TODO: obsolete, rocks/ related, remove later
+  SUBPROJ_NAME = { "pk", "project" }
+}
+
+-- how values must be wrapped in text to be replaces,
+-- default eg. #{PROJECT_NAME}
+data_wrapper =
+{
+  left = "#{";
+  right = "}";
+}
+
+-- folders and files containing this values will be replicated in concordance
+-- with dictionary values
+replicate_data =
+{
+  "CLUSTER_NAME";
+  "SUBPROJ_NAME";
+}

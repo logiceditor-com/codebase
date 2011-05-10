@@ -1,11 +1,18 @@
 -- TODO: use this metamanifest as default
 
+-- keys are strings to be replaced by value strings
 dictionary =
 {
   PROJECT_NAME = "project-name";
 
   -- TODO: add syntax, remove this
-  PROJ_NAME_WITH_PERCENT = "project%-name";
+  PROJECT_NAME_ESCAPED = "project%-name";
+
+  PROJECT_TEAM = "project-name team";
+  PROJECT_MAIL = "info@logiceditor.com";
+  PROJECT_DOMAIN = "logiceditor.com";
+  COPYRIGHTS = "Copyright (c) 2009-2011 Alexander Gladysh, Dmitry Potapov";
+  MAINTAINER = "Alexander Gladysh <agladysh@gmail.com>";
 
   CLUSTER_NAME =
   {

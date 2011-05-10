@@ -206,7 +206,8 @@ do
   --copy_files------------------------------------------------------------------
 
   local copy_files = function(project_path)
-    local template_path = assert(luarocks_show_rock_dir("pk-tools.project-templates"))
+    -- TODO: move to (defaults manifest?) variables, constant path in code is evil
+    local template_path = assert(luarocks_show_rock_dir("pk-project-tools.project-templates"))
     template_path = string.sub(template_path, 1, -2) .. "/src/lua/project-templates"
     DEBUG_print("template_path :" .. template_path)
 

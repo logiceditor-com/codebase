@@ -337,6 +337,27 @@ do
     self.context_.wsapi_response:delete_cookie(name, path)
   end
 
+  local get_cookies = function(self)
+    method_arguments(self)
+    local util = require"wsapi.util"
+
+    local cookies = { }
+    local cookies_ = string.gsub(";" .. (get_cached_request(self).env.HTTP_COOKIE or "") .. ";", "%s*;%s*", ";")
+    local pattern = ";([%a%d-_]+)=(.-);"
+    local name, cookie, init = '', '', 1
+
+    while (true) do
+      name, cookie = string.match(cookies_, pattern, init)
+      if name == nil or cookie == nil then
+        break;
+      end
+      rawset(cookies, util.url_decode(name), util.url_decode(cookie))
+      init = init + #name + #cookie
+    end
+
+    return cookies
+  end
+
   local execute_system_action_on_current_node = function(self, action, ...)
     method_arguments(
         self,
@@ -405,6 +426,7 @@ do
       get_cookie = get_cookie;
       set_cookie = set_cookie;
       delete_cookie = delete_cookie;
+      get_cookies = get_cookies;
       --
       extend = extend;
       ext = ext;

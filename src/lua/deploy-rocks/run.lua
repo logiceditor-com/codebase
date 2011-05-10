@@ -31,6 +31,18 @@ local tstr
         'tstr'
       }
 
+local assert_is_table
+      = import 'lua-nucleo/typeassert.lua'
+      {
+        'assert_is_table'
+      }
+
+local do_in_environment
+      = import 'lua-nucleo/sandbox.lua'
+      {
+        'do_in_environment'
+      }
+
 local timapofrecords,
       twithdefaults,
       tgetpath,
@@ -75,24 +87,6 @@ local load_tools_cli_data_schema,
         'freeform_table_value'
       }
 
-local assert_is_table
-      = import 'lua-nucleo/typeassert.lua'
-      {
-        'assert_is_table'
-      }
-
-local do_in_environment
-      = import 'lua-nucleo/sandbox.lua'
-      {
-        'do_in_environment'
-      }
-
-local load_table_from_file
-      = import 'deploy-rocks/common_functions.lua'
-      {
-        'load_table_from_file'
-      }
-
 local deploy_rocks_from_versions_filename,
       deploy_rocks_from_code
       = import 'deploy-rocks/deploy_rocks.lua'
@@ -103,12 +97,14 @@ local deploy_rocks_from_versions_filename,
 
 local writeln_flush,
       write_flush,
-      ask_user
+      ask_user,
+      load_table_from_file
       = import 'deploy-rocks/common_functions.lua'
       {
         'writeln_flush',
         'write_flush',
-        'ask_user'
+        'ask_user',
+        'load_table_from_file'
       }
 
 --------------------------------------------------------------------------------

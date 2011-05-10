@@ -44,10 +44,14 @@ local do_in_environment
         'do_in_environment'
       }
 
-local shell_exec
-      = import 'lua-aplicado/shell.lua'
+local copy_file_to_dir,
+      remove_file,
+      create_symlink_from_to
+      = import 'lua-aplicado/shell/filesystem.lua'
       {
-        'shell_exec'
+        'copy_file_to_dir',
+        'remove_file',
+        'create_symlink_from_to'
       }
 
 --------------------------------------------------------------------------------
@@ -98,24 +102,6 @@ local ask_user = function(prompt, choices, default)
   return default -- May be nil if no default and user pressed ^D
 end
 
-local copy_file_to_dir = function(filename, dir)
-  assert(shell_exec(
-      "cp", filename, dir .. "/"
-    ) == 0)
-end
-
-local remove_file = function(filename)
-  assert(shell_exec(
-      "rm", filename
-    ) == 0)
-end
-
-local create_symlink_from_to = function(from_filename, to_filename)
-  assert(shell_exec(
-      "ln", "-s", from_filename, to_filename
-    ) == 0)
-end
-
 -- TODO: Move these somewhere to lua-nucleo?
 
 local load_table_from_file = function(path)
@@ -133,8 +119,5 @@ return
   writeln_flush = writeln_flush;
   write_flush = write_flush;
   ask_user = ask_user;
-  copy_file_to_dir = copy_file_to_dir;
-  remove_file = remove_file;
-  create_symlink_from_to = create_symlink_from_to;
   load_table_from_file = load_table_from_file;
 }

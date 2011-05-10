@@ -149,21 +149,25 @@ local remote_luarocks_remove_forced,
         'remote_luarocks_list_installed_rocks'
       }
 
+local copy_file_to_dir,
+      remove_file,
+      create_symlink_from_to
+      = import 'lua-aplicado/shell/filesystem.lua'
+      {
+        'copy_file_to_dir',
+        'remove_file',
+        'create_symlink_from_to'
+      }
+
 local writeln_flush,
       write_flush,
       ask_user,
-      copy_file_to_dir,
-      remove_file,
-      create_symlink_from_to,
       load_table_from_file
       = import 'deploy-rocks/common_functions.lua'
       {
         'writeln_flush',
         'write_flush',
         'ask_user',
-        'copy_file_to_dir',
-        'remove_file',
-        'create_symlink_from_to',
         'load_table_from_file'
       }
 

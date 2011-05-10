@@ -24,7 +24,7 @@ Available placeholders:
 doc:text "00_cover"
 [[
 % #{PROJECT_DOMAIN}. Клиентский протокол (API)
-% #{PROJECT_TEAM} #{PROJECT_MAIL}
+% #{PROJECT_TEAM} <#{PROJECT_MAIL}>
 \thispagestyle{empty}
 
 \begin{flushright}

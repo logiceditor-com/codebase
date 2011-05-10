@@ -5,9 +5,9 @@ source = {
 }
 description = {
    summary = "#{PROJECT_NAME} Common Server Code",
-   homepage = "http://#{PROJECT_NAME}.com",
+   homepage = "http://#{PROJECT_DOMAIN}",
    license = "Unpublished closed-source!",
-   maintainer = "Alexander Gladysh <agladysh@gmail.com>"
+   maintainer = "#{MAINTAINER}"
 }
 supported_platforms = {
    "unix"

@@ -23,8 +23,8 @@ Available placeholders:
 
 doc:text "00_cover"
 [[
-% #{PROJECT_NAME} Клиентский протокол (API)
-% #{PROJECT_NAME} team <info@#{PROJECT_NAME}.com>
+% #{PROJECT_DOMAIN}. Клиентский протокол (API)
+% #{PROJECT_TEAM} #{PROJECT_MAIL}
 \thispagestyle{empty}
 
 \begin{flushright}

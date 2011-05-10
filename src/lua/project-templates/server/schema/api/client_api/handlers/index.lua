@@ -4,5 +4,5 @@ api:static_url "/"
 
   content_type = "text/xml";
 
-  text = [[<pk_hb_server_api/>]];
+  text = [[<#{PROJECT_NAME}_api/>]];
 }

@@ -5,9 +5,9 @@ source = {
 }
 description = {
    summary = "#{PROJECT_NAME} website api",
-   homepage = "http://#{PROJECT_NAME}.com",
+   homepage = "http://#{PROJECT_DOMAIN}",
    license = "Unpublished closed-source!",
-   maintainer = "Alexander Gladysh <agladysh@gmail.com>"
+   maintainer = "#{MAINTAINER}"
 }
 dependencies = {
    "lua == 5.1",

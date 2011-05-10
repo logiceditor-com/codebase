@@ -1,1 +1,0 @@
-system = { address = { host = "#{PROJECT_NAME}-redis-system", port = 6379 }, database = 5 }

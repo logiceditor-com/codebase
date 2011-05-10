@@ -40,16 +40,14 @@ local is_table,
         'is_number'
       }
 
-local load_tools_cli_data_schema,
-      load_tools_cli_config,
-      print_tools_cli_config_usage,
-      freeform_table_value
-      = import 'pk-core/tools_cli_config.lua'
+local tgetpath,
+      tclone,
+      twithdefaults
+      = import 'lua-nucleo/table-utils.lua'
       {
-        'load_tools_cli_data_schema',
-        'load_tools_cli_config',
-        'print_tools_cli_config_usage',
-        'freeform_table_value'
+        'tgetpath',
+        'tclone',
+        'twithdefaults'
       }
 
 local load_all_files,
@@ -82,6 +80,18 @@ local luarocks_show_rock_dir
         'luarocks_show_rock_dir'
       }
 
+local copy_file_with_flag,
+      copy_file,
+      remove_file,
+      remove_recursively
+      = import 'lua-aplicado/shell/filesystem.lua'
+      {
+        'copy_file_with_flag',
+        'copy_file',
+        'remove_file',
+        'remove_recursively'
+      }
+
 local shell_read,
       shell_exec
       = import 'lua-aplicado/shell.lua'
@@ -90,20 +100,16 @@ local shell_read,
         'shell_exec'
       }
 
-local do_in_environment,
-      make_config_environment
-      = import 'lua-nucleo/sandbox.lua'
+local load_tools_cli_data_schema,
+      load_tools_cli_config,
+      print_tools_cli_config_usage,
+      freeform_table_value
+      = import 'pk-core/tools_cli_config.lua'
       {
-        'do_in_environment',
-        'make_config_environment'
-      }
-
-local tgetpath,
-      tclone
-      = import 'lua-nucleo/table-utils.lua'
-      {
-        'tgetpath',
-        'tclone'
+        'load_tools_cli_data_schema',
+        'load_tools_cli_config',
+        'print_tools_cli_config_usage',
+        'freeform_table_value'
       }
 
 local load_project_manifest
@@ -138,25 +144,9 @@ do
     end
   end
 
-  local copy_file = function(path_from, path_to)
-    assert(create_path_to_file(path_to))
-    assert(
-        write_file(
-            path_to,
-            assert(read_file(path_from))
-          )
-      )
-  end
-
   local copy_if_not_exist  = function(path_from, path_to)
-    if not does_file_exist(path_to) then
-      DEBUG_print("copy file :" .. path_from)
-      copy_file(path_from, path_to)
-      return true
-    else
-      DEBUG_print("\27[31mfile already exists\27[0m :" .. path_to)
-      return false
-    end
+    create_path_to_file(path_to)
+    copy_file_with_flag(path_from, path_to, "-n")
   end
 
   local get_replacement_pattern = function(filename, metamanifest)
@@ -170,6 +160,7 @@ do
   end
 
   local replace_string_in_file = function(filename, string, replace)
+    -- TODO: check on '/' and replace to s||| or s:::
     assert(
         shell_exec(
             "sed",
@@ -188,19 +179,6 @@ do
           v
         )
     end
-  end
-
-  local function remove_recursively(path)
-    local attr = assert(lfs.attributes(path))
-    if attr.mode == "directory" then
-      for filename in lfs.dir(path) do
-        if filename ~= "." and filename ~= ".." and filename ~= ".git" then
-          local filepath = path .. "/" .. filename
-          remove_recursively(filepath)
-        end
-      end
-    end
-    os.remove(path)
   end
 
   --copy_files------------------------------------------------------------------
@@ -562,37 +540,57 @@ do
         "string", metamanifest_path,
         "string", project_path
       )
+    DEBUG_print("\n\n")
+    log("\27[1mLoading metamanifest\27[0m")
+    DEBUG_print("Loading defaults")
 
-    DEBUG_print("\n\n\27[1mLoading metamanifest\27[0m")
+    -- TODO: HACK? how to get path to this?
+    local defaults_path = 
+      assert(luarocks_show_rock_dir("pk-project-tools.pk-project-create"))
+    defaults_path =
+      string.sub(defaults_path, 1, -2) .. "/src/lua/project-create/metamanifest"
+    local metamanifest_defaults = load_project_manifest(
+        defaults_path,
+        "",
+        ""
+      )
+    DEBUG_print(
+        "\27[32mmetamanifest defaults\27[0m:"
+     .. tpretty(metamanifest_defaults, "  ", 80)
+      )
+    DEBUG_print("Loading project metamanifest")
     local metamanifest = load_project_manifest(
         metamanifest_path,
         project_path,
         ""
       )
-    DEBUG_print("metamanifest :" .. tpretty(metamanifest, "  ", 80))
+    DEBUG_print(
+        "\27[32mproject metamanifest\27[0m:"
+     .. tpretty(metamanifest, "  ", 80)
+      )
+    metamanifest = twithdefaults(metamanifest, metamanifest_defaults)
+    DEBUG_print("\27[32mfinal metamanifest\27[0m:" .. tpretty(metamanifest, "  ", 80))
 
     -- TODO: handle overwriting with flag, now overwriting is prohibited
-    DEBUG_print("\n\n\27[1mCopy template files\27[0m")
+    -- use copy_file_with_flag "-f"
+    DEBUG_print("\n\n")
+    log("\27[1mCopy template files\27[0m")
     local new_files = copy_files(project_path)
     DEBUG_print("new files :" .. tpretty(new_files, "  ", 80))
 
-    DEBUG_print("\n\n\27[1mReplicating data\27[0m")
+    DEBUG_print("\n\n")
+    log("\27[1mReplicating data\27[0m")
     replicate_data(metamanifest, project_path)
 
-    DEBUG_print("\n\n\27[1mCleanup replication data\27[0m")
+    DEBUG_print("\n\n")
+    log("\27[1mCleanup replication data\27[0m")
     clean_up_replicate_data(metamanifest, project_path)
 
-    DEBUG_print("\n\n\27[1mFilling placeholders\27[0m")
+    DEBUG_print("\n\n")
+    log("\27[1mFilling placeholders\27[0m")
     fill_placeholders(metamanifest, project_path)
 
-    -- TODO: WRONG, copy chmod from template
-    DEBUG_print("\n\n\27[1mChmodding\27[0m")
-    chmod_bin(project_path)
-
-    DEBUG_print("\n\n\27[1mRun project generative and deployment scripts\27[0m")
-    run_scripts(metamanifest, project_path)
-
-    log("project created")
+    log("Project " .. metamanifest.dictionary.PROJECT_NAME .. " created")
     return true
   end
 end

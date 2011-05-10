@@ -1,0 +1,38 @@
+# LogRotate script for the first node of #{PROJECT_NAME}
+#
+/var/log/#{PROJECT_NAME}-api.log {
+  #
+  # Keep logs for a month
+  #
+  rotate 30
+  #
+  # Rotate daily
+  #
+  daily
+  #
+  # Compress logs
+  #
+  compress
+  #
+  # Keep most fresh rotated log uncompressed. Important!
+  #
+  delaycompress
+  #
+  # OK if file is missing
+  #
+  missingok
+  #
+  # Don't rotate empty file
+  #
+  notifempty
+  #
+  # Create a log new file with these permissions
+  #
+  create 600 www-data www-data
+  #
+  # Tell service to let go of the old log file (works only with delaycompress on)
+  #
+  postrotate
+    #{PROJECT_NAME}-execute-system-action api 1 reopen_log_file
+  endscript
+}

@@ -1,0 +1,4 @@
+pk_hb_server =
+{
+  client_api_version = "2010XXX";
+}

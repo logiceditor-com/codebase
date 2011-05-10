@@ -144,9 +144,13 @@ do
     end
   end
 
-  local copy_if_not_exist  = function(path_from, path_to)
+  local copy_file_check_force  = function(path_from, path_to)
     create_path_to_file(path_to)
-    copy_file_with_flag(path_from, path_to, "-n")
+    if not CONFIG[TOOL_NAME].force then
+      copy_file_with_flag(path_from, path_to, "-n")
+    else
+      copy_file_with_flag(path_from, path_to, "-f")
+    end
   end
 
   local get_replacement_pattern = function(filename, metamanifest)
@@ -200,7 +204,7 @@ do
       local project_filepath = project_path .. short_path
 
       -- do not overwrite
-      if copy_if_not_exist(all_template_files[i], project_filepath) then
+      if copy_file_check_force(all_template_files[i], project_filepath) then
         new_files[#new_files + 1] = short_path
       end
     end
@@ -264,6 +268,7 @@ do
       end
       return new_filenames
     end
+
     local process_replication_recursively
     do
       local add_string = function(path, pattern, replace)
@@ -305,7 +310,7 @@ do
            )
         else
           if filepath ~= created_path then
-            copy_if_not_exist(filepath, created_path)
+            copy_file_check_force(filepath, created_path)
           end
           -- TODO: check if pattern exists in file
           -- replace universal pattern to replicated
@@ -395,7 +400,7 @@ do
       )
       DEBUG_print("Making plain dictionary")
       metamanifest = make_plain_dictionary(metamanifest)
-      DEBUG_print("metamanifest :" .. tpretty(metamanifest, "  ", 80))
+      DEBUG_print("\27[32mmetamanifest\27[0m :" .. tpretty(metamanifest, "  ", 80))
 
       -- no dictionary replacements
       process_replication_recursively(
@@ -446,18 +451,27 @@ do
       end
       -- TODO: vaible way?
       if filepath ~= new_filepath then
+        -- TODO: use os.fileexists(new_filepath) on non force renaming?
         local res, err = os.rename(filepath, new_filepath)
         if res == nil then
-          DEBUG_print(
-              "\27[31mcan't rename\27[0m: " .. err
-            )
-          remove_recursively(filepath)
-          DEBUG_print("removed")
+          if not CONFIG[TOOL_NAME].force then
+            DEBUG_print(
+                "\27[31mcan't rename\27[0m: " .. err
+              )
+            remove_recursively(filepath)
+            DEBUG_print("removed")
+          else
+            remove_recursively(new_filepath)
+            assert(os.rename(filepath, new_filepath))
+            DEBUG_print(
+                "\27[32mforce renamed\27[0m: \n   " .. filepath
+             .. "\nto " .. new_filepath)
+          end
         else
-          DEBUG_print("renamed: \n   " .. filepath .. "\nto " .. new_filepath)
+          DEBUG_print("\27[32mrenamed\27[0m: \n   " .. filepath .. "\nto " .. new_filepath)
         end
       end
-      --copy_if_not_exist(all_template_files[i], new_filename)
+      --copy_file_check_force(all_template_files[i], new_filename)
       return new_filepath
     end
 
@@ -608,6 +622,7 @@ Usage:
 Options:
 
     --debug                    Verbose output
+    --force                    Force overwrite all generated files over old copies
 ]]
 
 local CONFIG_SCHEMA = create_config_schema()
@@ -624,6 +639,7 @@ local run = function(...)
         param.metamanifest_path = args[1]
         param.root_project_path = args[2]
         param.debug             = args["--debug"]
+        param.force             = args["--force"]
         return
         {
           PROJECT_PATH = ""; -- TODO: Remove

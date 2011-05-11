@@ -14,6 +14,8 @@ dictionary =
   COPYRIGHTS = "Copyright (c) 2009-2011 Alexander Gladysh, Dmitry Potapov";
   MAINTAINER = "Alexander Gladysh <agladysh@gmail.com>";
 
+  IP_ADDRESS = "TODO:Change! 127.0.255."
+
   CLUSTER_NAME =
   {
     "localhost-vf";

@@ -176,9 +176,9 @@ Hosts
 
 Add this to /etc/hosts:
 
-    127.0.XXX.1 #{PROJECT_NAME}
-    127.0.XXX.2 #{PROJECT_NAME}-internal-config
-    127.0.XXX.3 #{PROJECT_NAME}-internal-config-deploy
+    #{IP_ADDRESS}1 #{PROJECT_NAME}
+    #{IP_ADDRESS}2 #{PROJECT_NAME}-internal-config
+    #{IP_ADDRESS}3 #{PROJECT_NAME}-internal-config-deploy
 
 Also add aliases to localhost (developer machine only):
 
@@ -188,16 +188,102 @@ DB initialization
 -----------------
 
 1. Set MySQL root password to 12345
-sudo /usr/bin/mysql_secure_installation
+
+    sudo /usr/bin/mysql_secure_installation
 
 2. Create main databases
-mysql -uroot -p <<< '
-create database `#{PROJECT_NAME}`;
-'
+
+    mysql -uroot -p <<< '
+    create database `#{PROJECT_NAME}`;
+    '
 
 3. Initialize databases
-cd ~/projects/#{PROJECT_NAME}/bin/
-pk-banner-db-changes initialize_db #{PROJECT_NAME}
+
+    cd ~/projects/#{PROJECT_NAME}/bin/
+    pk-banner-db-changes initialize_db #{PROJECT_NAME}
+
+Install project
+---------------
+
+1. Clone server code Git to ${HOME}/projects/#{PROJECT_NAME}
+
+    mkdir -p ${HOME}/projects/#{PROJECT_NAME}
+    cd ${HOME}/projects/#{PROJECT_NAME}
+    git clone gitolite@git.iphonestudio.ru:/#{PROJECT_NAME}/server
+    git clone gitolite@git.iphonestudio.ru:/#{PROJECT_NAME}/deployment
+
+2. Setup Git hooks
+
+    rm -r ${HOME}/projects/pk/.git/hooks
+    ln -s ../etc/git/hooks ${HOME}/projects/pk/.git/hooks
+
+3. Install foreign rocks
+
+WARNING! Always remove all installed rocks before installation!
+         See list of installed rocks with
+
+            luarocks list
+
+         (When transforming these instructions to .deb packages,
+         remove a rock being installed with --force.)
+
+If you have rocks installed check what you miss from list. Compare
+
+    cd ${HOME}/projects/#{PROJECT_NAME}/server/lib/pk-foreign-rocks
+    find rocks -name *.rockspec
+
+and
+
+    luarocks list
+
+by using command
+
+    sudo luarocks install ${ROCK_NAME} \
+    --only-from=${HOME}/projects/#{PROJECT_NAME}/server/lib/pk-foreign-rocks/rocks
+
+ON CLEAN MACHINE ONLY:
+
+    cd ${HOME}/projects/#{PROJECT_NAME}/server/lib/pk-foreign-rocks
+    find rocks -name *.rockspec | xargs -l1 sudo luarocks install
+
+4. Install libs
+
+4.1 lua-nucleo
+
+    luarocks list lua-nucleo
+
+If nothing found:
+
+    cd ${HOME}/projects/#{PROJECT_NAME}/server/lib/lua-nucleo
+    sudo luarocks make rockspec/lua-nucleo-banner-1.rockspec
+
+4.2 lua-aplicado
+
+    luarocks list lua-aplicado
+
+If nothing found:
+
+    cd ${HOME}/projects/#{PROJECT_NAME}/server/lib/lua-aplicado
+    sudo luarocks make rockspec/lua-aplicado-banner-1.rockspec
+
+4.3 pk-core
+
+    luarocks list pk-core
+
+If nothing found:
+
+    cd ${HOME}/projects/#{PROJECT_NAME}/server/lib/pk-core
+    sudo luarocks make rockspec/pk-core-banner-1.rockspec
+
+4.4 pk-engine
+
+    cd ${HOME}/projects/#{PROJECT_NAME}/server/lib/pk-engine/
+    ./make.sh
+
+4.5 pk-tools
+
+    cd ${HOME}/projects/#{PROJECT_NAME}/server/lib/pk-engine/
+    ./make.sh
 
 Deploying to developer machine
 ------------------------------
@@ -206,11 +292,7 @@ Deploying to developer machine
 
 Most likely it is localhost-<your-initials>. But ask AG.
 
-2. Install rocks
-
-TODO: THIS PART TO BE FILLED AFTER CLEAN SYSTEM DEPLOYEMENT WILL BE TESTED
-
-3. Check if deploy-rocks would work
+2. Check if deploy-rocks would work
 
 This command should not crash:
 
@@ -218,7 +300,7 @@ This command should not crash:
 
 If it does not print anything, you're missing deploy-rocks rock.
 
-4. Deploy:
+3. Deploy:
 
     bin/deploy-rocks deploy_from_code <your-cluster-name>
 

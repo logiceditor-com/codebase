@@ -26,8 +26,10 @@ PK.override_menu_item_to_enable_tooltips = function()
         this.textEl = this.el.child('.x-menu-item-text');
         if (this.tooltip)
         {
+          // Note: constrainPosition is not documented
           this.tooltip = new Ext.ToolTip(Ext.apply({
                 target: this.el,
+                constrainPosition: true,
                 dismissDelay: DISMISS_DELAY_FOR_MENU_ITEM_TOOLTIP
                 }, Ext.isObject(this.tooltip) ? this.tooltip : { html: this.tooltip } ));
         }

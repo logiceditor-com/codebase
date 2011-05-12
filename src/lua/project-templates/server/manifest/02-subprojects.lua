@@ -17,7 +17,7 @@ subprojects =
   };
   --
   {
-    name = "pk-hb-deployment";
+    name = "#{PROJECT_NAME}-deployment";
     local_path = PROJECT_PATH .. "/../deployment";
     rockspec_generator = false;
     provides_rocks_repo =

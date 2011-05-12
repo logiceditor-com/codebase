@@ -46,6 +46,7 @@ APT-packages
         bc                  \
         libev-dev           \
         libzmq-dev          \
+        pandoc              \
         luajit
 
 2. Ensure that machine is in Europe/Moscow timezone.

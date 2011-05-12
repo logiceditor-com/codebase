@@ -31,7 +31,7 @@ do
         }
 
   -- TODO: Make configurable!
-  local LOG_FILE_NAME = "/var/log/#{PROJECT_NAME}-api-wsapi.log"
+  local LOG_FILE_NAME = "/var/log/#{PROJECT_NAME}-#{API_NAME}-wsapi.log"
 
   local ok
   ok, reopen_log_file = common_init_logging_to_file(LOG_FILE_NAME)
@@ -98,7 +98,7 @@ local HANDLERS,
 --------------------------------------------------------------------------------
 
 local log, dbg, spam, log_error = make_loggers(
-    "#{PROJECT_NAME}-api/wsapi",
+    "#{PROJECT_NAME}-#{API_NAME}/wsapi",
     "DAW"
   )
 
@@ -114,8 +114,8 @@ log("loading wsapi-runner (#{PROJECT_NAME}-api 1)")
 -- TODO: Fix wsapi/luasocket, so this would not be needed. (Or, better, migrate to lua-ev)
 
 -- TODO: Get these from internal config
-local SERVICE_ID = "#{PROJECT_NAME}:api:1"
-local SYSTEM_ACTION_URL = "/api/sys/#{PROJECT_NAME}-api/1/ec7719ce-0fea-11e0-af19-00219bd18c14"
+local SERVICE_ID = "#{PROJECT_NAME}:#{API_NAME}:1"
+local SYSTEM_ACTION_URL = "/api/sys/#{PROJECT_NAME}-#{API_NAME}/1/ec7719ce-0fea-11e0-af19-00219bd18c14"
 
 local SYSTEM_ACTIONS = { }
 

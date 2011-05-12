@@ -4,39 +4,29 @@
 ## ABSOLUTE path to the spawn-fcgi binary
 SPAWNFCGI="/usr/bin/spawn-fcgi"
 
+## ABSOLUTE path to the multiwatch binary
+MULTIWATCH="/usr/bin/multiwatch"
+
 ## ABSOLUTE path to the FastCGI application (php-cgi, dispatch.fcgi, ...)
 FCGIPROGRAM="/usr/local/bin/#{PROJECT_NAME}.fcgi"
 
 ## bind to unix socket
-FCGISOCKET="/tmp/#{PROJECT_NAME}-api.socket"
+FCGISOCKET="/tmp/#{PROJECT_NAME}-#{API_NAME}.socket"
 
-# allowed environment variables separated by spaces
-#ALLOWED_ENV="PATH USER"
+## Number of forks
+FCGI_CHILDREN=10
 
 ## if this script is run as root switch to the following user
 USERID=www-data
 SOCKUSERID=www-data
-#CHROOT=/home/www/
-
-#RAILS_ENV="production"
-#export RAILS_ENV
-
 
 ################## no config below this line
 
 exec 2>&1
 
-if test x$PHP_FCGI_CHILDREN = x; then
-  PHP_FCGI_CHILDREN=4
-fi
+ALLOWED_ENV=""
 
-ALLOWED_ENV="$ALLOWED_ENV RAILS_ENV"
-
-if test x$UID = x0; then
-  EX="$SPAWNFCGI -n -s $FCGISOCKET -u $USERID -U $SOCKUSERID -- $FCGIPROGRAM"
-else
-  EX="$SPAWNFCGI -n -s $FCGISOCKET -C $PHP_FCGI_CHILDREN -- $FCGIPROGRAM"
-fi
+EX="$SPAWNFCGI -n -s $FCGISOCKET -u $USERID -U $SOCKUSERID -- $MULTIWATCH -f $FCGI_CHILDREN $FCGIPROGRAM"
 
 # copy the allowed environment variables
 E=

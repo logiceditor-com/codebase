@@ -1,4 +1,4 @@
-package = "#{PROJECT_NAME}.api"
+package = "#{PROJECT_NAME}.#{API_NAME}"
 version = "scm-1"
 source = {
    url = "" -- Installable with `luarocks make` only
@@ -27,15 +27,15 @@ dependencies = {
 build = {
    type = "none",
    copy_directories = {
-      "www/#{PROJECT_NAME}/api/service",
-      "www/#{PROJECT_NAME}/api/generated"
+      "www/#{API_NAME}/service",
+      "www/#{API_NAME}/generated"
    },
    install = {
       lua = {
-         ["#{PROJECT_NAME}.api.run"] = "www/#{PROJECT_NAME}/api/site/run.lua"
+         ["#{PROJECT_NAME}.#{API_NAME}.run"] = "www/#{API_NAME}/site/run.lua"
       },
       bin = {
-         "www/#{PROJECT_NAME}/api/bin/#{PROJECT_NAME}.fcgi"
+         "www/#{API_NAME}/bin/#{PROJECT_NAME}.fcgi"
       }
    }
 }

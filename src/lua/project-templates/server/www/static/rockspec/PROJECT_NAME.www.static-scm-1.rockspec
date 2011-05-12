@@ -17,6 +17,6 @@ dependencies = {
 build = {
    type = "none",
    copy_directories = {
-      "www/#{PROJECT_NAME}/static";
+      "www/static";
    }
 }

@@ -7,6 +7,6 @@ server {
   real_ip_header X-Real-IP;
 
   location / {
-    alias /usr/local/lib/luarocks/rocks/#{PROJECT_NAME}.www.static/scm-1/www/#{PROJECT_NAME}/static/;
+    alias /usr/local/lib/luarocks/rocks/#{PROJECT_NAME}.www.static/scm-1/www/static/site/;
   }
 }

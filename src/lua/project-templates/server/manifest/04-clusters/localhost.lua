@@ -32,7 +32,7 @@ local localhost_config = function(name)
           { name = "internal-config-deploy" };
           { name = "internal-config" };
           { name = "#{PROJECT_NAME}" };
-          { name = "#{PROJECT_NAME}-api" };
+          { name = "#{PROJECT_NAME}-#{API_NAME}" };
           { name = "redis-system" };
           { name = "mysql-db" };
         };

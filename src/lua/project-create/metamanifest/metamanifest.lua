@@ -16,6 +16,8 @@ dictionary =
 
   IP_ADDRESS = "TODO:Change! 127.0.255.";
 
+  API_NAME = "api";
+
   CLUSTER_NAME =
   {
     "localhost-vf";
@@ -25,7 +27,7 @@ dictionary =
   };
 
   -- TODO: obsolete, rocks/ related, remove later
-  SUBPROJ_NAME = { "pk", "project" }
+  SUBPROJ_NAME = { "pk", "project" };
 }
 
 -- how values must be wrapped in text to be replaces,

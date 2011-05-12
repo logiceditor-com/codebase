@@ -234,11 +234,11 @@ roles =
   --
   wsapi_service_role
   {
-    name = "#{PROJECT_NAME}-api";
+    name = "#{PROJECT_NAME}-#{API_NAME}";
     wsapi =
     {
-      service_name = "#{PROJECT_NAME}.api";
-      log_file = "/var/log/#{PROJECT_NAME}-api-wsapi.log";
+      service_name = "#{PROJECT_NAME}.#{API_NAME}";
+      log_file = "/var/log/#{PROJECT_NAME}-#{API_NAME}-wsapi.log";
     };
     nginx =
     {
@@ -248,21 +248,21 @@ roles =
     logrotate =
     {
       rock_name = "#{PROJECT_NAME}.nginx.${CLUSTER_NAME}";
-      config_path = "cluster/${CLUSTER_NAME}/logrotate/#{PROJECT_NAME}-api";
+      config_path = "cluster/${CLUSTER_NAME}/logrotate/#{PROJECT_NAME}-#{API_NAME}";
     };
     runit =
     {
-      service_name = "#{PROJECT_NAME}.api";
-      run_path = "www/#{PROJECT_NAME}/api/service/run";
+      service_name = "#{PROJECT_NAME}.#{API_NAME}";
+      run_path = "www/#{API_NAME}/service/run";
     };
     system_service =
     {
-      name = "api";
+      name = "#{API_NAME}";
       node = "1";
     };
     deploy_rocks =
     {
-      "#{PROJECT_NAME}.api";
+      "#{PROJECT_NAME}.#{API_NAME}";
       "#{PROJECT_NAME}.lib"; -- TODO: This is a dependency, do not list it explicitly
     };
   };

@@ -1,12 +1,12 @@
 local ROCKS =
 {
   {
-    "www/#{PROJECT_NAME}/rockspec/"
+    "www/static/rockspec/"
      .. "#{PROJECT_NAME}.www.static-scm-1.rockspec";
   };
   {
-    "www/#{PROJECT_NAME}/api/rockspec/"
-     .. "#{PROJECT_NAME}.api-scm-1.rockspec";
+    "www/#{API_NAME}/rockspec/"
+     .. "#{PROJECT_NAME}.#{API_NAME}-scm-1.rockspec";
   };
   {
     "tools/rockspec/"

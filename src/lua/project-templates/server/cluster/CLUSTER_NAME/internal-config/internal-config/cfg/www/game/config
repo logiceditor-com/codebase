@@ -1,4 +1,4 @@
-pk_hb_server =
+["#{PROJECT_NAME}"] =
 {
   client_api_version = "2010XXX";
 }

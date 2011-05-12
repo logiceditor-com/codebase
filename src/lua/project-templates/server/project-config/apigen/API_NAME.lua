@@ -6,14 +6,14 @@
 
 local file = function(name) return { filename = name } end
 
-local NAME = "api"
+local NAME = "#{API_NAME}"
 
 local EXPORTS_LIST_NAME = PROJECT_PATH
     .. "tmp/" .. NAME .. "/code/exports/client_api.lua";
 
 common.PROJECT_PATH = PROJECT_PATH
 
-common.www.application.url = "http://#{PROJECT_NAME}/api/"
+common.www.application.url = "http://#{PROJECT_NAME}/#{API_NAME}/"
 common.www.application.api_schema_dir = PROJECT_PATH .. "schema/" .. NAME .. "/client_api"
 common.www.application.have_unity_client = false
 -- common.www.application.session_checker_file_name = false
@@ -46,7 +46,7 @@ common.www.application.code.globals =
 
 common.www.application.generated =
 {
-  file_root = PROJECT_PATH .. "www/#{PROJECT_NAME}/" .. NAME .. "/generated/";
+  file_root = PROJECT_PATH .. "www/" .. NAME .. "/generated/";
 
   api_version_filename = "client_api_version.lua";
   handlers_index_filename = "handlers.lua";
@@ -64,7 +64,7 @@ common.www.application.generated =
   doc_latex_template_filename = common.www.application.api_schema_dir
     .. "/doc/latex.template";
 
-  base_url_prefix = "/api/";
+  base_url_prefix = "/#{API_NAME}/";
 
   --
 

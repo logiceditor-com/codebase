@@ -78,6 +78,7 @@ do
   -- Private method
   local get_cached_request = function(self)
     method_arguments(self)
+    self.raw_input = self.context_.wsapi_env.input:read(self.context_.wsapi_env.input.length)
     if not self.cached_request_ then
       self.cached_request_ = wsapi.request.new(
           self.context_.wsapi_env,
@@ -391,6 +392,10 @@ do
     return self.context_.redis_manager
   end
 
+  local get_raw_postdata = function(self)
+    return self.raw_input
+  end
+
   make_api_context = function(
       context,
       db_tables,
@@ -427,6 +432,8 @@ do
       set_cookie = set_cookie;
       delete_cookie = delete_cookie;
       get_cookies = get_cookies;
+      --
+      get_raw_postdata = get_raw_postdata;
       --
       extend = extend;
       ext = ext;

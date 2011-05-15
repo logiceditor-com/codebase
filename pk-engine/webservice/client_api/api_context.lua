@@ -78,8 +78,8 @@ do
   -- Private method
   local get_cached_request = function(self)
     method_arguments(self)
-    self.raw_input = self.context_.wsapi_env.input:read(self.context_.wsapi_env.input.length)
     if not self.cached_request_ then
+      self.raw_input = self.context_.wsapi_env.input:read(self.context_.wsapi_env.input.length)
       self.cached_request_ = wsapi.request.new(
           self.context_.wsapi_env,
           { overwrite = true }

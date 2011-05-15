@@ -35,7 +35,7 @@ build = {
          ["#{PROJECT_NAME}.#{API_NAME}.run"] = "www/#{API_NAME}/site/run.lua"
       },
       bin = {
-         "www/#{API_NAME}/bin/#{PROJECT_NAME}.fcgi"
+         "www/#{API_NAME}/bin/#{PROJECT_NAME}-#{API_NAME}.fcgi"
       }
    }
 }

@@ -1,6 +1,6 @@
 # LogRotate script for the first node of #{PROJECT_NAME}
 #
-/var/log/#{PROJECT_NAME}-api.log {
+/var/log/#{PROJECT_NAME}-#{API_NAME}.log {
   #
   # Keep logs for a month
   #
@@ -33,6 +33,6 @@
   # Tell service to let go of the old log file (works only with delaycompress on)
   #
   postrotate
-    #{PROJECT_NAME}-execute-system-action api 1 reopen_log_file
+    #{PROJECT_NAME}-execute-system-action #{API_NAME} 1 reopen_log_file
   endscript
 }

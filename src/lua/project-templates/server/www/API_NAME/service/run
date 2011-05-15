@@ -8,7 +8,7 @@ SPAWNFCGI="/usr/bin/spawn-fcgi"
 MULTIWATCH="/usr/bin/multiwatch"
 
 ## ABSOLUTE path to the FastCGI application (php-cgi, dispatch.fcgi, ...)
-FCGIPROGRAM="/usr/local/bin/#{PROJECT_NAME}.fcgi"
+FCGIPROGRAM="/usr/local/bin/#{PROJECT_NAME}-#{API_NAME}.fcgi"
 
 ## bind to unix socket
 FCGISOCKET="/tmp/#{PROJECT_NAME}-#{API_NAME}.socket"

@@ -79,9 +79,9 @@ do
   local get_cached_request = function(self)
     method_arguments(self)
     if not self.cached_request_ then
-      self.raw_input = self.context_.wsapi_env.input:read(self.context_.wsapi_env.input.length)
+      self.new_wsapi_env = wsapi.util.make_rewindable(self.context_.wsapi_env)
       self.cached_request_ = wsapi.request.new(
-          self.context_.wsapi_env,
+          self.new_wsapi_env,
           { overwrite = true }
         )
     end
@@ -393,7 +393,8 @@ do
   end
 
   local get_raw_postdata = function(self)
-    return self.raw_input
+    self.new_wsapi_env.input:rewind()
+    return self.new_wsapi_env.input:read(self.context_.wsapi_env.input.length)
   end
 
   make_api_context = function(

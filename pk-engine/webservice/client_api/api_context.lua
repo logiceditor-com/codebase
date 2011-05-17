@@ -6,6 +6,7 @@
 
 require 'wsapi.request'
 require 'socket.url'
+require 'wsapi.util'
 
 --------------------------------------------------------------------------------
 
@@ -340,23 +341,26 @@ do
 
   local get_cookies = function(self)
     method_arguments(self)
-    local util = require"wsapi.util"
 
-    local cookies = { }
-    local cookies_ = string.gsub(";" .. (get_cached_request(self).env.HTTP_COOKIE or "") .. ";", "%s*;%s*", ";")
-    local pattern = ";([%a%d-_]+)=(.-);"
-    local name, cookie, init = '', '', 1
+    if self.cached_cookies_ == nil then
+      local cookies = { }
+      local cookies_ = string.gsub(";" .. (get_cached_request(self).env.HTTP_COOKIE or "") .. ";", "%s*;%s*", ";")
+      local pattern = ";([%a%d-_]+)=(.-);"
+      local name, cookie, init = '', '', 1
 
-    while (true) do
-      name, cookie = string.match(cookies_, pattern, init)
-      if name == nil or cookie == nil then
-        break;
+      while (true) do
+        name, cookie = string.match(cookies_, pattern, init)
+        if name == nil or cookie == nil then
+          break;
+        end
+        rawset(cookies, wsapi.util.url_decode(name), wsapi.util.url_decode(cookie))
+        init = init + #name + #cookie
       end
-      rawset(cookies, util.url_decode(name), util.url_decode(cookie))
-      init = init + #name + #cookie
+
+      self.cached_cookies_ = cookies
     end
 
-    return cookies
+    return self.cached_cookies_
   end
 
   local execute_system_action_on_current_node = function(self, action, ...)
@@ -393,8 +397,11 @@ do
   end
 
   local get_raw_postdata = function(self)
-    self.new_wsapi_env.input:rewind()
-    return self.new_wsapi_env.input:read(self.context_.wsapi_env.input.length)
+    if self.cached_postdata_ == nil then
+      self.new_wsapi_env.input:rewind()
+      self.cached_cookies_ = self.new_wsapi_env.input:read(self.context_.wsapi_env.input.length)
+    end
+    return self.cached_cookies_
   end
 
   make_api_context = function(

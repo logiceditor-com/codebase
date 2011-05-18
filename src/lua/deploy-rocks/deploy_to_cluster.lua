@@ -175,6 +175,7 @@ local writeln_flush,
 --   remote_exec
 --   deploy_rocks
 --   ensure_file_access_rights
+--   ensure_dir_access_rights
 --------------------------------------------------------------------------------
 
 local deploy_to_cluster
@@ -535,6 +536,54 @@ do
         )
       assert(shell_exec_remote(
           machine.external_url, "sudo", "chown", owner, assert(action.file)
+        ) == 0)
+    end
+  end
+
+--ensure_dir_access_rights-----------------------------------------------------
+
+  action_handlers.ensure_dir_access_rights = function(
+      manifest,
+      cluster_info,
+      param,
+      machine,
+      role_args,
+      action
+    )
+    local dry_run = param.dry_run
+
+    local directory = fill_cluster_info_placeholders(
+        manifest, cluster_info, machine, action.dir
+      )
+    if dry_run then
+      writeln_flush(
+          "-!!-> DRY RUN: Want to ensure dir access rights `", directory,
+          "' on `" .. machine.name .. "'"
+        )
+    else
+      -- TODO: check if directory already exists?
+      writeln_flush("-> Mkdir `", directory, "' on `" .. machine.name .. "'")
+      assert(shell_exec_remote(
+          machine.external_url, "sudo", "mkdir", "-p", assert(directory)
+        ) == 0)
+
+      writeln_flush(
+          "-> Chmodding `", directory,
+          "' to ", action.mode,
+          " on `" .. machine.name .. "'"
+        )
+      assert(shell_exec_remote(
+          machine.external_url, "sudo", "chmod", assert(action.mode), assert(directory)
+        ) == 0)
+
+      local owner = assert(action.owner_user) .. ":" .. assert(action.owner_group)
+
+      writeln_flush(
+          "-> Chowning `", directory,
+          "' to `", owner, "' on `" .. machine.name .. "'"
+        )
+      assert(shell_exec_remote(
+          machine.external_url, "sudo", "chown", owner, assert(directory)
         ) == 0)
     end
   end

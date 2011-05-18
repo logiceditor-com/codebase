@@ -62,8 +62,7 @@ local TASK_PROCESSOR_GROUPS_URL = "/cfg/task/groups"
 local CRONTAB_URL               = "/cfg/cron/crontab"
 local CRON_GROUPS_URL           = "/cfg/cron/groups"
 local DB_INFO_URL               = "/cfg/db/bases"
-local WWW_GAME_INFO_URL         = "/cfg/www/game/config"
-local WWW_ADMIN_INFO_URL        = "/cfg/www/admin/config"
+local WWW_APPLICATION_INFO_URL  = "/cfg/www/application/config"
 local REDIS_NODES_URL           = "/cfg/redis/nodes"
 local SERVICES_CONFIG_URL       = "/cfg/services/config"
 
@@ -77,8 +76,7 @@ do
   local TASK_PROCESSOR_NODE_LIST  = "task_processor_nodes_"
   local TASK_PROCESSOR_GROUP_LIST = "task_processor_groups_"
   local DB_INFO_LIST              = "db_info_"
-  local WWW_GAME_INFO_LIST        = "www_game_info_"
-  local WWW_ADMIN_INFO_LIST       = "www_admin_info_"
+  local WWW_APPLICATION_INFO_LIST = "www_application_info_"
   local REDIS_NODE_LIST           = "redis_nodes_"
   local SERVICES_CONFIG_LIST      = "services_config_"
 
@@ -381,14 +379,9 @@ do
     return get_node_info(self, DB_INFO_LIST, group_name, DB_INFO_URL)
   end
 
-  local get_www_game_info = function(self, group_name)
+  local get_www_application_info = function(self, group_name)
     method_arguments(self, "string", group_name)
-    return get_node_info(self, WWW_GAME_INFO_LIST, group_name, WWW_GAME_INFO_URL)
-  end
-
-  local get_www_admin_info = function(self, group_name)
-    method_arguments(self, "string", group_name)
-    return get_node_info(self, WWW_ADMIN_INFO_LIST, group_name, WWW_ADMIN_INFO_URL)
+    return get_node_info(self, WWW_APPLICATION_INFO_LIST, group_name, WWW_APPLICATION_INFO_URL)
   end
 
   local get_redis_node_info = function(self, node_name)
@@ -462,8 +455,7 @@ do
       get_cron_group_info = get_cron_group_info;
       get_crontab = get_crontab;
       get_db_info = get_db_info;
-      get_www_game_info = get_www_game_info;
-      get_www_admin_info = get_www_admin_info;
+      get_www_application_info = get_www_application_info;
       get_redis_node_info = get_redis_node_info;
       get_services_config = get_services_config;
       --
@@ -478,8 +470,7 @@ do
       [TASK_PROCESSOR_NODE_LIST] = nil;
       [TASK_PROCESSOR_GROUP_LIST] = nil;
       [DB_INFO_LIST] = nil;
-      [WWW_GAME_INFO_LIST] = nil;
-      [WWW_ADMIN_INFO_LIST] = nil;
+      [WWW_APPLICATION_INFO_LIST] = nil;
       [REDIS_NODE_LIST] = nil;
       [SERVICES_CONFIG_LIST] = nil;
       [CRONTAB] = nil;
@@ -500,8 +491,7 @@ return
   CRONTAB_URL = CRONTAB_URL;
   CRON_GROUPS_URL = CRON_GROUPS_URL;
   DB_INFO_URL = DB_INFO_URL;
-  WWW_GAME_INFO_URL = WWW_GAME_INFO_URL;
-  WWW_ADMIN_INFO_URL = WWW_ADMIN_INFO_URL;
+  WWW_APPLICATION_INFO_URL = WWW_APPLICATION_INFO_URL;
   REDIS_NODES_URL = REDIS_NODES_URL;
   SERVICES_CONFIG_URL = SERVICES_CONFIG_URL;
   --

@@ -128,32 +128,123 @@ local INTERNAL_CONFIG_HOST,
       }
 
 --------------------------------------------------------------------------------
+#! /usr/bin/env pk-lua-interpreter
 
-local config_manager = assert(make_config_manager(INTERNAL_CONFIG_HOST, INTERNAL_CONFIG_PORT))
+local SERVICE_NAME = assert(select(1, ...), "missing service name")
+local SERVICE_NODE = assert(select(2, ...), "missing service node")
+local ACTION_NAME = assert(select(3, ...), "missing action name")
 
-local SERVICE = assert(config_manager:get_services_config(SERVICE_NAME), "unknown service")
+--------------------------------------------------------------------------------
 
-assert(SERVICE.actions[ACTION_NAME], "unknown action")
+require 'lua-nucleo.module'
+require 'lua-nucleo.strict'
 
-local NODE_INFO = assert(
-    assert(SERVICE.nodes)[SERVICE_NODE], "unknown service node"
+require = import 'lua-nucleo/require_and_declare.lua' { 'require_and_declare' }
+
+local zmq = require 'zmq'
+local luabins = require 'luabins'
+local posix = require 'posix'
+
+--------------------------------------------------------------------------------
+
+do
+  local LOG_LEVEL = import 'lua-nucleo/log.lua' { 'LOG_LEVEL' }
+
+  import 'pk-core/common_logging.lua' {
+      'create_common_stdout_logging'
+    } {
+      [LOG_LEVEL.DEBUG] = true;
+      [LOG_LEVEL.SPAM] = true;
+    }
+end
+
+--------------------------------------------------------------------------------
+
+local log, dbg, spam, log_error
+    = import 'pk-core/log.lua' { 'make_loggers' } (
+        "pk-banner/execute-system-action", "ESA"
+      )
+
+--------------------------------------------------------------------------------
+
+local tstr
+      = import 'lua-nucleo/tstr.lua'
+      {
+        'tstr'
+      }
+
+local call
+      = import 'pk-core/error.lua'
+      {
+        'call'
+      }
+
+local make_redis_manager,
+      make_redis_connection_manager
+      = import 'pk-engine/redis/redis_manager.lua'
+      {
+        'make_redis_manager',
+        'make_redis_connection_manager'
+      }
+
+local try_send_system_message
+      = import 'pk-engine/webservice/client_api/system_message.lua'
+      {
+        'try_send_system_message'
+      }
+
+local make_config_manager
+      = import '#{PROJECT_NAME}/internal_config_client.lua'
+      {
+        'make_config_manager'
+      }
+
+local INTERNAL_CONFIG_HOST,
+      INTERNAL_CONFIG_PORT
+      = import '#{PROJECT_NAME}/cluster/config.lua'
+      {
+        'INTERNAL_CONFIG_HOST',
+        'INTERNAL_CONFIG_PORT'
+      }
+
+--------------------------------------------------------------------------------
+
+local config_manager = assert(
+    make_config_manager(INTERNAL_CONFIG_HOST, INTERNAL_CONFIG_PORT)
   )
 
-local redis_manager = assert(make_redis_manager(config_manager, make_redis_connection_manager()))
+-- TODO: Make on demand? Anyway, it is deprecated.
+local redis_manager = assert(
+    make_redis_manager(config_manager, make_redis_connection_manager())
+  )
 
-local conn, conn_id = assert(redis_manager:acquire_redis_connection("system"))
-assert(push_task(conn, assert(SERVICE.prefix) .. SERVICE_NODE, ACTION_NAME))
-redis_manager:unacquire_redis_connection(conn, conn_id)
+local zmq_context = assert(zmq.init(1))
 
-if NODE_INFO.url then
-  local answer = assert(
-      http_request(assert(NODE_INFO.url))
-    )
+log("executing", SERVICE_NAME, SERVICE_NODE, ACTION_NAME)
 
-  io.stdout:write(answer, "\n")
-else
-  -- TODO: Get status somehow! (At least check if task was taken from Redis;
-  --       note that service may leave response in Redis as well;
-  --       this would help to workaround 502 on shutdown.)
-  io.stdout:write("Silent OK", "\n")
-end
+io.stdout:write(
+    "Received: ",
+    tstr(
+        assert(
+            call(
+                try_send_system_message,
+                false, -- Don't skip any urls
+                config_manager,
+                redis_manager,
+                zmq_context,
+                SERVICE_NAME,
+                SERVICE_NODE,
+                ACTION_NAME
+                -- TODO: Support additional parameters
+              )
+          )
+      ),
+    "\n"
+  )
+
+log("terminating zmq context")
+
+zmq_context:term()
+zmq_context = nil
+
+io.stdout:flush()

@@ -209,7 +209,6 @@ do
        .. " (WARNING: Ensure you pushed changes to cluster's LR repository.)";
       }
 
-
       if not param.dry_run then
         if ask_user(
             messages[CONFIG[TOOL_NAME].action.name],

@@ -4,7 +4,7 @@ source = {
    url = "" -- Installable with `luarocks make` only
 }
 description = {
-   summary = "#{PROJECT_NAME}.com nginx Configuration for #{CLUSTER_NAME}",
+   summary = "#{PROJECT_NAME} nginx Configuration for #{CLUSTER_NAME}",
    homepage = "http://#{PROJECT_DOMAIN}",
    license = "Unpublished closed-source!",
    maintainer = "#{MAINTAINER}"

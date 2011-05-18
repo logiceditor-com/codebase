@@ -502,6 +502,10 @@ do
     )
     local dry_run = param.dry_run
 
+    action.file = fill_cluster_info_placeholders(
+        manifest, cluster_info, machine, action.file
+      )
+
     if dry_run then
       writeln_flush(
           "-!!-> DRY RUN: Want to ensure file access rights `", action.file,

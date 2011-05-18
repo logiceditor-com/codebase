@@ -200,8 +200,8 @@ DB initialization
 
 3. Initialize databases
 
-    cd ~/projects/#{PROJECT_NAME}/bin/
-    pk-banner-db-changes initialize_db #{PROJECT_NAME}
+    cd ~/projects/#{PROJECT_NAME}/server/bin/
+    #{PROJECT_NAME}-db-changes initialize_db #{PROJECT_NAME}
 
 Install project
 ---------------
@@ -215,8 +215,10 @@ Install project
 
 2. Setup Git hooks
 
-    rm -r ${HOME}/projects/pk/.git/hooks
-    ln -s ../etc/git/hooks ${HOME}/projects/pk/.git/hooks
+    rm -r ${HOME}/projects/#{PROJECT_NAME}/server/.git/hooks
+    ln -s ../etc/git/hooks ${HOME}/projects/#{PROJECT_NAME}/server/.git/hooks
+    rm -r ${HOME}/projects/#{PROJECT_NAME}/deployment/.git/hooks
+    ln -s ../etc/git/hooks ${HOME}/projects/#{PROJECT_NAME}/deployment/.git/hooks
 
 3. Install foreign rocks
 
@@ -307,6 +309,15 @@ If it does not print anything, you're missing deploy-rocks rock.
 
 Does it work?
 -------------
+sudo su - www-data -c '/usr/bin/env \
+    "PATH_INFO=/redir" \
+    "PK_CONFIG_HOST=#{PROJECT_NAME}-internal-config" "PK_CONFIG_PORT=80" \
+    #{PROJECT_NAME}-#{API_NAME}.fcgi'
+
+sudo su - www-data -c '/usr/bin/env \
+    "PATH_INFO=/redir" \
+    "PK_CONFIG_HOST=pk-billing-internal-config" "PK_CONFIG_PORT=80" \
+    pk-billing-api.fcgi'
 
     GET http://#{PROJECT_NAME}-internal-config/cfg/db/bases
 

@@ -4,6 +4,7 @@ PK.remove_holes_in_array = function(arr)
   if (!arr || arr.length == 0)
     return
 
+  //PKLILE.timing.start("remove_holes_in_array")
   var i = 0;
   while (i < arr.length)
   {
@@ -16,4 +17,5 @@ PK.remove_holes_in_array = function(arr)
       i++
     }
   }
+  //PKLILE.timing.stop("remove_holes_in_array")
 }

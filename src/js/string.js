@@ -44,7 +44,10 @@ PK.entityify_and_escape_quotes = function (s)
 {
   if(typeof(s) == "number")
     return s
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+  //PKLILE.timing.start("entityify_and_escape_quotes")
+  var result = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+  //PKLILE.timing.stop("entityify_and_escape_quotes")
+  return result
 }
 
 // TODO: Note:
@@ -52,6 +55,7 @@ PK.entityify_and_escape_quotes = function (s)
 //   2. Very non-optimal, reduce to one iteration
 PK.split_using_placeholders = function(s, keys)
 {
+  //PKLILE.timing.start("split_using_placeholders")
   var SEPARATOR = '{%_SEP_%}'
 
   var num_placehoders = 0, placeholder_found = true
@@ -97,6 +101,7 @@ PK.split_using_placeholders = function(s, keys)
 
   }
 
+  //PKLILE.timing.stop("split_using_placeholders")
   return result
 }
 
@@ -108,6 +113,8 @@ PK.fill_placeholders = function(s, ivalues)
   var data_with_ph = PK.split_using_placeholders(s, keys)
   if (!data_with_ph)
     return s
+
+  //PKLILE.timing.start("fill_placeholders")
 
   var result = []
 
@@ -138,5 +145,7 @@ PK.fill_placeholders = function(s, ivalues)
     }
   }
 
-  return result.join('')
+  var out = result.join('')
+  //PKLILE.timing.stop("fill_placeholders")
+  return out
 }

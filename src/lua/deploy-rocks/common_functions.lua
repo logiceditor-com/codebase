@@ -54,6 +54,12 @@ local copy_file_to_dir,
         'create_symlink_from_to'
       }
 
+local luarocks_load_manifest
+      = import 'lua-aplicado/shell/luarocks.lua'
+      {
+        'luarocks_load_manifest'
+      }
+
 --------------------------------------------------------------------------------
 -- TODO: Move these somewhere to lua-aplicado?
 
@@ -111,6 +117,50 @@ local load_table_from_file = function(path)
   return table_from_file
 end
 
+--------------------------------------------------------------------------------
+
+local find_rock_files_in_subproject = function(path, rocks_repo)
+  local rocks = assert(luarocks_load_manifest(
+      path .. "/" .. rocks_repo .. "/manifest"
+    ).repository)
+
+  -- TODO: Generalize
+  local rock_files, rockspec_files = { }, { }
+  for rock_name, versions in pairs(rocks) do
+    local have_version = false
+    for version_name, infos in pairs(versions) do
+      assert(have_version == false, "duplicate rock " .. rock_name
+        .. " versions " .. version_name .. " in manifest")
+      have_version = true
+      for i = 1, #infos do
+        local info = infos[i]
+        local arch = assert(info.arch)
+
+        local filename = rock_name .. "-" .. version_name .. "." .. arch
+        if arch ~= "rockspec" then
+          filename = filename .. ".rock"
+        end
+
+        filename = rocks_repo .. "/" .. filename;
+
+        if arch == "rockspec" then
+          rockspec_files[rock_name] = filename
+        end
+
+        writeln_flush("Found `", rock_name, "' at `", filename, "'")
+
+        rock_files[#rock_files + 1] =
+        {
+          name = rock_name;
+          filename = filename;
+        }
+      end
+    end
+    assert(have_version == true, "bad rock manifest")
+  end
+  local tpretty = import 'lua-nucleo/tpretty.lua' { 'tpretty' }
+  return rock_files, rockspec_files
+end
 
 --------------------------------------------------------------------------------
 
@@ -120,4 +170,5 @@ return
   write_flush = write_flush;
   ask_user = ask_user;
   load_table_from_file = load_table_from_file;
+  find_rock_files_in_subproject = find_rock_files_in_subproject;
 }

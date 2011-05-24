@@ -162,13 +162,15 @@ local copy_file_to_dir,
 local writeln_flush,
       write_flush,
       ask_user,
-      load_table_from_file
+      load_table_from_file,
+      find_rock_files_in_subproject
       = import 'deploy-rocks/common_functions.lua'
       {
         'writeln_flush',
         'write_flush',
         'ask_user',
-        'load_table_from_file'
+        'load_table_from_file',
+        'find_rock_files_in_subproject'
       }
 
 local run_pre_deploy_actions
@@ -229,6 +231,7 @@ do
     local rocks = assert(subproject.provides_rocks)
 
     if #rocks > 0 then
+      -- TODO: move to manifest sanity check?
       if subproject.rockspec_generator then
         if dry_run then
           writeln_flush("-!!-> DRY RUN: Want to generate rockspecs")
@@ -373,6 +376,7 @@ do
     local name = subproject.name
     local path = assert(subproject.local_path)
 
+    -- TODO: move to manifest sanity check?
     if not is_table(subproject.provides_rocks_repo) then
       subproject.provides_rocks_repo = { { name = subproject.provides_rocks_repo } }
     end
@@ -382,9 +386,9 @@ do
       local rocks_repo = subproject.provides_rocks_repo[i].name
 
       if not subproject.provides_rocks_repo[i].pre_deploy_actions then
-        writeln_flush("----> No pre-deploy actions for ", name, rocks_repo)
+        writeln_flush("---> No pre-deploy actions for ", name, rocks_repo)
       else
-        writeln_flush("----> Running pre-deploy actions for ", name, rocks_repo)
+        writeln_flush("---> Running pre-deploy actions for ", name, rocks_repo)
 
         run_pre_deploy_actions(
             manifest,
@@ -397,49 +401,12 @@ do
           )
       end
 
-      writeln_flush("----> Searching for rocks in repo `", rocks_repo, "'...")
+      writeln_flush("---> Searching for rocks in repo `", rocks_repo, "'...")
 
-      local rocks = assert(luarocks_load_manifest(
-          path .. "/" .. rocks_repo .. "/manifest"
-        ).repository)
+      local rock_files, rockspec_files =
+        find_rock_files_in_subproject(path, rocks_repo)
 
-      -- TODO: Generalize
-      local rock_files, rockspec_files = { }, { }
-      for rock_name, versions in pairs(rocks) do
-        local have_version = false
-        for version_name, infos in pairs(versions) do
-          assert(have_version == false, "duplicate rock " .. rock_name
-            .. " versions " .. version_name .. " in manifest")
-          have_version = true
-
-          for i = 1, #infos do
-            local info = infos[i]
-            local arch = assert(info.arch)
-
-            local filename = rock_name .. "-" .. version_name .. "." .. arch
-            if arch ~= "rockspec" then
-              filename = filename .. ".rock"
-            end
-
-            filename = rocks_repo .. "/" .. filename;
-
-            if arch == "rockspec" then
-              rockspec_files[rock_name] = filename
-            end
-
-            writeln_flush("Found `", rock_name, "' at `", filename, "'")
-
-            rock_files[#rock_files + 1] =
-            {
-              name = rock_name;
-              filename = filename;
-            }
-          end
-        end
-        assert(have_version == true, "bad rock manifest")
-      end
-
-      writeln_flush("----> Determining changed rocks...")
+      writeln_flush("---> Determining changed rocks...")
 
       local need_to_reinstall = { }
       for i = 1, #rock_files do
@@ -473,9 +440,9 @@ do
       end
 
       if not next(need_to_reinstall) then
-        writeln_flush("----> No changed rocks detected.")
+        writeln_flush("---> No changed rocks detected.")
       else
-        writeln_flush("----> Reinstalling changed rocks...")
+        writeln_flush("---> Reinstalling changed rocks...")
 
         for rock_name, _ in pairs(need_to_reinstall) do
           local rockspec =
@@ -484,18 +451,18 @@ do
                 "rock without rockspec "..rock_name
               )
           if dry_run then
-            writeln_flush("-!!-> DRY RUN: Want to reinstall", rockspec)
+            writeln_flush("!!-> DRY RUN: Want to reinstall", rockspec)
           else
-            writeln_flush("----> Reinstalling `", rockspec, "'...")
+            writeln_flush("---> Reinstalling `", rockspec, "'...")
             luarocks_ensure_rock_not_installed_forced(rock_name)
             luarocks_install_from(rock_name, path .. "/" .. rocks_repo)
           end
 
           if dry_run then
-            writeln_flush("-!!-> DRY RUN: Want to pack", rockspec)
+            writeln_flush("!!-> DRY RUN: Want to pack", rockspec)
           else
             writeln_flush(
-                "----> Packing `", rockspec, "' to `",
+                "---> Packing `", rockspec, "' to `",
                 manifest.local_rocks_repo_path, "'..."
               )
             luarocks_pack_to(rock_name, manifest.local_rocks_repo_path)
@@ -507,7 +474,7 @@ do
                   rockspec
                 )
             end
-            writeln_flush("----> Rebuilding manifest...")
+            writeln_flush("---> Rebuilding manifest...")
             luarocks_admin_make_manifest(manifest.local_rocks_repo_path)
           end
         end
@@ -516,10 +483,10 @@ do
       if have_changed_rocks_in_repo then
         need_new_versions_for_subprojects[name] = true
         if dry_run then
-          writeln_flush("-!!-> DRY RUN: Want to commit changed rocks")
+          writeln_flush("!!-> DRY RUN: Want to commit changed rocks")
         else
           -- TODO: HACK! Add only generated files!
-          writeln_flush("----> Committing changed rocks...")
+          writeln_flush("---> Committing changed rocks...")
           git_add_directory(
               manifest.local_rocks_git_repo_path,
               manifest.local_rocks_repo_path
@@ -551,17 +518,19 @@ do
 
     local subprojects = manifest.subprojects
 
-    writeln_flush("----> Checking git repo sanity for subprojects...")
+    if not manifest.cli_param.debug then
+      writeln_flush("----> Checking git repo sanity for subprojects...")
 
-    for i = 1, #subprojects do
-      local subproject = subprojects[i]
-      local name = subproject.name
-      writeln_flush("----> Checking subproject git repo sanity for `", name, "'...")
+      for i = 1, #subprojects do
+        local subproject = subprojects[i]
+        local name = subproject.name
 
-      -- TODO: HACK! Do this at load stage.
-      subproject.local_path = subproject.local_path
-        or manifest.project_path .. "/" .. name
-      check_git_repo_sanity(manifest, name, subproject.local_path)
+        writeln_flush("---> Checking subproject git repo sanity for `", name, "'...")
+
+        check_git_repo_sanity(manifest, name, subproject.local_path)
+      end
+    else
+      writeln_flush("----> Checking git repo sanity for subprojects skipped (debug run)")
     end
 
     writeln_flush("----> Collecting data from subprojects...")
@@ -571,9 +540,9 @@ do
       local name = subproject.name
 
       if subproject.no_deploy then
-        writeln_flush("----> Skipping no-deploy subproject `", name, "'.")
+        writeln_flush("---> Skipping no-deploy subproject `", name, "'.")
       else
-        writeln_flush("----> Collecting data from `", name, "'...")
+        writeln_flush("---> Collecting data from `", name, "'...")
 
         local path = assert(subproject.local_path)
         if
@@ -628,7 +597,7 @@ do
       if dry_run then
         writeln_flush("-!!-> DRY RUN: Want to rebuild manifest")
       else
-        writeln_flush("----> Rebuilding manifest...")
+        writeln_flush("---> Rebuilding manifest...")
         luarocks_admin_make_manifest(manifest.local_rocks_repo_path)
 
         -- TODO: HACK! Add only generated files!
@@ -645,12 +614,12 @@ do
             manifest.local_rocks_repo_path
          )
       then
-        writeln_flush("----> Manifest not changed")
+        writeln_flush("---> Manifest not changed")
       else
         if dry_run then
-          writeln_flush("-!!-> DRY RUN: Want to commit changed manifest")
+          writeln_flush("!!-> DRY RUN: Want to commit changed manifest")
         else
-          writeln_flush("----> Comitting changed manifest...")
+          writeln_flush("---> Comitting changed manifest...")
 
           git_commit_with_message(
               manifest.local_rocks_git_repo_path,
@@ -660,9 +629,9 @@ do
       end
 
       if dry_run then
-        writeln_flush("-!!-> DRY RUN: Want to push manifest git repo")
+        writeln_flush("!!-> DRY RUN: Want to push manifest git repo")
       else
-        writeln_flush("----> Pushing manifest git repo...")
+        writeln_flush("---> Pushing manifest git repo...")
         git_push_all(manifest.local_rocks_git_repo_path)
       end
     end

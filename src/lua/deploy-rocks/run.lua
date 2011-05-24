@@ -95,6 +95,12 @@ local deploy_rocks_from_versions_filename,
         'deploy_rocks_from_code'
       }
 
+local check_manifest
+      = import 'deploy-rocks/check_manifest.lua'
+      {
+        'check_manifest'
+      }
+
 local writeln_flush,
       write_flush,
       ask_user,
@@ -241,6 +247,7 @@ do
       if param.debug   then writeln_flush("-!!-> DEBUG MODE ON") end
       if param.dry_run then writeln_flush("-!!-> DRY RUN BEGIN <----") end
 
+      check_manifest(manifest)
       handler(manifest, param)
 
       -- write cache file

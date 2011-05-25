@@ -69,6 +69,10 @@ local wsapi_service_role = function(param)
   assert(param.system_service)
   local system_service_name = assert(param.system_service.name)
   local system_service_node = assert(param.system_service.node)
+  local system_service_control_socket_path = assert(
+      param.system_service.control_socket_path or
+      "/var/run/#{PROJECT_NAME}/" .. system_service_name .. "/control/${MACHINE_NODE_ID}/"
+    )
 
   local config_rocks =
   {
@@ -94,6 +98,13 @@ local wsapi_service_role = function(param)
     };
     post_deploy_actions = -- Warning: Order IS important here.
     {
+      {
+        tool = "ensure_dir_access_rights";
+        dir = system_service_control_socket_path;
+        owner_user = "www-data";
+        owner_group = "www-data";
+        mode = 770;
+      };
       {
         tool = "ensure_file_access_rights";
         file = wsapi_log_file;

@@ -1,4 +1,4 @@
-["#{PROJECT_NAME}"] =
+PROJECT_NAME_UNDERLINE =
 {
   client_api_version = "2010XXX";
 }

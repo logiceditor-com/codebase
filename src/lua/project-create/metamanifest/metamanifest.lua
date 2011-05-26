@@ -8,6 +8,9 @@ dictionary =
   -- TODO: add syntax, remove this
   PROJECT_NAME_ESCAPED = "project%-name";
 
+  -- TODO: add syntax, remove this
+  PROJECT_NAME_UNDERLINE = "project_name";
+
   PROJECT_TEAM = "project-name team";
   PROJECT_MAIL = "info@logiceditor.com";
   PROJECT_DOMAIN = "logiceditor.com";

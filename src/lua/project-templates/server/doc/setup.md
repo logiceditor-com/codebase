@@ -44,7 +44,6 @@ APT-packages
         runit               \
         ntp                 \
         bc                  \
-        libev-dev           \
         libzmq-dev          \
         pandoc              \
         luajit
@@ -81,6 +80,17 @@ Change group admin to NOPASSWD: ALL
     sudo apt-get install mysql-server
 
 Set the root password to 12345
+
+7. Other useful apt packages
+
+libwww-perl allows using GET, POST in shell
+
+    sudo apt-get install \
+      libwww-perl \
+      iotop \
+      dstat \
+      htop
+...
 
 Raw .deb installation
 ---------------------
@@ -158,22 +168,20 @@ Manual installation
 
 1. LuaRocks (note that APT package is broken)
 
-IMPORTANT:
-
- -- LR below 2.0.3 have a bug with installing executables.
- -- LR below 2.0.4 does not understand rocks with dots in the name
-    as a dependencies
+IMPORTANT: LR below 2.0.3 have a bug with installing executables.
 
     mkdir -p ~/build && cd ~/build
-    wget http://luarocks.org/releases/luarocks-2.0.4.tar.gz
-    tar -zxf luarocks-2.0.4.tar.gz
-    cd luarocks-2.0.4
+    wget http://luarocks.org/releases/luarocks-2.0.4.1.tar.gz
+    tar -zxf luarocks-2.0.4.1.tar.gz
+    cd luarocks-2.0.4.1
     ./configure --with-lua-include=/usr/include/lua5.1/
     make
     sudo make install
 
 Hosts
 -----
+
+IF INSTALLED ON LOCALHOST
 
 Add this to /etc/hosts:
 
@@ -307,6 +315,25 @@ If it does not print anything, you're missing deploy-rocks rock.
 
     bin/deploy-rocks deploy_from_code <your-cluster-name>
 
+Other useful commands
+---------------------
+
+1. Update subtrees (lib directory)
+
+Never commit any changes for anything located in /server/lib/.
+If you need to make any changes in /server/lib project - ask AG.
+
+    cd ~/projects/server/
+    bin/update-subtrees update
+
+2. Update api handlers
+
+   bin/apigen api update_handlers
+
+3. Generate api documentation
+
+   bin/apigen api generate_documents
+
 Does it work?
 -------------
 sudo su - www-data -c '/usr/bin/env \
@@ -324,3 +351,4 @@ sudo su - www-data -c '/usr/bin/env \
     GET http://#{PROJECT_NAME}-internal-config-deploy/cfg/db/bases
 
     GET http://#{PROJECT_NAME}
+

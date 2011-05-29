@@ -45,7 +45,7 @@ local get_www_application_config = function(context)
     )
   if not config then
     log_error(
-        "failed to get www/application config for", 
+        "failed to get www/application config for",
         WWW_APPLICATION_CONFIG_SECTION,
         err
       )

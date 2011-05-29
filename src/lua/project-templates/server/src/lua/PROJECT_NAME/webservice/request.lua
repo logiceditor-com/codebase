@@ -38,8 +38,14 @@ local log, dbg, spam, log_error = make_loggers("webservice/request", "WRQ")
 
 local WWW_APPLICATION_CONFIG_SECTION = "#{PROJECT_NAME_UNDERLINE}"
 
+-- TODO: remove, left for compatibility with pk-engine and apigen
+local get_www_admin_config = function(context)
+  return {}
+end
+
 -- TODO: Move to a more appropriate place?
-local get_www_application_config = function(context)
+-- TODO: this is "get_www_application_config", name left for compatibility
+local get_www_game_config = function(context)
   local config, err = context.config_manager:get_www_application_info(
       WWW_APPLICATION_CONFIG_SECTION
     )
@@ -60,5 +66,6 @@ return
 {
   WWW_APPLICATION_CONFIG_SECTION = WWW_APPLICATION_CONFIG_SECTION;
   --
-  get_www_application_config = get_www_application_config;
+  get_www_game_config = get_www_game_config;
+  get_www_admin_config = get_www_admin_config;
 }

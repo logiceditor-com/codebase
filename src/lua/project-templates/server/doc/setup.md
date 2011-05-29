@@ -351,4 +351,3 @@ sudo su - www-data -c '/usr/bin/env \
     GET http://#{PROJECT_NAME}-internal-config-deploy/cfg/db/bases
 
     GET http://#{PROJECT_NAME}
-

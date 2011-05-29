@@ -36,7 +36,7 @@ local log, dbg, spam, log_error = make_loggers("webservice/request", "WRQ")
 
 --------------------------------------------------------------------------------
 
-local WWW_APPLICATION_CONFIG_SECTION = "#{PROJECT_NAME}"
+local WWW_APPLICATION_CONFIG_SECTION = "#{PROJECT_NAME_UNDERLINE}"
 
 -- TODO: Move to a more appropriate place?
 local get_www_application_config = function(context)

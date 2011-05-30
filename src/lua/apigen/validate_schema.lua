@@ -752,7 +752,26 @@ do
           upvalues_to_be,
           data
         )
+    elseif section_name == "error_handler" then
+      walkers.handler_is_dynamic_ = false
+      walkers.handler_is_raw_ = false
+      local upvalues_to_be = { }
+      do
+        -- TODO: Hack!
+        upvalues_to_be["log"] = true
+        upvalues_to_be["dbg"] = true
+        upvalues_to_be["spam"] = true
+        upvalues_to_be["log_error"] = true
+      end
 
+      validate_handler(
+          walkers.known_exports_,
+          walkers.allowed_requires_,
+          walkers.allowed_globals_,
+          walkers,
+          upvalues_to_be,
+          data
+        )
     elseif section_name == "tests" then
 
       walkers.node_.have_tests = true
@@ -877,6 +896,7 @@ do
         ["api:client_session_handler"] = validate_api_section;
         ["api:session_handler_with_events"] = validate_api_section;
         ["api:dynamic_output_format_handler"] = validate_api_section;
+        ["api:error_handler"] = validate_api_section;
         ["api:raw_handler"] = validate_api_section;
         ["api:tests"] = validate_api_section;
 

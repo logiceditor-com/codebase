@@ -93,7 +93,7 @@ do
       FORMATS[]] (("%q"):format(data_name)) [[].input_loader,
 ]] cat_output_format(walkers, url, format, data_name) [[
       ]] (format) [[_response,
-      common_]] (format) [[_error
+      error_handler_fn and error_handler_fn or common_]] (format) [[_error
     )
 ]]
 
@@ -165,11 +165,12 @@ do
 do
   local ]] (
       (not handler_info.wrappers) and "handler_fn" or handler_info.export
-    ) [[
+    ) [[, error_handler_fn
 
         = import ']] (handler_filename) [['
         {
-          ']] (handler_info.export) [['
+          ']] (handler_info.export) [[',
+          'error_handler'
         }
 ]]
 

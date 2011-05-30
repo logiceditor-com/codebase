@@ -170,6 +170,7 @@ local log, dbg, spam, log_error
       ["api:dynamic_output_format_handler"] =
         "handle_api_with_dynamic_output_format";
       ["api:raw_handler"] = "handle_raw";
+      ["api:error_handler"] = "error_handler";
     }
 
     local down_handler = function(walkers, data)
@@ -184,14 +185,20 @@ local log, dbg, spam, log_error
         )
       assert(checker:result())
 
-      walkers.handler_name_ = handler_names[data.id]
-
-      walkers.handler_text_ = extract_handler_source(
+      local handler_name = handler_names[data.id]
+      local handler_text = extract_handler_source(
           data.handler,
           data.id
         )
+      if handler_name == "error_handler" then
+        walkers.error_handler_text = handler_text
+      else
+        walkers.handler_name_ = handler_name
+        walkers.handler_text_ = handler_text
+      end
     end
 
+    down["api:error_handler"] = down_handler
     down["api:handler"] = down_handler
     down["api:session_handler"] = down_handler
     down["api:client_session_handler"] = down_handler
@@ -276,13 +283,19 @@ end
           )
       )
   ) [[
-local ]] (walkers.handler_name_) [[ = ]] (walkers.handler_text_) [[
+local ]] (walkers.handler_name_) [[ = ]] (walkers.handler_text_) [[]]
+if walkers.error_handler_text ~= nil then
+      walkers.cat_ [[
+local error_handler = ]] (walkers.error_handler_text) [[]]
+end
+      walkers.cat_ [[
 
 --------------------------------------------------------------------------------
 
 return
 {
   ]] (walkers.handler_name_) [[ = ]] (walkers.handler_name_) [[;
+  error_handler = ]] (walkers.error_handler_text  and "error_handler" or "false" ) [[;
 }
 ]]
 
@@ -301,6 +314,7 @@ return
       walkers.api_globals_ = nil
       walkers.global_overrides_ = nil
 
+      walkers.error_handler_text = nil
       -- TODO: Implement
     end
 

@@ -95,21 +95,24 @@ do
 
       local input, err = call(input_loader, api_context)
       if not input then
+        local status, body, headers = response_fn(error_formatter_fn(tostring(err), api_context))
+
         api_context:destroy()
         api_context = nil
 
-        return response_fn(error_formatter_fn(tostring(err)))
+        return status, body, headers
       end
 
       -- TODO: HACK! Remove that "extra".
       local output, extra = call(handler_fn, api_context, input)
       if not output then
+        local err = extra
+        local status, body, headers = response_fn(error_formatter_fn(tostring(err), api_context))
+
         api_context:destroy()
         api_context = nil
 
-        local err = extra
-
-        return response_fn(error_formatter_fn(tostring(err)))
+        return status, body, headers
       end
 
       local rendered_output, err = call(
@@ -119,10 +122,12 @@ do
           extra
         )
       if not rendered_output then
+        local status, body, headers = response_fn(error_formatter_fn(tostring(err), api_context))
+
         api_context:destroy()
         api_context = nil
 
-        return response_fn(error_formatter_fn(tostring(err)))
+        return status, body, headers
       end
 
       api_context:destroy()
@@ -167,10 +172,12 @@ do
 
       local input, err = call(input_loader, api_context)
       if not input then
+        local status, body, headers = response_fn(error_formatter_fn(tostring(err), api_context))
+
         api_context:destroy()
         api_context = nil
 
-        return response_fn(error_formatter_fn(tostring(err)))
+        return status, body, headers
       end
 
       local rendered_output, err = call(
@@ -181,10 +188,12 @@ do
           input
         )
       if not rendered_output then
+        local status, body, headers = response_fn(error_formatter_fn(tostring(err), api_context))
+
         api_context:destroy()
         api_context = nil
 
-        return response_fn(error_formatter_fn(tostring(err)))
+        return status, body, headers
       end
 
       api_context:destroy()

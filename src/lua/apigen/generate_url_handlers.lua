@@ -24,10 +24,12 @@ local make_checker
         'make_checker'
       }
 
-local tkeys
+local tkeys,
+      tijoin_many
       = import 'lua-nucleo/table-utils.lua'
       {
-        'tkeys'
+        'tkeys',
+        'tijoin_many'
       }
 
 local create_path_to_file,
@@ -171,11 +173,13 @@ local log, dbg, spam, log_error
         "handle_api_with_dynamic_output_format";
       ["api:raw_handler"] = "handle_raw";
       ["api:error_handler"] = "error_handler";
+      ["api:response_handler"] = "response_handler";
     }
 
-    local down_handler = function(walkers, data)
+   local down_handler = function(walkers, data)
+   log(data)
       local checker = make_checker()
-      walkers.api_globals_ = tkeys(
+      local tglobals = tkeys(
           list_globals_in_handler(
               checker,
               tostring(data.id)
@@ -183,6 +187,10 @@ local log, dbg, spam, log_error
               data.handler
             )
         )
+      walkers.api_globals_ = walkers.api_globals_ or { }
+      if tglobals then
+        walkers.api_globals_ = tijoin_many(walkers.api_globals_, tglobals)
+      end
       assert(checker:result())
 
       local handler_name = handler_names[data.id]
@@ -192,6 +200,8 @@ local log, dbg, spam, log_error
         )
       if handler_name == "error_handler" then
         walkers.error_handler_text = handler_text
+      elseif handler_name == "response_handler" then
+        walkers.response_handler_text = handler_text
       else
         walkers.handler_name_ = handler_name
         walkers.handler_text_ = handler_text
@@ -199,6 +209,7 @@ local log, dbg, spam, log_error
     end
 
     down["api:error_handler"] = down_handler
+    down["api:response_handler"] = down_handler
     down["api:handler"] = down_handler
     down["api:session_handler"] = down_handler
     down["api:client_session_handler"] = down_handler
@@ -288,6 +299,10 @@ if walkers.error_handler_text ~= nil then
       walkers.cat_ [[
 local error_handler = ]] (walkers.error_handler_text) [[]]
 end
+if walkers.response_handler_text ~= nil then
+      walkers.cat_ [[
+local response_handler = ]] (walkers.response_handler_text) [[]]
+end
       walkers.cat_ [[
 
 --------------------------------------------------------------------------------
@@ -296,6 +311,7 @@ return
 {
   ]] (walkers.handler_name_) [[ = ]] (walkers.handler_name_) [[;
   error_handler = ]] (walkers.error_handler_text  and "error_handler" or "false" ) [[;
+  response_handler = ]] (walkers.response_handler_text  and "response_handler" or "false" ) [[;
 }
 ]]
 
@@ -315,6 +331,7 @@ return
       walkers.global_overrides_ = nil
 
       walkers.error_handler_text = nil
+      walkers.response_handler_text = nil
       -- TODO: Implement
     end
 

@@ -92,7 +92,7 @@ do
       handler_fn,
       FORMATS[]] (("%q"):format(data_name)) [[].input_loader,
 ]] cat_output_format(walkers, url, format, data_name) [[
-      ]] (format) [[_response,
+      response_handler_fn and response_handler_fn or ]] (format) [[_response,
       error_handler_fn and error_handler_fn or common_]] (format) [[_error
     )
 ]]
@@ -165,12 +165,13 @@ do
 do
   local ]] (
       (not handler_info.wrappers) and "handler_fn" or handler_info.export
-    ) [[, error_handler_fn
+    ) [[, error_handler_fn, response_handler_fn
 
         = import ']] (handler_filename) [['
         {
           ']] (handler_info.export) [[',
-          'error_handler'
+          'error_handler',
+          'response_handler'
         }
 ]]
 
@@ -296,10 +297,12 @@ end
 
     walkers.cat_ [[
 do
-  local handler_fn
+  local handler_fn, error_handler_fn, response_handler_fn
         = import ']] (handler_filename) [['
         {
-          'handle_raw'
+          'handle_raw',
+          'error_handler',
+          'response_handler'
         }
 
 ]]
@@ -323,7 +326,9 @@ do
       ("%q"):format(concat_url(base_url, url))
     ) [[] = url:raw(
       handler_fn,
-      FORMATS[]] (("%q"):format(data.name)) [[].input_loader
+      FORMATS[]] (("%q"):format(data.name)) [[].input_loader,
+      response_handler_fn,
+      error_handler_fn
     )
 INTERNAL_CALL_HANDLERS[]] (("%q"):format(url)) [[] = function()
   error("Internal calls for raw URLs are not supported")

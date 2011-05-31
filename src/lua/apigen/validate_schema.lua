@@ -215,7 +215,7 @@ do
       return nil, "must be a string"
     end
 
-    if v:find("[^a-zA-Z_%-]") then
+    if v:find("[^a-zA-Z0-9_%-]") then
       return nil, "contains invalid characters"
     end
 
@@ -752,7 +752,10 @@ do
           upvalues_to_be,
           data
         )
-    elseif section_name == "error_handler" then
+    elseif
+      section_name == "error_handler" or
+      section_name == "response_handler"
+    then
       walkers.handler_is_dynamic_ = false
       walkers.handler_is_raw_ = false
       local upvalues_to_be = { }
@@ -897,6 +900,7 @@ do
         ["api:session_handler_with_events"] = validate_api_section;
         ["api:dynamic_output_format_handler"] = validate_api_section;
         ["api:error_handler"] = validate_api_section;
+        ["api:response_handler"] = validate_api_section;
         ["api:raw_handler"] = validate_api_section;
         ["api:tests"] = validate_api_section;
 

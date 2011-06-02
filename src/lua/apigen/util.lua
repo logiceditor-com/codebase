@@ -150,6 +150,16 @@ do
       MOIMIR_AUTHENTIFICATION_KEY = context.identifier(1, 256);
       VKONTAKTE_USER_ID = context.identifier(1, 256);
       VKONTAKTE_AUTH_KEY = context.identifier(1, 256);
+
+--------------------------------------------------------------------------------
+-- TYPES FOR SPPIP
+--------------------------------------------------------------------------------
+      PAY_SYSTEM_ID = context.string(1, 36);
+      PAY_SYSTEM_SUBID = context.optional(context.string(1, 36));
+      APPLICATION_ID = context.string(1, 36);
+      BILLING_ACCOUNT_ID = context.string(1, 256);
+      PAYMENT_ID = context.string(1, 36);
+
 --------------------------------------------------------------------------------
 -- BEGIN POSTCARDS
 --------------------------------------------------------------------------------

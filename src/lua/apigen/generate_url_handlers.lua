@@ -177,7 +177,6 @@ local log, dbg, spam, log_error
     }
 
    local down_handler = function(walkers, data)
-   log(data)
       local checker = make_checker()
       local tglobals = tkeys(
           list_globals_in_handler(

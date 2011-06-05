@@ -4,6 +4,7 @@
 dictionary =
 {
   PROJECT_NAME = "project-name";
+  DEPLOY_SERVER = "server.name.ru"
 
   -- TODO: add syntax, remove this
   PROJECT_NAME_ESCAPED = "project%-name";
@@ -20,6 +21,11 @@ dictionary =
   IP_ADDRESS = "TODO:Change! 127.0.255.";
 
   API_NAME = "api";
+
+  SERVICE_NAME = "service-name";
+  -- TODO: add syntax, remove this
+  SERVICE_NAME_UNDERLINE = "service_name";
+  SERVICE_NAME_SHORT = "SVN";
 
   CLUSTER_NAME =
   {

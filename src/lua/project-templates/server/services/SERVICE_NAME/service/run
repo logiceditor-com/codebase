@@ -1,0 +1,19 @@
+#!/bin/bash
+
+PROGRAM="/usr/local/bin/pk-banner-daily-stats-collector.service"
+USERID="www-data"
+
+################## no config below this line
+
+exec 2>&1
+
+# TODO: WTF?!
+
+# This requires chroot newer than 10.4 has
+#ROOT="/"
+#USERSPEC="www-data:www-data"
+#EX="/usr/sbin/chroot --userspec=$USERSPEC $ROOT $PROGRAM"
+EX="/bin/su - $USERID -c -- $PROGRAM"
+
+# clean environment and set up a new one
+exec env - $EX

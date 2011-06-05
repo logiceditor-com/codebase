@@ -9,9 +9,9 @@ local localhost_config = function(name)
     version_tag_suffix = name;
     rocks_repo_url = local_rocks_repo_path;
 
-    internal_config_host = "pk-banner-internal-config";
+    internal_config_host = "#{PROJECT_NAME}-internal-config";
     internal_config_port = 80;
-    internal_config_deploy_host = "pk-banner-internal-config-deploy";
+    internal_config_deploy_host = "#{PROJECT_NAME}-internal-config-deploy";
     internal_config_deploy_port = 80;
 
     machines =
@@ -33,6 +33,7 @@ local localhost_config = function(name)
           { name = "internal-config" };
           { name = "#{PROJECT_NAME}" };
           { name = "#{PROJECT_NAME}-#{API_NAME}" };
+          { name = "#{PROJECT_NAME}-#{SERVICE_NAME}" };
           { name = "redis-system" };
           { name = "mysql-db" };
         };

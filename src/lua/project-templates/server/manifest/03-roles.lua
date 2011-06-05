@@ -43,6 +43,99 @@ local static_nginx_role = function(param)
   }
 end
 
+-- TODO: Generalize with wsapi_service_role!
+local plain_service_role = function(param)
+
+  local name = assert(param.name)
+  local log_file = assert(param.log_file)
+
+  local deploy_rocks = assert(param.deploy_rocks)
+  deploy_rocks.tool = "deploy_rocks"
+
+  assert(param.runit)
+  local runit_service_name = assert(param.runit.service_name)
+  local runit_run_path = assert(param.runit.run_path)
+
+  assert(param.logrotate)
+  local logrotate_rock_name = assert(param.logrotate.rock_name)
+  local logrotate_config_path = assert(param.logrotate.config_path)
+
+  assert(param.system_service)
+  local system_service_name = assert(param.system_service.name)
+  local system_service_node = assert(param.system_service.node)
+  local system_service_control_socket_path = assert(
+      param.system_service.control_socket_path or
+      "/tmp/#{PROJECT_NAME}/" .. system_service_name .. "/${MACHINE_NODE_ID}/"
+    )
+
+  local config_rocks =
+  {
+    tool = "deploy_rocks";
+    "pk-tools.pk-ensure-runit-service-enabled";
+    "pk-tools.pk-ensure-logrotate-enabled";
+    "#{PROJECT_NAME}.tools.#{PROJECT_NAME}-execute-system-action";
+    logrotate_rock_name;
+  }
+
+  return
+  {
+    name = name;
+    deployment_actions =
+    {
+      config_rocks;
+      deploy_rocks;
+    };
+    post_deploy_actions = -- Warning: Order IS important here.
+    {
+      {
+        tool = "ensure_dir_access_rights"; -- TODO: not file, directory
+        dir = system_service_control_socket_path;
+        owner_user = "www-data";
+        owner_group = "www-data";
+        mode = 770;
+      };
+      {
+        tool = "ensure_file_access_rights";
+        file = log_file;
+        owner_user = "www-data";
+        owner_group = "www-data";
+        mode = 640;
+      };
+      --
+      {
+        tool = "remote_exec";
+        {
+          'sudo', 'pk-ensure-runit-service-enabled',
+           runit_service_name,
+           '$(luarocks show --rock-dir ' .. runit_service_name
+        .. ')/' .. runit_run_path
+           ;
+        };
+      };
+      --
+      {
+        tool = "remote_exec";
+        {
+          'sudo', '#{PROJECT_NAME}-execute-system-action',
+          system_service_name, system_service_node,
+          'shutdown' -- Assuming runit will restart us at once
+           ;
+        };
+      };
+      --
+      {
+        tool = "remote_exec";
+        {
+          'sudo', 'pk-ensure-logrotate-enabled',
+          '$(luarocks show --rock-dir ' .. logrotate_rock_name
+           .. ')/' .. logrotate_config_path
+            ;
+        };
+      };
+    };
+  }
+end
+
 local wsapi_service_role = function(param)
 
   local name = assert(param.name)
@@ -196,7 +289,7 @@ roles =
         tool = "local_exec";
         {
           "pk-git-reset-branch-to-head",
-          "deploy/#{PROJECT_NAME}", -- remotebranch
+          "deploy/#{DEPLOY_SERVER}", -- remotebranch
           "origin",                 -- destremote
           "HEAD",                   -- localbranch
           PROJECT_PATH              -- localroot
@@ -207,11 +300,11 @@ roles =
         tool = "local_exec";
         {
           "pk-git-update-host",
-          "#{PROJECT_NAME}",        -- host
-          "deploy/#{PROJECT_NAME}", -- localbranch
+          "#{DEPLOY_SERVER}",        -- host
+          "deploy/#{DEPLOY_SERVER}", -- localbranch
           "origin",              -- destremote
-          "deploy/#{PROJECT_NAME}", -- remotebranch
-          "/srv/#{PROJECT_NAME}"    -- remoteroot
+          "deploy/#{DEPLOY_SERVER}", -- remotebranch
+          "/srv/#{PROJECT_NAME}-deployment"    -- remoteroot
         };
       };
     }
@@ -269,12 +362,38 @@ roles =
     system_service =
     {
       name = "#{API_NAME}";
-      node = "1";
+      node = "${MACHINE_NODE_ID}";
     };
     deploy_rocks =
     {
       "#{PROJECT_NAME}.#{API_NAME}";
       "#{PROJECT_NAME}.lib"; -- TODO: This is a dependency, do not list it explicitly
+    };
+  };
+  --
+  plain_service_role
+  {
+    name = "#{SERVICE_NAME}";
+    log_file = "/var/log/#{PROJECT_NAME}-#{SERVICE_NAME}-service.log";
+    logrotate =
+    {
+      rock_name = "#{SERVICE_NAME}.#{SERVICE_NAME}";
+      config_path = "logrotate/#{PROJECT_NAME}-#{SERVICE_NAME}";
+    };
+    runit =
+    {
+      service_name = "#{PROJECT_NAME}.#{SERVICE_NAME}";
+      run_path = "service/run";
+    };
+    system_service =
+    {
+      name = "#{SERVICE_NAME_UNDERLINE}";
+      node = "1";
+    };
+    deploy_rocks =
+    {
+      "#{PROJECT_NAME}.#{SERVICE_NAME}";
+      "#{PROJECT_NAME}.lib"; -- TODO: Do not list dependencies here, move them to the rockspec
     };
   };
   --

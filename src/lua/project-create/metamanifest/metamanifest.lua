@@ -4,7 +4,7 @@
 dictionary =
 {
   PROJECT_NAME = "project-name";
-  DEPLOY_SERVER = "server.name.ru"
+  DEPLOY_SERVER = "server.name.ru";
 
   -- TODO: add syntax, remove this
   PROJECT_NAME_ESCAPED = "project%-name";

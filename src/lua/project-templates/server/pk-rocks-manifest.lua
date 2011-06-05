@@ -14,6 +14,10 @@ local ROCKS =
      .. "#{PROJECT_NAME}-execute-system-action-scm-1.rockspec";
   };
   {
+    "services/#{SERVICE_NAME}/rockspec/"
+     .. "#{PROJECT_NAME}.#{SERVICE_NAME}-scm-1.rockspec";
+  };
+  {
     generator = { "rockspec/gen-rockspecs" };
     "rockspec/#{PROJECT_NAME}.lib-scm-1.rockspec";
   };

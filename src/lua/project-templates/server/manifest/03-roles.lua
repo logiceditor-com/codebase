@@ -373,21 +373,21 @@ roles =
   --
   plain_service_role
   {
-    name = "#{SERVICE_NAME}";
+    name = "#{PROJECT_NAME}-#{SERVICE_NAME}";
     log_file = "/var/log/#{PROJECT_NAME}-#{SERVICE_NAME}-service.log";
     logrotate =
     {
-      rock_name = "#{SERVICE_NAME}.#{SERVICE_NAME}";
-      config_path = "logrotate/#{PROJECT_NAME}-#{SERVICE_NAME}";
+      rock_name = "#{PROJECT_NAME}.#{SERVICE_NAME}";
+      config_path = "services/#{SERVICE_NAME}/logrotate/#{PROJECT_NAME}-#{SERVICE_NAME}";
     };
     runit =
     {
-      service_name = "#{PROJECT_NAME}.#{SERVICE_NAME}";
-      run_path = "service/run";
+      service_name = "#{PROJECT_NAME}-#{SERVICE_NAME}";
+      run_path = "services/#{SERVICE_NAME}/service/run";
     };
     system_service =
     {
-      name = "#{SERVICE_NAME_UNDERLINE}";
+      name = "#{PROJECT_NAME_UNDERLINE}_#{SERVICE_NAME_UNDERLINE}";
       node = "1";
     };
     deploy_rocks =

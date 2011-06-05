@@ -25,7 +25,7 @@ build = {
    },
    install = {
       lua = {
-         ["#{PROJECT_NAME}.daily-stats-collector.run"] = "services/#{SERVICE_NAME}/src/#{PROJECT_NAME}/#{SERVICE_NAME}/run.lua"
+         ["#{PROJECT_NAME}.#{SERVICE_NAME}.run"] = "services/#{SERVICE_NAME}/src/#{PROJECT_NAME}/#{SERVICE_NAME}/run.lua"
       },
       bin = {
          "services/#{SERVICE_NAME}/bin/#{PROJECT_NAME}-#{SERVICE_NAME}.service"

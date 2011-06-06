@@ -435,6 +435,7 @@ do
       ----------------------------------------------------------------------
 
       "APPLICATION_NOT_FOUND";
+      "PAYSYSTEM_NOT_FOUND";
     }
 
     local doc_tags =

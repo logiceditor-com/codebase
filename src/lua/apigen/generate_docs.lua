@@ -931,6 +931,11 @@ end
       "SLOT_NOT_AVAILABLE";
       "UNAUTHORIZED";
       "UNREGISTERED";
+-------------------------------------------
+---------- sppip errors -------------------
+-------------------------------------------
+      "APPLICATION_NOT_FOUND";
+      "PAYSYSTEM_NOT_FOUND";
     }
 
     local additional_error_handler = function(walkers, data)

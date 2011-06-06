@@ -14,7 +14,7 @@
   };
 }
 
-#{SERVICE_NAME} =
+#{SERVICE_NAME_UNDERLINE} =
 {
   prefix = "#{PROJECT_NAME}:#{SERVICE_NAME}:";
   actions =

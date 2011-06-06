@@ -377,7 +377,7 @@ roles =
     log_file = "/var/log/#{PROJECT_NAME}-#{SERVICE_NAME}-service.log";
     logrotate =
     {
-      rock_name = "#{PROJECT_NAME}.#{SERVICE_NAME}";
+      rock_name = "#{PROJECT_NAME}-#{SERVICE_NAME}";
       config_path = "services/#{SERVICE_NAME}/logrotate/#{PROJECT_NAME}-#{SERVICE_NAME}";
     };
     runit =
@@ -387,12 +387,12 @@ roles =
     };
     system_service =
     {
-      name = "#{PROJECT_NAME_UNDERLINE}_#{SERVICE_NAME_UNDERLINE}";
+      name = "#{SERVICE_NAME_UNDERLINE}";
       node = "1";
     };
     deploy_rocks =
     {
-      "#{PROJECT_NAME}.#{SERVICE_NAME}";
+      "#{PROJECT_NAME}-#{SERVICE_NAME}";
       "#{PROJECT_NAME}.lib"; -- TODO: Do not list dependencies here, move them to the rockspec
     };
   };

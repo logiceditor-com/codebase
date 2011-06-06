@@ -1,4 +1,4 @@
-package = "#{PROJECT_NAME}.#{SERVICE_NAME}"
+package = "#{PROJECT_NAME}-#{SERVICE_NAME}"
 version = "scm-1"
 source = {
    url = ""
@@ -25,7 +25,7 @@ build = {
    },
    install = {
       lua = {
-         ["#{PROJECT_NAME}.#{SERVICE_NAME}.run"] = "services/#{SERVICE_NAME}/src/#{PROJECT_NAME}/#{SERVICE_NAME}/run.lua"
+         ["#{PROJECT_NAME}-#{SERVICE_NAME}.run"] = "services/#{SERVICE_NAME}/src/#{PROJECT_NAME}/#{SERVICE_NAME}/run.lua"
       },
       bin = {
          "services/#{SERVICE_NAME}/bin/#{PROJECT_NAME}-#{SERVICE_NAME}.service"

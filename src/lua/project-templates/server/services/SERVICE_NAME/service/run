@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROGRAM="/usr/local/bin/pk-banner-daily-stats-collector.service"
+PROGRAM="/usr/local/bin/#{PROJECT_NAME}-#{SERVICE_NAME}.service"
 USERID="www-data"
 
 ################## no config below this line

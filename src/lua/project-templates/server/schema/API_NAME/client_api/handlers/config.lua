@@ -76,7 +76,6 @@ api:cacheable_url "/config"
   api:additional_errors { };
 
   api:handler (function(api_context, param)
-    name3()
     fail("NOT_IMPLEMENTED", "TODO: Implement")
   end);
 }

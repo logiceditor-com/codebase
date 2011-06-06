@@ -15,7 +15,7 @@ local ROCKS =
   };
   {
     "services/#{SERVICE_NAME}/rockspec/"
-     .. "#{PROJECT_NAME}.#{SERVICE_NAME}-scm-1.rockspec";
+     .. "#{PROJECT_NAME}-#{SERVICE_NAME}-scm-1.rockspec";
   };
   {
     generator = { "rockspec/gen-rockspecs" };

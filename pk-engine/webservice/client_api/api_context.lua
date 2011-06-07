@@ -456,6 +456,7 @@ do
       --
       -- WARNING: Do not expose this variable (see push/pop_param).
       context_ = context;
+      new_wsapi_env = nil;
       --
       cached_request_ = nil;
       cached_game_config_ = nil;
@@ -463,6 +464,8 @@ do
       cached_db_ = nil;
       cached_redis_ = nil;
       cached_hiredis_ = nil;
+      cached_cookies_ = nil;
+      cached_postdata_ = nil;
       --
       tables_ = db_tables;
       www_game_config_getter_ = www_game_config_getter;

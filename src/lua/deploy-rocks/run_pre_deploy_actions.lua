@@ -246,33 +246,39 @@ do
         local filename = assert(rockspec[1])
         local data = luarocks_load_rockspec(action.local_path .. "/" .. filename)
         local name = assert(data.package)
+        action.source_repo_name = action.source_repo_name or subproject.name
 
+        -- TODO: code duplicated in update_rocks!
         local rockspec_files =
           luarocks_list_rockspec_files(
               action.local_path .. "/" .. assert(rockspec[1]),
-              action.local_path
+              action.local_path  .. "/"
             )
-        local rockspec_files_changed = { }
+        assert(#rockspec_files > 1, "rockspec files not found, wrong path")
+        writeln_flush("-> Files found in rockspec:")
 
+        local have_rockspec_files_changed = false
         for i = 1, #rockspec_files do
           if
             not current_versions[subproject.name]
             or git_is_file_changed_between_revisions(
-                              action.local_path,
+                              manifest.project_path .. "/",
                               rockspec_files[i],
-                              current_versions[subproject.name],
+                              current_versions[action.source_repo_name],
                               "HEAD"
                             )
           then
-            writeln_flush("------> ", rockspec_files[i], " changed ")
-            rockspec_files_changed[#rockspec_files_changed + 1] = rockspec_files[i]
+            writeln_flush("> Changed file found: ", rockspec_files[i])
+            have_rockspec_files_changed = true
+            break
+          else
+            writeln_flush("> File not changed: ", rockspec_files[i])
           end
         end
 
-        if #rockspec_files_changed == 0 then
-          writeln_flush("------> No files changed in ", filename)
+        if not have_rockspec_files_changed then
+          writeln_flush("--> No files changed in ", filename)
         else
-
           if dry_run then
             writeln_flush("-!!-> DRY RUN: Want to rebuild ", filename)
           else
@@ -296,7 +302,7 @@ do
           if rockspec["x-cluster-name"] then
             if dry_run then
               writeln_flush(
-                  "-!!-> DRY RUN: Want to remove cluster-specific rock after pack",
+                 "-!!-> DRY RUN: Want to remove cluster-specific rock after pack",
                   name
                 )
             else

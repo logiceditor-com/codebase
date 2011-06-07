@@ -2,7 +2,10 @@ PK.code_highlighting = new function()
 {
   if (!window.hljs)
   {
-    this.highlight = function(code_text) { return '<pre>' + code_text + '</pre>' }
+    this.highlight = function(code_text)
+    {
+      return '<pre>' + PK.entityify_and_escape_quotes(code_text) + '</pre>'
+    }
     return
   }
 
@@ -15,14 +18,16 @@ PK.code_highlighting = new function()
       lang = "lua"
     }
 
+    var escaped_code_text = PK.entityify_and_escape_quotes(code_text)
+
     var viewDiv = document.getElementById("highlight-view");
     if(!viewDiv)
     {
       CRITICAL_ERROR("No 'highlight-view' div necessary for code highlighting!")
-      return '<pre>' + code_text + '</pre>'
+      return '<pre>' + escaped_code_text + '</pre>'
     }
 
-    viewDiv.innerHTML = '<pre><code class="' + lang + '">' + code_text + "</code></pre>"
+    viewDiv.innerHTML = '<pre><code class="' + lang + '">' + escaped_code_text + "</code></pre>"
     hljs.highlightBlock(viewDiv.firstChild.firstChild)
 
     var result = viewDiv.innerHTML

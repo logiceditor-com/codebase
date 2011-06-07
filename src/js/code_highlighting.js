@@ -8,8 +8,13 @@ PK.code_highlighting = new function()
 
   hljs.initHighlightingOnLoad()
 
-  this.highlight = function(code_text)
+  this.highlight = function(code_text, lang)
   {
+    if (lang === undefined)
+    {
+      lang = "lua"
+    }
+
     var viewDiv = document.getElementById("highlight-view");
     if(!viewDiv)
     {
@@ -17,7 +22,7 @@ PK.code_highlighting = new function()
       return '<pre>' + code_text + '</pre>'
     }
 
-    viewDiv.innerHTML = '<pre><code class="lua">' + code_text + "</code></pre>"
+    viewDiv.innerHTML = '<pre><code class="' + lang + '">' + code_text + "</code></pre>"
     hljs.highlightBlock(viewDiv.firstChild.firstChild)
 
     var result = viewDiv.innerHTML

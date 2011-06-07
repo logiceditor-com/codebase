@@ -234,9 +234,9 @@ do
       -- TODO: move to manifest sanity check?
       if subproject.rockspec_generator then
         if dry_run then
-          writeln_flush("-!!-> DRY RUN: Want to generate rockspecs")
+          writeln_flush("!!> DRY RUN: Want to generate rockspecs")
         else
-          writeln_flush("----> Generating rockspecs...")
+          writeln_flush("--> Generating rockspecs...")
           local rockspec_generator = is_table(subproject.rockspec_generator)
             and subproject.rockspec_generator
              or { subproject.rockspec_generator }
@@ -249,15 +249,18 @@ do
         end
       end
 
-      writeln_flush("----> Updating rocks...")
+      writeln_flush("--> Updating rocks...")
       for i = 1, #rocks do
         local rock = rocks[i]
 
+        -- TODO: code duplicated in run_pre_deploy_actions!
         local rockspec_files = luarocks_list_rockspec_files(
             subproject.local_path .. "/" .. assert(rock.rockspec),
             subproject.local_path  .. "/"
           )
-        local rockspec_files_changed = { }
+        assert(#rockspec_files > 1, "rockspec files not found, wrong path")
+        writeln_flush("-> Files found in rockspec:")
+        local have_rockspec_files_changed = false
 
         for i = 1, #rockspec_files do
           if not current_versions[subproject.name]
@@ -268,28 +271,31 @@ do
                 "HEAD"
               )
           then
-            writeln_flush("------> Changed file found: ", rockspec_files[i])
-            rockspec_files_changed[#rockspec_files_changed + 1] = rockspec_files[i]
+            writeln_flush("-> Changed file found: ", rockspec_files[i])
+            have_rockspec_files_changed = true
+            break
+          else
+            writeln_flush("-> File not changed: ", rockspec_files[i])
           end
         end
 
-        if #rockspec_files_changed == 0 then
-          writeln_flush("------> No files changed in ", rock.rockspec)
+        if not have_rockspec_files_changed then
+          writeln_flush("-> No files changed in ", rock.rockspec)
         else
           have_changed_rocks = true
           if
             manifest.ignore_rocks and
             manifest.ignore_rocks[get_filename_from_path(rock.name)]
           then
-            writeln_flush("----> Ignoring `", rock.rockspec, "'")
+            writeln_flush("--> Ignoring `", rock.rockspec, "'")
           else
             changed_rocks[rock.name] = true
 
             if rock.rockspec_generator then
               if dry_run then
-                writeln_flush("-!!-> DRY RUN: Want to generate rock for ", rock.name)
+                writeln_flush("!!> DRY RUN: Want to generate rock for ", rock.name)
               else
-                writeln_flush("----> Generating rock for ", rock.name, "...")
+                writeln_flush("--> Generating rock for ", rock.name, "...")
                 local rockspec_generator = is_table(rock.rockspec_generator)
                   and rock.rockspec_generator
                    or { rock.rockspec_generator }

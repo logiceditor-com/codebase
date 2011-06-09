@@ -20,3 +20,4 @@
 
 nohup.out
 *.log
+*.kate_swp

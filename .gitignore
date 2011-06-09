@@ -24,3 +24,4 @@ nohup.out
 /test/pk-test
 /test/test.lua
 /test/test.sh
+*.kate_swp

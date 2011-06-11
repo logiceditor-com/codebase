@@ -422,8 +422,12 @@ do
             "cluster/" .. cluster_info.name .. ": updated versions after deployment"
           )
 
-        writeln_flush("----> Pushing")
-        git_push_all(manifest.local_cluster_versions_git_repo_path)
+        if manifest.cli_param.local_only then
+         writeln_flush("-!!-> LOCAL ONLY: Pushing skipped")
+        else
+          writeln_flush("----> Pushing")
+          git_push_all(manifest.local_cluster_versions_git_repo_path)
+        end
       end
     end
   end

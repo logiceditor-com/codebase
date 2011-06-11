@@ -636,6 +636,8 @@ do
 
       if dry_run then
         writeln_flush("!!-> DRY RUN: Want to push manifest git repo")
+      elseif manifest.cli_param.local_only then
+         writeln_flush("-!!-> LOCAL ONLY: Pushing skipped")
       else
         writeln_flush("---> Pushing manifest git repo...")
         git_push_all(manifest.local_rocks_git_repo_path)

@@ -30,6 +30,7 @@ do
             cfg:existing_path "manifest_path";
             cfg:boolean "debug" { default = false };
             cfg:boolean "dry_run" { default = false };
+            cfg:boolean "local_only" { default = false };
           };
 
           ["deploy_from_versions_file"] = {
@@ -37,6 +38,7 @@ do
             cfg:existing_path "manifest_path";
             cfg:boolean "debug" { default = false };
             cfg:boolean "dry_run" { default = false };
+            cfg:boolean "local" { default = false };
             cfg:existing_path "version_filename";
           };
 
@@ -45,6 +47,7 @@ do
             cfg:existing_path "manifest_path";
             cfg:boolean "debug" { default = false };
             cfg:boolean "dry_run" { default = false };
+            cfg:boolean "local" { default = false };
             cfg:existing_path "version_filename";
             cfg:string "machine_name";
           };

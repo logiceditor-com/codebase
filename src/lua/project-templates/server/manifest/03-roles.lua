@@ -92,7 +92,7 @@ local plain_service_role = function(param)
         dir = system_service_control_socket_path;
         owner_user = "www-data";
         owner_group = "www-data";
-        mode = 770;
+        mode = 775;
       };
       {
         tool = "ensure_file_access_rights";
@@ -196,7 +196,7 @@ local wsapi_service_role = function(param)
         dir = system_service_control_socket_path;
         owner_user = "www-data";
         owner_group = "www-data";
-        mode = 770;
+        mode = 775;
       };
       {
         tool = "ensure_file_access_rights";
@@ -292,7 +292,7 @@ roles =
           "deploy/#{DEPLOY_SERVER}", -- remotebranch
           "origin",                 -- destremote
           "HEAD",                   -- localbranch
-          PROJECT_PATH              -- localroot
+          PROJECT_PATH .. "/../deployment" -- localroot
         };
       };
       --

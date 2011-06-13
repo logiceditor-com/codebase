@@ -11,17 +11,16 @@ description = {
 }
 dependencies = {
    "lua == 5.1",
-   "wsapi-fcgi >= 1.3.4",
    "lua-nucleo >= 0.0.1",
    "lua-aplicado >= 0.0.1",
    "pk-core >= 0.0.1",
-   "pk-engine >= 0.0.1",
-   "lbase64 >= 20070628-1",
+   "pk-engine >= 0.0.1"
 }
 build = {
    type = "none",
    copy_directories = {
-      "service", "logrotate"
+      "services/#{SERVICE_NAME}/service";
+      "services/#{SERVICE_NAME}/logrotate";
    },
    install = {
       lua = {

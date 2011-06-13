@@ -12,6 +12,6 @@ if [ -z "$(which ${LUA})" ]; then
   fi
 fi
 
-ROCK=PROJECT_NAME.SERVICE_NAME
+ROCK=#{PROJECT_NAME}-#{SERVICE_NAME}
 
 ${LUA} -lluarocks.require -e "require('${ROCK}.run').loop()"

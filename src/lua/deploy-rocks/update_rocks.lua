@@ -259,7 +259,8 @@ do
             subproject.local_path  .. "/"
           )
         assert(#rockspec_files > 1, "rockspec files not found, wrong path")
-        writeln_flush("-> Files found in rockspec:")
+        -- TODO: debug output, move to logging
+        -- writeln_flush("-> Files found in rockspec:")
         local have_rockspec_files_changed = false
 
         for i = 1, #rockspec_files do
@@ -271,11 +272,12 @@ do
                 "HEAD"
               )
           then
-            writeln_flush("-> Changed file found: ", rockspec_files[i])
+            writeln_flush("> Changed file found: ", rockspec_files[i])
             have_rockspec_files_changed = true
             break
           else
-            writeln_flush("-> File not changed: ", rockspec_files[i])
+            -- TODO: debug output, move to logging
+            -- writeln_flush("> File not changed: ", rockspec_files[i])
           end
         end
 

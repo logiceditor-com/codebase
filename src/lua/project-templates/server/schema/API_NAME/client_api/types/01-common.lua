@@ -86,10 +86,10 @@ io_type:integer "PARAMETER_NAME"
   doc:description [[модифицируемый параметр]];
 }
 
-io_type:string "FOTOSTRANA_SESSION_ID"
+io_type:string "TEST_SESSION_ID"
 {
   min_length = 1;
   max_length = 256;
 
-  doc:description [[Идентификатор сессии у партнёра fotostrana TODO: это стаб.]];
+  doc:description [[Идентификатор сессии у партнёра TEST_TEST_TODO: это стаб.]];
 }

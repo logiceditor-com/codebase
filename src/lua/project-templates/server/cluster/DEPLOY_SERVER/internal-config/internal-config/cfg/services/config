@@ -1,3 +1,4 @@
+--[[BLOCK_START:API_NAME]]
 #{API_NAME} =
 {
   prefix = "#{PROJECT_NAME}.#{API_NAME}";
@@ -13,8 +14,10 @@
     mask = ".*%.ipc$";
   };
 }
+--[[BLOCK_END:API_NAME]]
 
-#{SERVICE_NAME} =
+--[[BLOCK_START:SERVICE_NAME]]
+#{SERVICE_NAME_UNDERLINE} =
 {
   prefix = "#{PROJECT_NAME}:#{SERVICE_NAME}:";
   actions =
@@ -30,3 +33,4 @@
     };
   };
 }
+--[[BLOCK_END:SERVICE_NAME]]

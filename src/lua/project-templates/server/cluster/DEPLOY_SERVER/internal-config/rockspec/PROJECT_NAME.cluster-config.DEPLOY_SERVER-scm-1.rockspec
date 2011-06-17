@@ -1,10 +1,10 @@
-package = "#{PROJECT_NAME}.cluster-config.#{CLUSTER_NAME}"
+package = "#{PROJECT_NAME}.cluster-config.#{DEPLOY_SERVER}"
 version = "scm-1"
 source = {
    url = "" -- Use luarocks make
 }
 description = {
-   summary = "#{PROJECT_NAME} Cluster Configuration for #{CLUSTER_NAME}",
+   summary = "#{PROJECT_NAME} Cluster Configuration for #{DEPLOY_SERVER}",
    homepage = "http://#{PROJECT_DOMAIN}",
    license = "Unpublished closed-source!",
    maintainer = "#{MAINTAINER}"

@@ -1,4 +1,4 @@
--- TODO: use this metamanifest as default
+-- TODO: add redis (and mysql?) bases names
 
 -- keys are strings to be replaced by value strings
 dictionary =
@@ -20,8 +20,10 @@ dictionary =
 
   IP_ADDRESS = "TODO:Change! 127.0.255.";
 
+  -- TODO: replicate this
   API_NAME = "api";
 
+  -- TODO: replicate this
   SERVICE_NAME = "service-name";
   -- TODO: add syntax, remove this
   SERVICE_NAME_UNDERLINE = "service_name";

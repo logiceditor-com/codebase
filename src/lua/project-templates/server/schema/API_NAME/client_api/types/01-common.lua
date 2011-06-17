@@ -91,5 +91,5 @@ io_type:string "TEST_SESSION_ID"
   min_length = 1;
   max_length = 256;
 
-  doc:description [[Идентификатор сессии у партнёра TEST_TEST_TODO: это стаб.]];
+  doc:description [[Идентификатор сессии у партнёра TODO: это стаб.]];
 }

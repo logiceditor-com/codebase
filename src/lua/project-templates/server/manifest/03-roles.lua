@@ -336,6 +336,7 @@ roles =
     };
   };
   --
+--[[BLOCK_START:API_NAME]]
   wsapi_service_role
   {
     name = "#{PROJECT_NAME}-#{API_NAME}";
@@ -370,7 +371,9 @@ roles =
       "#{PROJECT_NAME}.lib"; -- TODO: This is a dependency, do not list it explicitly
     };
   };
+--[[BLOCK_END:API_NAME]]
   --
+--[[BLOCK_START:SERVICE_NAME]]
   plain_service_role
   {
     name = "#{PROJECT_NAME}-#{SERVICE_NAME}";
@@ -396,6 +399,7 @@ roles =
       "#{PROJECT_NAME}.lib"; -- TODO: Do not list dependencies here, move them to the rockspec
     };
   };
+--[[BLOCK_END:SERVICE_NAME]]
   --
   {
     name = "mysql-db"; -- TODO: stub mysql rock

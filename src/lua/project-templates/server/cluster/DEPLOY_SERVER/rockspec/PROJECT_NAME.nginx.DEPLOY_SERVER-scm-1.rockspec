@@ -18,6 +18,6 @@ build = {
    type = "none",
    copy_directories = {
       "cluster/#{DEPLOY_SERVER}/nginx";
-      "cluster/#{DEPLOY_SERVER}/logrotate"
+      "cluster/#{DEPLOY_SERVER}/logrotate";
    }
 }

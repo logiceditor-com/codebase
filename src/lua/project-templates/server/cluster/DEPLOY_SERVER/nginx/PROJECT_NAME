@@ -10,7 +10,8 @@ server {
     alias /usr/local/lib/luarocks/rocks/#{PROJECT_NAME}.www.static/scm-1/www/static/site/;
   }
 
-  location /#{API_NAME}/ {
+--[[BLOCK_START:API_NAME]]
+  location /#{API_NAME} {
     fastcgi_pass unix:/tmp/#{PROJECT_NAME}-#{API_NAME}.socket;
 
     fastcgi_param  SCRIPT_FILENAME  run.lua;
@@ -26,4 +27,5 @@ server {
     fastcgi_param  PK_CONFIG_HOST "#{PROJECT_NAME}-internal-config";
     fastcgi_param  PK_CONFIG_PORT "80";
   }
+--[[BLOCK_END:API_NAME]]
 }

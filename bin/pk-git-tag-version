@@ -8,14 +8,16 @@ set -e
 # TODO: Not very elegant. Cache git tag -l output etc.!
 
 if [ -z "$1" ]; then
-  echo "Usage: $0 <suffix> major|minor|build|getlast [--dry-run]" >&2
+  echo "Usage: $0 <suffix> major|minor|build|getlast [--dry-run] [--no-push]" >&2
   exit 1
 fi
 
 if [ "$3" != "--dry-run" ]; then
-  if [ ! -z "$3" ]; then
-    echo "Usage: $0 <suffix> major|minor|build|getlast [--dry-run]" >&2
-    exit 1
+  if [ "$3" != "--no-push" ]; then
+    if [ ! -z "$3" ]; then
+      echo "Usage: $0 <suffix> major|minor|build|getlast [--dry-run] [--no-push]" >&2
+      exit 1
+    fi
   fi
 fi
 
@@ -69,5 +71,7 @@ echo "$newversion"
 if [ "$3" != "--dry-run" ]; then
   git tag -a -m "version $newversion (auto)" $newversion || exit 1
 
-  git push --tags origin $newversion
+  if [ "$3" != "--no-push" ]; then
+    git push --tags origin $newversion
+  fi
 fi

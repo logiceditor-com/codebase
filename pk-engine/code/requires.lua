@@ -22,6 +22,7 @@ local REQUIRE_GLOBALS =
   geoip = "geoip";
   hiredis = "hiredis";
   zmq = "zmq";
+  lxp = "lxp";
 }
 
 --------------------------------------------------------------------------------

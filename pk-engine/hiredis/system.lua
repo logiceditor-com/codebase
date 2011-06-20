@@ -6,7 +6,7 @@
 --
 --------------------------------------------------------------------------------
 
-local sidereal = require 'sidereal'
+local hiredis = require 'hiredis'
 
 --------------------------------------------------------------------------------
 
@@ -44,30 +44,18 @@ local do_with_redis_lock_ttl
         'do_with_redis_lock_ttl'
       }
 
-local rtry,
-      hmset_workaround,
-      hgetall_workaround,
-      lpush_ilist
-      = import 'pk-engine/redis/workarounds.lua'
+local try_unwrap
+      = import 'pk-engine/hiredis/util.lua'
       {
-        'rtry',
-        'hmset_workaround',
-        'hgetall_workaround',
-        'lpush_ilist'
-      }
-
-local make_loggers
-      = import 'pk-core/log.lua'
-      {
-        'make_loggers'
+        'try_unwrap'
       }
 
 --------------------------------------------------------------------------------
 
-local log, dbg, spam, log_error = make_loggers(
-    "redis/system",
-    "RSY"
-  )
+local log, dbg, spam, log_error
+    = import 'pk-core/log.lua' { 'make_loggers' } (
+        "redis/system", "RSY"
+      )
 
 --------------------------------------------------------------------------------
 
@@ -80,7 +68,7 @@ local LOCK_TTL = 3
 --------------------------------------------------------------------------------
 
 local system_redis = function(api_context)
-  local redis = api_context:redis()
+  local redis = api_context:hiredis()
   return redis[DB_NAME](redis)
 end
 
@@ -98,17 +86,19 @@ local get_next_task_nonblocking = function(conn, service_id)
 
   local list_key = task_queue_key(service_id)
 
-  conn:ping()
-  local res, err = conn:lpop(list_key)
+  conn:command("PING") -- ignoring errors
+
+  local res, err = hiredis.unwrap_reply(conn:command("LPOP", list_key))
+
   if not res then
     log_error(
         "get_next_task_nonblocking for service_id",
         service_id, "failed:", err
       )
-    return nil, "do_next_task_nonblocking failed: " .. tostring(err)
+    return nil, "get_task_nonblocking failed: " .. tostring(err)
   end
 
-  if res == sidereal.NULL then
+  if res == hiredis.NIL then
     return false -- Not found
   end
 
@@ -130,6 +120,8 @@ local try_get_next_task_nonblocking = function(api_context, service_id)
     )
 end
 
+--------------------------------------------------------------------------------
+
 -- Set timeout to 0 to block forever. Timeout is in integer seconds.
 -- Returns false if timeout expired
 -- Returns nil, err on error
@@ -142,26 +134,24 @@ local get_next_task_blocking = function(cache, service_id, timeout)
 
   local list_key = task_queue_key(service_id)
 
-  cache:ping()
-  local actual_list_key, value = cache:blpop(list_key, timeout)
-  if not actual_list_key then
-    local err = value
-    if err == "timeout" then
-      --[[
-      spam(
-          "get_next_task_blocking for service_id", service_id,
-          ": timeout", timeout, "expired"
-        )
-      --]]
-      return false
-    end
+  cache:command("PING") -- ignoring errors
 
+  local res, err = hiredis.unwrap_reply(cache:command("BLPOP", list_key, timeout))
+
+  if not res then
     log_error(
-        "get_next_task_blocking for service_id", service_id,
-        "failed:", err
+        "get_next_task_nonblocking for service_id",
+        service_id, "failed:", err
       )
-    return nil, "get_next_task_blocking failed: " .. tostring(err)
+    return nil, "get_task_nonblocking failed: " .. tostring(err)
   end
+
+  if res == hiredis.NIL then
+    return false -- timeout
+  end
+
+  local actual_list_key = res[1]
+  local value = res[2]
 
   assert(actual_list_key == list_key, "sanity check")
 
@@ -177,7 +167,6 @@ local try_get_next_task_blocking = function(api_context, service_id, timeout)
       "string", service_id,
       "number", timeout
     )
-
   return try(
       "INTERNAL_ERROR",
       get_next_task_blocking(
@@ -188,16 +177,19 @@ local try_get_next_task_blocking = function(api_context, service_id, timeout)
     )
 end
 
+--------------------------------------------------------------------------------
+
 local push_task = function(conn, service_id, task_data)
-  conn:ping()
-  local res, err = conn:rpush(task_queue_key(service_id), task_data)
-  if res == false and err then -- TODO: Hack. Remove when sidereal is fixed
-    res = nil
-  end
+
+  conn:command("PING") -- ignoring errors
+
+  local res, err = hiredis.unwrap_reply(
+      conn:command("RPUSH", task_queue_key(service_id), task_data)
+    )
 
   if res == nil then
     log_error("failed to push task to service", service_id, ":", err)
-    return nil, "push_task failed: " .. tostring(err)
+    return nil, "push_task failed: " .. (tostring(err) or nil)
   end
 
   return res
@@ -223,8 +215,8 @@ local try_flush_tasks = function(api_context, service_id)
     )
   local cache = system_redis(api_context)
   local list_key = task_queue_key(service_id)
-  cache:ping()
-  rtry("INTERNAL_ERROR", cache:ltrim(list_key, 1, 0))
+  cache:command("PING") -- ignoring errors
+  try_unwrap("INTERNAL_ERROR", cache:command("LTRIM", list_key, 1, 0))
 end
 
 --------------------------------------------------------------------------------

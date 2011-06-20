@@ -62,7 +62,7 @@ local find_all_files
       }
 
 local push_task
-      = import 'pk-engine/redis/system.lua'
+      = import 'pk-engine/hiredis/system.lua'
       {
         'push_task'
       }
@@ -132,7 +132,7 @@ local try_send_system_message = function(
       )
 
     local conn, conn_id = try(
-        "INTERNAL_ERROR", redis_manager:acquire_redis_connection("system")
+        "INTERNAL_ERROR", redis_manager:acquire_hiredis_connection("system")
       )
     try(
         "INTERNAL_ERROR",
@@ -144,7 +144,7 @@ local try_send_system_message = function(
             action_name
           )
       )
-    redis_manager:unacquire_redis_connection(conn, conn_id)
+    redis_manager:unacquire_hiredis_connection(conn, conn_id)
 
     if NODE_INFO.url then
       local answer = try(

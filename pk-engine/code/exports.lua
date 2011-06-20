@@ -98,6 +98,8 @@ return
   gif_response = { "pk-engine/webservice/response.lua" };
   handle_command = { "pk-engine/srv/channel/manager.lua" };
   handler_404 = { "pk-engine/webservice/request_manager.lua" };
+  hgetall_workaround = { "pk-engine/redis/workarounds.lua" };
+  hmset_workaround = { "pk-engine/redis/workarounds.lua" };
   html_renderer_makers = { "pk-engine/form_handler_builder/html_renderer.lua" };
   html_response = { "pk-engine/webservice/response.lua" };
   http_request = { "pk-engine/connector.lua" };
@@ -115,6 +117,7 @@ return
   list_db_tables = { "pk-engine/db/info.lua" };
   list_installed_changesets = { "pk-engine/db/changeset.lua" };
   load_all_changesets = { "pk-engine/db/changeset.lua" };
+  lpush_ilist = { "pk-engine/redis/workarounds.lua" };
   luabins_response = { "pk-engine/webservice/response.lua" };
   make_api_context = { "pk-engine/webservice/client_api/api_context.lua" };
   make_api_context_stub = { "pk-engine/webservice/client_api/api_context_stub.lua" };
@@ -184,6 +187,7 @@ return
   redis_attempt_lock = { "pk-engine/redis/lock.lua" };
   redis_unlock = { "pk-engine/redis/lock.lua" };
   revert_db_changeset = { "pk-engine/db/changeset.lua" };
+  rtry = { "pk-engine/redis/workarounds.lua" };
   run = { "pk-engine/task/cron.lua", "pk-engine/webservice/fcgi_wsapi_runner.lua" };
   run_ev_server = { "pk-engine/net/ev-server.lua" };
   schedule_cron = { "pk-engine/cron.lua" };

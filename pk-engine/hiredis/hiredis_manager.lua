@@ -39,6 +39,12 @@ local tstr
         'tstr'
       }
 
+local tset
+      = import 'lua-nucleo/table-utils.lua'
+      {
+        'tset'
+      }
+
 local make_generic_connection_manager
       = import 'pk-engine/generic_connection_manager.lua'
       {
@@ -51,6 +57,13 @@ local make_hiredis_connection_manager
 do
   local make_persistent_connection
   do
+    local blocking_commands = tset
+    {
+      "BLPOP";
+      "BRPOP";
+      "BRPOPLPUSH";
+    }
+
     local banned = setmetatable(
         { },
         {
@@ -118,7 +131,7 @@ do
 
       -- TODO: Make limit configurable
       local time_end = socket.gettime()
-      if time_end - time_start > 0.3 then
+      if time_end - time_start > 0.3 and not blocking_commands[cmd] then
         log_error(
             "WARNING: slow hiredis command",
             ("%04.2fs:"):format(time_end - time_start),

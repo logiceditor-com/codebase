@@ -46,7 +46,8 @@ APT-packages
         bc                  \
         libzmq-dev          \
         pandoc              \
-        luajit
+        luajit              \
+        libexpat-dev
 
 2. Ensure that machine is in Europe/Moscow timezone.
 

@@ -39,6 +39,13 @@ end
 
 --------------------------------------------------------------------------------
 
+local log, dbg, spam, log_error
+    = import 'pk-core/log.lua' { 'make_loggers' } (
+        "#{SERVICE_NAME}/run", "#{SERVICE_NAME_SHORT}"
+      )
+
+--------------------------------------------------------------------------------
+
 local arguments,
       optional_arguments,
       method_arguments
@@ -47,12 +54,6 @@ local arguments,
         'arguments',
         'optional_arguments',
         'method_arguments'
-      }
-
-local make_loggers
-      = import 'pk-core/log.lua'
-      {
-        'make_loggers'
       }
 
 local make_config_manager
@@ -95,20 +96,13 @@ local make_api_context_stub
 
 local try_get_next_task_nonblocking,
       try_get_next_task_blocking
-      = import 'pk-engine/redis/system.lua'
+      = import 'pk-engine/hiredis/system.lua'
       {
         'try_get_next_task_nonblocking',
         'try_get_next_task_blocking'
       }
 
 local TABLES = import '#{PROJECT_NAME}/db/tables.lua' ()
-
---------------------------------------------------------------------------------
-
-local log, dbg, spam, log_error = make_loggers(
-    "#{SERVICE_NAME}/run",
-    "#{SERVICE_NAME_SHORT}"
-  )
 
 --------------------------------------------------------------------------------
 

@@ -1,5 +1,4 @@
--- TODO: add redis (and mysql?) bases names
-
+-- TODO: add syntax for escaped, underline, short
 -- keys are strings to be replaced by value strings
 dictionary =
 {
@@ -20,10 +19,10 @@ dictionary =
 
   IP_ADDRESS = "TODO:Change! 127.0.255.";
 
-  -- TODO: replicate this
+  -- TODO: make replicable this, replicate it
   API_NAME = "api";
 
-  -- TODO: replicate this
+  -- TODO: make replicable this, replicate it
   SERVICE_NAME = "service-name";
   -- TODO: add syntax, remove this
   SERVICE_NAME_UNDERLINE = "service_name";
@@ -41,6 +40,27 @@ dictionary =
   SUBPROJ_NAME = { "pk", "project" };
 }
 
+  -- TODO: check places where those can be used
+dictionary.MYSQL_BASES_CFG = [[--No bases]];
+dictionary.REDIS_BASES_CFG = 
+    [[system = { address = { host = "]] .. dictionary.PROJECT_NAME
+ .. [[-redis-system", port = 6379 }, database = 5 }]];
+
+-- folders and files containing this values will be replicated in concordance
+-- with dictionary values
+replicate_data =
+{
+  ["CLUSTER_NAME"] = true;
+  ["SUBPROJ_NAME"] = true;
+}
+
+-- files and directories that will be ignored on project generation
+-- TODO: Use ignore paths on replacement also
+ignore_paths =
+{
+  "server/lib/";
+}
+
 -- how values must be wrapped in text to be replaces,
 -- default eg. #{PROJECT_NAME}
 data_wrapper =
@@ -49,10 +69,12 @@ data_wrapper =
   right = "}";
 }
 
--- folders and files containing this values will be replicated in concordance
--- with dictionary values
-replicate_data =
+-- how blocks to be replicated must be wrapped in text
+-- TODO: Not implemented
+block_wrapper =
 {
-  "CLUSTER_NAME";
-  "SUBPROJ_NAME";
+  top_left = "--[[BLOCK_START:" .. data_wrapper.left;
+  top_right = data_wrapper.right .. "]]";
+  bottom_left = "--[[BLOCK_END:" .. data_wrapper.left;
+  bottom_right = data_wrapper.right .. "]]";
 }

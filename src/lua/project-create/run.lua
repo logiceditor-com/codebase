@@ -2,6 +2,8 @@
 -- run.lua: project-create runner
 --------------------------------------------------------------------------------
 
+local loadfile, loadstring = loadfile, loadstring
+
 -- Create module loggers
 local log, dbg, spam, log_error
       = import 'pk-core/log.lua' { 'make_loggers' } (
@@ -169,6 +171,9 @@ do
 
   local replace_string_in_file = function(filename, string, replace)
     -- TODO: check on '/' and replace to s||| or s:::
+    DEBUG_print("string :", string)
+    DEBUG_print("replace :", replace)
+    if type(replace) == "table" then DEBUG_print("\27[32mreplace\27[0m:\n" .. tpretty(replace, "  ", 80)) end
     assert(
         shell_exec(
             "sed",
@@ -203,6 +208,40 @@ do
     dir_struct_curr.FLAGS["FILE"] = true
     return dir_struct
   end
+
+  local replace_dictionary_patterns_in_path = function(filepath, metamanifest)
+    local new_filepath = filepath
+    for k, v in pairs(metamanifest.dictionary) do
+      if new_filepath:find(k) then
+        new_filepath = string.gsub(new_filepath, k, v);
+      end
+    end
+    -- TODO: vaible way?
+    if filepath ~= new_filepath then
+      -- TODO: use os.fileexists(new_filepath) on non force renaming?
+      local res, err = os.rename(filepath, new_filepath)
+      if res == nil then
+        if not CONFIG[TOOL_NAME].force then
+          DEBUG_print(
+              "\27[31mcan't rename\27[0m: " .. err
+            )
+          remove_recursively(filepath)
+          DEBUG_print("removed")
+        else
+          remove_recursively(new_filepath)
+          assert(os.rename(filepath, new_filepath))
+          DEBUG_print(
+              "\27[33mforce renamed\27[0m: \n   " .. filepath
+           .. "\nto " .. new_filepath)
+        end
+      else
+        DEBUG_print("\27[32mrenamed\27[0m: \n   " .. filepath .. "\nto " .. new_filepath)
+      end
+    end
+    --copy_file_check_force(all_template_files[i], new_filename)
+    return new_filepath
+  end
+
 
   --copy_files------------------------------------------------------------------
 
@@ -274,16 +313,19 @@ do
     local make_plain_dictionary = function(metamanifest)
       metamanifest.processed = {}
 
-      -- TODO: replace this
+      -- TODO: AWFUL! replace this
+      local replicate_data_temp = { }
       for k, v in pairs(metamanifest.replicate_data) do
-        metamanifest.replicate_data[#metamanifest.replicate_data + 1] = k
+        replicate_data_temp[#replicate_data_temp + 1] = k
         metamanifest.replicate_data[k] = nil
       end
+      metamanifest.replicate_data = replicate_data_temp
 
       for i = 1, #metamanifest.replicate_data do
         local data = metamanifest.replicate_data[i]
         local replicate = metamanifest.dictionary[data]
-
+        DEBUG_print("\27[32mdata\27[0m:\n" .. data)
+        DEBUG_print("\27[32mmetamanifest.dictionary[data]\27[0m:\n" .. tpretty(metamanifest.dictionary[data], "  ", 80))
         -- TODO: good way to clean up numbered part?
         --for j = 1, #metamanifest.replicate_data[data] do
         --end
@@ -337,56 +379,88 @@ do
 
     local process_replication_recursively
     do
-      local add_string = function(path, pattern, replace)
-        assert(
-            shell_exec(
-                "sed",
-                "-i",
-                "s/" .. pattern .. "/" .. pattern .. "/p;"
-             .. "s/" .. pattern .. "/" .. replace .. "/",
-                path
-              ) == 0
-          )
+      local replace_dictionary = function(string_to_process, metamanifest)
+        for k, v in pairs(metamanifest.dictionary) do
+          string_to_process = string.gsub(
+              string_to_process,
+              string.gsub(metamanifest.data_wrapper.left, "%p", "%%%1")
+           .. string.gsub(k, "%p", "%%%1")
+           .. string.gsub(metamanifest.data_wrapper.right, "%p", "%%%1"),
+              v
+            )
+        end
+        return string_to_process
       end
+    
+      local replicate_and_replace_in_file = function(
+          metamanifest,
+          created_dir_structure,
+          replaces_used,
+          created_path
+        )
+        -- TODO: check if pattern exists in file
+        local block = metamanifest.block_wrapper
+        local file = assert(io.open(created_path, "r"))
+        local file_content = file:read("*all")
+        file:close()
 
-      local replace_string = function(path, pattern, replace)
-        assert(
-            shell_exec(
-                "sed",
-                "-i",
-                "s/" .. pattern .. "/" .. replace .. "/",
-                path
-              ) == 0
-          )
-      end
---[[
-      local get_path_in_file_structure = function(path, file_dir_structure, project_path)
-
-        if path == project_path then
-          if file_dir_structure.FLAGS["CHECKED_REPLICATED"] then
-            return nil
+        for k, v in pairs(replaces_used) do
+          file_content = string.gsub(
+              file_content,
+              metamanifest.data_wrapper.left .. k .. metamanifest.data_wrapper.right,
+              metamanifest.data_wrapper.left .. v .. metamanifest.data_wrapper.right
+            )
+        end
+        for k, v in pairs(metamanifest.replicate_data) do
+          -- TODO: replicate blocks here! Almost done!
+          --find block
+          local block_top_wrapper = 
+            string.gsub(block.top_left, "%p", "%%%1") .. k ..
+            string.gsub(block.top_right, "%p", "%%%1")
+          local block_bottom_wrapper =
+            string.gsub(block.bottom_left, "%p", "%%%1") .. k ..
+            string.gsub(block.bottom_right, "%p", "%%%1")
+          local string_to_find =
+            block_top_wrapper .. ".-" .. block_bottom_wrapper
+          local blocks = {}
+          for w in string.gmatch(file_content, string_to_find) do
+            blocks[#blocks + 1] = w
           end
-          file_dir_structure.FLAGS["CHECKED_REPLICATED"] = true
-          return file_dir_structure
-        end
-
-        local file_dir_list = break_path(string.sub(path, #project_path))
-        local dir_struct_curr = file_dir_structure
-        for j = 1, #file_dir_list do
-          if not dir_struct_curr[ file_dir_list[j] ] then
-            return nil
+          --form new block
+          local blocks_set_to_write = { }
+          for j = 1, #blocks do
+            blocks_set_to_write[j] = { }
+            for i = 1, #v do        
+              local current_block_replica = blocks[j]
+              -- insert replica instead of general marker
+              current_block_replica = string.gsub(
+                  current_block_replica,
+                  metamanifest.data_wrapper.left .. k .. metamanifest.data_wrapper.right,
+                  metamanifest.data_wrapper.left .. v[i] .. metamanifest.data_wrapper.right
+                )
+              -- cut block wrappers
+              current_block_replica = string.gsub(current_block_replica, block_top_wrapper .. "\n", "")
+              current_block_replica = string.gsub(current_block_replica, "\n" .. block_bottom_wrapper, "")
+              blocks_set_to_write[j][i] = current_block_replica
+            end
+            --replace found block
+            file_content = string.gsub(
+                file_content,
+                string.gsub(blocks[j], "[%p%%]", "%%%1"),
+                table.concat(blocks_set_to_write[j], "\n")
+              )
           end
-          dir_struct_curr = dir_struct_curr[ file_dir_list[j] ]
+          --DEBUG_print("\27[32mBlock replicas\27[0m:" .. tpretty(blocks_set_to_write, "  ", 80))
         end
-
-        if dir_struct_curr.FLAGS["CHECKED_REPLICATED"] then
-          return nil
-        end
-        dir_struct_curr.FLAGS["CHECKED_REPLICATED"] = true
-        return dir_struct_curr
-
+        -- TODO: rename and make dictionary replaces
+        
+        file_content = replace_dictionary(file_content, metamanifest)
+        --DEBUG_print(file_content)
+        local file = io.open(created_path, "w")
+        file:write(file_content)
+        file:close()
       end
---]]
+
       local process_curr_path = function(
           attr,
           created_path,
@@ -398,7 +472,8 @@ do
         )
         if attr.mode == "directory" then
           create_path_to_file(created_path .. "/.")
-        --  assert(file_dir_structure.FLAGS.FILE == nil, "dir structure sanity check")
+          -- TODO: sanity check must work
+          -- assert(file_dir_structure.FLAGS.FILE == nil, "dir structure sanity check")
           process_replication_recursively(
              {
                existed_path = filepath,
@@ -410,38 +485,10 @@ do
              metamanifest
            )
         else
-          -- DEBUG_print(created_path .. " FILE \27[32mproject-created, processing\27[0m")
           if filepath ~= created_path then
             copy_file_check_force(filepath, created_path)
           end
-          -- TODO: check if pattern exists in file
-          -- replace universal pattern to replicated
-          for k, v in pairs(replaces_used) do
-            replace_string_in_file(
-                created_path,
-                metamanifest.data_wrapper.left .. k .. metamanifest.data_wrapper.right,
-                metamanifest.data_wrapper.left .. v .. metamanifest.data_wrapper.right
-              )
-          end
-          for k, v in pairs(metamanifest.replicate_data) do
-            -- TODO: replicate blocks here!
-            -- magic that makes "some string SOME_PATTERN" :
-            -- "some string val1"
-            -- "some string val2"
-            -- based on simple sed commands
-            for i = 1, (#v - 1) do
-              add_string(
-                  created_path,
-                  metamanifest.data_wrapper.left .. k .. metamanifest.data_wrapper.right,
-                  metamanifest.data_wrapper.left .. v[i] .. metamanifest.data_wrapper.right
-                )
-            end
-            replace_string(
-                  created_path,
-                  metamanifest.data_wrapper.left .. k .. metamanifest.data_wrapper.right,
-                  metamanifest.data_wrapper.left .. v[#v] .. metamanifest.data_wrapper.right
-                )
-          end
+          replicate_and_replace_in_file(metamanifest, created_dir_structure, replaces_used, created_path)
         end
       end
 
@@ -474,15 +521,8 @@ do
               for i = 1, #pattern_combinations do
                 -- create paths
                 local created_path =
-                  path_data.created_path .. "/"
-               .. pattern_combinations[i].filename
+                  path_data.created_path .. "/" .. pattern_combinations[i].filename
                 local replaces_used = tclone(pattern_combinations[i].replaces_used)
-                -- local structure_replicated = tclone(structure)
-                -- file_dir_structure[pattern_combinations[i].filename] = structure_replicated
-                -- structure_replicated.FLAGS["REPLACES"] = replaces_used
-                -- structure_replicated.FLAGS["CHECKED_REPLICATED"] = true
-                -- Do not enter replcated structure
-                -- structure.FLAGS["CHECKED_REPLICATED"] = true
 
                  path_data.created_structure = add_to_directory_structure(
                     pattern_combinations[i].filename,
@@ -521,7 +561,7 @@ do
                     replaces_used,
                     metamanifest,
                     structure,
-                    path_data.created_structure[filename]
+                    structure_new
                 )
             end
 
@@ -565,18 +605,22 @@ do
 --        DEBUG_print("\27[31mfilename\27[0m" .. filename)
 --        DEBUG_print("structure :" .. tpretty(structure, "  ", 80))
         local filepath = path .. "/" .. filename
-        local attr = assert(lfs.attributes(filepath))
-
-        -- TODO: replace on reading file_dir_structure FLAGS?
-        local pattern_used = get_replacement_pattern(filename, metamanifest)
-
-        if #pattern_used > 0 then
-          DEBUG_print("\27[31mremoving\27[0m: " .. filepath)
-          remove_recursively(filepath)
-        else
+        
+        -- TODO: BAD handle through dir structure
+        if does_file_exist(filepath) then
           local attr = assert(lfs.attributes(filepath))
-          if attr.mode == "directory" then
-            clean_up_replicate_data_recursively(metamanifest, filepath, structure)
+
+          -- TODO: replace on reading file_dir_structure FLAGS?
+          local pattern_used = get_replacement_pattern(filename, metamanifest)
+
+          if #pattern_used > 0 then
+            DEBUG_print("\27[31mremoving\27[0m: " .. filepath)
+            remove_recursively(filepath)
+          else
+            local attr = assert(lfs.attributes(filepath))
+            if attr.mode == "directory" then
+              clean_up_replicate_data_recursively(metamanifest, filepath, structure)
+            end
           end
         end
       end
@@ -588,50 +632,6 @@ do
 
   local fill_placeholders
   do
-    local replace_dictionary_patterns = function(filepath, metamanifest)
-      local new_filepath = filepath
-      for k, v in pairs(metamanifest.dictionary) do
-        if new_filepath:find(k) then
-          new_filepath = string.gsub(new_filepath, k, v);
-        end
-      end
-      -- TODO: vaible way?
-      if filepath ~= new_filepath then
-        -- TODO: use os.fileexists(new_filepath) on non force renaming?
-        local res, err = os.rename(filepath, new_filepath)
-        if res == nil then
-          if not CONFIG[TOOL_NAME].force then
-            DEBUG_print(
-                "\27[31mcan't rename\27[0m: " .. err
-              )
-            remove_recursively(filepath)
-            DEBUG_print("removed")
-          else
-            remove_recursively(new_filepath)
-            assert(os.rename(filepath, new_filepath))
-            DEBUG_print(
-                "\27[32mforce renamed\27[0m: \n   " .. filepath
-             .. "\nto " .. new_filepath)
-          end
-        else
-          DEBUG_print("\27[32mrenamed\27[0m: \n   " .. filepath .. "\nto " .. new_filepath)
-        end
-      end
-      --copy_file_check_force(all_template_files[i], new_filename)
-      return new_filepath
-    end
-
-
-    local replace_dictionary_in_file = function(filename, metamanifest)
-      for k, v in pairs(metamanifest.dictionary) do
-        replace_string_in_file(
-            filename,
-            metamanifest.data_wrapper.left .. k .. metamanifest.data_wrapper.right,
-            v
-          )
-      end
-    end
-
     fill_placeholders = function(
         metamanifest, path, file_dir_structure
       )
@@ -639,59 +639,20 @@ do
         if filename ~= "FLAGS" then
           local filepath = path .. "/" .. filename
           DEBUG_print(filepath .. " : \27[32mprocessing\27[0m")
-          filepath = replace_dictionary_patterns(filepath, metamanifest)
+          filepath = replace_dictionary_patterns_in_path(filepath, metamanifest)
           local attr = lfs.attributes(filepath)
           if attr.mode == "directory" then
             fill_placeholders(metamanifest, filepath, structure)
           else
             -- replace dictionary patterns
-            replace_dictionary_in_file(filepath, metamanifest)
-          end
-
-        end -- if filename ~= "." and filename ~= ".." and filename ~= ".git" then
-      end -- for filename in lfs.dir(path_data.existed_path) do
-    end
-  end
-
-  ------------------------------------------------------------------------------
-  --[[ not used
-  local chmod_bin
-  do
-    local chmod_files = function(bin_path)
-     for filename in lfs.dir(bin_path) do
-        if filename ~= "." and filename ~= ".." and filename ~= ".git" then
-          local filepath = bin_path .. "/" .. filename
-          local attr = lfs.attributes(filepath)
-          if attr.mode == "directory" then
-            chmod_files(filepath)
-          else
-            DEBUG_print("Chmodding " .. filepath .. " 755")
-            assert(shell_exec("sudo", "chmod", "755", filepath) == 0)
-          end
-        end -- if filename ~= "." and filename ~= ".." and filename ~= ".git" then
-      end -- for filename in lfs.dir(path_data.existed_path) do
-    end
-
-    chmod_bin = function(project_path)
-      for filename in lfs.dir(project_path) do
-        if filename ~= "." and filename ~= ".." and filename ~= ".git" then
-          local filepath = project_path .. "/" .. filename
-          local attr = lfs.attributes(filepath)
-          if attr.mode == "directory" then
-            if filename == "bin" then
-              chmod_files(filepath)
-            else
-              chmod_bin(filepath)
-            end
-          elseif filename == "gen-rockspec" or filename == "gen-rockspecs" then
-            DEBUG_print("Chmodding " .. filepath .. " 755")
-            assert(shell_exec("sudo", "chmod", "755", filepath) == 0)
+            -- replace_dictionary_in_file(filepath, metamanifest)
+            -- FYI: already replaced, do nothing
           end
         end -- if filename ~= "." and filename ~= ".." and filename ~= ".git" then
       end -- for filename in lfs.dir(path_data.existed_path) do
     end
   end
-  --]]
+
   ------------------------------------------------------------------------------
   create_project = function(
       metamanifest_path,
@@ -741,7 +702,8 @@ do
     DEBUG_print("\n\n")
     log("\27[1mReplicating data\27[0m")
     local replicated_structure = replicate_data(metamanifest, file_dir_structure)
-    DEBUG_print("replicated_structure :" .. tpretty(replicated_structure, "  ", 80))
+    -- TODO: make some more nice dir structure output
+   -- DEBUG_print("replicated_structure :" .. tpretty(replicated_structure, "  ", 80))
 
     DEBUG_print("\n\n")
     log("\27[1mCleanup replication data\27[0m")
@@ -796,7 +758,7 @@ local run = function(...)
         param.metamanifest_path = args[1]
         param.root_project_path = args[2]
         param.debug             = args["--debug"]
-        param.force             = args["--force"]
+        param.force             = true --args["--force"]
         return
         {
           PROJECT_PATH = ""; -- TODO: Remove

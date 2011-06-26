@@ -3,13 +3,11 @@
 dictionary =
 {
   PROJECT_NAME = "project-name";
-  DEPLOY_SERVER = "server.name.ru";
-
   -- TODO: add syntax, remove this
   PROJECT_NAME_ESCAPED = "project%-name";
-
-  -- TODO: add syntax, remove this
   PROJECT_NAME_UNDERLINE = "project_name";
+
+  DEPLOY_SERVER = "server.name.ru";
 
   PROJECT_TEAM = "project-name team";
   PROJECT_MAIL = "info@logiceditor.com";
@@ -21,6 +19,9 @@ dictionary =
 
   -- TODO: make replicable this, replicate it
   API_NAME = "api";
+
+  -- TODO: make replicable this, replicate it
+  STATIC_NAME = "static";
 
   -- TODO: make replicable this, replicate it
   SERVICE_NAME = "service-name";
@@ -73,8 +74,8 @@ data_wrapper =
 -- TODO: Not implemented
 block_wrapper =
 {
-  top_left = "--[[BLOCK_START:" .. data_wrapper.left;
-  top_right = data_wrapper.right .. "]]";
-  bottom_left = "--[[BLOCK_END:" .. data_wrapper.left;
-  bottom_right = data_wrapper.right .. "]]";
+  top_left = "--[[BLOCK_START:";
+  top_right = "]]";
+  bottom_left = "--[[BLOCK_END:";
+  bottom_right = "]]";
 }

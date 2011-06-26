@@ -47,6 +47,9 @@ dictionary.REDIS_BASES_CFG =
     [[system = { address = { host = "]] .. dictionary.PROJECT_NAME
  .. [[-redis-system", port = 6379 }, database = 5 }]];
 
+dictionary.APPLICATION_CONFIG =
+  [[client_api_version = "2010XXX";]]
+
 -- folders and files containing this values will be replicated in concordance
 -- with dictionary values
 replicate_data =

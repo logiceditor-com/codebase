@@ -326,15 +326,17 @@ roles =
     nginx_config_name = "cluster/${CLUSTER_NAME}/internal-config/nginx/#{PROJECT_NAME}-internal-config-deploy";
   };
   --
+--[[BLOCK_START:STATIC_NAME]]
   static_nginx_role
   {
-    name = "#{PROJECT_NAME}";
-    rock_name = "#{PROJECT_NAME}.nginx.${CLUSTER_NAME}";
+    name = "#{PROJECT_NAME}-static-#{STATIC_NAME}";
+    rock_name = "#{PROJECT_NAME}.nginx-static.#{STATIC_NAME}.${CLUSTER_NAME}";
     deploy_rocks =
     {
-      "#{PROJECT_NAME}.www.static"
+      "#{PROJECT_NAME}.www.static.#{STATIC_NAME}"
     };
   };
+--[[BLOCK_END:STATIC_NAME]]
   --
 --[[BLOCK_START:API_NAME]]
   wsapi_service_role
@@ -347,12 +349,12 @@ roles =
     };
     nginx =
     {
-      rock_name = "#{PROJECT_NAME}.nginx.${CLUSTER_NAME}";
-      config_path = "cluster/${CLUSTER_NAME}/nginx/#{PROJECT_NAME}";
+      rock_name = "#{PROJECT_NAME}.nginx.#{API_NAME}.${CLUSTER_NAME}";
+      config_path = "cluster/${CLUSTER_NAME}/nginx/#{PROJECT_NAME}-#{API_NAME}";
     };
     logrotate =
     {
-      rock_name = "#{PROJECT_NAME}.nginx.${CLUSTER_NAME}";
+      rock_name = "#{PROJECT_NAME}.nginx.#{API_NAME}.${CLUSTER_NAME}";
       config_path = "cluster/${CLUSTER_NAME}/logrotate/#{PROJECT_NAME}-#{API_NAME}";
     };
     runit =

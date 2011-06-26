@@ -49,12 +49,12 @@ local call
         'call'
       }
 
-local make_redis_manager,
-      make_redis_connection_manager
-      = import 'pk-engine/redis/redis_manager.lua'
+local make_hiredis_manager,
+      make_hiredis_connection_manager
+      = import 'pk-engine/hiredis/hiredis_manager.lua'
       {
-        'make_redis_manager',
-        'make_redis_connection_manager'
+        'make_hiredis_manager',
+        'make_hiredis_connection_manager'
       }
 
 local try_send_system_message
@@ -85,7 +85,7 @@ local config_manager = assert(
 
 -- TODO: Make on demand? Anyway, it is deprecated.
 local redis_manager = assert(
-    make_redis_manager(config_manager, make_redis_connection_manager())
+    make_hiredis_manager(config_manager, make_hiredis_connection_manager())
   )
 
 local zmq_context = assert(zmq.init(1))

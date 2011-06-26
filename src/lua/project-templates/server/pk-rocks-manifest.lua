@@ -27,8 +27,12 @@ local ROCKS =
 
 local CLUSTERS =
 {
+--[[BLOCK_START:CLUSTER_NAME]]
   { name = "#{CLUSTER_NAME}" };
+--[[BLOCK_END:CLUSTER_NAME]]
+--[[BLOCK_START:DEPLOY_SERVER]]
   { name = "#{DEPLOY_SERVER}" };
+--[[BLOCK_END:DEPLOY_SERVER]]
 }
 
 for i = 1, #CLUSTERS do

@@ -337,10 +337,12 @@ If you need to make any changes in /server/lib project - ask AG.
 
 Does it work?
 -------------
+--[[BLOCK_START:API_NAME]]
 sudo su - www-data -c '/usr/bin/env \
     "PATH_INFO=/redir" \
     "PK_CONFIG_HOST=#{PROJECT_NAME}-internal-config" "PK_CONFIG_PORT=80" \
     #{PROJECT_NAME}-#{API_NAME}.fcgi'
+--[[BLOCK_END:API_NAME]]
 
 sudo su - www-data -c '/usr/bin/env \
     "PATH_INFO=/redir" \

@@ -3,7 +3,6 @@
 dictionary =
 {
   PROJECT_NAME = "project-name";
-  -- TODO: add syntax, remove this
   PROJECT_NAME_ESCAPED = "project%-name";
   PROJECT_NAME_UNDERLINE = "project_name";
 
@@ -12,20 +11,17 @@ dictionary =
   PROJECT_TEAM = "project-name team";
   PROJECT_MAIL = "info@logiceditor.com";
   PROJECT_DOMAIN = "logiceditor.com";
+
   COPYRIGHTS = "Copyright (c) 2009-2011 Alexander Gladysh, Dmitry Potapov";
   MAINTAINER = "Alexander Gladysh <agladysh@gmail.com>";
 
   IP_ADDRESS = "TODO:Change! 127.0.255.";
 
-  -- TODO: make replicable this, replicate it
   API_NAME = "api";
 
-  -- TODO: make replicable this, replicate it
   STATIC_NAME = "static";
 
-  -- TODO: make replicable this, replicate it
   SERVICE_NAME = "service-name";
-  -- TODO: add syntax, remove this
   SERVICE_NAME_UNDERLINE = "service_name";
   SERVICE_NAME_SHORT = "SVN";
 
@@ -41,7 +37,6 @@ dictionary =
   SUBPROJ_NAME = { "pk", "project" };
 }
 
-  -- TODO: check places where those can be used
 dictionary.MYSQL_BASES_CFG = [[--No bases]];
 dictionary.REDIS_BASES_CFG = 
     [[system = { address = { host = "]] .. dictionary.PROJECT_NAME
@@ -50,16 +45,8 @@ dictionary.REDIS_BASES_CFG =
 dictionary.APPLICATION_CONFIG =
   [[client_api_version = "2010XXX";]]
 
--- folders and files containing this values will be replicated in concordance
--- with dictionary values
-replicate_data =
-{
-  ["CLUSTER_NAME"] = true;
-  ["SUBPROJ_NAME"] = true;
-}
 
 -- files and directories that will be ignored on project generation
--- TODO: Use ignore paths on replacement also
 ignore_paths =
 {
   "server/lib/";
@@ -74,7 +61,6 @@ data_wrapper =
 }
 
 -- how blocks to be replicated must be wrapped in text
--- TODO: Not implemented
 block_wrapper =
 {
   top_left = "--[[BLOCK_START:";

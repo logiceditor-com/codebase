@@ -314,16 +314,15 @@ do
   local replicate_data
   do
     local make_plain_dictionary = function(metamanifest)
-      metamanifest.processed = {}
+      metamanifest.processed = { }
 
-      -- TODO: AWFUL! replace this TSET backwards
-      local replicate_data_temp = { }
-      for k, v in pairs(metamanifest.replicate_data) do
-        replicate_data_temp[#replicate_data_temp + 1] = k
-        metamanifest.replicate_data[k] = nil
+      metamanifest.replicate_data = { }
+      for k, v in pairs(metamanifest.dictionary) do
+        if is_table(v) then
+          metamanifest.replicate_data[#metamanifest.replicate_data + 1] = k
+        end
       end
       
-      metamanifest.replicate_data = replicate_data_temp
       metamanifest.subdictionary = { }
       for i = 1, #metamanifest.replicate_data do
         local data = metamanifest.replicate_data[i]
@@ -387,12 +386,14 @@ do
     do
       local replace_dictionary = function(string_to_process, dictionary, data_wrapper)
         for k, v in pairs(dictionary) do
+          -- TODO: hack?
+          local to_insert = string.gsub(v, "%%", "%%%1")
           string_to_process = string.gsub(
               string_to_process,
               string.gsub(data_wrapper.left, "%p", "%%%1")
            .. string.gsub(k, "%p", "%%%1")
            .. string.gsub(data_wrapper.right, "%p", "%%%1"),
-              v
+              to_insert
             )
         end
         return string_to_process
@@ -685,7 +686,7 @@ do
           DEBUG_print("\27[31mRemoved: " .. short_path .. "\27[0m")
         else
           create_path_to_file(new_filepath)
-          assert(os.rename(filepath, new_filepath))
+          assert(os.rename(filepath, new_filepath), filepath .. " -> " .. new_filepath)
           DEBUG_print("\27[33mRenamed:\27[0m " .. short_path_new)
         end
       end

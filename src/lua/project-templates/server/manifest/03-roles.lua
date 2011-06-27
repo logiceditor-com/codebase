@@ -335,6 +335,7 @@ roles =
     {
       "#{PROJECT_NAME}.www.static.#{STATIC_NAME}"
     };
+    nginx_config_name = "cluster/${CLUSTER_NAME}/nginx/#{STATIC_NAME}-static/#{PROJECT_NAME}-static-#{STATIC_NAME}";
   };
 --[[BLOCK_END:STATIC_NAME]]
   --
@@ -350,12 +351,12 @@ roles =
     nginx =
     {
       rock_name = "#{PROJECT_NAME}.nginx.#{API_NAME}.${CLUSTER_NAME}";
-      config_path = "cluster/${CLUSTER_NAME}/nginx/#{PROJECT_NAME}-#{API_NAME}";
+      config_path = "cluster/${CLUSTER_NAME}/nginx/#{API_NAME}/#{PROJECT_NAME}-#{API_NAME}";
     };
     logrotate =
     {
       rock_name = "#{PROJECT_NAME}.nginx.#{API_NAME}.${CLUSTER_NAME}";
-      config_path = "cluster/${CLUSTER_NAME}/logrotate/#{PROJECT_NAME}-#{API_NAME}";
+      config_path = "cluster/${CLUSTER_NAME}/logrotate/#{API_NAME}/#{PROJECT_NAME}-#{API_NAME}";
     };
     runit =
     {

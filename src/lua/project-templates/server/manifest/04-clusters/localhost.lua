@@ -31,7 +31,6 @@ local localhost_config = function(name)
           { name = "cluster-member" };
           { name = "internal-config-deploy" };
           { name = "internal-config" };
-          { name = "#{PROJECT_NAME}" };
 --[[BLOCK_START:API_NAME]]
           { name = "#{PROJECT_NAME}-#{API_NAME}" };
 --[[BLOCK_END:API_NAME]]

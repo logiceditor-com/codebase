@@ -8,7 +8,7 @@ clusters[#clusters + 1] =
 {
   name = "#{SERVER_NAME}";
   version_tag_suffix = "#{SERVER_NAME}";
-  rocks_repo_url = "/srv/pk-billing-deployment/cluster/#{SERVER_NAME}/rocks";
+  rocks_repo_url = "/srv/#{PROJECT_NAME}-deployment/cluster/#{SERVER_NAME}/rocks";
   -- TODO: Must be nginx HTTP service instead
 
   internal_config_host = "#{PROJECT_NAME}-internal-config";
@@ -33,7 +33,6 @@ clusters[#clusters + 1] =
         { name = "cluster-member" };
         { name = "internal-config-deploy" };
         { name = "internal-config" };
-        { name = "#{PROJECT_NAME}" };
 --[[BLOCK_START:API_NAME]]
         { name = "#{PROJECT_NAME}-#{API_NAME}" };
 --[[BLOCK_END:API_NAME]]

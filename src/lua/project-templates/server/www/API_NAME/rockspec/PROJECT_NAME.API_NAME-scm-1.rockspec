@@ -4,7 +4,7 @@ source = {
    url = "" -- Installable with `luarocks make` only
 }
 description = {
-   summary = "#{PROJECT_NAME} website api",
+   summary = "#{PROJECT_NAME} website #{API_NAME} api",
    homepage = "http://#{PROJECT_DOMAIN}",
    license = "Unpublished closed-source!",
    maintainer = "#{MAINTAINER}"

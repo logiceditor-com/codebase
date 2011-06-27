@@ -186,9 +186,14 @@ IF INSTALLED ON LOCALHOST
 
 Add this to /etc/hosts:
 
-    #{IP_ADDRESS}1 #{PROJECT_NAME}
-    #{IP_ADDRESS}2 #{PROJECT_NAME}-internal-config
-    #{IP_ADDRESS}3 #{PROJECT_NAME}-internal-config-deploy
+    #{IP_ADDRESS}1 #{PROJECT_NAME}-internal-config
+    #{IP_ADDRESS}2 #{PROJECT_NAME}-internal-config-deploy
+--[[BLOCK_START:API_NAME]]
+    #{IP_ADDRESS}#{API_NAME_IP} #{PROJECT_NAME}-#{API_NAME}
+--[[BLOCK_END:API_NAME]]
+--[[BLOCK_START:STATIC_NAME]]
+    #{IP_ADDRESS}#{STATIC_NAME_IP} #{PROJECT_NAME}-#{STATIC_NAME}-static
+--[[BLOCK_END:STATIC_NAME]]
 
 Also add aliases to localhost (developer machine only):
 
@@ -339,9 +344,10 @@ Does it work?
 -------------
 --[[BLOCK_START:API_NAME]]
 sudo su - www-data -c '/usr/bin/env \
-    "PATH_INFO=/redir" \
+    "PATH_INFO=/sys/info.xml" \
     "PK_CONFIG_HOST=#{PROJECT_NAME}-internal-config" "PK_CONFIG_PORT=80" \
     #{PROJECT_NAME}-#{API_NAME}.fcgi'
+    
 --[[BLOCK_END:API_NAME]]
 
 sudo su - www-data -c '/usr/bin/env \

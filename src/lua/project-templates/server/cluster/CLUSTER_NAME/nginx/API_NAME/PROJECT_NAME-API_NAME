@@ -1,17 +1,12 @@
 server {
-  listen #{DEPLOY_SERVER}:80;
-  server_name #{DEPLOY_SERVER};
+  listen #{PROJECT_NAME}-#{API_NAME}:80;
+  server_name #{PROJECT_NAME}-#{API_NAME};
 
-  access_log  /var/log/nginx/#{PROJECT_NAME}.access.log;
+  access_log  /var/log/nginx/#{PROJECT_NAME}-#{API_NAME}.access.log;
   set_real_ip_from 0.0.0.0/0;
   real_ip_header X-Real-IP;
 
   location / {
-    alias /usr/local/lib/luarocks/rocks/#{PROJECT_NAME}.www.static/scm-1/www/static/site/;
-  }
-
---[[BLOCK_START:API_NAME]]
-  location /#{API_NAME} {
     fastcgi_pass unix:/tmp/#{PROJECT_NAME}-#{API_NAME}.socket;
 
     fastcgi_param  SCRIPT_FILENAME  run.lua;
@@ -27,5 +22,4 @@ server {
     fastcgi_param  PK_CONFIG_HOST "#{PROJECT_NAME}-internal-config";
     fastcgi_param  PK_CONFIG_PORT "80";
   }
---[[BLOCK_END:API_NAME]]
 }

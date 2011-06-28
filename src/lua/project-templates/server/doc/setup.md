@@ -17,12 +17,20 @@ APT-packages
 
 1. Generic
 
-1.1. Enable iphonestudio repository
+1.1.1 Enable iphonestudio repository
 
     wget -q http://ubuntu.iphonestudio.ru/key.asc -O- | sudo apt-key add -
 
     echo "deb http://ubuntu.iphonestudio.ru unstable main" \
       | sudo tee -a /etc/apt/sources.list.d/ubuntu.iphonestudio.ru.list
+
+    sudo apt-get update
+    sudo apt-get upgrade
+
+1.1.2 Enable developer iphonestudio repository (developer machine only).
+
+    echo "deb http://ubuntu-dev.iphonestudio.ru unstable main" \
+      | sudo tee -a /etc/apt/sources.list.d/ubuntu-dev.iphonestudio.ru.list
 
     sudo apt-get update
     sudo apt-get upgrade
@@ -191,6 +199,9 @@ Add this to /etc/hosts:
 --[[BLOCK_START:API_NAME]]
     #{IP_ADDRESS}#{API_NAME_IP} #{PROJECT_NAME}-#{API_NAME}
 --[[BLOCK_END:API_NAME]]
+--[[BLOCK_START:JOINED_WSAPI]]
+    #{IP_ADDRESS}#{JOINED_WSAPI_IP} #{PROJECT_NAME}-#{JOINED_WSAPI}
+--[[BLOCK_END:JOINED_WSAPI]]
 --[[BLOCK_START:STATIC_NAME]]
     #{IP_ADDRESS}#{STATIC_NAME_IP} #{PROJECT_NAME}-#{STATIC_NAME}-static
 --[[BLOCK_END:STATIC_NAME]]
@@ -347,7 +358,7 @@ sudo su - www-data -c '/usr/bin/env \
     "PATH_INFO=/sys/info.xml" \
     "PK_CONFIG_HOST=#{PROJECT_NAME}-internal-config" "PK_CONFIG_PORT=80" \
     #{PROJECT_NAME}-#{API_NAME}.fcgi'
-    
+
 --[[BLOCK_END:API_NAME]]
 
 sudo su - www-data -c '/usr/bin/env \

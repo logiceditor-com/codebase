@@ -23,6 +23,11 @@ local ROCKS =
     "www/#{API_NAME}/rockspec/#{PROJECT_NAME}.#{API_NAME}-scm-1.rockspec";
   };
 --[[BLOCK_END:API_NAME]]
+--[[BLOCK_START:JOINED_WSAPI]]
+  {
+    "www/#{JOINED_WSAPI}/rockspec/#{PROJECT_NAME}.#{JOINED_WSAPI}-scm-1.rockspec";
+  };
+--[[BLOCK_END:JOINED_WSAPI]]
 --[[BLOCK_START:SERVICE_NAME]]
   {
     "services/#{SERVICE_NAME}/rockspec/"
@@ -47,23 +52,28 @@ for i = 1, #CLUSTERS do
   ROCKS[#ROCKS + 1] =
   {
     ["x-cluster-name"] = name;
-
-   -- generator = { "cluster/gen-rockspec-nginx", name, #{API_NAME} };
-
     "cluster/" .. name .. "/rockspec/"
  .. "#{PROJECT_NAME}.nginx.#{API_NAME}." .. name .. "-scm-1.rockspec";
   }
+
 --[[BLOCK_END:API_NAME]]
+--[[BLOCK_START:JOINED_WSAPI]]
+  ROCKS[#ROCKS + 1] =
+  {
+    ["x-cluster-name"] = name;
+    "cluster/" .. name .. "/rockspec/"
+ .. "#{PROJECT_NAME}.nginx.#{JOINED_WSAPI}." .. name .. "-scm-1.rockspec";
+  }
+
+--[[BLOCK_END:JOINED_WSAPI]]
 --[[BLOCK_START:STATIC_NAME]]
   ROCKS[#ROCKS + 1] =
   {
     ["x-cluster-name"] = name;
-
-   -- generator = { "cluster/gen-rockspec-nginx-static", name, #{STATIC_NAME} };
-
     "cluster/" .. name .. "/rockspec/"
  .. "#{PROJECT_NAME}.nginx-static.#{STATIC_NAME}." .. name .. "-scm-1.rockspec";
   }
+
 --[[BLOCK_END:STATIC_NAME]]
   ROCKS[#ROCKS + 1] =
   {

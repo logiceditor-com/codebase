@@ -337,8 +337,8 @@ roles =
     };
     nginx_config_name = "cluster/${CLUSTER_NAME}/nginx/#{STATIC_NAME}-static/#{PROJECT_NAME}-static-#{STATIC_NAME}";
   };
---[[BLOCK_END:STATIC_NAME]]
   --
+--[[BLOCK_END:STATIC_NAME]]
 --[[BLOCK_START:API_NAME]]
   wsapi_service_role
   {
@@ -374,8 +374,45 @@ roles =
       "#{PROJECT_NAME}.lib"; -- TODO: This is a dependency, do not list it explicitly
     };
   };
---[[BLOCK_END:API_NAME]]
   --
+--[[BLOCK_END:API_NAME]]
+--[[BLOCK_START:JOINED_WSAPI]]
+  wsapi_service_role
+  {
+    name = "#{PROJECT_NAME}-#{JOINED_WSAPI}";
+    wsapi =
+    {
+      service_name = "#{PROJECT_NAME}.#{JOINED_WSAPI}";
+      log_file = "/var/log/#{PROJECT_NAME}-#{JOINED_WSAPI}-wsapi.log";
+    };
+    nginx =
+    {
+      rock_name = "#{PROJECT_NAME}.nginx.#{JOINED_WSAPI}.${CLUSTER_NAME}";
+      config_path = "cluster/${CLUSTER_NAME}/nginx/#{JOINED_WSAPI}/#{PROJECT_NAME}-#{JOINED_WSAPI}";
+    };
+    logrotate =
+    {
+      rock_name = "#{PROJECT_NAME}.nginx.#{JOINED_WSAPI}.${CLUSTER_NAME}";
+      config_path = "cluster/${CLUSTER_NAME}/logrotate/#{JOINED_WSAPI}/#{PROJECT_NAME}-#{JOINED_WSAPI}";
+    };
+    runit =
+    {
+      service_name = "#{PROJECT_NAME}.#{JOINED_WSAPI}";
+      run_path = "www/#{JOINED_WSAPI}/service/run";
+    };
+    system_service =
+    {
+      name = "#{JOINED_WSAPI}";
+      node = "${MACHINE_NODE_ID}";
+    };
+    deploy_rocks =
+    {
+      "#{PROJECT_NAME}.#{JOINED_WSAPI}";
+      "#{PROJECT_NAME}.lib"; -- TODO: This is a dependency, do not list it explicitly
+    };
+  };
+  --
+--[[BLOCK_END:JOINED_WSAPI]]
 --[[BLOCK_START:SERVICE_NAME]]
   plain_service_role
   {
@@ -402,8 +439,8 @@ roles =
       "#{PROJECT_NAME}.lib"; -- TODO: Do not list dependencies here, move them to the rockspec
     };
   };
---[[BLOCK_END:SERVICE_NAME]]
   --
+--[[BLOCK_END:SERVICE_NAME]]
   {
     name = "mysql-db"; -- TODO: stub mysql rock
     deployment_actions = { };

@@ -6,14 +6,14 @@
 
 local file = function(name) return { filename = name } end
 
-local NAME = "#{API_NAME}"
+local NAME = "#{JOINED_WSAPI}"
 
 local EXPORTS_LIST_NAME = PROJECT_PATH
     .. "tmp/" .. NAME .. "/code/exports/client_api.lua";
 
 common.PROJECT_PATH = PROJECT_PATH
 
-common.www.application.url = "http://#{PROJECT_NAME}-#{API_NAME}/"
+common.www.application.url = "http://#{PROJECT_NAME}-#{JOINED_WSAPI}/"
 common.www.application.api_schema_dir = PROJECT_PATH .. "schema/" .. NAME .. "/client_api"
 common.www.application.have_unity_client = false
 -- common.www.application.session_checker_file_name = false
@@ -59,8 +59,8 @@ common.www.application.generated =
   context_extensions_dir_name = "ext";
   context_extensions_list_name = "extensions.lua";
 
-  doc_md_filename = PROJECT_PATH .. "doc/#{API_NAME}/client_api.md";
-  doc_pdf_filename = PROJECT_PATH .. "doc/#{API_NAME}/client_api.pdf";
+  doc_md_filename = PROJECT_PATH .. "doc/#{JOINED_WSAPI}/client_api.md";
+  doc_pdf_filename = PROJECT_PATH .. "doc/#{JOINED_WSAPI}/client_api.pdf";
   doc_latex_template_filename = common.www.application.api_schema_dir
     .. "/doc/latex.template";
 

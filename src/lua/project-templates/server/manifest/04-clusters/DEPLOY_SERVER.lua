@@ -36,6 +36,9 @@ clusters[#clusters + 1] =
 --[[BLOCK_START:API_NAME]]
         { name = "#{PROJECT_NAME}-#{API_NAME}" };
 --[[BLOCK_END:API_NAME]]
+--[[BLOCK_START:JOINED_WSAPI]]
+          { name = "#{PROJECT_NAME}-#{JOINED_WSAPI}" };
+--[[BLOCK_END:JOINED_WSAPI]]
 --[[BLOCK_START:SERVICE_NAME]]
         { name = "#{PROJECT_NAME}-#{SERVICE_NAME}" };
 --[[BLOCK_END:SERVICE_NAME]]

@@ -31,7 +31,7 @@ do
         }
 
   -- TODO: Make configurable!
-  local LOG_FILE_NAME = "/var/log/#{PROJECT_NAME}-#{API_NAME}-wsapi.log"
+  local LOG_FILE_NAME = "/var/log/#{PROJECT_NAME}-#{JOINED_WSAPI}-wsapi.log"
 
   local ok
   ok, reopen_log_file = common_init_logging_to_file(LOG_FILE_NAME)
@@ -41,7 +41,7 @@ end
 
 local log, dbg, spam, log_error
     = import 'pk-core/log.lua' { 'make_loggers' } (
-        "#{API_NAME}/wsapi", "#{API_NAME_SHORT}"
+        "#{JOINED_WSAPI}/wsapi", "#{JOINED_WSAPI_SHORT}"
       )
 
 --------------------------------------------------------------------------------
@@ -130,7 +130,7 @@ local EXTENSIONS
 
 -------------------------------------------------------------------------------
 
-log("loading wsapi-runner (#{API_NAME} 11)")
+log("loading wsapi-runner (#{JOINED_SERVICE_NAME} 11)")
 
 -------------------------------------------------------------------------------
 
@@ -160,8 +160,8 @@ end
 
 -------------------------------------------------------------------------------
 
-local SERVICE_NAME = "#{PROJECT_NAME}.#{API_NAME}"
-local SYSTEM_ACTION_SERVICE_NAME = "#{API_NAME}" -- TODO: ?! WTF? Remove.
+local SERVICE_NAME = "#{PROJECT_NAME}.#{JOINED_SERVICE_NAME}"
+local SYSTEM_ACTION_SERVICE_NAME = "#{JOINED_SERVICE_NAME}" -- TODO: ?! WTF? Remove.
 local NODE_ID = nil
 local PID = nil
 
@@ -554,7 +554,7 @@ local loop = function(node_id)
   -- TODO: Take this from internal config instead!
   -- TODO: Check if nodeid is fit for filename. Fail otherwise.
   local zmq_control_socket_filename =
-      "/var/run/#{PROJECT_NAME}/#{API_NAME}/control/"
+      "/var/run/#{PROJECT_NAME}/#{JOINED_WSAPI}/control/"
    .. NODE_ID .. "/" .. PID .. ".ipc"
 
   -- TODO: This should not be needed.

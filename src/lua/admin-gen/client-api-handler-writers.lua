@@ -26,7 +26,7 @@ local Q, CR, NPAD, write_file_using_template
 --------------------------------------------------------------------------------
 
 local make_table_handler_writer = function(operation, comment)
-  return function(name, fields, dir_out)
+  return function(name, fields, template_dir, dir_out)
     local values = {}
 
     values.HEADER = [[
@@ -47,7 +47,7 @@ local make_table_handler_writer = function(operation, comment)
     write_file_using_template(
       values,
       dir_out .. name .. "/" .. operation .. ".lua",
-      "admin-gen/templates/handlers/" .. operation .. ".lua.template"
+      template_dir .. operation .. ".lua.template"
     )
   end
 end
@@ -57,7 +57,9 @@ end
 local make_serialized_list_handler_writer = function(operation, comment)
   return function(
       name, serialized_list_name,
-      sl_api_maker, fields, dir_out
+      sl_api_maker, fields,
+      template_dir,
+      dir_out
     )
 
     local values = {}
@@ -81,7 +83,7 @@ local make_serialized_list_handler_writer = function(operation, comment)
     write_file_using_template(
       values,
       dir_out .. name .. "/" .. serialized_list_name .. "/" .. operation .. ".lua",
-      "admin-gen/templates/handlers/serialized_list/" .. operation .. ".lua.template"
+      template_dir .. "serialized_list/" .. operation .. ".lua.template"
     )
   end
 end
@@ -89,7 +91,7 @@ end
 --------------------------------------------------------------------------------
 
 local write_table_handlers = function(
-    metadata, table_name, dir_out,
+    metadata, table_name, template_dir, dir_out,
     existing_fields, new_fields, updated_fields
   )
   metadata = metadata or {}
@@ -111,17 +113,17 @@ local write_table_handlers = function(
     )
 
   if not metadata.read_only then
-    write_insert_handler(table_name, new_fields, dir_out)
+    write_insert_handler(table_name, new_fields, template_dir, dir_out)
     if not metadata.append_only then
-      write_update_handler(table_name, updated_fields, dir_out)
+      write_update_handler(table_name, updated_fields, template_dir, dir_out)
     end
     if not metadata.append_only and not metadata.prohibit_deletion then
-      write_delete_handler(table_name, nil, dir_out)
+      write_delete_handler(table_name, nil, template_dir, dir_out)
     end
   end
 
-  write_get_by_id_handler(table_name, existing_fields, dir_out)
-  write_list_handler(table_name, existing_fields, dir_out)
+  write_get_by_id_handler(table_name, existing_fields, template_dir, dir_out)
+  write_list_handler(table_name, existing_fields, template_dir, dir_out)
 end
 
 --------------------------------------------------------------------------------
@@ -131,6 +133,7 @@ local write_serialized_list_handlers = function(
     object_id_field,
     serialized_list_name,
     serialized_item_id_field,
+    template_dir,
     dir_out,
     existing_fields, new_fields, updated_fields
   )
@@ -159,23 +162,23 @@ local write_serialized_list_handlers = function(
 
   write_delete_handler(
       table_name, serialized_list_name,
-      sl_api_maker, nil, dir_out
+      sl_api_maker, nil, template_dir, dir_out
     )
   write_get_by_id_handler(
       table_name, serialized_list_name,
-      sl_api_maker, existing_fields, dir_out
+      sl_api_maker, existing_fields, template_dir, dir_out
     )
   write_insert_handler(
       table_name, serialized_list_name,
-      sl_api_maker, new_fields, dir_out
+      sl_api_maker, new_fields, template_dir, dir_out
     )
   write_list_handler(
       table_name, serialized_list_name,
-      sl_api_maker, existing_fields, dir_out
+      sl_api_maker, existing_fields, template_dir, dir_out
     )
   write_update_handler(
       table_name, serialized_list_name,
-      sl_api_maker, updated_fields, dir_out
+      sl_api_maker, updated_fields, template_dir, dir_out
     )
 end
 

@@ -228,6 +228,7 @@ do
       write_table_handlers(
           walkers.table_admin_metadata,
           assert_is_string(walkers.current_table_name),
+          walkers.template_dir_,
           walkers.dir_out_,
           existing_fields, new_fields, updated_fields
         )
@@ -251,6 +252,7 @@ do
             assert_is_string(walkers.table_primary_key),
             assert_is_string(walkers.current_serialized_list_name),
             assert_is_string(walkers.serialized_list_primary_key),
+            walkers.template_dir_,
             walkers.dir_out_,
             existing_fields, new_fields, updated_fields
           )
@@ -267,13 +269,14 @@ do
     return "OPTIONAL_" .. raw_type
   end
 
-  generate_client_api_schema = function(tables, generate_client_api_schema, dir_out)
+  generate_client_api_schema = function(tables, template_dir, dir_out)
     local walkers =
     {
       down = down;
       up = up;
       visitors = {};
       --
+      template_dir_ = template_dir;
       dir_out_ = dir_out;
     }
 

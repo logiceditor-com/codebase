@@ -28,6 +28,7 @@ do
         };
 
         cfg:existing_path "schema_filename";
+        cfg:existing_path "db_schema_filename";
 
         cfg:variant "action"
         {

@@ -122,7 +122,7 @@ ACTIONS.help = function()
 end
 
 ACTIONS.generate_admin_api_schema = function()
-  local tables = load_db_schema(CONFIG.common.db.schema_filename)
+  local tables = load_db_schema(CONFIG.admin_gen.schema_filename)
   validate_db_schema(tables)
 
   local out_dir = CONFIG.admin_gen.intermediate.api_schema_dir
@@ -154,7 +154,7 @@ end
 ACTIONS.generate_js = function(
     db_schema_filename
   )
-  local tables = load_db_schema(CONFIG.common.db.schema_filename)
+  local tables = load_db_schema(CONFIG.admin_gen.schema_filename)
   validate_db_schema(tables)
 
   local out_dir = CONFIG.admin_gen.intermediate.js_dir

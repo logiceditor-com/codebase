@@ -25,7 +25,7 @@ local Q, CR, NPAD, write_file_using_template
 
 --------------------------------------------------------------------------------
 
-local write_navigator = function(game_model_data, filename_out)
+local write_navigator = function(game_model_data, navigator_template_filename, filename_out)
   local values = {}
 
   values.HEADER = [[
@@ -66,7 +66,7 @@ local write_navigator = function(game_model_data, filename_out)
   write_file_using_template(
     values,
     filename_out,
-    "admin-gen/templates/js/navigator.js.template"
+    navigator_template_filename
   )
 end
 
@@ -75,7 +75,9 @@ end
 local write_table_view = function(
     name, primary_key,
     read_only_data, append_only_data, prohibit_deletion,
-    columns, dir_out
+    columns,
+    tv_template_filename,
+    dir_out
   )
   local values = {}
 
@@ -102,11 +104,11 @@ local write_table_view = function(
   write_file_using_template(
     values,
     dir_out .. "modules/topics/tv_" .. name .. ".js",
-    "admin-gen/templates/js/table_view.js.template"
+    tv_template_filename
   )
 end
 
-local write_table_element_editor = function(name, primary_key, properties, dir_out)
+local write_table_element_editor = function(name, primary_key, properties, tee_template_filename, dir_out)
   local values = {}
 
   values.HEADER = [[
@@ -131,14 +133,16 @@ local write_table_element_editor = function(name, primary_key, properties, dir_o
   write_file_using_template(
     values,
     dir_out .. "modules/topics/tee_" .. name .. ".js",
-    "admin-gen/templates/js/table_element_editor.js.template"
+    tee_template_filename
   )
 end
 
 --------------------------------------------------------------------------------
 
 local write_serialized_list_view = function(
-    name, serialized_list_name, primary_key, columns, dir_out
+    name, serialized_list_name, primary_key, columns,
+    slv_template_filename,
+    dir_out
   )
 
   local full_name = name .. '-' .. serialized_list_name
@@ -165,12 +169,14 @@ local write_serialized_list_view = function(
   write_file_using_template(
     values,
     dir_out .. "modules/topics/tv_sl_" .. full_name .. ".js",
-    "admin-gen/templates/js/serialized_list_view.js.template"
+    slv_template_filename
   )
 end
 
 local write_serialized_list_element_editor = function(
-    name, serialized_list_name, primary_key, properties, dir_out
+    name, serialized_list_name, primary_key, properties,
+    slee_template_filename,
+    dir_out
   )
 
   local full_name = name .. '-' .. serialized_list_name
@@ -199,7 +205,7 @@ local write_serialized_list_element_editor = function(
   write_file_using_template(
     values,
     dir_out .. "modules/topics/tee_sl_" .. full_name .. ".js",
-    "admin-gen/templates/js/serialized_list_element_editor.js.template"
+    slee_template_filename
   )
 end
 

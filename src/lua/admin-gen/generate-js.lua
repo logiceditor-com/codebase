@@ -127,7 +127,7 @@ do
           }]]
   end
 
-  generate_navigator = function(tables, filename_out)
+  generate_navigator = function(tables, template_dir, filename_out)
     local cat, concat = make_concatter()
 
     local walkers =
@@ -145,7 +145,11 @@ do
 
     local game_model_data = concat()
 
-    write_navigator(game_model_data, filename_out)
+    write_navigator(
+        game_model_data,
+        template_dir .. "/navigator.js.template",
+        filename_out
+      )
   end
 end
 
@@ -563,6 +567,7 @@ do
           metadata.append_only,
           metadata.prohibit_deletion,
           walkers.visitors.column.concat(),
+          walkers.template_dir_ .. "table_view.js.template",
           walkers.dir_out_
         )
 
@@ -619,6 +624,7 @@ do
           data.name,
           walkers.table_primary_key,
           properties,
+          walkers.template_dir_ .. "table_element_editor.js.template",
           walkers.dir_out_
         )
 
@@ -643,6 +649,7 @@ do
             walkers.current_serialized_list_name,
             walkers.serialized_list_primary_key,
             walkers.visitors.column.sl_concat(),
+            walkers.template_dir_ .. "serialized_list_view.js.template",
             walkers.dir_out_
           )
 
@@ -656,6 +663,7 @@ do
             walkers.current_serialized_list_name,
             walkers.serialized_list_primary_key,
             properties,
+            walkers.template_dir_ .. "serialized_list_element_editor.js.template",
             walkers.dir_out_
           )
       end
@@ -665,13 +673,14 @@ do
 
 --------------------------------------------------------------------------------
 
-  generate_table_views = function(tables, table_infos, dir_out)
+  generate_table_views = function(tables, table_infos, template_dir, dir_out)
     local walkers =
     {
       down = down;
       up = up;
       --
       table_infos_ = table_infos;
+      template_dir_ = template_dir;
       dir_out_ = dir_out;
     }
 
@@ -699,10 +708,14 @@ end
 
 --------------------------------------------------------------------------------
 
-local generate_js = function(tables, dir_out)
-  generate_navigator(tables, dir_out .. "modules/navigator.js")
+local generate_js = function(
+    tables,
+    template_dir,
+    dir_out
+  )
+  generate_navigator(tables, template_dir, dir_out .. "modules/navigator.js")
   local table_infos = collect_table_info(tables)
-  generate_table_views(tables, table_infos, dir_out)
+  generate_table_views(tables, table_infos, template_dir, dir_out)
 end
 
 --------------------------------------------------------------------------------

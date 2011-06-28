@@ -267,7 +267,7 @@ do
     return "OPTIONAL_" .. raw_type
   end
 
-  generate_client_api_schema = function(tables, dir_out)
+  generate_client_api_schema = function(tables, generate_client_api_schema, dir_out)
     local walkers =
     {
       down = down;

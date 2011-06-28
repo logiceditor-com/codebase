@@ -125,6 +125,7 @@ ACTIONS.generate_admin_api_schema = function()
   local tables = load_db_schema(CONFIG.admin_gen.schema_filename)
   validate_db_schema(tables)
 
+  local template_dir = CONFIG.admin_gen.template_api_dir
   local out_dir = CONFIG.admin_gen.intermediate.api_schema_dir
 
   -- TODO: Detect obsolete files and fail instead of this!
@@ -136,7 +137,7 @@ ACTIONS.generate_admin_api_schema = function()
     )
 
   log("Generating client api schema to", out_dir)
-  generate_client_api_schema(tables, out_dir)
+  generate_client_api_schema(tables, template_dir, out_dir)
 
   log("OK")
 end
@@ -157,6 +158,7 @@ ACTIONS.generate_js = function(
   local tables = load_db_schema(CONFIG.admin_gen.schema_filename)
   validate_db_schema(tables)
 
+  local template_dir = CONFIG.admin_gen.template_js_dir
   local out_dir = CONFIG.admin_gen.intermediate.js_dir
 
   -- TODO: Detect obsolete files and fail instead of this!
@@ -168,7 +170,7 @@ ACTIONS.generate_js = function(
     )
 
   log("Generating js to", out_dir)
-  generate_js(tables, out_dir)
+  generate_js(tables, template_dir, out_dir)
 
   log("OK")
 end

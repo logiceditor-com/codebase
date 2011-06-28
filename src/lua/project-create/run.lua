@@ -237,6 +237,10 @@ do
               ignored[ignore] = nil
             end
           end
+        elseif v == false then
+          if not ignored[string.gsub(ignore, string.gsub(k, "%p", "%%%1"), "")] then
+            ignored[ignore] = nil
+          end
         else
           if not ignored[string.gsub(ignore, string.gsub(k, "%p", "%%%1"), v)] then
             ignored[string.gsub(ignore, string.gsub(k, "%p", "%%%1"), v)] = true
@@ -384,17 +388,38 @@ do
 
     local process_replication_recursively
     do
-      local replace_dictionary = function(string_to_process, dictionary, data_wrapper)
+      local replace_dictionary_in_string = function(
+          string_to_process,
+          dictionary,
+          data_wrapper
+        )
         for k, v in pairs(dictionary) do
-          -- TODO: hack?
-          local to_insert = string.gsub(v, "%%", "%%%1")
-          string_to_process = string.gsub(
-              string_to_process,
-              string.gsub(data_wrapper.left, "%p", "%%%1")
-           .. string.gsub(k, "%p", "%%%1")
-           .. string.gsub(data_wrapper.right, "%p", "%%%1"),
-              to_insert
-            )
+          if is_string(v) then
+            -- TODO: hack?
+            local to_insert = string.gsub(v, "%%", "%%%1")
+            string_to_process = string.gsub(
+                string_to_process,
+                string.gsub(data_wrapper.left, "%p", "%%%1")
+             .. string.gsub(k, "%p", "%%%1")
+             .. string.gsub(data_wrapper.right, "%p", "%%%1"),
+                to_insert
+              )
+           -- Remove all strings with pattern that ==false
+           elseif v == false then
+DEBUG_print("String before: " .. string_to_process)
+            string_to_process = string.gsub(
+                string_to_process,
+                "\n[.]*"
+             .. string.gsub(data_wrapper.left, "%p", "%%%1")
+             .. string.gsub(k, "%p", "%%%1")
+             .. string.gsub(data_wrapper.right, "%p", "%%%1")
+             .. "[.]*\n",
+                "\n"
+              )
+DEBUG_print("String before: " .. string_to_process)
+           else
+             assert(nil, k .. " is not string or false in manifest dictionary")
+           end
         end
         return string_to_process
       end
@@ -418,7 +443,7 @@ do
               metamanifest.data_wrapper.left .. v .. metamanifest.data_wrapper.right
             )
           if metamanifest.subdictionary[metamanifest.dictionary[v]] then
-            file_content = replace_dictionary(
+            file_content = replace_dictionary_in_string(
                 file_content,
                 metamanifest.subdictionary[metamanifest.dictionary[v]],
                 metamanifest.data_wrapper
@@ -459,7 +484,7 @@ do
                 )
               -- sub dictionary replaces
               if metamanifest.subdictionary[v[i]] then
-                current_block_replica = replace_dictionary(
+                current_block_replica = replace_dictionary_in_string(
                     current_block_replica,
                     metamanifest.subdictionary[v[i]],
                     metamanifest.data_wrapper
@@ -476,11 +501,41 @@ do
                 string.gsub(blocks[j], "[%p%%]", "%%%1"),
                 table.concat(blocks_set_to_write[j], "\n")
               )
-          end
+          end         
           --DEBUG_print("\27[32mBlock replicas\27[0m:" .. tpretty(blocks_set_to_write, "  ", 80))
         end
-        -- TODO: rename and make dictionary replaces
-        file_content = replace_dictionary(
+
+        -- TODO: remove code duplication
+        -- removing blocks with "false" dictionary patterns
+        for k, v in pairs(metamanifest.dictionary) do
+          if v == false then
+            --find block
+            local block_top_wrapper = 
+              string.gsub(block.top_left, "%p", "%%%1") .. k ..
+              string.gsub(block.top_right, "%p", "%%%1")
+            local block_bottom_wrapper =
+              string.gsub(block.bottom_left, "%p", "%%%1") .. k ..
+              string.gsub(block.bottom_right, "%p", "%%%1")
+            local string_to_find =
+              block_top_wrapper .. ".-" .. block_bottom_wrapper
+            blocks = {}
+            for w in string.gmatch(file_content, string_to_find) do
+              blocks[#blocks + 1] = w
+            end
+            for j = 1, #blocks do
+            --remove found block
+DEBUG_print("Before block removed: " .. file_content)
+              file_content = string.gsub(
+                  file_content,
+                  string.gsub(blocks[j], "[%p%%]", "%%%1"),
+                  "\n"
+                )
+DEBUG_print("After block removed: " .. file_content)
+            end
+          end
+        end
+
+        file_content = replace_dictionary_in_string(
             file_content,
             metamanifest.dictionary,
             metamanifest.data_wrapper
@@ -670,7 +725,12 @@ do
       local new_filepath = filepath
       for k, v in pairs(metamanifest.dictionary) do
         if new_filepath:find(k) then
-          new_filepath = string.gsub(new_filepath, k, v);
+          if v ~= false then
+            new_filepath = string.gsub(new_filepath, k, v);
+          else
+            DEBUG_print("\27[33mFalse  : " .. filepath .. "\27[0m")
+            return
+          end
         end
       end
       local short_path = string.sub(filepath, #metamanifest.project_path + 2)
@@ -690,7 +750,7 @@ do
           DEBUG_print("\27[33mRenamed:\27[0m " .. short_path_new)
         end
       end
-      return new_filepath
+--      return new_filepath
     end
 
     fill_placeholders = function(

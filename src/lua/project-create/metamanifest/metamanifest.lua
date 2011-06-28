@@ -18,8 +18,15 @@ dictionary =
   IP_ADDRESS = "TODO:Change! 127.0.255.";
 
   API_NAME = "api";
+  API_NAME_IP = "3";
+  API_NAME_SHORT = "API";
+
+  JOINED_WSAPI = "wsapi";
+  JOINED_WSAPI_IP = "4";
+  JOINED_WSAPI_SHORT = "WSA";
 
   STATIC_NAME = "static";
+  STATIC_NAME_IP = "5";
 
   SERVICE_NAME = "service-name";
   SERVICE_NAME_UNDERLINE = "service_name";

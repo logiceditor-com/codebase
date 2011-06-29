@@ -32,6 +32,17 @@ dictionary =
   SERVICE_NAME_UNDERLINE = "service_name";
   SERVICE_NAME_SHORT = "SVN";
 
+  REDIS_BASE_PORT = "6379";
+  REDIS_BASE_HOST = "pk-billing-redis-system";
+
+  -- TODO: make redis deploy params as DEPLOY_SERVER subdictionary
+  REDIS_BASE_PORT_DEPLOY = "6379";
+  REDIS_BASE_HOST_DEPLOY = "pk-billing-redis-system";
+
+  REDIS_BASE = "system";
+  REDIS_BASE_NUMBER = "1";
+  REDIS_BASE_NUMBER_DEPLOY = "1";
+
   CLUSTER_NAME =
   {
     "localhost-vf";

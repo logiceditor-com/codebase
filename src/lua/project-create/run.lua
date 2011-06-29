@@ -406,7 +406,6 @@ do
               )
            -- Remove all strings with pattern that ==false
            elseif v == false then
-DEBUG_print("String before: " .. string_to_process)
             string_to_process = string.gsub(
                 string_to_process,
                 "\n[.]*"
@@ -416,7 +415,6 @@ DEBUG_print("String before: " .. string_to_process)
              .. "[.]*\n",
                 "\n"
               )
-DEBUG_print("String before: " .. string_to_process)
            else
              assert(nil, k .. " is not string or false in manifest dictionary")
            end
@@ -524,13 +522,11 @@ DEBUG_print("String before: " .. string_to_process)
             end
             for j = 1, #blocks do
             --remove found block
-DEBUG_print("Before block removed: " .. file_content)
               file_content = string.gsub(
                   file_content,
                   string.gsub(blocks[j], "[%p%%]", "%%%1"),
                   "\n"
                 )
-DEBUG_print("After block removed: " .. file_content)
             end
           end
         end

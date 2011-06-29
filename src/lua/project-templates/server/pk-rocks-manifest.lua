@@ -9,9 +9,6 @@ local ROCKS =
     generator = { "rockspec/gen-rockspecs" };
     "rockspec/#{PROJECT_NAME}.lib-scm-1.rockspec";
   };
-  {
-    "www/static/rockspec/#{PROJECT_NAME}.www.static-scm-1.rockspec";
-  };
 --[[BLOCK_START:STATIC_NAME]]
   {
     "www/static/#{STATIC_NAME}/rockspec/"

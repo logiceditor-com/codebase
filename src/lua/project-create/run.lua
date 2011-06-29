@@ -388,6 +388,13 @@ do
 
     local process_replication_recursively
     do
+      local check_trailspaces_newlines = function(file_content)
+        file_content = string.gsub(file_content, "[ \t]*\n", "\n")
+        file_content = string.gsub(file_content, "\n\n[\n]+", "\n")
+        file_content = string.gsub(file_content, "\n\n$", "\n")
+        return file_content
+      end
+
       local replace_dictionary_in_string = function(
           string_to_process,
           dictionary,
@@ -537,6 +544,8 @@ do
             metamanifest.data_wrapper
           )
         --DEBUG_print(file_content)
+        -- TODO: move it elsewhere
+        file_content = check_trailspaces_newlines(file_content)
         local file = io.open(created_path, "w")
         file:write(file_content)
         file:close()
@@ -649,7 +658,6 @@ do
                     structure_new
                 )
             end
-
           end -- if filename ~= "FLAGS"
         end -- filename, structure in pairs(file_dir_structure) do
         return path_data.created_structure

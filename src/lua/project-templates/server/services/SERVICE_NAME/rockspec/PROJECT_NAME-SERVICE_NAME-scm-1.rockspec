@@ -4,10 +4,10 @@ source = {
    url = ""
 }
 description = {
-   summary = "Pulsar Banner Daily Stats Collector",
-   homepage = "http://pulsargalaxy.com",
+   summary = "#{PROJECT_NAME} #{SERVICE_NAME}",
+   homepage = "http://#{PROJECT_DOMAIN}",
    license = "Unpublished closed-source!",
-   maintainer = "Alexander Gladysh <agladysh@gmail.com>"
+   maintainer = "#{MAINTAINER}"
 }
 dependencies = {
    "lua == 5.1",

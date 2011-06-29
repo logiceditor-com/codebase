@@ -208,7 +208,9 @@ Add this to /etc/hosts:
 
 Also add aliases to localhost (developer machine only):
 
-    127.0.0.1 #{PROJECT_NAME}-redis-system
+--[[BLOCK_START:REDIS_BASE_HOST]]
+    127.0.0.1 #{REDIS_BASE_HOST}
+--[[BLOCK_END:REDIS_BASE_HOST]]
 
 DB initialization
 -----------------

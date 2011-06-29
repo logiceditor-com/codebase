@@ -130,7 +130,7 @@ local EXTENSIONS
 
 -------------------------------------------------------------------------------
 
-log("loading wsapi-runner (#{JOINED_SERVICE_NAME} 11)")
+log("loading wsapi-runner (#{JOINED_WSAPI} 11)")
 
 -------------------------------------------------------------------------------
 
@@ -160,8 +160,8 @@ end
 
 -------------------------------------------------------------------------------
 
-local SERVICE_NAME = "#{PROJECT_NAME}.#{JOINED_SERVICE_NAME}"
-local SYSTEM_ACTION_SERVICE_NAME = "#{JOINED_SERVICE_NAME}" -- TODO: ?! WTF? Remove.
+local SERVICE_NAME = "#{PROJECT_NAME}.#{JOINED_WSAPI}"
+local SYSTEM_ACTION_SERVICE_NAME = "#{JOINED_WSAPI}" -- TODO: ?! WTF? Remove.
 local NODE_ID = nil
 local PID = nil
 

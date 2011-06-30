@@ -54,7 +54,7 @@ dictionary =
   -- TODO: obsolete, rocks/ related, remove later
   SUBPROJ_NAME = { "pk", "project" };
 }
-
+dictionary.MYSQL_BASES_DEPLOY_CFG = [[--No bases]];
 dictionary.MYSQL_BASES_CFG = [[--No bases]];
 dictionary.REDIS_BASES_CFG = 
     [[system = { address = { host = "]] .. dictionary.PROJECT_NAME

@@ -20,23 +20,33 @@ do
   local schema_chunk = function()
     cfg:root
     {
---      common_tool_config_schema_chunk();
--- TODO: remove common part, make it to include externally
---------------------------------------------------------------------------------
--- Temporarily added common part
-  cfg:node "common"
-  {
-    cfg:existing_path "PROJECT_PATH";
+      cfg:node "common"
+      {
+        cfg:existing_path "PROJECT_PATH";
 
-    cfg:node "db"
-    {
-      cfg:existing_path "schema_filename";
-      cfg:existing_path "changes_dir";
-      cfg:path "tables_filename";
-      cfg:path "tables_test_data_filename";
-    };
-  };
---------------------------------------------------------------------------------
+        cfg:node "internal_config"
+        {
+          cfg:node "deploy"
+          {
+            cfg:host "host";
+            cfg:port "port";
+          };
+        };
+
+        cfg:node "db"
+        {
+          cfg:existing_path "schema_filename";
+
+          cfg:existing_path "changes_dir";
+
+          cfg:path "tables_filename";
+          cfg:path "tables_test_data_filename";
+
+          cfg:path "generated_dot_filename";
+          cfg:path "generated_pdf_filename";
+        };
+      };
+
       cfg:node "dbgen"
       {
         cfg:variant "action"

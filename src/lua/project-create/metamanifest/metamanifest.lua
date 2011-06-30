@@ -17,6 +17,8 @@ dictionary =
 
   IP_ADDRESS = "TODO:Change! 127.0.255.";
 
+  API_TEST_HANDLERS = false;
+
   API_NAME = "api";
   API_NAME_IP = "3";
   API_NAME_SHORT = "API";

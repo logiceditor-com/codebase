@@ -225,7 +225,7 @@ do
   end
   
   -- replicate ignored paths ---------------------------------------------------
-
+  -- TODO: generalize for all dictionary
   local process_ignored_paths = function(metamanifest)
     local ignored = tset(metamanifest.ignore_paths)
     for ignore, _ in pairs(ignored) do
@@ -725,8 +725,23 @@ do
 
   local fill_placeholders
   do
-    local replace_dictionary_patterns_in_path = function(filepath, metamanifest)
+    local replace_dictionary_patterns_in_path = function(filepath, metamanifest, replaces)
       local new_filepath = filepath
+      for key, value in pairs(replaces) do
+        if metamanifest.subdictionary[value] then
+          for k, v in pairs(metamanifest.subdictionary[value]) do
+            if new_filepath:find(k) then
+              if v ~= false then
+                new_filepath = string.gsub(new_filepath, k, v);
+                DEBUG_print("\27[32mLocally: " .. filepath .. "\27[0m")
+              else
+                DEBUG_print("\27[33mLocally: " .. filepath .. "\27[0m")
+                return
+              end
+            end
+          end
+        end
+      end
       for k, v in pairs(metamanifest.dictionary) do
         if new_filepath:find(k) then
           if v ~= false then
@@ -770,7 +785,8 @@ do
           if attr.mode == "directory" then
             fill_placeholders(metamanifest, filepath, structure)
           else
-            replace_dictionary_patterns_in_path(filepath, metamanifest)
+            -- DEBUG_print("structure: ", tpretty(structure, "  ", 80))
+            replace_dictionary_patterns_in_path(filepath, metamanifest, structure.FLAGS.replaces_used)
           end
         end
       end

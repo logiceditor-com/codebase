@@ -4,5 +4,5 @@ api:static_url "/"
 
   content_type = "text/xml";
 
-  text = [[<#{PROJECT_NAME}_api/>]];
+  text = [[<#{PROJECT_NAME}-#{API_NAME}/>]];
 }

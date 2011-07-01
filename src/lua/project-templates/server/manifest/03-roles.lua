@@ -173,6 +173,7 @@ local wsapi_service_role = function(param)
     "pk-tools.pk-ensure-runit-service-enabled";
     "pk-tools.pk-ensure-nginx-site-enabled";
     "pk-tools.pk-ensure-logrotate-enabled";
+    "pk-tools.pk-node-id";
     "#{PROJECT_NAME}.tools.#{PROJECT_NAME}-execute-system-action";
     nginx_rock_name;
   }

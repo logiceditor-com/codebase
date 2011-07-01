@@ -25,7 +25,7 @@ SOCKUSERID=www-data
 exec 2>&1
 
 # Added to recreate /var/run dir that is used by service
-NODE_ID = $(pk-node-id) #install pk-tools.pk-node-id rock
+NODE_ID="$(pk-node-id)" #install pk-tools.pk-node-id rock
 mkdir -p /var/run/#{PROJECT_NAME}/#{API_NAME}/$NODE_ID
 chown www-data:www-data /var/run/#{PROJECT_NAME}/#{API_NAME}/$NODE_ID
 sudo chmod 775 /var/run/#{PROJECT_NAME}/#{API_NAME}/control/$NODE_ID

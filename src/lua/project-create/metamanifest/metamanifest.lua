@@ -58,7 +58,7 @@ dictionary =
 }
 dictionary.MYSQL_BASES_DEPLOY_CFG = [[--No bases]];
 dictionary.MYSQL_BASES_CFG = [[--No bases]];
-dictionary.REDIS_BASES_CFG = 
+dictionary.REDIS_BASES_CFG =
     [[system = { address = { host = "]] .. dictionary.PROJECT_NAME
  .. [[-redis-system", port = 6379 }, database = 5 }]];
 

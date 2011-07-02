@@ -7,7 +7,9 @@
 
 return
 {
+  REGISTRATION_FAILURE = { "pk-admin/webservice/html_answer_render.lua" };
   check_admin_account_params = { "pk-admin/webservice/db/admin_account.lua" };
+  check_recaptcha = { "pk-admin/webservice/recaptcha.lua" };
   create_session_checker = { "pk-admin/webservice/db/admin_session.lua" };
   delete = { "pk-admin/webservice/db/object_tag.lua", "pk-admin/webservice/db/object_tag_type.lua" };
   delete_expired_admin_session_by_account_id = { "pk-admin/webservice/db/admin_session.lua" };
@@ -32,6 +34,9 @@ return
   make_object_tag_api = { "pk-admin/webservice/db/object_tag_api.lua" };
   make_serialized_list_api = { "pk-admin/webservice/db/serialized_list.lua" };
   may_create_one_admin_session = { "pk-admin/webservice/db/admin_session.lua" };
+  render_login_answer_ok = { "pk-admin/webservice/html_answer_render.lua" };
+  render_login_answer_unregistered = { "pk-admin/webservice/html_answer_render.lua" };
+  render_register_answer_failed = { "pk-admin/webservice/html_answer_render.lua" };
   try_ban_admin_account_by_id = { "pk-admin/webservice/db/admin_account.lua" };
   try_create_admin_account = { "pk-admin/webservice/db/admin_account.lua" };
   try_create_admin_session = { "pk-admin/webservice/db/admin_session.lua" };

@@ -9,11 +9,11 @@ function SetGlobalSessionCookies()
     username = Get_Cookie("username"),
     profile = Get_Cookie("profile");
 
-  Delete_Cookie("uid", PKAdmin.Settings.API_PREFIX + "/session");
-  Delete_Cookie("sid", PKAdmin.Settings.API_PREFIX + "/session");
-  Delete_Cookie("username",PKAdmin.Settings.API_PREFIX + "/session");
-  Delete_Cookie("profile", PKAdmin.Settings.API_PREFIX + "/session");
-  Delete_Cookie("server_answer_error", PKAdmin.Settings.API_PREFIX + "/session");
+  Delete_Cookie("uid", "/session");
+  Delete_Cookie("sid", "/session");
+  Delete_Cookie("username","/session");
+  Delete_Cookie("profile", "/session");
+  Delete_Cookie("server_answer_error", "/session");
 
   if (server_answer_error != null)
     Set_Cookie("server_answer_error", server_answer_error, MINUTES_TILL_EXPIRATION * 60, "/");

@@ -1,6 +1,6 @@
 PK.make_admin_request_url = function(suffix)
 {
-  return "api/json/" + suffix;
+  return PKAdmin.Settings.API_PREFIX + "/json/" + suffix;
 };
 
 PK.make_admin_request_params = function(params)

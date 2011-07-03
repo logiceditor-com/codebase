@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
--- manifest/clusters/#{SERVER_NAME}.lua: developer machine pseudo-cluster description
+-- manifest/clusters/#{DEPLOY_SERVER}.lua: #{DEPLOY_SERVER} cluster description
 --------------------------------------------------------------------------------
 
 clusters = clusters or { }

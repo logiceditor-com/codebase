@@ -44,7 +44,7 @@ PK.on_server_error = function(error_id)
       break;
     case "SESSION_EXPIRED":
       CRITICAL_ERROR(I18N('Session expired. Re-login, please.'));
-      PK.navigation.go_to_topic("client-login", undefined, true);
+      PK.navigation.go_to_topic("admin-login", undefined, true);
       break;
     case "DUPLICATE_WEBSITE_URL":
       CRITICAL_ERROR(I18N('Duplicated url of website'));

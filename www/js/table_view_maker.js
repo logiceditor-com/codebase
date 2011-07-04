@@ -309,7 +309,7 @@ PK.make_table_view_panel = function(
       title: title,
       tbar: tbar,
       height: 550,
-      width: 1010,
+      //width: 1010,
       per_page: per_page,
       displayMsg: params.displayMsg,
       emptyMsg: params.emptyMsg,

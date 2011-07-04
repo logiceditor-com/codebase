@@ -1,6 +1,7 @@
 // Parameters:
 //   title
 //   tbar
+//   bbar
 //   height
 //   width
 //   per_page
@@ -14,7 +15,9 @@ PK.make_grid_panel = function(params)
 {
   var plugins
   if(params.filters)
+  {
     plugins = [params.filters];
+  }
 
   var panel = new Ext.grid.GridPanel({
     renderTo: params.render_to,
@@ -47,7 +50,8 @@ PK.make_grid_panel = function(params)
       displayMsg: params.displayMsg,
       emptyMsg: params.emptyMsg
     }),
-    tbar: params.tbar
+    tbar: params.tbar,
+    bbar: params.bbar
   });
 
   if (params.store !== undefined)
@@ -87,35 +91,38 @@ PK.make_table_view_panel = function(
   if (params.per_page !== undefined)
     per_page = params.per_page
 
-  var reader_fields = new Array;
+  var reader_fields = [], filters = []
 
   for(f in columns)
   {
-    reader_fields[reader_fields.length] =
-    {
+    reader_fields.push({
       name: columns[f].dataIndex,
       convert: columns[f].convert
-    }
+    })
+
+    if(columns[f].sortable)
+      filters.push([ filters.length, columns[f].header ])
   }
 
-  var filters = new Ext.ux.grid.GridFilters({
-    local: true, // false
 
-    filters:[
-      {dataIndex: params.primaryKey,   type: 'numeric'},
-      {dataIndex: 'name',    type: 'string'}
-//           {
-//             dataIndex: 'risk',
-//             type: 'list',
-//             active:false,//whether filter value is activated
-//             value:'low',//default filter value
-//             options: ['low','medium','high'],
-//             //if local = false or unspecified, phpMode has an effect
-//             phpMode: false
-//           }
-    ]
-  });
-
+  var grid_filters = undefined
+//   var grid_filters = new Ext.ux.grid.GridFilters({
+//     local: true, // false
+//
+//     filters:[
+//       {dataIndex: params.primaryKey,   type: 'numeric'},
+//       {dataIndex: 'name',    type: 'string'}
+//       //{
+//       //  dataIndex: 'risk',
+//       //  type: 'list',
+//       //  active:false,//whether filter value is activated
+//       //  value:'low',//default filter value
+//       //  options: ['low','medium','high'],
+//       //  //if local = false or unspecified, phpMode has an effect
+//       //  phpMode: false
+//       //}
+//     ]
+//   });
 
 
   if(params.store_maker)
@@ -305,21 +312,75 @@ PK.make_table_view_panel = function(
     }
   }
 
-  panel = PK.make_grid_panel({
-      title: title,
-      tbar: tbar,
-      height: 550,
-      //width: 1010,
+  var grid_panel = PK.make_grid_panel({
+      bbar: tbar,
       per_page: per_page,
       displayMsg: params.displayMsg,
       emptyMsg: params.emptyMsg,
-      render_to: 'main-module-panel',
       columns: columns,
-      filters: filters,
+      filters: grid_filters,
       store: store_
     });
 
-  panel.addListener('rowdblclick', onRowDblClick);
+  grid_panel.addListener('rowdblclick', onRowDblClick);
+
+  var filter_store = new Ext.data.ArrayStore({
+      id: 0,
+      fields: ['id','title'],
+      data:filters
+  })
+
+
+  var panel
+
+  panel = new Ext.Panel({
+      title: title,
+      baseCls: 'x-plain',
+      renderTo: 'main-module-panel',
+      layout: 'auto',
+      items:
+      [
+        {
+          height: 5,
+          xtype:'spacer',
+        },
+        {
+          collapsible: true,
+          title: I18N('Filters'),
+          height: 150,
+          xtype: 'panel',
+          tbarCfg: { baseCls: 'x-plain' },
+          //baseCls: 'x-plain',
+          tbar:
+          [
+            {
+              xtype: 'combo',
+              store: filter_store,
+              valueField: 'id',
+              displayField: 'title',
+              editable: false,
+              typeAhead: true,
+              mode: 'local',
+              triggerAction: 'all',
+              emptyText: I18N('Add new filter'),
+              selectOnFocus: true,
+              width: 150
+            }
+          ]
+        },
+        {
+          height: 10,
+          xtype:'spacer',
+        },
+        {
+          height: 450,
+          layout: 'fit',
+          xtype: 'panel',
+          baseCls:'x-plain',
+          items: grid_panel
+        }
+      ]
+    });
 
   return panel;
 }

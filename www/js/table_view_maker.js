@@ -102,10 +102,15 @@ PK.make_table_view_panel = function(
 
     if(columns[f].sortable)
       filters.push([
-          filters.length,
-          columns[f].dataIndex,
-          columns[f].header,
-          'integer',
+        filters.length,
+        columns[f].dataIndex,
+        columns[f].header,
+        // FIXME: Filter should be created in tv_*, not here
+        PKAdmin.filters.make_filter(
+            PK.table_element_types.INT,
+            columns[f].dataIndex,
+            columns[f].header
+          )
       ])
   }
 
@@ -335,22 +340,16 @@ PK.make_table_view_panel = function(
 
   var addFilter = function(el, item)
   {
-    if (!current_filters[item.data.dataIndex])
-    {
-      current_filters[item.data.dataIndex] = 1
-    }
-    else
+    if (current_filters[item.data.id])
     {
       Ext.Msg.alert(('Warning'), 'This field is already used in another filter');
-      ++current_filters[item.data.dataIndex]
+      return
     }
 
-    filter_panel.add({
-      xtype: 'textfield',
-      fieldLabel: item.data.title,
-      name: item.data.dataIndex
-      //vtype: filter_type
-    })
+    current_filters[item.data.id] = true
+
+    var filter_control = item.data.filter.render()
+    filter_panel.add(filter_control)
 
     filter_panel.doLayout()
   }
@@ -371,6 +370,7 @@ PK.make_table_view_panel = function(
       title: I18N('Filters'),
       height: 150,
       xtype: 'panel',
+      autoScroll: true,
       layout: 'form',
       tbarCfg: { baseCls: 'x-plain' },
       bodyStyle:'padding:5px 5px 0',
@@ -380,9 +380,13 @@ PK.make_table_view_panel = function(
         {
           xtype: 'combo',
           emptyText: I18N('Add new filter'),
-          store: new Ext.data.ArrayStore({ id: 0, fields: ['id', 'dataIndex', 'title'], data: filters }),
+          store: new Ext.data.ArrayStore({
+            id: 0,
+            fields: ['id', 'field_name', 'field_title', 'filter'],
+            data: filters
+          }),
           valueField: 'id',
-          displayField: 'title',
+          displayField: 'field_title',
           editable: false,
           typeAhead: true,
           mode: 'local',

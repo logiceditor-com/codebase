@@ -1,29 +1,83 @@
 PK.common_custom_editors = new function()
 {
+  this.make_form_field_string_editor = function()
+  {
+    return new Ext.form.TextField({
+        selectOnFocus: true,
+        allowBlank: true,
+        style:'text-align:left;'
+      });
+  };
+
+  this.make_form_field_enum_editor = function(my_enum)
+  {
+    return new Ext.form.ComboBox({
+      typeAhead: true,
+      triggerAction: 'all',
+      editable: false,
+      mode: 'local',
+      lazyRender: true, // should always be true for editor
+      store: new Ext.data.ArrayStore({
+          fields: ['id', 'text'],
+          data: my_enum
+        }),
+      displayField: 'text',
+      valueField: 'id'
+    });
+  };
+
+  this.make_form_field_bool_editor = function()
+  {
+    return this.make_form_field_enum_editor(
+        [[0, I18N('no')],
+        [1, I18N('yes')]]
+      );
+  }
+
+  this.make_form_field_number_editor = function()
+  {
+    return new Ext.form.NumberField({
+        selectOnFocus: true,
+        allowBlank: true,
+        style:'text-align:left;'
+      });
+  };
+
+  this.make_form_field_money_editor = function()
+  {
+    return new Ext.form.NumberField({
+        selectOnFocus: true,
+        allowBlank: true,
+        style:'text-align:left;',
+        allowDecimals: true,
+        allowNegative: false,
+    });
+  };
+
+  this.make_form_field_date_editor = function()
+  {
+    return new Ext.form.DateField({
+        format: 'd.m.Y',
+        selectOnFocus: true
+      });
+  };
+
+  this.make_form_field_password_editor = function()
+  {
+    return new Ext.form.TextField({allowBlank: false})
+  };
+
+
+  // ---------------------------------------------------------------------------
+
+
   this.make_enum_editor_maker = function(my_enum)
   {
     return function()
     {
-      return new Ext.grid.GridEditor(new Ext.form.ComboBox({
-        // if we enable typeAhead it will be querying database
-        // so we may not want typeahead consuming resources
-        typeAhead: true,
-        triggerAction: 'all',
-        editable: false,
-
-        mode: 'local',
-
-        // By enabling lazyRender this prevents the combo box
-        // from rendering until requested
-        lazyRender: true, // should always be true for editor
-
-        store: new Ext.data.ArrayStore({
-            fields: ['id', 'text'],
-            data: my_enum
-          }),
-        displayField: 'text',
-        valueField: 'id'
-      }));
+      return new Ext.grid.GridEditor(
+          this.make_form_field_enum_editor(my_enum)
+        );
     };
   };
 
@@ -32,22 +86,16 @@ PK.common_custom_editors = new function()
 
   this.make_number_editor = function()
   {
-    return new Ext.grid.GridEditor(new Ext.form.NumberField({
-        selectOnFocus: true,
-        allowBlank: true,
-        style:'text-align:left;'
-      }));
+    return new Ext.grid.GridEditor(
+        this.make_form_field_number_editor()
+      );
   };
 
   this.make_money_editor = function()
   {
-    var grid_editor =  new Ext.grid.GridEditor(new Ext.form.NumberField({
-        selectOnFocus: true,
-        allowBlank: true,
-        style:'text-align:left;',
-        allowDecimals: true,
-        allowNegative: false,
-    }));
+    return new Ext.grid.GridEditor(
+        this.make_form_field_money_editor()
+      );
     grid_editor.on(
         'beforecomplete',
         function(this_ge, value, startValue)
@@ -74,35 +122,15 @@ PK.common_custom_editors = new function()
 
   this.make_date_editor = function()
   {
-    return new Ext.grid.GridEditor(new Ext.form.DateField({
-        format: 'd.m.Y',
-        selectOnFocus: true
-      }));
-  };
-
-  this.make_profile_editor = function()
-  {
-    return new Ext.grid.GridEditor(new Ext.form.ComboBox({
-      // if we enable typeAhead it will be querying database
-      // so we may not want typeahead consuming resources
-      typeAhead: false,
-      triggerAction: 'all',
-
-      // By enabling lazyRender this prevents the combo box
-      // from rendering until requested
-      lazyRender: true, // should always be true for editor
-
-      store: PK.stores.admin_profiles,
-
-      displayField: 'title',
-      valueField: 'id'
-    }));
+    return new Ext.grid.GridEditor(
+        this.make_form_field_date_editor()
+      );
   };
 
   this.make_password_editor = function()
   {
-    var grid_editor = new Ext.grid.GridEditor(
-        new Ext.form.TextField({allowBlank: false})
+    return new Ext.grid.GridEditor(
+        this.make_form_field_password_editor()
       );
 
     grid_editor.on(
@@ -119,6 +147,59 @@ PK.common_custom_editors = new function()
       );
 
     return grid_editor;
+  };
+
+
+  //----------------------------------------------------------------------------
+
+
+  this.make_form_field_editor = function(value_type, params)
+  {
+    switch (Number(value_type))
+    {
+      case PK.table_element_types.STRING:
+        return this.make_form_field_string_editor();
+        break;
+
+      case PK.table_element_types.INT:
+        return this.make_form_field_number_editor();
+        break;
+
+      case PK.table_element_types.ENUM:
+        if(!params.enum_items)
+          return undefined;
+        return this.make_form_field_enum_editor(params.enum_items);
+        break;
+
+      case PK.table_element_types.BOOL:
+        return this.make_form_field_bool_editor();
+        break;
+
+      case PK.table_element_types.DATE:
+        return this.make_form_field_date_editor();
+        break;
+
+      case PK.table_element_types.PHONE:
+      case PK.table_element_types.MAIL:
+        return this.make_form_field_string_editor();
+        break;
+
+      case PK.table_element_types.DB_IDS:
+        // TODO: Hack! Value can contain few ids!
+        return this.make_form_field_number_editor();
+        break;
+
+      case PK.table_element_types.BINARY_DATA:
+        return undefined;
+        break;
+
+      case PK.table_element_types.MONEY:
+        return this.make_form_field_money_editor();
+        break;
+
+      default:
+        return undefined;
+    }
   };
 
 

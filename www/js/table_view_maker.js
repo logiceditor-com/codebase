@@ -29,6 +29,11 @@ PKAdmin.make_filter_panel = function(filters)
     filter_panel.doLayout()
   }
 
+  var applyFilters = function()
+  {
+    Ext.Msg.alert('TODO', 'Implement applyFilters.');
+  }
+
   var loadFilters = function()
   {
     Ext.Msg.alert('TODO', 'Implement loadFilters.');
@@ -70,14 +75,20 @@ PKAdmin.make_filter_panel = function(filters)
         listeners: { select : addFilter }
       },
       {
-        text: I18N('Load filters'),
-        tooltip: I18N('Click to load'),
+        text: I18N('Apply'),
+        tooltip: I18N('Apply filters'),
+        iconCls: 'icon-apply',
+        handler: applyFilters
+      },
+      {
+        text: I18N('Load'),
+        tooltip: I18N('Load filters'),
         iconCls: 'icon-load',
         handler: loadFilters
       },
       {
-        text: I18N('Save filters'),
-        tooltip: I18N('Click to save'),
+        text: I18N('Save'),
+        tooltip: I18N('Save filters'),
         iconCls: 'icon-save',
         handler: saveFilters
       }

@@ -1,15 +1,48 @@
 PKAdmin.filters = new function()
 {
+  var wrap_filter_params_ = function(items)
+  {
+    return {
+      id: 'param_container',
+      xtype: 'panel',
+      baseCls: 'x-plain',
+      flex: 1,
+      //height: 50,
+      layout: 'hbox',
+      items: items
+    }
+  }
+
+  var update_filter_ = function(single_filter_panel, items)
+  {
+    single_filter_panel.remove('param_container')
+    single_filter_panel.add(wrap_filter_params_(items))
+    single_filter_panel.doLayout()
+  }
+
+
   this.make_string_filter = function(field_name, field_title)
   {
-    var render_interval_params = function(el)
+    var render_comparision_params = function()
     {
-      Ext.Msg.alert('TODO', 'Implement render_interval_params()')
+      return {
+        xtype: 'textfield'
+      }
     }
 
-    var render_comparision_params = function(el)
+    var render_interval_params = function()
     {
-      Ext.Msg.alert('TODO', 'Implement render_comparision_params()')
+      return [
+        {
+          xtype: 'textfield'
+        },
+        { xtype: 'spacer', width: 10 },
+        { xtype: 'label', html: "&dash;" },
+        { xtype: 'spacer', width: 10 },
+        {
+          xtype: 'textfield'
+        }
+      ]
     }
 
     return {
@@ -33,11 +66,11 @@ PKAdmin.filters = new function()
               store: new Ext.data.ArrayStore({
                 fields: ['title', 'params_renderer' ],
                 data: [
-                  [ '<= X <=', render_interval_params ],
-                  [ '=', render_comparision_params ]
+                  [ '=', render_comparision_params ],
+                  [ I18N('interval'), render_interval_params ]
                 ]
               }),
-              value: '<= X <=',
+              value: '=',
               valueField: 'title',
               displayField: 'title',
               autoSelect: true,
@@ -46,16 +79,15 @@ PKAdmin.filters = new function()
               mode: 'local',
               triggerAction: 'all',
               selectOnFocus: true,
-              width: 70,
-              listeners: { select : function(el, item) { item.data.params_renderer(el) } }
+              width: 80,
+              listeners: { select : function(el, item) {
+                var items = item.data.params_renderer()
+                var single_filter_panel = el.ownerCt
+                update_filter_(single_filter_panel, items)
+              }}
             },
             { xtype: 'spacer', width: 10 },
-            {
-              id: 'param_container',
-              xtype: 'panel',
-              //baseCls: 'x-plain',
-              layout: 'hbox',
-            },
+            wrap_filter_params_(render_comparision_params())
           ]
         }
       }

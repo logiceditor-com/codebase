@@ -2,6 +2,16 @@ PKAdmin.filters = new function()
 {
   this.make_string_filter = function(field_name, field_title)
   {
+    var render_interval_params = function(el)
+    {
+      Ext.Msg.alert('TODO', 'Implement render_interval_params()')
+    }
+
+    var render_comparision_params = function(el)
+    {
+      Ext.Msg.alert('TODO', 'Implement render_comparision_params()')
+    }
+
     return {
       render: function()
       {
@@ -15,21 +25,20 @@ PKAdmin.filters = new function()
           [
             {
               xtype: 'label',
-              text: field_name + " :"
+              text: field_title + " :"
             },
             { xtype: 'spacer', width: 10 },
             {
               xtype: 'combo',
               store: new Ext.data.ArrayStore({
-                id: 0,
-                fields: ['id', 'title'],
+                fields: ['title', 'params_renderer' ],
                 data: [
-                  [1, '<= X <='],
-                  [2, '=']
+                  [ '<= X <=', render_interval_params ],
+                  [ '=', render_comparision_params ]
                 ]
               }),
-              value: 1,
-              valueField: 'id',
+              value: '<= X <=',
+              valueField: 'title',
               displayField: 'title',
               autoSelect: true,
               editable: false,
@@ -38,22 +47,15 @@ PKAdmin.filters = new function()
               triggerAction: 'all',
               selectOnFocus: true,
               width: 70,
-              //listeners: { select : addFilter }
+              listeners: { select : function(el, item) { item.data.params_renderer(el) } }
             },
             { xtype: 'spacer', width: 10 },
             {
-              xtype: 'textfield',
-              fieldLabel: field_title,
-              name: field_name
-              //vtype: filter_type
+              id: 'param_container',
+              xtype: 'panel',
+              //baseCls: 'x-plain',
+              layout: 'hbox',
             },
-            { xtype: 'spacer', width: 10 },
-            {
-              xtype: 'textfield',
-              fieldLabel: field_title,
-              name: field_name
-              //vtype: filter_type
-            }
           ]
         }
       }

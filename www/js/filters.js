@@ -7,10 +7,52 @@ PKAdmin.filters = new function()
       {
         // TODO: Implement
         return {
-          xtype: 'textfield',
-          fieldLabel: field_title,
-          name: field_name
-          //vtype: filter_type
+          xtype: 'container',
+          layout: 'hbox',
+          items:
+          [
+            {
+              xtype: 'label',
+              text: field_name + " :"
+            },
+            { xtype: 'spacer', width: 10 },
+            {
+              xtype: 'combo',
+              store: new Ext.data.ArrayStore({
+                id: 0,
+                fields: ['id', 'title'],
+                data: [
+                  [1, '<= X <='],
+                  [2, '=']
+                ]
+              }),
+              value: 1,
+              valueField: 'id',
+              displayField: 'title',
+              autoSelect: true,
+              editable: false,
+              typeAhead: true,
+              mode: 'local',
+              triggerAction: 'all',
+              selectOnFocus: true,
+              width: 70,
+              //listeners: { select : addFilter }
+            },
+            { xtype: 'spacer', width: 10 },
+            {
+              xtype: 'textfield',
+              fieldLabel: field_title,
+              name: field_name
+              //vtype: filter_type
+            },
+            { xtype: 'spacer', width: 10 },
+            {
+              xtype: 'textfield',
+              fieldLabel: field_title,
+              name: field_name
+              //vtype: filter_type
+            }
+          ]
         }
       }
     }

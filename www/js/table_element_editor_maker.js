@@ -575,7 +575,6 @@ PK.make_table_element_editor = function(params)
         general_properties_panel_ = new Ext.grid.PropertyGrid({
           title  : (must_have_tabs ? I18N('General properties') : title_),
           //autoHeight: false,
-          renderTo: (must_have_tabs ? undefined : 'main-module-panel'),
           width: params.nameWidth + params.valueWidth + VSCROLL_WIDTH,
           height: TEE_HEIGHT,
           propertyNames: propertyNames,
@@ -589,8 +588,12 @@ PK.make_table_element_editor = function(params)
         general_properties_panel_.getColumnModel().setColumnWidth(0, params.nameWidth);
         general_properties_panel_.getColumnModel().setColumnWidth(1, params.valueWidth);
 
+        var main_module = Ext.getCmp('main-module-panel')
+
         if (!must_have_tabs)
         {
+          main_module.add(general_properties_panel_)
+
           panel_ = general_properties_panel_;
         }
         else
@@ -611,7 +614,6 @@ PK.make_table_element_editor = function(params)
             title  : title_,
             autoHeight: false,
             frame: false,
-            renderTo: 'main-module-panel',
             width: width,
             height: height,
             layout : 'fit',
@@ -624,8 +626,11 @@ PK.make_table_element_editor = function(params)
               })
             ]
           });
+
+          main_module.add(panel_)
         }
 
+        main_module.doLayout()
       };
 
       if(element_id)

@@ -1,3 +1,114 @@
+//------------------------------------------------------------------------------
+//                           FILTER PANEL
+//------------------------------------------------------------------------------
+
+PKAdmin.make_filter_panel = function(filters)
+{
+  var filter_panel = undefined,
+      current_filters = {},
+      num_current_filters = 0
+
+  var addFilter = function(el, item)
+  {
+    if (current_filters[item.data.id])
+    {
+      Ext.Msg.alert(('Warning'), 'This field is already used in another filter');
+      return
+    }
+
+    current_filters[item.data.id] = true
+    ++num_current_filters
+
+    var filter_control = item.data.filter.render()
+
+    if(num_current_filters % 2 == 1)
+      filter_panel.get('left').add(filter_control)
+    else
+      filter_panel.get('right').add(filter_control)
+
+    filter_panel.doLayout()
+  }
+
+  var loadFilters = function()
+  {
+    Ext.Msg.alert('TODO', 'Implement loadFilters.');
+  }
+
+  var saveFilters = function()
+  {
+    Ext.Msg.alert('TODO', 'Implement saveFilters.');
+  }
+
+
+  filter_panel = new Ext.Panel({
+    collapsible: true,
+    title: I18N('Filters'),
+    autoHeight: true,
+    //height: 200,
+    xtype: 'panel',
+    autoScroll: true,
+    layout:'column',
+    bodyStyle:'padding:2px 2px 2px 2px',
+
+    tbar:
+    [
+      {
+        xtype: 'combo',
+        emptyText: I18N('Add new filter'),
+        store: new Ext.data.ArrayStore({
+          id: 0,
+          fields: ['id', 'field_name', 'field_title', 'filter'],
+          data: filters
+        }),
+        valueField: 'id',
+        displayField: 'field_title',
+        editable: false,
+        typeAhead: true,
+        mode: 'local',
+        triggerAction: 'all',
+        selectOnFocus: true,
+        width: 150,
+        listeners: { select : addFilter }
+      },
+      {
+        text: I18N('Load filters'),
+        tooltip: I18N('Click to load'),
+        iconCls: 'icon-load',
+        handler: loadFilters
+      },
+      {
+        text: I18N('Save filters'),
+        tooltip: I18N('Click to save'),
+        iconCls: 'icon-save',
+        handler: saveFilters
+      }
+    ],
+
+    items:
+    [
+      {
+        layout: 'form',
+        id: 'left',
+        baseCls: 'x-plain',
+        columnWidth: 0.5
+      },
+      {
+        layout: 'form',
+        id: 'right',
+        baseCls: 'x-plain',
+        columnWidth: 0.5
+      }
+    ]
+  })
+
+  return filter_panel
+}
+
+
+//------------------------------------------------------------------------------
+//                           GRID PANEL
+//------------------------------------------------------------------------------
+
 // Parameters:
 //   title
 //   tbar
@@ -11,7 +122,7 @@
 //   columns
 //   filters
 //   store
-PK.make_grid_panel = function(params)
+PKAdmin.make_grid_panel = function(params)
 {
   var plugins
   if(params.filters)
@@ -64,6 +175,10 @@ PK.make_grid_panel = function(params)
 }
 
 
+//------------------------------------------------------------------------------
+//                           TABLE VIEW PANEL
+//------------------------------------------------------------------------------
+
 // Parameters:
 //   title
 //   primaryKey
@@ -83,7 +198,7 @@ PK.make_grid_panel = function(params)
 //   add_request_params
 //   per_page
 //   custom_tbar
-PK.make_table_view_panel = function(
+PKAdmin.make_table_view_panel = function(
     panel_getter, title, columns, params, show_params
   )
 {
@@ -323,7 +438,7 @@ PK.make_table_view_panel = function(
   }
 
 
-  var grid_panel = PK.make_grid_panel({
+  var grid_panel = PKAdmin.make_grid_panel({
       bbar: tbar,
       per_page: per_page,
       displayMsg: params.displayMsg,
@@ -335,86 +450,11 @@ PK.make_table_view_panel = function(
 
   grid_panel.addListener('rowdblclick', onRowDblClick);
 
-
-  var filter_panel = undefined, current_filters = {}
-
-  var addFilter = function(el, item)
-  {
-    if (current_filters[item.data.id])
-    {
-      Ext.Msg.alert(('Warning'), 'This field is already used in another filter');
-      return
-    }
-
-    current_filters[item.data.id] = true
-
-    var filter_control = item.data.filter.render()
-    filter_panel.add(filter_control)
-
-    filter_panel.doLayout()
-  }
-
-  var loadFilters = function()
-  {
-    Ext.Msg.alert('TODO', 'Implement loadFilters.');
-  }
-
-  var saveFilters = function()
-  {
-    Ext.Msg.alert('TODO', 'Implement saveFilters.');
-  }
-
-
-  filter_panel = new Ext.FormPanel({
-      collapsible: true,
-      title: I18N('Filters'),
-      height: 150,
-      xtype: 'panel',
-      autoScroll: true,
-      layout: 'form',
-      tbarCfg: { baseCls: 'x-plain' },
-      bodyStyle:'padding:5px 5px 0',
-      defaults: { width: 400 },
-      tbar:
-      [
-        {
-          xtype: 'combo',
-          emptyText: I18N('Add new filter'),
-          store: new Ext.data.ArrayStore({
-            id: 0,
-            fields: ['id', 'field_name', 'field_title', 'filter'],
-            data: filters
-          }),
-          valueField: 'id',
-          displayField: 'field_title',
-          editable: false,
-          typeAhead: true,
-          mode: 'local',
-          triggerAction: 'all',
-          selectOnFocus: true,
-          width: 150,
-          handler: addFilter,
-          listeners: { select : addFilter }
-        },
-        {
-          text: I18N('Load filters'),
-          tooltip: I18N('Click to load'),
-          iconCls: 'icon-load',
-          handler: loadFilters
-        },
-        {
-          text: I18N('Save filters'),
-          tooltip: I18N('Click to save'),
-          iconCls: 'icon-save',
-          handler: saveFilters
-        }
-      ]
-    })
+  var filter_panel = PKAdmin.make_filter_panel(filters)
 
   var panel = new Ext.Panel({
       title: title,
       baseCls: 'x-plain',
-      renderTo: 'main-module-panel',
       layout: 'auto',
       items:
       [
@@ -437,8 +477,17 @@ PK.make_table_view_panel = function(
       ]
     });
 
+  var parent = Ext.getCmp('main-module-panel')
+  parent.add(panel)
+  parent.doLayout()
+
   return panel;
 }
+
+
+//------------------------------------------------------------------------------
+//                           TABLE VIEW
+//------------------------------------------------------------------------------
 
 // Parameters:
 //   title
@@ -468,7 +517,7 @@ PK.make_table_view = function(params)
       else
         this.title = params.title;
 
-      panel_ = PK.make_table_view_panel(
+      panel_ = PKAdmin.make_table_view_panel(
         function() { return panel_; },
         this.title,
         columns,

@@ -101,7 +101,12 @@ PK.make_table_view_panel = function(
     })
 
     if(columns[f].sortable)
-      filters.push([ filters.length, columns[f].header ])
+      filters.push([
+          filters.length,
+          columns[f].dataIndex,
+          columns[f].header,
+          'integer',
+      ])
   }
 
 
@@ -312,6 +317,7 @@ PK.make_table_view_panel = function(
     }
   }
 
+
   var grid_panel = PK.make_grid_panel({
       bbar: tbar,
       per_page: per_page,
@@ -324,16 +330,84 @@ PK.make_table_view_panel = function(
 
   grid_panel.addListener('rowdblclick', onRowDblClick);
 
-  var filter_store = new Ext.data.ArrayStore({
-      id: 0,
-      fields: ['id','title'],
-      data:filters
-  })
+
+  var filter_panel = undefined, current_filters = {}
+
+  var addFilter = function(el, item)
+  {
+    if (!current_filters[item.data.dataIndex])
+    {
+      current_filters[item.data.dataIndex] = 1
+    }
+    else
+    {
+      Ext.Msg.alert(('Warning'), 'This field is already used in another filter');
+      ++current_filters[item.data.dataIndex]
+    }
+
+    filter_panel.add({
+      xtype: 'textfield',
+      fieldLabel: item.data.title,
+      name: item.data.dataIndex
+      //vtype: filter_type
+    })
+
+    filter_panel.doLayout()
+  }
+
+  var loadFilters = function()
+  {
+    Ext.Msg.alert('TODO', 'Implement loadFilters.');
+  }
+
+  var saveFilters = function()
+  {
+    Ext.Msg.alert('TODO', 'Implement saveFilters.');
+  }
 
 
-  var panel
+  filter_panel = new Ext.FormPanel({
+      collapsible: true,
+      title: I18N('Filters'),
+      height: 150,
+      xtype: 'panel',
+      layout: 'form',
+      tbarCfg: { baseCls: 'x-plain' },
+      bodyStyle:'padding:5px 5px 0',
+      defaults: { width: 400 },
+      tbar:
+      [
+        {
+          xtype: 'combo',
+          emptyText: I18N('Add new filter'),
+          store: new Ext.data.ArrayStore({ id: 0, fields: ['id', 'dataIndex', 'title'], data: filters }),
+          valueField: 'id',
+          displayField: 'title',
+          editable: false,
+          typeAhead: true,
+          mode: 'local',
+          triggerAction: 'all',
+          selectOnFocus: true,
+          width: 150,
+          handler: addFilter,
+          listeners: { select : addFilter }
+        },
+        {
+          text: I18N('Load filters'),
+          tooltip: I18N('Click to load'),
+          iconCls: 'icon-load',
+          handler: loadFilters
+        },
+        {
+          text: I18N('Save filters'),
+          tooltip: I18N('Click to save'),
+          iconCls: 'icon-save',
+          handler: saveFilters
+        }
+      ]
+    })
 
-  panel = new Ext.Panel({
+  var panel = new Ext.Panel({
       title: title,
       baseCls: 'x-plain',
       renderTo: 'main-module-panel',
@@ -344,30 +418,7 @@ PK.make_table_view_panel = function(
           height: 5,
           xtype:'spacer',
         },
-        {
-          collapsible: true,
-          title: I18N('Filters'),
-          height: 150,
-          xtype: 'panel',
-          tbarCfg: { baseCls: 'x-plain' },
-          //baseCls: 'x-plain',
-          tbar:
-          [
-            {
-              xtype: 'combo',
-              store: filter_store,
-              valueField: 'id',
-              displayField: 'title',
-              editable: false,
-              typeAhead: true,
-              mode: 'local',
-              triggerAction: 'all',
-              emptyText: I18N('Add new filter'),
-              selectOnFocus: true,
-              width: 150
-            }
-          ]
-        },
+        filter_panel,
         {
           height: 10,
           xtype:'spacer',

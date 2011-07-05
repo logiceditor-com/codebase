@@ -7,8 +7,10 @@ PKAdmin.filters = new function()
       {
         // TODO: Implement
         return {
-          xtype: 'container',
+          xtype: 'panel',
+          baseCls: 'x-plain',
           layout: 'hbox',
+          bodyStyle: 'padding: 2px 2px 2px 2px',
           items:
           [
             {

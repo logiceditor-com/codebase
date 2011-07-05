@@ -10,13 +10,13 @@ PKAdmin.make_filter_panel = function(filters)
 
   var addFilter = function(el, item)
   {
-    if (current_filters[item.data.id])
+    if (current_filters[item.data.field_name])
     {
       Ext.Msg.alert(('Warning'), 'This field is already used in another filter');
       return
     }
 
-    current_filters[item.data.id] = true
+    current_filters[item.data.field_name] = true
     ++num_current_filters
 
     var filter_control = item.data.filter.render()
@@ -56,11 +56,10 @@ PKAdmin.make_filter_panel = function(filters)
         xtype: 'combo',
         emptyText: I18N('Add new filter'),
         store: new Ext.data.ArrayStore({
-          id: 0,
-          fields: ['id', 'field_name', 'field_title', 'filter'],
+          fields: ['field_name', 'field_title', 'filter'],
           data: filters
         }),
-        valueField: 'id',
+        valueField: 'field_name',
         displayField: 'field_title',
         editable: false,
         typeAhead: true,
@@ -217,7 +216,6 @@ PKAdmin.make_table_view_panel = function(
 
     if(columns[f].sortable)
       filters.push([
-        filters.length,
         columns[f].dataIndex,
         columns[f].header,
         // FIXME: Filter should be created in tv_*, not here
@@ -477,9 +475,9 @@ PKAdmin.make_table_view_panel = function(
       ]
     });
 
-  var parent = Ext.getCmp('main-module-panel')
-  parent.add(panel)
-  parent.doLayout()
+  var main_module = Ext.getCmp('main-module-panel')
+  main_module.add(panel)
+  main_module.doLayout()
 
   return panel;
 }

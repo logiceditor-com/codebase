@@ -59,19 +59,6 @@ PK.common_custom_renderers = new function()
     }
   };
 
-  this.render_profile = function(v)
-  {
-    var record = PK.stores.admin_profiles.getById(v);
-    if(record && record.data)
-    {
-      return I18N(record.data.title);
-    }
-    else
-    {
-      return I18N('invalid field value');
-    }
-  };
-
   this.make_money_renderer = function(suffix_in)
   {
     var suffix = suffix_in ? suffix_in : 'rub'

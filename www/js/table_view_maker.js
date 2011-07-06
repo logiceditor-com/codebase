@@ -225,16 +225,11 @@ PKAdmin.make_table_view_panel = function(
       convert: columns[f].convert
     })
 
-    if(columns[f].sortable)
+    if (columns[f].filter)
       filters.push([
         columns[f].dataIndex,
         columns[f].header,
-        // FIXME: Filter should be created in tv_*, not here
-        PKAdmin.filters.make_filter(
-            PK.table_element_types.INT,
-            columns[f].dataIndex,
-            columns[f].header
-          )
+        columns[f].filter
       ])
   }
 

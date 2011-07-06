@@ -6,9 +6,9 @@ clusters = clusters or { }
 
 clusters[#clusters + 1] =
 {
-  name = "#{SERVER_NAME}";
-  version_tag_suffix = "#{SERVER_NAME}";
-  rocks_repo_url = "/srv/#{PROJECT_NAME}-deployment/cluster/#{SERVER_NAME}/rocks";
+  name = "#{DEPLOY_SERVER}";
+  version_tag_suffix = "#{DEPLOY_SERVER}";
+  rocks_repo_url = "/srv/#{PROJECT_NAME}-deployment/cluster/#{DEPLOY_SERVER}/rocks";
   -- TODO: Must be nginx HTTP service instead
 
   internal_config_host = "#{PROJECT_NAME}-internal-config";
@@ -19,8 +19,8 @@ clusters[#clusters + 1] =
   machines =
   {
     {
-      name = "#{SERVER_NAME}";
-      external_url = "#{SERVER_NAME}";
+      name = "#{DEPLOY_SERVER}";
+      external_url = "#{DEPLOY_SERVER}";
       internal_url = "localhost";
 
       -- TODO: Make sure this works, should result in call to $ hostname.

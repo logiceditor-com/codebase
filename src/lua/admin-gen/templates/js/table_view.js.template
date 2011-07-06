@@ -1,7 +1,7 @@
 $(HEADER)
 PK.navigation.add_topic(
     $(TOPIC_NAME),
-    function() { return PK.make_table_view({
+    function() { return PKAdmin.make_table_view({
         title: $(TITLE),
         primaryKey: $(PRIMARY_KEY),
         columns:

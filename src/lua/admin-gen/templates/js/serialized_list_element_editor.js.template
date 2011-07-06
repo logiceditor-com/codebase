@@ -1,7 +1,7 @@
 $(HEADER)
 PK.navigation.add_topic(
     $(TOPIC_NAME),
-    function() { return PK.make_table_element_editor({
+    function() { return PKAdmin.make_table_element_editor({
         topic_name: $(TOPIC_NAME),
         primaryKey: $(PRIMARY_KEY),
         table_view_topic_name: $(TABLE_VIEW_TOPIC_NAME),

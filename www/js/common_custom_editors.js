@@ -76,7 +76,7 @@ PK.common_custom_editors = new function()
     return function()
     {
       return new Ext.grid.GridEditor(
-          this.make_form_field_enum_editor(my_enum)
+          PK.common_custom_editors.make_form_field_enum_editor(my_enum)
         );
     };
   };
@@ -87,14 +87,14 @@ PK.common_custom_editors = new function()
   this.make_number_editor = function()
   {
     return new Ext.grid.GridEditor(
-        this.make_form_field_number_editor()
+        PK.common_custom_editors.make_form_field_number_editor()
       );
   };
 
   this.make_money_editor = function()
   {
     return new Ext.grid.GridEditor(
-        this.make_form_field_money_editor()
+        PK.common_custom_editors.make_form_field_money_editor()
       );
     grid_editor.on(
         'beforecomplete',
@@ -123,14 +123,14 @@ PK.common_custom_editors = new function()
   this.make_date_editor = function()
   {
     return new Ext.grid.GridEditor(
-        this.make_form_field_date_editor()
+        PK.common_custom_editors.make_form_field_date_editor()
       );
   };
 
   this.make_password_editor = function()
   {
     return new Ext.grid.GridEditor(
-        this.make_form_field_password_editor()
+        PK.common_custom_editors.make_form_field_password_editor()
       );
 
     grid_editor.on(

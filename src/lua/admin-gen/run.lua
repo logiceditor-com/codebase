@@ -155,6 +155,9 @@ end
 ACTIONS.generate_js = function(
     db_schema_filename
   )
+  local ACTION_CONFIG = CONFIG.admin_gen.action.param.generate_js
+  local must_generate_navigator = ACTION_CONFIG.must_generate_navigator
+
   local tables = load_db_schema(CONFIG.admin_gen.db_schema_filename)
   validate_db_schema(tables)
 
@@ -170,7 +173,7 @@ ACTIONS.generate_js = function(
     )
 
   log("Generating js to", out_dir)
-  generate_js(tables, template_dir, out_dir)
+  generate_js(tables, template_dir, out_dir, must_generate_navigator)
 
   log("OK")
 end

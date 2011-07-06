@@ -48,6 +48,8 @@ do
 
             ["generate_js"] =
             {
+              cfg:boolean "must_generate_navigator" { default = true };
+
               -- No parameters
             };
           };

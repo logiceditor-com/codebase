@@ -711,10 +711,16 @@ end
 local generate_js = function(
     tables,
     template_dir,
-    dir_out
+    dir_out,
+    must_generate_navigator
   )
-  generate_navigator(tables, template_dir, dir_out .. "modules/navigator.js")
+
+  if must_generate_navigator then
+    generate_navigator(tables, template_dir, dir_out .. "modules/navigator.js")
+  end
+
   local table_infos = collect_table_info(tables)
+
   generate_table_views(tables, table_infos, template_dir, dir_out)
 end
 

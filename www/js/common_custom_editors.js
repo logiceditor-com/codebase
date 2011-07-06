@@ -21,6 +21,8 @@ PK.common_custom_editors = new function()
           fields: ['id', 'text'],
           data: my_enum
         }),
+      value: my_enum[0][0],
+      autoSelect: true,
       displayField: 'text',
       valueField: 'id'
     });

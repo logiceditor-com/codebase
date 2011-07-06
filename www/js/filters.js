@@ -21,7 +21,7 @@ PKAdmin.filters = new function()
   }
 
 
-  this.make_common_filter = function(value_type, field_name, field_title, params)
+  this.make_common_filter = function(value_type, ordered, field_name, field_title, params)
   {
     var render_comparision_params = function()
     {
@@ -45,6 +45,17 @@ PKAdmin.filters = new function()
       ]
     }
 
+
+    var filter_types = [ [ '=', render_comparision_params ] ]
+
+    if (ordered)
+    {
+      //TODO: Add <, <=, >, >= comparators
+
+      filter_types.push([ I18N('interval'), render_interval_params ])
+    }
+
+
     return {
       render: function()
       {
@@ -65,10 +76,7 @@ PKAdmin.filters = new function()
               xtype: 'combo',
               store: new Ext.data.ArrayStore({
                 fields: ['title', 'params_renderer' ],
-                data: [
-                  [ '=', render_comparision_params ],
-                  [ I18N('interval'), render_interval_params ]
-                ]
+                data: filter_types
               }),
               value: '=',
               valueField: 'title',
@@ -101,14 +109,17 @@ PKAdmin.filters = new function()
     {
       case PK.table_element_types.STRING:
       case PK.table_element_types.INT:
-      case PK.table_element_types.ENUM:
-      case PK.table_element_types.BOOL:
       case PK.table_element_types.DATE:
       case PK.table_element_types.PHONE:
       case PK.table_element_types.MAIL:
       case PK.table_element_types.DB_IDS:
       case PK.table_element_types.MONEY:
-        return this.make_common_filter(value_type, field_name, field_title, params)
+        return this.make_common_filter(value_type, true, field_name, field_title, params)
+        break
+
+      case PK.table_element_types.BOOL:
+      case PK.table_element_types.ENUM:
+        return this.make_common_filter(value_type, false, field_name, field_title, params)
         break
 
       case PK.table_element_types.BINARY_DATA:

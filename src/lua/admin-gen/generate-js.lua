@@ -237,6 +237,31 @@ do
   end
 
 
+  local cat_filter = function(cat, index, name, type, custom_params)
+    local padding = "            "
+
+    cat (CR) (padding)
+      [[filter: PKAdmin.filters.make_filter(]] (type) [[, ']] (index) [[', I18N(']] (name) [['), ]]
+
+    local first = true
+    for k, v in pairs(custom_params) do
+      if first then
+        cat [[{]] (CR) (padding) [[  ]]
+      else
+        cat [[,]] (CR) (padding) [[  ]]
+      end
+      cat (k) " : " (v)
+      first = false
+    end
+
+    if first then
+      cat [[{})]]
+    else
+      cat (CR) (padding) [[})]]
+    end
+  end
+
+
   local cat_editor = function(cat, type, custom_params)
     local padding = "              "
 
@@ -271,7 +296,7 @@ do
       return false
     end
 
-    local custom_renderer_params = {}
+    local custom_renderer_params, custom_filter_params = {}, {}
 
     local sortable = "false"
     if walkers.table_infos_[walkers.current_table_name][name] then
@@ -286,6 +311,8 @@ do
       post = column_data.post
       custom_renderer_params.suffix = column_data.suffix
       custom_renderer_params.precision = column_data.precision
+
+      custom_filter_params.precision = column_data.precision
     end
 
     if hidden then hidden = "true" else hidden = "false" end
@@ -301,10 +328,12 @@ do
 
     if type == TABLE_ELEMENT_TYPES.ENUM then
       custom_renderer_params.enum_items = "PK.project_enums." .. column_data.enum_name
+      custom_filter_params.enum_items = "PK.project_enums." .. column_data.enum_name
     end
 
     if type == TABLE_ELEMENT_TYPES.DATE then
       custom_renderer_params.print_time = "true"
+      custom_filter_params.print_time = "true"
     end
 
     cat [[
@@ -316,6 +345,12 @@ do
             convert: PK.common_custom_convertors.make_convertor(]] (type) [[),]]
 
     cat_renderer(cat, true, type, custom_renderer_params)
+
+    if sortable == "true" then
+      cat ","
+      cat_filter(cat, index, name, type, custom_filter_params)
+    end
+
 
     if post then
       cat [[,]] (CR) [[

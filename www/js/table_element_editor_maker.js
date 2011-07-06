@@ -1,5 +1,5 @@
 //
-// TODO: Move PK.make_linked_field_editor() to separate file
+// TODO: Move PKAdmin.make_linked_field_editor() to separate file
 //
 
 var LFE_PER_PAGE = 1000;
@@ -22,7 +22,7 @@ var VSCROLL_WIDTH = 20;
 //    linked_object_table_request_url
 //    assign_request_url
 //    unassign_request_url
-PK.make_linked_field_editor = function(element_id, params)
+PKAdmin.make_linked_field_editor = function(element_id, params)
 {
   var HEIGHT_1 = (TEE_HEIGHT - 54)/2, HEIGHT_2 = (TEE_HEIGHT - 54)/2;
 
@@ -224,7 +224,7 @@ PK.make_linked_field_editor = function(element_id, params)
 //   on_successful_insert
 //   primaryKey
 //   custom_tbar
-PK.make_table_element_editor = function(params)
+PKAdmin.make_table_element_editor = function(params)
 {
   return new function()
   {
@@ -607,7 +607,7 @@ PK.make_table_element_editor = function(params)
           if (linked_tables_data)
           {
             for(var i = 0; i < linked_tables_data.length; i++)
-              tabs.push(PK.make_linked_field_editor(element_id, linked_tables_data[i]));
+              tabs.push(PKAdmin.make_linked_field_editor(element_id, linked_tables_data[i]));
           }
 
           panel_ = new Ext.Panel({

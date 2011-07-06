@@ -512,7 +512,7 @@ PKAdmin.make_table_view_panel = function(
 //   on_edit_item
 //   on_successful_delete
 //   add_request_params
-PK.make_table_view = function(params)
+PKAdmin.make_table_view = function(params)
 {
   return new function()
   {

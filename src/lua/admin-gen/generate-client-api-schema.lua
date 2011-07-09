@@ -25,6 +25,12 @@ local make_concatter,
         'fill_placeholders'
       }
 
+local tset
+      = import 'lua-nucleo/table-utils.lua'
+      {
+        'tset'
+      }
+
 local do_nothing
       = import 'lua-nucleo/functional.lua'
       {
@@ -175,7 +181,13 @@ do
       end)
 
       local metadata = wrap_field_down(function(walkers, data)
+
+        if data.admin and data.admin.read_only_fields then
+          data.admin.read_only_fields = tset(data.admin.read_only_fields)
+        end
+
         walkers.table_admin_metadata = data.admin
+
         return false, nil
       end)
 
@@ -240,6 +252,9 @@ do
       local new_fields = walkers.visitors.new_item_field.sl_concat()
       local updated_fields = walkers.visitors.updated_item_field.sl_concat()
 
+      -- TODO: Implement list metadata
+      local list_metadata = {}
+
       if not walkers.serialized_list_primary_key then
         log(
             "WARNING: Skipped serialized list",
@@ -248,6 +263,8 @@ do
           )
       else
         write_serialized_list_handlers(
+            walkers.table_admin_metadata,
+            list_metadata,
             assert_is_string(walkers.current_table_name),
             assert_is_string(walkers.table_primary_key),
             assert_is_string(walkers.current_serialized_list_name),

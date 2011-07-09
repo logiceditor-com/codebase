@@ -129,10 +129,10 @@ ACTIONS.generate_admin_api_schema = function()
   local out_dir = CONFIG.admin_gen.intermediate.api_schema_dir
 
   -- TODO: Detect obsolete files and fail instead of this!
-  log("Removing", out_dir.."*")
+  log("Removing", out_dir)
   assert(
       os.execute( -- TODO: Use lfs.
-          'rm -rf "' .. out_dir .. '*"'
+          'rm -rf "' .. out_dir .. '"'
         ) == 0
     )
 
@@ -165,10 +165,10 @@ ACTIONS.generate_js = function(
   local out_dir = CONFIG.admin_gen.intermediate.js_dir
 
   -- TODO: Detect obsolete files and fail instead of this!
-  log("Removing", out_dir.."*")
+  log("Removing", out_dir)
   assert(
       os.execute( -- TODO: Use lfs.
-          'rm -rf "' .. out_dir .. '*"'
+          'rm -rf "' .. out_dir .. '"'
         ) == 0
     )
 

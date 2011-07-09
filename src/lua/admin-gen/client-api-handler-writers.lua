@@ -129,6 +129,8 @@ end
 --------------------------------------------------------------------------------
 
 local write_serialized_list_handlers = function(
+    table_metadata,
+    list_metadata,
     table_name,
     object_id_field,
     serialized_list_name,
@@ -137,6 +139,8 @@ local write_serialized_list_handlers = function(
     dir_out,
     existing_fields, new_fields, updated_fields
   )
+  table_metadata = table_metadata or {}
+  list_metadata = list_metadata or {}
 
   local write_delete_handler = make_serialized_list_handler_writer(
       "delete", "delete items from serialized list"
@@ -160,25 +164,41 @@ local write_serialized_list_handlers = function(
         "]] .. serialized_item_id_field .. [["
       )]]
 
-  write_delete_handler(
-      table_name, serialized_list_name,
-      sl_api_maker, nil, template_dir, dir_out
-    )
+
+  local read_only = table_metadata.read_only or list_metadata.read_only
+  local append_only = list_metadata.append_only
+  local prohibit_deletion = list_metadata.prohibit_deletion
+
+  if table_metadata.read_only_fields then
+    read_only = read_only or table_metadata.read_only_fields[serialized_list_name]
+  end
+
+  if not read_only then
+    write_insert_handler(
+        table_name, serialized_list_name,
+        sl_api_maker, new_fields, template_dir, dir_out
+      )
+    if not append_only then
+      write_update_handler(
+          table_name, serialized_list_name,
+          sl_api_maker, updated_fields, template_dir, dir_out
+        )
+    end
+    if not append_only and not prohibit_deletion then
+      write_delete_handler(
+          table_name, serialized_list_name,
+          sl_api_maker, nil, template_dir, dir_out
+        )
+    end
+  end
+
   write_get_by_id_handler(
       table_name, serialized_list_name,
       sl_api_maker, existing_fields, template_dir, dir_out
     )
-  write_insert_handler(
-      table_name, serialized_list_name,
-      sl_api_maker, new_fields, template_dir, dir_out
-    )
   write_list_handler(
       table_name, serialized_list_name,
       sl_api_maker, existing_fields, template_dir, dir_out
-    )
-  write_update_handler(
-      table_name, serialized_list_name,
-      sl_api_maker, updated_fields, template_dir, dir_out
     )
 end
 

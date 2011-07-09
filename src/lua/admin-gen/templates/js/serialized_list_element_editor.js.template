@@ -14,7 +14,7 @@ PK.navigation.add_topic(
           I18N('Item added. Do you want to add another item?'),
         nameWidth:  150,
         valueWidth: 400,
-        properties: $(PROPERTIES),
+        properties:$(PROPERTIES),
         server_handler_name: $(HANDLER),
         get_by_id_request_params_maker: function(request_params, show_params)
         {

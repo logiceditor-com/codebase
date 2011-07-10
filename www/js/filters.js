@@ -134,7 +134,8 @@ PKAdmin.filters = new function()
         break
 
       case PK.table_element_types.BINARY_DATA:
-        return undefined // No filter for binary data
+      case PK.table_element_types.SERIALIZED_LIST:
+        return undefined // No filter for binary data / serialized lists
         break
 
       default:

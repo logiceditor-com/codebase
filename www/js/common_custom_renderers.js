@@ -5,6 +5,17 @@ PK.common_custom_renderers = new function()
     return I18N('binary data');
   }
 
+  this.render_serialized_list = function (value, metaData, record, rowIndex, colIndex, store)
+  {
+    //TODO: Provide correct data
+    var url = 'edit-this'
+    var text = I18N('Edit assigned_rights')
+
+    return '<a href="' + '#' + url + '/' + record.id + '">'
+      + text
+      + '</a>'
+  }
+
   this.make_enum_renderer = function(my_enum)
   {
     return function(v)
@@ -117,6 +128,10 @@ PK.common_custom_renderers = new function()
 
       case PK.table_element_types.BINARY_DATA:
         return this.render_binary_data;
+        break;
+
+      case PK.table_element_types.SERIALIZED_LIST:
+        return this.render_serialized_list;
         break;
 
       case PK.table_element_types.MONEY:

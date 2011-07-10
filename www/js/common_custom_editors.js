@@ -192,6 +192,7 @@ PK.common_custom_editors = new function()
         break;
 
       case PK.table_element_types.BINARY_DATA:
+      case PK.table_element_types.SERIALIZED_LIST:
         return undefined;
         break;
 
@@ -242,6 +243,7 @@ PK.common_custom_editors = new function()
         break;
 
       case PK.table_element_types.BINARY_DATA:
+      case PK.table_element_types.SERIALIZED_LIST:
         return undefined;
         break;
 

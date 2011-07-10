@@ -102,7 +102,6 @@ PKAdmin.filters = new function()
               listeners: { select : function(el, item) {
                 var items = item.data.params_renderer()
                 var single_filter_panel = el.ownerCt
-                //console.log("FIRST:", el, item, single_filter_panel)
                 update_filter_(single_filter_panel, items)
               }}
             },

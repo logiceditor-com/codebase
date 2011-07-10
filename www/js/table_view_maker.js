@@ -12,7 +12,7 @@ PKAdmin.make_filter_panel = function(filters)
   {
     if (current_filters[item.data.field_name])
     {
-      Ext.Msg.alert(('Warning'), 'This field is already used in another filter');
+      Ext.Msg.alert(I18N('Warning'), I18N('This field is already used in another filter'));
       return
     }
 

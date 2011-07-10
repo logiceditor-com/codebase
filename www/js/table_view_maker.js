@@ -44,6 +44,7 @@ PKAdmin.make_filter_panel = function(filters)
     Ext.Msg.alert('TODO', 'Implement saveFilters.');
   }
 
+  var disabled = !filters || filters.length < 1
 
   filter_panel = new Ext.Panel({
     collapsible: true,
@@ -55,44 +56,47 @@ PKAdmin.make_filter_panel = function(filters)
     layout:'column',
     bodyStyle:'padding:2px 2px 2px 2px',
 
-    tbar:
-    [
-      {
-        xtype: 'combo',
-        emptyText: I18N('Add new filter'),
-        store: new Ext.data.ArrayStore({
-          fields: ['field_name', 'field_title', 'filter'],
-          data: filters
-        }),
-        valueField: 'field_name',
-        displayField: 'field_title',
-        editable: false,
-        typeAhead: true,
-        mode: 'local',
-        triggerAction: 'all',
-        selectOnFocus: true,
-        width: 150,
-        listeners: { select : addFilter }
-      },
-      {
-        text: I18N('Apply'),
-        tooltip: I18N('Apply filters'),
-        iconCls: 'icon-apply',
-        handler: applyFilters
-      },
-      {
-        text: I18N('Load'),
-        tooltip: I18N('Load filters'),
-        iconCls: 'icon-load',
-        handler: loadFilters
-      },
-      {
-        text: I18N('Save'),
-        tooltip: I18N('Save filters'),
-        iconCls: 'icon-save',
-        handler: saveFilters
-      }
-    ],
+    tbar: new Ext.Toolbar({
+      disabled: disabled,
+      items:
+      [
+        {
+          xtype: 'combo',
+          emptyText: I18N('Add new filter'),
+          store: new Ext.data.ArrayStore({
+            fields: ['field_name', 'field_title', 'filter'],
+            data: filters
+          }),
+          valueField: 'field_name',
+          displayField: 'field_title',
+          editable: false,
+          typeAhead: true,
+          mode: 'local',
+          triggerAction: 'all',
+          selectOnFocus: true,
+          width: 150,
+          listeners: { select : addFilter }
+        },
+        {
+          text: I18N('Apply'),
+          tooltip: I18N('Apply filters'),
+          iconCls: 'icon-apply',
+          handler: applyFilters
+        },
+        {
+          text: I18N('Load'),
+          tooltip: I18N('Load filters'),
+          iconCls: 'icon-load',
+          handler: loadFilters
+        },
+        {
+          text: I18N('Save'),
+          tooltip: I18N('Save filters'),
+          iconCls: 'icon-save',
+          handler: saveFilters
+        }
+      ]
+    }),
 
     items:
     [

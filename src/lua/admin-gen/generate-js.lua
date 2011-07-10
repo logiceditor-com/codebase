@@ -25,6 +25,12 @@ local make_concatter,
         'fill_placeholders'
       }
 
+local tset
+      = import 'lua-nucleo/table-utils.lua'
+      {
+        'tset'
+      }
+
 local do_nothing
       = import 'lua-nucleo/functional.lua'
       {
@@ -88,16 +94,17 @@ local make_db_field_visitor,
 --TODO: Duplicate data - same data in table_element_type.js!
 local TABLE_ELEMENT_TYPES =
 {
-  STRING      =  1;
-  INT         =  2;
-  ENUM        =  3;
-  BOOL        =  4;
-  DATE        =  5;
-  PHONE       =  6;
-  MAIL        =  7;
-  DB_IDS      =  8;
-  BINARY_DATA =  9;
-  MONEY       = 10;
+  STRING          =  1;
+  INT             =  2;
+  ENUM            =  3;
+  BOOL            =  4;
+  DATE            =  5;
+  PHONE           =  6;
+  MAIL            =  7;
+  DB_IDS          =  8;
+  BINARY_DATA     =  9;
+  MONEY           = 10;
+  SERIALIZED_LIST = 11;
 }
 
 --------------------------------------------------------------------------------
@@ -375,10 +382,9 @@ do
 
     local custom_renderer_params, custom_editor_params = {}, {}
 
-    local hidden, is_serialized_list, post
+    local hidden, post
     if property_data then
       hidden = property_data.hidden
-      is_serialized_list = property_data.is_serialized_list
       post = property_data.post
       custom_renderer_params.suffix = property_data.suffix
       custom_renderer_params.precision = property_data.precision
@@ -388,16 +394,16 @@ do
       return false
     end
 
-    -- Don't generate editors for binary data now
-    if type == TABLE_ELEMENT_TYPES.BINARY_DATA then
+    local read_only = false
+    if walkers.table_admin_metadata and walkers.table_admin_metadata.read_only_fields then
+      read_only = walkers.table_admin_metadata.read_only_fields[name]
+    end
 
-      -- Add to list of serialized if necessary
-      if is_serialized_list then
-        walkers.visitors.property.serialized_fields[
-            #walkers.visitors.property.serialized_fields + 1
-          ] = name;
-      end
-
+    -- Don't generate editors for read-only fields and for binary data / serialized_list
+    if read_only
+      or type == TABLE_ELEMENT_TYPES.BINARY_DATA
+      or type == TABLE_ELEMENT_TYPES.SERIALIZED_LIST
+    then
       return false
     end
 
@@ -454,8 +460,10 @@ do
         nil,
         wrap_field_down(
           function(walkers, data)
-            return false, TABLE_ELEMENT_TYPES.BINARY_DATA, data.name, false, nil,
-              nil, { is_serialized_list = true }
+            walkers.visitors.property.serialized_fields[
+                #walkers.visitors.property.serialized_fields + 1
+              ] = data.name;
+            return false, TABLE_ELEMENT_TYPES.SERIALIZED_LIST, data.name
           end,
           true
         )
@@ -546,7 +554,13 @@ do
       end)
 
       local metadata = wrap_field_down(function(walkers, data)
+
+        if data.admin and data.admin.read_only_fields then
+          data.admin.read_only_fields = tset(data.admin.read_only_fields)
+        end
+
         walkers.table_admin_metadata = data.admin
+
         return false, nil
       end)
 

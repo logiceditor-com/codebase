@@ -8,6 +8,7 @@ PK.navigation.add_topic(
         [
           $(COLUMNS)
         ],
+        custom_tbar: $(CUSTOM_TBAR),
         read_only_data: $(READ_ONLY_DATA),
         append_only_data: $(APPEND_ONLY_DATA),
         prohibit_deletion: $(PROHIBIT_DELETION),

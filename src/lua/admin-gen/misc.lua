@@ -43,8 +43,8 @@ do
   {
 --    admin_accounts = true;
 --    admin_profiles = true;
-    admin_sessions = true;
-    admin_log = true;
+--    admin_sessions = true;
+--    admin_log = true;
   }
 
   table_contains_game_data = function(name)

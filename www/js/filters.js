@@ -3,7 +3,6 @@ PKAdmin.filters = new function()
   var wrap_filter_params_ = function(items)
   {
     return {
-      id: 'param_container',
       xtype: 'panel',
       baseCls: 'x-plain',
       flex: 1,
@@ -15,7 +14,9 @@ PKAdmin.filters = new function()
 
   var update_filter_ = function(single_filter_panel, items)
   {
-    single_filter_panel.remove('param_container')
+    var param_container = single_filter_panel.findByType('container')[0]
+
+    single_filter_panel.remove(param_container)
     single_filter_panel.add(wrap_filter_params_(items))
     single_filter_panel.doLayout()
   }
@@ -51,6 +52,9 @@ PKAdmin.filters = new function()
       [ PK.project_enums.FILTER_TYPE_NAME[PK.project_enums.FILTER_TYPE.NE], render_comparision_params ]
     ]
 
+    var initial_value = PK.project_enums.FILTER_TYPE_NAME[PK.project_enums.FILTER_TYPE.EQ]
+    var render_initial_params = render_comparision_params
+
     if (ordered)
     {
       filter_types = filter_types.concat([
@@ -59,13 +63,14 @@ PKAdmin.filters = new function()
           [ PK.project_enums.FILTER_TYPE_NAME[PK.project_enums.FILTER_TYPE.GE], render_comparision_params ],
           [ PK.project_enums.FILTER_TYPE_NAME[PK.project_enums.FILTER_TYPE.BETWEEN], render_interval_params ]
         ])
-    }
 
+      initial_value = PK.project_enums.FILTER_TYPE_NAME[PK.project_enums.FILTER_TYPE.BETWEEN]
+      render_initial_params = render_interval_params
+    }
 
     return {
       render: function()
       {
-        // TODO: Implement
         return {
           xtype: 'panel',
           baseCls: 'x-plain',
@@ -84,7 +89,7 @@ PKAdmin.filters = new function()
                 fields: ['title', 'params_renderer' ],
                 data: filter_types
               }),
-              value: '=',
+              value: initial_value,
               valueField: 'title',
               displayField: 'title',
               autoSelect: true,
@@ -97,11 +102,12 @@ PKAdmin.filters = new function()
               listeners: { select : function(el, item) {
                 var items = item.data.params_renderer()
                 var single_filter_panel = el.ownerCt
+                //console.log("FIRST:", el, item, single_filter_panel)
                 update_filter_(single_filter_panel, items)
               }}
             },
             { xtype: 'spacer', width: 10 },
-            wrap_filter_params_(render_comparision_params())
+            wrap_filter_params_(render_initial_params())
           ]
         }
       }

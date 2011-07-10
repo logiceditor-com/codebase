@@ -473,8 +473,43 @@ do
 
 
   local generate_custom_table_view_tbar = function(subordinate_tables)
-    -- TODO: Implement
-    return 'false'
+    if not subordinate_tables or #subordinate_tables == 0 then
+      return 'false'
+    end
+
+    local cat, concat = make_concatter()
+    cat  [=[[]=]
+
+    for i = 1, #subordinate_tables do
+
+      local table_name = subordinate_tables[i]
+
+      if i > 1 then cat [[,]] end
+      cat  (CR) [[
+          {
+            text: I18N(']] (table_name) [['),
+            tooltip: I18N(']] (table_name) [['),
+            iconCls:'icon-grid',
+            handler: function(grid_panel)
+            {
+              if (!grid_panel || !grid_panel.selModel || grid_panel.selModel.selections.keys.length == 0)
+                return;
+
+              var element_id = grid_panel.selModel.selections.keys[0];
+
+              PK.navigation.go_to_topic(
+                  "tv_]] (table_name) [[",
+                  [ element_id ],
+                  true
+                );
+            }
+          }]]
+    end
+
+    cat  (CR) [=[
+        ]]=] (CR)
+
+    return concat()
   end
 
   local down = { }

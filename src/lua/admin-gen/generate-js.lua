@@ -214,6 +214,10 @@ do
     try_add_subordinate_table(walkers, data)
   end
 
+  down.password = function(walkers, data)
+    walkers.table_infos_[walkers.current_table_name_].password_field = data.name
+  end
+
   down.unique_key = function(walkers, data)
     try_add_key(walkers, data)
   end
@@ -599,7 +603,6 @@ do
       end)
 
       local password = wrap_field_down(function(walkers, data)
-        walkers.password_field = data.name
         return false, TABLE_ELEMENT_TYPES.STRING, data.name,
           { hidden = true },
           { hidden = true }
@@ -740,6 +743,26 @@ do
         serialized_fields = concat()
       end
 
+      local custom_tbar = "false"
+      if walkers.table_infos_[walkers.current_table_name].password_field then
+        local password_field_name = walkers.table_infos_[walkers.current_table_name].password_field
+        custom_tbar = [=[[
+              {
+                text:     I18N('Change ]=] .. password_field_name .. [=['),
+                tooltip:  I18N('Click to change ]=] .. password_field_name .. [=['),
+                iconCls:  'icon-change-password',
+                handler:  function(property_grid)
+                {
+                  PK.Windows.SetPassword( function(new_pass){
+                      if(!property_grid.hidden_fields)
+                        property_grid.hidden_fields = {}
+                      property_grid.hidden_fields.]=] .. password_field_name .. [=[ = new_pass;
+                    })
+                }
+              }
+            ]]=]
+      end
+
       local properties = [[function(is_existing_element, callback)
         {
           var properties =]] .. CR .. plain_properties .. [[;
@@ -754,6 +777,7 @@ do
       write_table_element_editor(
           data.name,
           walkers.table_primary_key,
+          custom_tbar,
           properties,
           walkers.template_dir_ .. "table_element_editor.js.template",
           walkers.dir_out_

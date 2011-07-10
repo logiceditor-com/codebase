@@ -13,6 +13,7 @@ PK.navigation.add_topic(
           I18N('Item added. Do you want to add another item?'),
         nameWidth:  150,
         valueWidth: 400,
+        custom_tbar: $(CUSTOM_TBAR),
         properties: $(PROPERTIES),
         server_handler_name: $(HANDLER)
       })}

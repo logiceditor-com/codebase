@@ -109,7 +109,7 @@ local write_table_view = function(
   )
 end
 
-local write_table_element_editor = function(name, primary_key, properties, tee_template_filename, dir_out)
+local write_table_element_editor = function(name, primary_key, custom_tbar, properties, tee_template_filename, dir_out)
   local values = {}
 
   values.HEADER = [[
@@ -129,6 +129,7 @@ local write_table_element_editor = function(name, primary_key, properties, tee_t
   values.EXISTING_ITEM_TITLE = 'I18N("Existing item of ' .. name .. '")'
   values.NEW_ITEM_TITLE = 'I18N("New item of ' .. name .. '")'
   values.HANDLER = Q(name)
+  values.CUSTOM_TBAR = custom_tbar
   values.PROPERTIES = properties
 
   write_file_using_template(

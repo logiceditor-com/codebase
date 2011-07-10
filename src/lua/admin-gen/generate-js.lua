@@ -502,6 +502,7 @@ do
                     undefined,
                     true
                   );
+                return
               }
 
               var element_id = grid_panel.selModel.selections.keys[0];

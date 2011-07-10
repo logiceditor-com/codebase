@@ -492,8 +492,17 @@ do
             iconCls:'icon-grid',
             handler: function(grid_panel)
             {
-              if (!grid_panel || !grid_panel.selModel || grid_panel.selModel.selections.keys.length == 0)
+              if (!grid_panel || !grid_panel.selModel)
                 return;
+
+              if (grid_panel.selModel.selections.keys.length == 0)
+              {
+                PK.navigation.go_to_topic(
+                    "tv_]] (table_name) [[",
+                    undefined,
+                    true
+                  );
+              }
 
               var element_id = grid_panel.selModel.selections.keys[0];
 

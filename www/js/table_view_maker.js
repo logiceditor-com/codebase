@@ -213,7 +213,7 @@ PKAdmin.make_grid_panel = function(params)
 //   per_page
 //   custom_tbar
 PKAdmin.make_table_view_panel = function(
-    panel_getter, title, columns, params, show_params
+    grid_panel_getter, title, columns, params, show_params
   )
 {
   var per_page = 20
@@ -289,9 +289,9 @@ PKAdmin.make_table_view_panel = function(
 
   function editItem(id)
   {
-    if(!id && panel_getter().selModel.selections.keys.length > 0)
+    if(!id && grid_panel_getter().selModel.selections.keys.length > 0)
     {
-      id = panel_getter().selModel.selections.keys[0];
+      id = grid_panel_getter().selModel.selections.keys[0];
     }
 
     if(id)
@@ -305,7 +305,7 @@ PKAdmin.make_table_view_panel = function(
 
   function deleteItems()
   {
-    var id = panel_getter().selModel.selections.keys[0];
+    var id = grid_panel_getter().selModel.selections.keys[0];
 
     var request_url = PK.make_admin_request_url(
         params.server_handler_name + '/delete'
@@ -366,7 +366,7 @@ PKAdmin.make_table_view_panel = function(
 
   function confirmDelete()
   {
-    if(panel_getter().selModel.selections.keys.length > 0)
+    if(grid_panel_getter().selModel.selections.keys.length > 0)
       Ext.Msg.confirm(
         I18N('Irreversible action'),
         I18N('Are you sure to delete selection?'),
@@ -418,9 +418,9 @@ PKAdmin.make_table_view_panel = function(
     ];
   }
 
-  var make_button_handler_using_panel_getter = function(handler)
+  var make_button_handler_using_grid_panel_getter = function(handler)
   {
-    return function() { return handler(panel_getter()) }
+    return function() { return handler(grid_panel_getter()) }
   }
 
   if(params.custom_tbar)
@@ -434,7 +434,7 @@ PKAdmin.make_table_view_panel = function(
           text:     params.custom_tbar[i].text,
           tooltip:  params.custom_tbar[i].tooltip,
           iconCls:  params.custom_tbar[i].iconCls,
-          handler:  make_button_handler_using_panel_getter(
+          handler:  make_button_handler_using_grid_panel_getter(
               params.custom_tbar[i].handler
             )
         };
@@ -506,11 +506,17 @@ PKAdmin.make_table_view_panel = function(
 //   table_element_editor
 //   server_handler_name
 // Optional parameters:
+//   read_only_data
+//   append_only_data
+//   prohibit_deletion
 //   store_maker
+//   remote_sorting_params
 //   on_add_item
 //   on_edit_item
 //   on_successful_delete
 //   add_request_params
+//   per_page
+//   custom_tbar
 PKAdmin.make_table_view = function(params)
 {
   return new function()
@@ -526,7 +532,12 @@ PKAdmin.make_table_view = function(params)
         this.title = params.title;
 
       panel_ = PKAdmin.make_table_view_panel(
-        function() { return panel_; },
+        function() // grid panel getter
+        {
+          if (!panel_ || !panel_.get(3) || !panel_.get(3).get(0))
+            return undefined;
+          return panel_.get(3).get(0)
+        },
         this.title,
         columns,
         params,

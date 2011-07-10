@@ -178,6 +178,13 @@ local git_tag_version_increment = function(path, suffix, majority)
     ))
 end
 
+local git_tag_version_increment_local = function(path, suffix, majority)
+  return trim(shell_read(
+      "cd", path,
+      "&&", GIT_TAG_TOOL_PATH, suffix, majority, "--no-push"
+    ))
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -357,6 +364,14 @@ do
               "-!!-> DRY RUN: Want to tag subproject `", name,
               "' with `", version, "'"
             )
+        elseif manifest.cli_param.local_only then
+          version =
+            git_tag_version_increment_local(
+                subproject.local_path,
+                cluster_info.version_tag_suffix,
+                "build" -- TODO: Do not hardcode "build".
+              )
+          writeln_flush("----> Subproject `", name, "' tagged locally `", version, "'")
         else
           version =
             git_tag_version_increment(

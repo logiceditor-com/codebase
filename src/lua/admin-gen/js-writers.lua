@@ -73,7 +73,7 @@ end
 --------------------------------------------------------------------------------
 
 local write_table_view = function(
-    name, primary_key,
+    name, primary_key, custom_tbar,
     read_only_data, append_only_data, prohibit_deletion,
     columns,
     tv_template_filename,
@@ -94,6 +94,7 @@ local write_table_view = function(
   values.TITLE = 'I18N("tv_' .. name .. '")'
   values.TOPIC_NAME = Q("tv_" .. name)
   values.PRIMARY_KEY = Q(primary_key)
+  values.CUSTOM_TBAR = custom_tbar
   values.READ_ONLY_DATA = read_only_data and 'true' or 'false'
   values.APPEND_ONLY_DATA = append_only_data and 'true' or 'false'
   values.PROHIBIT_DELETION = prohibit_deletion and 'true' or 'false'

@@ -471,6 +471,12 @@ do
     return true
   end
 
+
+  local generate_custom_table_view_tbar = function(subordinate_tables)
+    -- TODO: Implement
+    return 'false'
+  end
+
   local down = { }
   do
     down.table = wrap_table_down(
@@ -635,9 +641,14 @@ do
     up.table =  wrap_table_up(function(walkers, data)
       local metadata = walkers.table_admin_metadata or {}
 
+      local custom_tbar = generate_custom_table_view_tbar(
+          walkers.table_infos_[walkers.current_table_name].subordinate_tables
+        )
+
       write_table_view(
           data.name,
           walkers.table_primary_key,
+          custom_tbar,
           metadata.read_only,
           metadata.append_only,
           metadata.prohibit_deletion,

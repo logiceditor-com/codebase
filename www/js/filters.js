@@ -46,13 +46,19 @@ PKAdmin.filters = new function()
     }
 
 
-    var filter_types = [ [ '=', render_comparision_params ] ]
+    var filter_types = [
+      [ PK.project_enums.FILTER_TYPE_NAME[PK.project_enums.FILTER_TYPE.EQ], render_comparision_params ],
+      [ PK.project_enums.FILTER_TYPE_NAME[PK.project_enums.FILTER_TYPE.NE], render_comparision_params ]
+    ]
 
     if (ordered)
     {
-      //TODO: Add <, <=, >, >= comparators
-
-      filter_types.push([ I18N('interval'), render_interval_params ])
+      filter_types = filter_types.concat([
+          [ PK.project_enums.FILTER_TYPE_NAME[PK.project_enums.FILTER_TYPE.LT], render_comparision_params ],
+          [ PK.project_enums.FILTER_TYPE_NAME[PK.project_enums.FILTER_TYPE.GT], render_comparision_params ],
+          [ PK.project_enums.FILTER_TYPE_NAME[PK.project_enums.FILTER_TYPE.GE], render_comparision_params ],
+          [ PK.project_enums.FILTER_TYPE_NAME[PK.project_enums.FILTER_TYPE.BETWEEN], render_interval_params ]
+        ])
     }
 
 
@@ -108,18 +114,18 @@ PKAdmin.filters = new function()
     switch (Number(value_type))
     {
       case PK.table_element_types.STRING:
-      case PK.table_element_types.INT:
-      case PK.table_element_types.DATE:
       case PK.table_element_types.PHONE:
       case PK.table_element_types.MAIL:
-      case PK.table_element_types.DB_IDS:
-      case PK.table_element_types.MONEY:
-        return this.make_common_filter(value_type, true, field_name, field_title, params)
-        break
-
       case PK.table_element_types.BOOL:
       case PK.table_element_types.ENUM:
         return this.make_common_filter(value_type, false, field_name, field_title, params)
+        break
+
+      case PK.table_element_types.INT:
+      case PK.table_element_types.DATE:
+      case PK.table_element_types.DB_IDS:
+      case PK.table_element_types.MONEY:
+        return this.make_common_filter(value_type, true, field_name, field_title, params)
         break
 
       case PK.table_element_types.BINARY_DATA:

@@ -347,6 +347,11 @@ do
       custom_filter_params.print_time = "true"
     end
 
+    if type == TABLE_ELEMENT_TYPES.SERIALIZED_LIST then
+      custom_renderer_params.serialized_list_view_topic =
+        Q("tv_sl_" .. walkers.current_table_name .. "-" .. name)
+    end
+
     cat [[
             header: I18N(']]  (name)      [['),
             hidden: ]]        (hidden)    [[,

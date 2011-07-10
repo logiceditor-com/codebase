@@ -29,6 +29,8 @@ api:url "/$(REQUEST_PREFIX)/insert"
     data.s  = nil
     data.id = nil
 
+$(CODEBLOCK_BEFORE_INSERT_OR_UPDATE)
+
     try("INTERNAL_ERROR", table_api:insert(data))
 
     local id = try("INTERNAL_ERROR", table_api:getlastautoid())

@@ -155,6 +155,11 @@ do
         end)
       end
 
+      local password = wrap_field_down(function(walkers, data)
+        walkers.password_field = data.name
+        return false, "STRING256", data.name
+      end)
+
       local varchar = function(size, is_optional)
         return wrap_field_down(function(walkers, data)
           size = size or assert_is_number(data[1], "bad size")
@@ -209,7 +214,7 @@ do
       down.int_enum = std_int
       down.ip = varchar(15)
       down.md5 = varchar(32)
-      down.password = varchar(32)
+      down.password = password
       down.optional_ip = varchar(15, true)
       down.optional_ref = ref(true)
       down.ref = ref(false)
@@ -240,11 +245,13 @@ do
       write_table_handlers(
           walkers.table_admin_metadata,
           assert_is_string(walkers.current_table_name),
+          walkers.password_field,
           walkers.template_dir_,
           walkers.dir_out_,
           existing_fields, new_fields, updated_fields
         )
       walkers.table_admin_metadata = nil
+      walkers.password_field = nil
     end)
 
     up.serialized_list = wrap_serialized_list_up(function(walkers, data)

@@ -26,7 +26,7 @@ local Q, CR, NPAD, write_file_using_template
 --------------------------------------------------------------------------------
 
 local make_table_handler_writer = function(operation, comment)
-  return function(name, fields, template_dir, dir_out)
+  return function(name, codeblock_before_insert_or_update, fields, template_dir, dir_out)
     local values = {}
 
     values.HEADER = [[
@@ -43,6 +43,8 @@ local make_table_handler_writer = function(operation, comment)
     values.ITEM_FIELDS = fields
     values.NEW_ITEM_FIELDS = fields
     values.UPDATED_ITEM_FIELDS = fields
+    values.CODEBLOCK_BEFORE_INSERT_OR_UPDATE =
+      codeblock_before_insert_or_update or ""
 
     write_file_using_template(
       values,
@@ -91,7 +93,7 @@ end
 --------------------------------------------------------------------------------
 
 local write_table_handlers = function(
-    metadata, table_name, template_dir, dir_out,
+    metadata, table_name, password_field, template_dir, dir_out,
     existing_fields, new_fields, updated_fields
   )
   metadata = metadata or {}
@@ -112,18 +114,60 @@ local write_table_handlers = function(
       "update", "update item in DB table"
     )
 
+  local codeblock_before_insert_or_update = nil
+
+  if password_field then
+    codeblock_before_insert_or_update = [[
+    if data.]] .. password_field .. [[ and data.]] .. password_field .. [[ ~= "" then
+      data.]] .. password_field .. [[ = md5.sumhexa(data.]] .. password_field .. [[ .. "_" .. SALT_ADMIN)
+    else
+      data.]] .. password_field .. [[ = nil
+    end]]
+  end
+
   if not metadata.read_only then
-    write_insert_handler(table_name, new_fields, template_dir, dir_out)
+    write_insert_handler(
+        table_name,
+        codeblock_before_insert_or_update,
+        new_fields,
+        template_dir,
+        dir_out
+      )
     if not metadata.append_only then
-      write_update_handler(table_name, updated_fields, template_dir, dir_out)
+      write_update_handler(
+          table_name,
+          codeblock_before_insert_or_update,
+          updated_fields,
+          template_dir,
+          dir_out
+        )
     end
     if not metadata.append_only and not metadata.prohibit_deletion then
-      write_delete_handler(table_name, nil, template_dir, dir_out)
+      write_delete_handler(
+        table_name,
+        nil, -- codeblock_before_insert_or_update
+        nil, -- new fields
+        template_dir,
+        dir_out
+      )
+
     end
   end
 
-  write_get_by_id_handler(table_name, existing_fields, template_dir, dir_out)
-  write_list_handler(table_name, existing_fields, template_dir, dir_out)
+  write_get_by_id_handler(
+      table_name,
+      nil, -- codeblock_before_insert_or_update
+      existing_fields,
+      template_dir,
+      dir_out
+    )
+  write_list_handler(
+      table_name,
+      nil, -- codeblock_before_insert_or_update
+      existing_fields,
+      template_dir,
+      dir_out
+    )
 end
 
 --------------------------------------------------------------------------------

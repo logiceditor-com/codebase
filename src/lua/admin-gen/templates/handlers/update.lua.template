@@ -28,6 +28,8 @@ api:url "/$(REQUEST_PREFIX)/update"
     data.u  = nil
     data.s  = nil
 
+$(CODEBLOCK_BEFORE_INSERT_OR_UPDATE)
+
     local found = try("INTERNAL_ERROR", table_api:update(data))
     if found == false then
       return { count = 0; }

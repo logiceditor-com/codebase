@@ -176,9 +176,21 @@ do
     end
   end
 
+  local try_add_subordinate_table = function(walkers, data)
+    local main_table = assert(data.table)
+    local subordinate_table = walkers.current_table_name_
+
+    walkers.table_infos_[main_table].subordinate_tables[
+        #walkers.table_infos_[main_table].subordinate_tables + 1
+      ] = subordinate_table
+  end
+
   down.table = function(walkers, data)
     walkers.current_table_name_ = data.name
-    walkers.table_infos_[walkers.current_table_name_] = { }
+
+    walkers.table_infos_[walkers.current_table_name_] = {
+      subordinate_tables = {}
+    }
   end
 
   up.table = function(walkers, data)
@@ -195,6 +207,11 @@ do
 
   down.primary_ref = function(walkers, data)
     try_add_key(walkers, data)
+    try_add_subordinate_table(walkers, data)
+  end
+
+  down.ref = function(walkers, data)
+    try_add_subordinate_table(walkers, data)
   end
 
   down.unique_key = function(walkers, data)

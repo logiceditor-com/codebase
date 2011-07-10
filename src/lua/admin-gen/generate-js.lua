@@ -193,6 +193,10 @@ do
     try_add_key(walkers, data)
   end
 
+  down.primary_ref = function(walkers, data)
+    try_add_key(walkers, data)
+  end
+
   down.unique_key = function(walkers, data)
     try_add_key(walkers, data)
   end

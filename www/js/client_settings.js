@@ -55,4 +55,19 @@ PKAdmin.client_settings = new function()
 
     return table_column_settings_[table_name][column_name]
   }
+
+  this.set_table_column_visibility = function(table_name, column_name, hidden)
+  {
+    Ext.Msg.alert('TODO', 'Implement set_table_column_visibility: ' + column_name)
+  }
+
+  this.change_table_column_index = function(table_name, column_name, new_index)
+  {
+    Ext.Msg.alert('TODO', 'Implement change_table_column_index: ' + column_name)
+  }
+
+  this.change_table_column_width = function(table_name, column_name, width)
+  {
+    Ext.Msg.alert('TODO', 'Implement change_table_column_width: ' + column_name)
+  }
 }

@@ -150,7 +150,7 @@ PKAdmin.make_filter_panel = function(filters)
 //   displayMsg
 //   emptyMsg
 //   render_to
-//   columns
+//   columns, colModel_listeners
 //   filters
 //   store
 PKAdmin.make_grid_panel = function(params)
@@ -167,8 +167,8 @@ PKAdmin.make_grid_panel = function(params)
     //hidden: true,
     store: params.store,
     colModel: new Ext.grid.ColumnModel({
-      defaults: {sortable: true},
-      columns: params.columns
+      columns: params.columns,
+      listeners: params.colModel_listeners
     }),
     loadMask: true,
     plugins: plugins,
@@ -486,6 +486,27 @@ PKAdmin.make_table_view_panel = function(
       displayMsg: params.displayMsg,
       emptyMsg: params.emptyMsg,
       columns: columns,
+      colModel_listeners:
+      {
+        columnmoved : function(cm, oldIndex, newIndex)
+        {
+          column_name = columns[oldIndex].dataIndex
+
+          //TODO: Move column to proper place
+
+          PKAdmin.client_settings.change_table_column_index(params.table_name, column_name, newIndex)
+        },
+        hiddenchange : function(cm, columnIndex, hidden)
+        {
+          column_name = columns[columnIndex].dataIndex
+          PKAdmin.client_settings.set_table_column_visibility(params.table_name, column_name, hidden)
+        },
+        widthchange : function(cm, columnIndex, newWidth)
+        {
+          column_name = columns[columnIndex].dataIndex
+          PKAdmin.client_settings.change_table_column_width(params.table_name, column_name, newWidth)
+        }
+      },
       filters: grid_filters,
       store: store_
     });

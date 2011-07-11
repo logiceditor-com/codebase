@@ -212,6 +212,7 @@ PKAdmin.make_grid_panel = function(params)
 
 // Parameters:
 //   title
+//   name
 //   primaryKey
 //   displayMsg
 //   emptyMsg
@@ -241,6 +242,14 @@ PKAdmin.make_table_view_panel = function(
 
   for(f in columns)
   {
+    if (columns[f].hidden === undefined)
+      columns[f].hidden =
+        PKAdmin.client_settings.table_column(params.name, columns[f].dataIndex).hidden
+
+    if (columns[f].width === undefined)
+      columns[f].width =
+        PKAdmin.client_settings.table_column(params.name, columns[f].dataIndex).width
+
     reader_fields.push({
       name: columns[f].dataIndex,
       convert: columns[f].convert
@@ -516,6 +525,7 @@ PKAdmin.make_table_view_panel = function(
 
 // Parameters:
 //   title
+//   name
 //   primaryKey
 //   columns
 //   displayMsg

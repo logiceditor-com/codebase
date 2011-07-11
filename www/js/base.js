@@ -14,3 +14,18 @@ if (PKAdmin === undefined)
     }
   }
 }
+
+//TODO: Remove after pk-core-js is included
+if (PK !== undefined && PK.clone === undefined)
+{
+  PK.clone = function(obj)
+  {
+    if (typeof(obj) != "object" || obj == null)
+      return obj
+
+    var clone = obj.constructor()
+    for(var i in obj)
+      clone[i] = PK.clone(obj[i])
+    return clone
+  }
+}

@@ -371,6 +371,8 @@ do
     if type == TABLE_ELEMENT_TYPES.SERIALIZED_LIST then
       custom_renderer_params.serialized_list_view_topic =
         Q("tv_sl_" .. walkers.current_table_name .. "-" .. name)
+      custom_renderer_params.serialized_list_name =
+        Q(name)
     end
 
     -- hidden: PKAdmin.client_settings.table_column("]] (walkers.current_table_name) [[", "]] (index) [[").hidden,

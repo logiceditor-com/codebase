@@ -15,7 +15,12 @@ PKAdmin.client_settings = new function()
       table_column_settings_[table_name] = {}
 
     if (!table_column_settings_[table_name][column_name])
+    {
       table_column_settings_[table_name][column_name] = PK.clone(DEFAULT_TABLE_COLUMN_SETTINGS)
+
+      //table_column_settings_[table_name][column_name].width =
+      //  Ext.util.TextMetrics.measure(default_column, I18N(column_name).width)
+    }
 
     return table_column_settings_[table_name][column_name]
   }

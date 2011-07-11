@@ -31,7 +31,7 @@ PKAdmin.make_filter_panel = function(filters)
 
   var applyFilters = function()
   {
-    Ext.Msg.alert('TODO', 'Implement applyFilters.');
+    Ext.Msg.alert(I18N('TODO'), I18N('Not implemented yet'));
   }
 
   var clearFilters = function()
@@ -47,12 +47,12 @@ PKAdmin.make_filter_panel = function(filters)
 
   var loadFilters = function()
   {
-    Ext.Msg.alert('TODO', 'Implement loadFilters.');
+    Ext.Msg.alert(I18N('TODO'), I18N('Not implemented yet'));
   }
 
   var saveFilters = function()
   {
-    Ext.Msg.alert('TODO', 'Implement saveFilters.');
+    Ext.Msg.alert(I18N('TODO'), I18N('Not implemented yet'));
   }
 
   var disabled = !filters || filters.length < 1

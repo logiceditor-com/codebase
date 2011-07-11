@@ -8,6 +8,7 @@ dictionary =
 
   DEPLOY_SERVER = "server.name.ru";
   DEPLOY_SERVER_DOMAIN = ".2rl";
+  REMOTE_ROOT_DIR = "-deployment";
 
   PROJECT_TEAM = "project-name team";
   PROJECT_MAIL = "info@logiceditor.com";

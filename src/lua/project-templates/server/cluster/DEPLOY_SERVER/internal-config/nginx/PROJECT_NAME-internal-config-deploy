@@ -7,7 +7,7 @@ server {
   real_ip_header X-Real-IP;
 
   location / {
-    proxy_pass http://#{PROJECT_NAME}-internal-config/;
+    proxy_pass http://internal-config#{DEPLOY_SERVER_DOMAIN}/;
   }
 
   location /cfg/db/bases {

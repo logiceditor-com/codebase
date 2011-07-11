@@ -5,18 +5,16 @@ PK.common_custom_renderers = new function()
     return I18N('binary data');
   }
 
-  this.make_serialized_list_render = function(serialized_list_view_topic)
+  this.make_serialized_list_render = function(topic, name)
   {
     return function (value, metaData, record, rowIndex, colIndex, store)
     {
-      if (!serialized_list_view_topic)
+      if (!topic)
         return I18N('binary data')
 
-      var field_name = store.fields.keys[colIndex]
+      var text = I18N('Edit ' + name)
 
-      var text = I18N('Edit ' + field_name)
-
-      return '<a href="' + '#' + serialized_list_view_topic + '/' + record.id + '">'
+      return '<a href="' + '#' + topic + '/' + record.id + '">'
         + text
         + '</a>'
     }
@@ -137,7 +135,7 @@ PK.common_custom_renderers = new function()
         break;
 
       case PK.table_element_types.SERIALIZED_LIST:
-        return this.make_serialized_list_render(params.serialized_list_view_topic);
+        return this.make_serialized_list_render(params.serialized_list_view_topic, params.serialized_list_name);
         break;
 
       case PK.table_element_types.MONEY:

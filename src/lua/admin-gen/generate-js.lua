@@ -375,8 +375,8 @@ do
 
     cat [[
             header: I18N(']]  (name)      [['),
-            hidden: ]]        (hidden)    [[,
-            width:  ]]        (width)     [[,
+            hidden: PKAdmin.client_settings.table_column("]] (walkers.current_table_name) [[", "]] (index) [[").hidden,
+            width:  PKAdmin.client_settings.table_column("]] (walkers.current_table_name) [[", "]] (index) [[").width,
             dataIndex: "]]    (index)     [[",
             sortable: ]]      (sortable)  [[,
             convert: PK.common_custom_convertors.make_convertor(]] (type) [[),]]

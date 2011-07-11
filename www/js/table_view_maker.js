@@ -240,26 +240,34 @@ PKAdmin.make_table_view_panel = function(
 
   var reader_fields = [], filters = []
 
-  for(f in columns)
+  for(var i = 0; i < columns.length; i++)
   {
-    if (columns[f].hidden === undefined)
-      columns[f].hidden =
-        PKAdmin.client_settings.table_column(params.name, columns[f].dataIndex).hidden
+    if (columns[i].hidden === undefined)
+      columns[i].hidden =
+        PKAdmin.client_settings.table_column(
+            params.name,
+            columns[i].dataIndex,
+            columns[i].value_type
+          ).hidden
 
-    if (columns[f].width === undefined)
-      columns[f].width =
-        PKAdmin.client_settings.table_column(params.name, columns[f].dataIndex).width
+    if (columns[i].width === undefined)
+      columns[i].width =
+        PKAdmin.client_settings.table_column(
+            params.name,
+            columns[i].dataIndex,
+            columns[i].value_type
+          ).width
 
     reader_fields.push({
-      name: columns[f].dataIndex,
-      convert: columns[f].convert
+      name: columns[i].dataIndex,
+      convert: columns[i].convert
     })
 
-    if (columns[f].filter)
+    if (columns[i].filter)
       filters.push([
-        columns[f].dataIndex,
-        columns[f].header,
-        columns[f].filter
+        columns[i].dataIndex,
+        columns[i].header,
+        columns[i].filter
       ])
   }
 

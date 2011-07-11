@@ -34,6 +34,17 @@ PKAdmin.make_filter_panel = function(filters)
     Ext.Msg.alert('TODO', 'Implement applyFilters.');
   }
 
+  var clearFilters = function()
+  {
+    filter_panel.get('left').removeAll()
+    filter_panel.get('right').removeAll()
+
+    filter_panel.doLayout()
+
+    current_filters = {}
+    num_current_filters = 0
+  }
+
   var loadFilters = function()
   {
     Ext.Msg.alert('TODO', 'Implement loadFilters.');
@@ -82,6 +93,12 @@ PKAdmin.make_filter_panel = function(filters)
           tooltip: I18N('Apply filters'),
           iconCls: 'icon-apply',
           handler: applyFilters
+        },
+        {
+          text: I18N('Clear'),
+          tooltip: I18N('Clear filters'),
+          iconCls: 'icon-delete',
+          handler: clearFilters
         },
         {
           text: I18N('Load'),

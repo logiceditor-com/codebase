@@ -8,7 +8,7 @@ clusters[#clusters + 1] =
 {
   name = "#{DEPLOY_SERVER}";
   version_tag_suffix = "#{DEPLOY_SERVER}";
-  rocks_repo_url = "/srv/#{PROJECT_NAME}-deployment/cluster/#{DEPLOY_SERVER}/rocks";
+  rocks_repo_url = "/srv/#{PROJECT_NAME}#{REMOTE_ROOT_DIR}/cluster/#{DEPLOY_SERVER}/rocks";
   -- TODO: Must be nginx HTTP service instead
 
   internal_config_host = "internal-config#{DEPLOY_SERVER_DOMAIN}";

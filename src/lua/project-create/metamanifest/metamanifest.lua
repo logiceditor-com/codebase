@@ -7,6 +7,7 @@ dictionary =
   PROJECT_NAME_UNDERLINE = "project_name";
 
   DEPLOY_SERVER = "server.name.ru";
+  DEPLOY_SERVER_DOMAIN = ".2rl";
 
   PROJECT_TEAM = "project-name team";
   PROJECT_MAIL = "info@logiceditor.com";

@@ -1,6 +1,6 @@
 server {
-  listen #{PROJECT_NAME}-#{STATIC_NAME}-static:80;
-  server_name #{PROJECT_NAME}-#{STATIC_NAME}-static;
+  listen #{STATIC_NAME}-static#{DEPLOY_SERVER_DOMAIN}:80;
+  server_name #{STATIC_NAME}-static#{DEPLOY_SERVER_DOMAIN};
 
   access_log  /var/log/nginx/#{PROJECT_NAME}-#{STATIC_NAME}-static.access.log;
   set_real_ip_from 0.0.0.0/0;

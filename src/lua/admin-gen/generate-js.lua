@@ -379,6 +379,7 @@ do
             header: I18N(']]  (name)      [['),
             dataIndex: "]]    (index)     [[",
             sortable: ]]      (sortable)  [[,
+            value_type: ]]    (type)      [[,
             convert: PK.common_custom_convertors.make_convertor(]] (type) [[),]]
 
     cat_renderer(cat, true, type, custom_renderer_params)

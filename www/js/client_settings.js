@@ -28,6 +28,9 @@ PKAdmin.client_settings = new function()
 
   var table_column_settings_ = {}
 
+
+  // ---------------------------------------------------------------------------
+
   this.table_column = function(table_name, column_name, field_type)
   {
     if (!table_column_settings_[table_name])

@@ -19,7 +19,7 @@ server {
     fastcgi_param  X-FORWARDED-FOR  $remote_addr;
     fastcgi_param  REMOTE_ADDR      $remote_addr;
 
-    fastcgi_param  PK_CONFIG_HOST "#{PROJECT_NAME}-internal-config";
+    fastcgi_param  PK_CONFIG_HOST "internal-config#{DEPLOY_SERVER_DOMAIN}";
     fastcgi_param  PK_CONFIG_PORT "80";
   }
 }

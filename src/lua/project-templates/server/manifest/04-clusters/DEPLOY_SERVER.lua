@@ -11,9 +11,9 @@ clusters[#clusters + 1] =
   rocks_repo_url = "/srv/#{PROJECT_NAME}-deployment/cluster/#{DEPLOY_SERVER}/rocks";
   -- TODO: Must be nginx HTTP service instead
 
-  internal_config_host = "#{PROJECT_NAME}-internal-config";
+  internal_config_host = "internal-config#{DEPLOY_SERVER_DOMAIN}";
   internal_config_port = 80;
-  internal_config_deploy_host = "#{PROJECT_NAME}-internal-config-deploy";
+  internal_config_deploy_host = "internal-config-deploy#{DEPLOY_SERVER_DOMAIN}";
   internal_config_deploy_port = 80;
 
   machines =

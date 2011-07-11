@@ -447,8 +447,10 @@ roles =
     deployment_actions = { };
   };
   --
+--[[BLOCK_START:REDIS_BASE_HOST]]
   {
-    name = "redis-system"; -- TODO: stub redis rock
+    name = "#{REDIS_BASE_HOST}"; -- TODO: stub redis rock
     deployment_actions = { };
   };
+--[[BLOCK_END:REDIS_BASE_HOST]]
 }

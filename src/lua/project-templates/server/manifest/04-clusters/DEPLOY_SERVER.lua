@@ -45,7 +45,9 @@ clusters[#clusters + 1] =
 --[[BLOCK_START:STATIC_NAME]]
         { name = "#{PROJECT_NAME}-static-#{STATIC_NAME}" };
 --[[BLOCK_END:STATIC_NAME]]
+--[[BLOCK_START:REDIS_BASE_HOST]]
         { name = "redis-system" };
+--[[BLOCK_END:REDIS_BASE_HOST]]
         { name = "mysql-db" };
       };
     };

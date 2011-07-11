@@ -43,7 +43,9 @@ local localhost_config = function(name)
 --[[BLOCK_START:STATIC_NAME]]
           { name = "#{PROJECT_NAME}-static-#{STATIC_NAME}" };
 --[[BLOCK_END:STATIC_NAME]]
-          { name = "redis-system" };
+--[[BLOCK_START:REDIS_BASE_HOST]]
+          { name = "#{REDIS_BASE_HOST}" };
+--[[BLOCK_END:REDIS_BASE_HOST]]
           { name = "mysql-db" };
         };
       };

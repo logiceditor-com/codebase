@@ -305,7 +305,7 @@ roles =
           "deploy/#{DEPLOY_SERVER}", -- localbranch
           "origin",              -- destremote
           "deploy/#{DEPLOY_SERVER}", -- remotebranch
-          "/srv/#{PROJECT_NAME}-deployment"    -- remoteroot
+          "/srv/#{PROJECT_NAME}#{REMOTE_ROOT_DIR}"    -- remoteroot
         };
       };
     }

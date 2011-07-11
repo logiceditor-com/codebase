@@ -93,6 +93,7 @@ local write_table_view = function(
 
   values.TITLE = 'I18N("tv_' .. name .. '")'
   values.TOPIC_NAME = Q("tv_" .. name)
+  values.NAME = Q(name)
   values.PRIMARY_KEY = Q(primary_key)
   values.CUSTOM_TBAR = custom_tbar
   values.READ_ONLY_DATA = read_only_data and 'true' or 'false'

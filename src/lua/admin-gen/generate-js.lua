@@ -373,10 +373,10 @@ do
         Q("tv_sl_" .. walkers.current_table_name .. "-" .. name)
     end
 
+    -- hidden: PKAdmin.client_settings.table_column("]] (walkers.current_table_name) [[", "]] (index) [[").hidden,
+    -- width:  PKAdmin.client_settings.table_column("]] (walkers.current_table_name) [[", "]] (index) [[").width,
     cat [[
             header: I18N(']]  (name)      [['),
-            hidden: PKAdmin.client_settings.table_column("]] (walkers.current_table_name) [[", "]] (index) [[").hidden,
-            width:  PKAdmin.client_settings.table_column("]] (walkers.current_table_name) [[", "]] (index) [[").width,
             dataIndex: "]]    (index)     [[",
             sortable: ]]      (sortable)  [[,
             convert: PK.common_custom_convertors.make_convertor(]] (type) [[),]]
@@ -521,7 +521,7 @@ do
     end
 
     cat  (CR) [=[
-        ]]=] (CR)
+        ]]=]
 
     return concat()
   end

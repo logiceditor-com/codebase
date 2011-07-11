@@ -3,6 +3,7 @@ PK.navigation.add_topic(
     $(TOPIC_NAME),
     function() { return PKAdmin.make_table_view({
         title: $(TITLE),
+        name: $(NAME),
         primaryKey: $(PRIMARY_KEY),
         columns:
         [

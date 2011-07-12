@@ -31,7 +31,7 @@ PKAdmin.client_settings = new function()
 
   // ---------------------------------------------------------------------------
 
-  this.table_column = function(table_name, column_name, field_type)
+  this.table_column = function(table_name, column_name, field_type, field_index)
   {
     if (!table_column_settings_[table_name])
       table_column_settings_[table_name] = {}
@@ -51,6 +51,8 @@ PKAdmin.client_settings = new function()
           table_column_settings_[table_name][column_name].width,
           caption_width
         )
+
+      table_column_settings_[table_name][column_name].field_index = field_index
     }
 
     return table_column_settings_[table_name][column_name]
@@ -58,16 +60,17 @@ PKAdmin.client_settings = new function()
 
   this.set_table_column_visibility = function(table_name, column_name, hidden)
   {
-    Ext.Msg.alert('TODO', 'Implement set_table_column_visibility: ' + column_name)
+    table_column_settings_[table_name][column_name].hidden = hidden
   }
 
-  this.change_table_column_index = function(table_name, column_name, new_index)
+  this.change_table_column_order = function(table_name, column_order)
   {
-    Ext.Msg.alert('TODO', 'Implement change_table_column_index: ' + column_name)
+    for (var i = 0; i < column_order.length; i++)
+      table_column_settings_[table_name][column_order[i]].field_index = i
   }
 
   this.change_table_column_width = function(table_name, column_name, width)
   {
-    Ext.Msg.alert('TODO', 'Implement change_table_column_width: ' + column_name)
+    table_column_settings_[table_name][column_name].width = width
   }
 }

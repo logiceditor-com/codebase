@@ -490,21 +490,21 @@ PKAdmin.make_table_view_panel = function(
       {
         columnmoved : function(cm, oldIndex, newIndex)
         {
-          column_name = columns[oldIndex].dataIndex
+          var column_order = []
+          for (var i = 0; i < cm.columns.length; i++)
+            column_order.push(cm.columns[i].dataIndex)
 
-          //TODO: Move column to proper place
-
-          PKAdmin.client_settings.change_table_column_index(params.table_name, column_name, newIndex)
+          PKAdmin.client_settings.change_table_column_order(params.name, column_order)
         },
         hiddenchange : function(cm, columnIndex, hidden)
         {
           column_name = columns[columnIndex].dataIndex
-          PKAdmin.client_settings.set_table_column_visibility(params.table_name, column_name, hidden)
+          PKAdmin.client_settings.set_table_column_visibility(params.name, column_name, hidden)
         },
         widthchange : function(cm, columnIndex, newWidth)
         {
           column_name = columns[columnIndex].dataIndex
-          PKAdmin.client_settings.change_table_column_width(params.table_name, column_name, newWidth)
+          PKAdmin.client_settings.change_table_column_width(params.name, column_name, newWidth)
         }
       },
       filters: grid_filters,

@@ -43,9 +43,47 @@ local make_api_context
 local log, dbg, spam, log_error = make_loggers("webservice/client_api/url_handler_wrapper", "UHW")
 
 --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local make_url_handler_wrapper
 do
+
+  -- Common functions ----------------------------------------------------------
+
+  local clean_api_context = function(api_context)
+    api_context:destroy()
+    api_context = nil
+  end
+
+  local response_and_clean_context = function(
+      api_context,
+      err_info,
+      response_fn,
+      error_formatter_fn
+    )
+    local err, msg = call(
+        error_formatter_fn,
+        tostring(err_info) or "(error message is not a string)",
+        api_context
+      )
+
+    if not err then
+      -- TODO: some error handling here probably
+      spam(
+          "error_formatter_fn failed on ",
+          tostring(err) or "(error message is not a string)"
+        )
+    end
+
+    local status, body, headers = call(
+        response_fn, msg
+      )
+    clean_api_context(api_context)
+    return status, body, headers
+  end
+
+  -- static --------------------------------------------------------------------
+
   local static = function(self, handler_filename)
     method_arguments(
         self,
@@ -61,6 +99,8 @@ do
       return 200, BODY, CONTENT_TYPE
     end
   end
+
+  -- api -----------------------------------------------------------------------
 
   local api = function(
       self,
@@ -95,24 +135,14 @@ do
 
       local input, err = call(input_loader, api_context)
       if not input then
-        local status, body, headers = response_fn(error_formatter_fn(tostring(err), api_context))
-
-        api_context:destroy()
-        api_context = nil
-
-        return status, body, headers
+        return response_and_clean_context(api_context, err, response_fn, error_formatter_fn)
       end
 
       -- TODO: HACK! Remove that "extra".
       local output, extra = call(handler_fn, api_context, input)
       if not output then
         local err = extra
-        local status, body, headers = response_fn(error_formatter_fn(tostring(err), api_context))
-
-        api_context:destroy()
-        api_context = nil
-
-        return status, body, headers
+        return response_and_clean_context(api_context, err, response_fn, error_formatter_fn)
       end
 
       local rendered_output, err = call(
@@ -122,21 +152,16 @@ do
           extra
         )
       if not rendered_output then
-        local status, body, headers = response_fn(error_formatter_fn(tostring(err), api_context))
-
-        api_context:destroy()
-        api_context = nil
-
-        return status, body, headers
+        return response_and_clean_context(api_context, err, response_fn, error_formatter_fn)
       end
 
-      api_context:destroy()
-      api_context = nil
+      clean_api_context(api_context)
 
       return response_fn(rendered_output)
     end
   end
 
+  -- api with dynamic output format --------------------------------------------
   -- TODO: Generalize with above.
   local api_with_dynamic_output_format = function(
       self,
@@ -172,12 +197,7 @@ do
 
       local input, err = call(input_loader, api_context)
       if not input then
-        local status, body, headers = response_fn(error_formatter_fn(tostring(err), api_context))
-
-        api_context:destroy()
-        api_context = nil
-
-        return status, body, headers
+        return response_and_clean_context(api_context, err, response_fn, error_formatter_fn)
       end
 
       local rendered_output, err = call(
@@ -188,20 +208,16 @@ do
           input
         )
       if not rendered_output then
-        local status, body, headers = response_fn(error_formatter_fn(tostring(err), api_context))
-
-        api_context:destroy()
-        api_context = nil
-
-        return status, body, headers
+        return response_and_clean_context(api_context, err, response_fn, error_formatter_fn)
       end
 
-      api_context:destroy()
-      api_context = nil
+      clean_api_context(api_context)
 
       return response_fn(rendered_output)
     end
   end
+
+  -- do with api context -------------------------------------------------------
 
   local do_with_api_context
   do
@@ -238,6 +254,7 @@ do
     end
   end
 
+  -- raw -----------------------------------------------------------------------
   -- TODO: Generalize with above.
   local raw = function(
       self,
@@ -271,12 +288,11 @@ do
 
       local input, err = call(input_loader, api_context)
       if not input then
-        local status, body, headers = raw_response_handler(raw_error_handler(tostring(err), api_context))
-
-        api_context:destroy()
-        api_context = nil
-
-        return status, body, headers
+        return response_and_clean_context(
+            api_context,
+            err,
+            raw_response_handler,
+            raw_error_handler)
       end
 
       local status, body, headers = call(
@@ -286,23 +302,20 @@ do
         )
       if not status then
         local err = body
-
-        -- TODO: This should be configurable!
-        local status, body, headers = raw_response_handler(raw_error_handler(tostring(err), api_context))
-
-        api_context:destroy()
-        api_context = nil
-
-        return status, body, headers
+        return response_and_clean_context(
+            api_context,
+            err,
+            raw_response_handler,
+            raw_error_handler)
       end
 
-      api_context:destroy()
-      api_context = nil
+      clean_api_context(api_context)
 
       return status, body, headers
     end
   end
 
+  -- internal call -------------------------------------------------------------
   -- TODO: Generalize with above.
   -- WARNING: This works only with uhw:api() due to return value protocol!
   local internal_call = function(
@@ -341,6 +354,8 @@ do
       return output
     end
   end
+
+  --make_url_handler_wrapper----------------------------------------------------
 
   make_url_handler_wrapper = function(
       db_tables,

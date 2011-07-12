@@ -76,7 +76,7 @@ do
     end
 
     local status, body, headers = call(
-        response_fn, msg
+        response_fn, err, msg
       )
     clean_api_context(api_context)
     return status, body, headers

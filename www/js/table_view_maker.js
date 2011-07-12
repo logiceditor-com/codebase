@@ -150,7 +150,8 @@ PKAdmin.make_filter_panel = function(filters)
 //   displayMsg
 //   emptyMsg
 //   render_to
-//   columns, colModel_listeners
+//   columns,
+//   colModel_listeners, gridPanel_listeners
 //   filters
 //   store
 PKAdmin.make_grid_panel = function(params)
@@ -170,6 +171,7 @@ PKAdmin.make_grid_panel = function(params)
       columns: params.columns,
       listeners: params.colModel_listeners
     }),
+    listeners: params.gridPanel_listeners,
     loadMask: true,
     plugins: plugins,
     stripeRows: true,
@@ -498,12 +500,16 @@ PKAdmin.make_table_view_panel = function(
         },
         hiddenchange : function(cm, columnIndex, hidden)
         {
-          column_name = columns[columnIndex].dataIndex
+          column_name = cm.columns[columnIndex].dataIndex
           PKAdmin.client_settings.set_table_column_visibility(params.name, column_name, hidden)
-        },
-        widthchange : function(cm, columnIndex, newWidth)
+        }
+      },
+      gridPanel_listeners:
+      {
+        columnresize : function(columnIndex, newWidth)
         {
-          column_name = columns[columnIndex].dataIndex
+          var cm = grid_panel_getter().colModel
+          column_name = cm.columns[columnIndex].dataIndex
           PKAdmin.client_settings.change_table_column_width(params.name, column_name, newWidth)
         }
       },

@@ -31,6 +31,18 @@ PKAdmin.client_settings = new function()
 
   // ---------------------------------------------------------------------------
 
+  this.save = function()
+  {
+    Ext.state.Manager.set("client_settings.table_column_settings", table_column_settings_);
+  }
+
+  this.load = function()
+  {
+    table_column_settings_ = Ext.state.Manager.get("client_settings.table_column_settings", {});
+  }
+
+  // ---------------------------------------------------------------------------
+
   this.table_column = function(table_name, column_name, field_type, field_index)
   {
     if (!table_column_settings_[table_name])
@@ -61,16 +73,19 @@ PKAdmin.client_settings = new function()
   this.set_table_column_visibility = function(table_name, column_name, hidden)
   {
     table_column_settings_[table_name][column_name].hidden = hidden
+    this.save()
   }
 
   this.change_table_column_order = function(table_name, column_order)
   {
     for (var i = 0; i < column_order.length; i++)
       table_column_settings_[table_name][column_order[i]].field_index = i
+    this.save()
   }
 
   this.change_table_column_width = function(table_name, column_name, width)
   {
     table_column_settings_[table_name][column_name].width = width
+    this.save()
   }
 }

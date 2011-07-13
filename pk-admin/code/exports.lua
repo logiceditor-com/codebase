@@ -34,6 +34,7 @@ return
   make_object_tag_api = { "pk-admin/webservice/db/object_tag_api.lua" };
   make_serialized_list_api = { "pk-admin/webservice/db/serialized_list.lua" };
   may_create_one_admin_session = { "pk-admin/webservice/db/admin_session.lua" };
+  render_index = { "pk-admin/webservice/html_answer_render.lua" };
   render_login_answer_ok = { "pk-admin/webservice/html_answer_render.lua" };
   render_login_answer_unregistered = { "pk-admin/webservice/html_answer_render.lua" };
   render_register_answer_failed = { "pk-admin/webservice/html_answer_render.lua" };

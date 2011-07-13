@@ -27,18 +27,23 @@ PKAdmin.client_settings = new function()
     )
 
   var table_column_settings_ = {}
+  //console.log("inited CS", table_column_settings_)
 
 
   // ---------------------------------------------------------------------------
 
   this.save = function()
   {
+    //Ext.state.Manager.clear("client_settings.table_column_settings");
     Ext.state.Manager.set("client_settings.table_column_settings", table_column_settings_);
+    //var new_cs = Ext.state.Manager.get("client_settings.table_column_settings", {});
+    //console.log("saved CS", table_column_settings_, new_cs)
   }
 
   this.load = function()
   {
     table_column_settings_ = Ext.state.Manager.get("client_settings.table_column_settings", {});
+    //console.log("loaded CS", table_column_settings_)
   }
 
   // ---------------------------------------------------------------------------

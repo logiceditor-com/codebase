@@ -43,17 +43,11 @@ local make_api_context
 local log, dbg, spam, log_error = make_loggers("webservice/client_api/url_handler_wrapper", "UHW")
 
 --------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
 local make_url_handler_wrapper
 do
 
   -- Common functions ----------------------------------------------------------
-
-  local clean_api_context = function(api_context)
-    api_context:destroy()
-    api_context = nil
-  end
 
   local respond_and_clean_context = function(
       api_context,
@@ -66,15 +60,14 @@ do
         tostring(err_info) or "(error message is not a string)",
         api_context
       )
-    clean_api_context(api_context)
+    api_context:destroy()
+    api_context = nil
     if not err then
-      spam(
-          "error_formatter_fn failed on ",
-          tostring(err) or "(error message is not a string)"
+      error(
+          "INTERNAL_ERROR, error in error handler:" ..
+          (tostring(msg) or "(error message is not a string)")
         )
-      return call(response_fn, msg, nil)
     end
-
     return call(response_fn, err, msg)
   end
 
@@ -151,7 +144,8 @@ do
         return respond_and_clean_context(api_context, err, response_fn, error_formatter_fn)
       end
 
-      clean_api_context(api_context)
+      api_context:destroy()
+      api_context = nil
 
       return response_fn(rendered_output)
     end
@@ -207,7 +201,8 @@ do
         return respond_and_clean_context(api_context, err, response_fn, error_formatter_fn)
       end
 
-      clean_api_context(api_context)
+      api_context:destroy()
+      api_context = nil
 
       return response_fn(rendered_output)
     end
@@ -305,7 +300,8 @@ do
             raw_error_handler)
       end
 
-      clean_api_context(api_context)
+      api_context:destroy()
+      api_context = nil
 
       return status, body, headers
     end

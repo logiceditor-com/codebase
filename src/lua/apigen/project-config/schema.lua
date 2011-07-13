@@ -48,12 +48,12 @@ do
 
               cfg:non_empty_ilist "requires"
               {
-                cfg:existing_path "filename";
+                cfg:importable_path "filename";
               };
 
               cfg:non_empty_ilist "globals"
               {
-                cfg:existing_path "filename";
+                cfg:importable_path "filename";
               };
             };
 

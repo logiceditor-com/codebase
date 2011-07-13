@@ -55,7 +55,7 @@ do
     api_context = nil
   end
 
-  local response_and_clean_context = function(
+  local respond_and_clean_context = function(
       api_context,
       err_info,
       response_fn,
@@ -66,20 +66,16 @@ do
         tostring(err_info) or "(error message is not a string)",
         api_context
       )
-
+    clean_api_context(api_context)
     if not err then
-      -- TODO: some error handling here probably
       spam(
           "error_formatter_fn failed on ",
           tostring(err) or "(error message is not a string)"
         )
+      return call(response_fn, msg, nil)
     end
 
-    local status, body, headers = call(
-        response_fn, err, msg
-      )
-    clean_api_context(api_context)
-    return status, body, headers
+    return call(response_fn, err, msg)
   end
 
   -- static --------------------------------------------------------------------
@@ -135,14 +131,14 @@ do
 
       local input, err = call(input_loader, api_context)
       if not input then
-        return response_and_clean_context(api_context, err, response_fn, error_formatter_fn)
+        return respond_and_clean_context(api_context, err, response_fn, error_formatter_fn)
       end
 
       -- TODO: HACK! Remove that "extra".
       local output, extra = call(handler_fn, api_context, input)
       if not output then
         local err = extra
-        return response_and_clean_context(api_context, err, response_fn, error_formatter_fn)
+        return respond_and_clean_context(api_context, err, response_fn, error_formatter_fn)
       end
 
       local rendered_output, err = call(
@@ -152,7 +148,7 @@ do
           extra
         )
       if not rendered_output then
-        return response_and_clean_context(api_context, err, response_fn, error_formatter_fn)
+        return respond_and_clean_context(api_context, err, response_fn, error_formatter_fn)
       end
 
       clean_api_context(api_context)
@@ -197,7 +193,7 @@ do
 
       local input, err = call(input_loader, api_context)
       if not input then
-        return response_and_clean_context(api_context, err, response_fn, error_formatter_fn)
+        return respond_and_clean_context(api_context, err, response_fn, error_formatter_fn)
       end
 
       local rendered_output, err = call(
@@ -208,7 +204,7 @@ do
           input
         )
       if not rendered_output then
-        return response_and_clean_context(api_context, err, response_fn, error_formatter_fn)
+        return respond_and_clean_context(api_context, err, response_fn, error_formatter_fn)
       end
 
       clean_api_context(api_context)
@@ -288,7 +284,7 @@ do
 
       local input, err = call(input_loader, api_context)
       if not input then
-        return response_and_clean_context(
+        return respond_and_clean_context(
             api_context,
             err,
             raw_response_handler,
@@ -302,7 +298,7 @@ do
         )
       if not status then
         local err = body
-        return response_and_clean_context(
+        return respond_and_clean_context(
             api_context,
             err,
             raw_response_handler,

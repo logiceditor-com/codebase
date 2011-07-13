@@ -63,14 +63,11 @@ do
     api_context:destroy()
     api_context = nil
     if not err then
-      log_error(
-          "INTERNAL_ERROR, error in error handler:" ..
-          (tostring(msg) or "(error message is not a string)")
-        )
-      error(
-          "INTERNAL_ERROR, error in error handler:" ..
-          (tostring(msg) or "(error message is not a string)")
-        )
+      local message =
+        "Error in error handler: "
+     .. (tostring(msg) or "(error message is not a string)")
+      log_error(message)
+      error(message)
     end
     return call(response_fn, err, msg)
   end

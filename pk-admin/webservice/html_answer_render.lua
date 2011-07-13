@@ -60,7 +60,7 @@ end
 
 local render_login_answer_ok = function(static_url, uid, sid, username, profile)
   --TODO: Move to config?
-  local JS_URL = STATIC_URL .. "/js"
+  local JS_URL = static_url .. "/js"
 
   local cat, concat = make_concatter()
 
@@ -84,7 +84,7 @@ end
 
 local render_login_answer_unregistered = function(static_url)
   --TODO: Move to config?
-  local JS_URL = STATIC_URL .. "/js"
+  local JS_URL = static_url .. "/js"
 
   local cat, concat = make_concatter()
 
@@ -105,7 +105,7 @@ end
 
 local render_register_answer_failed = function(static_url, err_code)
   --TODO: Move to config?
-  local JS_URL = STATIC_URL .. "/js"
+  local JS_URL = static_url .. "/js"
 
   local cat, concat = make_concatter()
 

@@ -232,6 +232,17 @@ do
         and self:ensure("path must exist", lfs.attributes(value))
     end)
 
+    --[[
+      path to source file, suitable for "require" or "import"
+    ]]--
+    -- TODO: FIXME: implementation copied from cfg:path, but should perform
+    -- real check
+    types:up "cfg:importable_path" (function(self, info, value)
+      local _ =
+        self:ensure_equals("unexpected type", type(value), "string"):good()
+        and self:ensure("path string must not be empty", value ~= ""):good()
+    end)
+
     types:up "cfg:enum_value" (function(self, info, value)
       if not info.values_set then
         info.values_set = tidentityset(

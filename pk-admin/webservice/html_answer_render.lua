@@ -58,7 +58,7 @@ end
 
 --------------------------------------------------------------------------------
 
-local render_login_answer_ok = function(static_url, uid, sid, username, profile)
+local render_login_answer_ok = function(static_url, uid, sid, username)
   --TODO: Move to config?
   local JS_URL = static_url .. "/js"
 
@@ -74,7 +74,6 @@ local render_login_answer_ok = function(static_url, uid, sid, username, profile)
   cat_cookie(cat, "uid", uid)
   cat_cookie(cat, "sid", sid)
   cat_cookie(cat, "username", username)
-  cat_cookie(cat, "profile", profile)
 
   cat [[</head><body onLoad=SetGlobalSessionCookies()></body></html>]]
 

@@ -8,8 +8,8 @@ local lfs = require 'lfs'
 
 --------------------------------------------------------------------------------
 
-local tostring, type, assert, select, loadfile, error
-    = tostring, type, assert, select, loadfile, error
+local tostring, type, assert, select, loadfile, error, pcall, import
+    = tostring, type, assert, select, loadfile, error, pcall, import
 
 local os = os
 local io = io
@@ -235,12 +235,11 @@ do
     --[[
       path to source file, suitable for "require" or "import"
     ]]--
-    -- TODO: FIXME: implementation copied from cfg:path, but should perform
-    -- real check
     types:up "cfg:importable_path" (function(self, info, value)
       local _ =
         self:ensure_equals("unexpected type", type(value), "string"):good()
         and self:ensure("path string must not be empty", value ~= ""):good()
+        and self:ensure("path must be importable", pcall(import, value)):good()
     end)
 
     types:up "cfg:enum_value" (function(self, info, value)

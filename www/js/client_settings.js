@@ -42,7 +42,7 @@ PKAdmin.client_settings = new function()
         }),
       on_success : function(result)
       {
-        console.log("SAVED CLIENT SETTINGS")
+        //console.log("SAVED CLIENT SETTINGS")
       }
     })
   }
@@ -59,7 +59,7 @@ PKAdmin.client_settings = new function()
       on_success : function(result)
       {
         table_column_settings_ = Ext.util.JSON.decode(result.settings);
-        console.log("LOADED CLIENT SETTINGS:", table_column_settings_)
+        //console.log("LOADED CLIENT SETTINGS:", table_column_settings_)
       }
     })
   }

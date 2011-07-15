@@ -28,7 +28,16 @@ api:url "/$(REQUEST_PREFIX)/get_by_id"
       fail("INTERNAL_ERROR", "table not found")
     end
 
-    return try("INTERNAL_ERROR", table_api:get(param.id))
+    local result, err = table_api:get(param.id)
+    if result == nil then
+      fail("INTERNAL_ERROR", err)
+    end
+
+    if result == false then
+$(CODEBLOCK_ON_ITEM_NOT_FOUND)
+    end
+
+    return result
   end);
 
 --------------------------------------------------------------------------------

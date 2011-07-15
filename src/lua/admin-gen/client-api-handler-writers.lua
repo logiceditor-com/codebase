@@ -46,6 +46,10 @@ local make_table_handler_writer = function(operation, comment)
     values.CODEBLOCK_BEFORE_INSERT_OR_UPDATE =
       codeblock_before_insert_or_update or ""
 
+    -- TODO: Maybe we should not fail on item not found?
+    values.CODEBLOCK_ON_ITEM_NOT_FOUND = '      fail("NOT_FOUND", "item not found")'
+    --values.CODEBLOCK_ON_ITEM_NOT_FOUND = '      return false, "NOT_FOUND"'
+
     write_file_using_template(
       values,
       dir_out .. name .. "/" .. operation .. ".lua",

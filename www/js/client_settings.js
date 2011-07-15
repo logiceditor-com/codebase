@@ -27,23 +27,41 @@ PKAdmin.client_settings = new function()
     )
 
   var table_column_settings_ = {}
-  //console.log("inited CS", table_column_settings_)
-
 
   // ---------------------------------------------------------------------------
 
   this.save = function()
   {
-    //Ext.state.Manager.clear("client_settings.table_column_settings");
-    Ext.state.Manager.set("client_settings.table_column_settings", table_column_settings_);
-    //var new_cs = Ext.state.Manager.get("client_settings.table_column_settings", {});
-    //console.log("saved CS", table_column_settings_, new_cs)
+    PK.do_request({
+      url: PK.make_admin_request_url(
+          "client_settings/update_or_insert"
+        ),
+      params: PK.make_admin_request_params({
+          accound_id: PK.user.get_user_id(),
+          settings: Ext.util.JSON.encode(table_column_settings_)
+        }),
+      on_success : function(result)
+      {
+        console.log("SAVED CLIENT SETTINGS")
+      }
+    })
   }
 
   this.load = function()
   {
-    table_column_settings_ = Ext.state.Manager.get("client_settings.table_column_settings", {});
-    //console.log("loaded CS", table_column_settings_)
+    PK.do_request({
+      url: PK.make_admin_request_url(
+          "client_settings/get_by_id"
+        ),
+      params : PK.make_admin_request_params({
+          id: PK.user.get_user_id(),
+        }),
+      on_success : function(result)
+      {
+        table_column_settings_ = Ext.util.JSON.decode(result.settings);
+        console.log("LOADED CLIENT SETTINGS:", table_column_settings_)
+      }
+    })
   }
 
   // ---------------------------------------------------------------------------
@@ -78,6 +96,8 @@ PKAdmin.client_settings = new function()
   this.set_table_column_visibility = function(table_name, column_name, hidden)
   {
     table_column_settings_[table_name][column_name].hidden = hidden
+
+    // TODO: Actually we don't want to save settings on any user's change
     this.save()
   }
 
@@ -85,12 +105,16 @@ PKAdmin.client_settings = new function()
   {
     for (var i = 0; i < column_order.length; i++)
       table_column_settings_[table_name][column_order[i]].field_index = i
+
+    // TODO: Actually we don't want to save settings on any user's change
     this.save()
   }
 
   this.change_table_column_width = function(table_name, column_name, width)
   {
     table_column_settings_[table_name][column_name].width = width
+
+    // TODO: Actually we don't want to save settings on any user's change
     this.save()
   }
 }

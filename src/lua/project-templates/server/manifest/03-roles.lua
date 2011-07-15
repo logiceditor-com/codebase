@@ -282,8 +282,9 @@ roles =
     }
   };
   --
+--[[BLOCK_START:DEPLOY_SERVER]]
   {
-    name = "rocks-repo-release";
+    name = "rocks-repo-release-#{DEPLOY_SERVER}";
     deployment_actions = -- TODO: BAD! rsync system/rocks/cluster-name repo instead!
     {
       {
@@ -301,7 +302,12 @@ roles =
         tool = "local_exec";
         {
           "pk-git-update-host",
+--[[BLOCK_START:DEPLOY_SINGLE_MACHINE]]
           "#{DEPLOY_SERVER}",        -- host
+--[[BLOCK_END:DEPLOY_SINGLE_MACHINE]]
+--[[BLOCK_START:DEPLOY_SEVERAL_MACHINES]]
+          "#{DEPLOY_SERVER_HOST}",        -- host
+--[[BLOCK_END:DEPLOY_SEVERAL_MACHINES]]
           "deploy/#{DEPLOY_SERVER}", -- localbranch
           "origin",              -- destremote
           "deploy/#{DEPLOY_SERVER}", -- remotebranch
@@ -310,6 +316,7 @@ roles =
       };
     }
   };
+--[[BLOCK_END:DEPLOY_SERVER]]
   --
   static_nginx_role
   {

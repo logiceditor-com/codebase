@@ -8,6 +8,17 @@ dictionary =
 
   DEPLOY_SERVER = "server.name.ru";
   DEPLOY_SERVER_DOMAIN = ".2rl";
+
+  -- use this two EXCLUSIVELY for each deploy server
+  DEPLOY_SINGLE_MACHINE = { "true" }; -- intended table with string
+  DEPLOY_SEVERAL_MACHINES = false;
+  -- if DEPLOY_SEVERAL_MACHINES "true"
+  -- DEPLOY_MACHINE - list of name name
+  -- use this EXCLUSIVELY for each deploy machine
+  -- DEPLOY_MACHINE_EXTERNAL_URL
+  -- DEPLOY_MACHINE_INTERNAL_URL
+  -- REMOTE_ROCKS_REPO_URL
+  -- DEPLOY_SERVER_HOST (see manifest 03-roles)
   REMOTE_ROOT_DIR = "-deployment";
 
   PROJECT_TEAM = "project-name team";
@@ -22,10 +33,12 @@ dictionary =
   API_TEST_HANDLERS = false;
 
   API_NAME = "api";
+  -- use this EXCLUSIVELY for each api service
   API_NAME_IP = "3";
   API_NAME_SHORT = "API";
 
   JOINED_WSAPI = "wsapi";
+  -- use this EXCLUSIVELY for each joined api service
   JOINED_WSAPI_IP = "4";
   JOINED_WSAPI_SHORT = "WSA";
 
@@ -77,19 +90,15 @@ ignore_paths =
   "server/lib/";
 }
 
--- how values must be wrapped in text to be replaces,
--- default eg. #{PROJECT_NAME}
-data_wrapper =
+wrapper =
 {
-  left = "#{";
-  right = "}";
-}
-
--- how blocks to be replicated must be wrapped in text
-block_wrapper =
-{
-  top_left = "--[[BLOCK_START:";
-  top_right = "]]";
-  bottom_left = "--[[BLOCK_END:";
-  bottom_right = "]]";
+  -- how values must be wrapped in text to be replaces,
+  -- default eg. #{PROJECT_NAME}
+  data  =    { left = "#{"; right = "}"; };
+  -- how blocks to be replicated must be wrapped in text
+  block =
+  {
+    top =    { left = "--[[BLOCK_START:"; right = "]]"; };
+    bottom = { left = "--[[BLOCK_END:";   right = "]]"; };
+  };
 }

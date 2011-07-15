@@ -71,7 +71,8 @@ subprojects =
             tool = "add_rocks_from_pk_rocks_manifest";
             source_repo_name = "#{PROJECT_NAME}";
             local_path = PROJECT_PATH;
-            manifest = PROJECT_PATH .. "/pk-rocks-manifest.lua"
+            manifest = PROJECT_PATH .. "/pk-rocks-manifest.lua";
+            remove_after_pack = true;
           };
         };
       };

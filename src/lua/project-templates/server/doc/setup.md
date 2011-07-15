@@ -1,7 +1,7 @@
 Generic setup instructions for developer machine
 ================================================
 
-Prerequisites: Ubuntu
+Prerequisites: Ubuntu / Debian
 Preferred flavor: Ubuntu Lucid 10.10 Server x86_64
 
 Notes on server machine installation
@@ -37,6 +37,8 @@ APT-packages
 
 1.2. Install packages
 
+    sudo apt-get update
+    sudo apt-get upgrade
     sudo apt-get install    \
         build-essential     \
         libreadline-dev     \
@@ -47,7 +49,6 @@ APT-packages
         spawn-fcgi          \
         unzip               \
         zip                 \
-        libmysqlclient-dev  \
         uuid-dev            \
         runit               \
         ntp                 \
@@ -55,13 +56,29 @@ APT-packages
         libzmq-dev          \
         pandoc              \
         luajit              \
-        libexpat-dev
+        luarocks            \
+        multiwatch          \
+        redis-server        \
+        libev-dev           \
+        libgeoip-dev        \
+        libexpat-dev        \
+        libmysqlclient16
+
+Other useful apt packages:
+
+libwww-perl allows using GET, POST in shell
+
+    sudo apt-get install \
+        libwww-perl \
+        iotop \
+        dstat \
+        htop
 
 2. Ensure that machine is in Europe/Moscow timezone.
 
     sudo dpkg-reconfigure tzdata
 
-3. Install modern Git
+3. Install modern Git (unless provided by distribution)
 
     sudo apt-get install python-software-properties
     sudo add-apt-repository ppa:git-core/ppa
@@ -73,6 +90,9 @@ APT-packages
 
     git config --global user.name "Your Name"
     git config --global user.email "yourname@example.com"
+
+Additional recommended settings:
+
     git config --global rerere.enabled true
     git config --global color.diff auto
     git config --global color.interactive auto
@@ -84,115 +104,30 @@ APT-packages
 
 Change group admin to NOPASSWD: ALL
 
+--[[BLOCK_START:MYSQL_BASES_CFG]]
 6. Install MySQL (developer machine only).
 
     sudo apt-get install mysql-server
 
 Set the root password to 12345
+--[[BLOCK_END:MYSQL_BASES_CFG]]
 
-7. Other useful apt packages
+Minimal software versions
+-------------------------
 
-libwww-perl allows using GET, POST in shell
+Ensure that you have at least:
 
-    sudo apt-get install \
-      libwww-perl \
-      iotop \
-      dstat \
-      htop
-...
-
-Raw .deb installation
----------------------
-
-TODO: UBERHACK! Need to setup our own apt repo!
-
-### libev-dev 3.9
-
-If you're on Maverick (10.10), then do this instead:
-
-    sudo apt-get install redis-server
-
-If you're on Lucid (10.04), then do this, depending on your architecture:
-
-i386:
-
-     mkdir -p ~/deb && cd ~/deb/
-     wget https://launchpad.net/ubuntu/+archive/primary/+files/libev3_3.9-1_i386.deb
-     wget https://launchpad.net/ubuntu/+archive/primary/+files/libev-dev_3.9-1_i386.deb
-     sudo dpkg -i libev3_3.9-1_i386.deb
-     sudo dpkg -i libev-dev_3.9-1_i386.deb
-
-amd64:
-
-     mkdir -p ~/deb && cd ~/deb/
-     wget https://launchpad.net/ubuntu/+archive/primary/+files/libev3_3.9-1_amd64.deb
-     wget https://launchpad.net/ubuntu/+archive/primary/+files/libev-dev_3.9-1_amd64.deb
-     sudo dpkg -i libev3_3.9-1_amd64.deb
-     sudo dpkg -i libev-dev_3.9-1_amd64.deb
-
-On other OS you're on your own, sorry. Please add instructions here as needed.
-
-### redis 2.0.x
-
-Server: Install 2.0.3
-
-Developer machines (not suitable for production!):
-
-If you're on Maverick (10.10), then don't do anything for this section.
-
-If you're on Lucid (10.04), then do this, depending on your architecture:
-
-i386:
-
-     mkdir -p ~/deb && cd ~/deb/
-     wget https://launchpad.net/ubuntu/+archive/primary/+files/redis-server_2.0.1-2_i386.deb
-     sudo dpkg -i redis-server_2.0.1-2_i386.deb
-
-amd64:
-
-     mkdir -p ~/deb && cd ~/deb/
-     wget https://launchpad.net/ubuntu/+archive/primary/+files/redis-server_2.0.1-2_amd64.deb
-     sudo dpkg -i redis-server_2.0.1-2_amd64.deb
-
-### multiwatch 1.0.0
-
-If on 10.10+: `sudo apt-get install multiwatch`
-
-Otherwise:
-
-i386:
-
-      mkdir -p ~/deb && cd ~/deb/
-      wget -c http://mirror.pnl.gov/ubuntu//pool/universe/m/multiwatch/multiwatch_1.0.0-rc1-1_i386.deb
-      sudo dpkg -i multiwatch_1.0.0-rc1-1_i386.deb
-
-amd64:
-
-      mkdir -p ~/deb && cd ~/deb/
-      wget -c http://mirror.pnl.gov/ubuntu//pool/universe/m/multiwatch/multiwatch_1.0.0-rc1-1_amd64.deb
-      sudo dpkg -i multiwatch_1.0.0-rc1-1_amd64.deb
-
-Manual installation
--------------------
-
-1. LuaRocks (note that APT package is broken)
-
-IMPORTANT: LR below 2.0.3 have a bug with installing executables.
-
-    mkdir -p ~/build && cd ~/build
-    wget http://luarocks.org/releases/luarocks-2.0.4.1.tar.gz
-    tar -zxf luarocks-2.0.4.1.tar.gz
-    cd luarocks-2.0.4.1
-    ./configure --with-lua-include=/usr/include/lua5.1/
-    make
-    sudo make install
+* libev-dev 3.9
+* redis-server 2.2.11
+* multiwatch 1.0.0
+* luajit 2 beta 8
 
 Hosts
 -----
 
-IF INSTALLED ON LOCALHOST
+Developer machine only
 
-Add this to /etc/hosts:
+Add this to /etc/hosts (developer machine only!):
 
     #{IP_ADDRESS}1 #{PROJECT_NAME}-internal-config
     #{IP_ADDRESS}2 #{PROJECT_NAME}-internal-config-deploy
@@ -206,12 +141,13 @@ Add this to /etc/hosts:
     #{IP_ADDRESS}#{STATIC_NAME_IP} #{PROJECT_NAME}-#{STATIC_NAME}-static
 --[[BLOCK_END:STATIC_NAME]]
 
-Also add aliases to localhost (developer machine only):
+Also add aliases to localhost (developer machine only!):
 
 --[[BLOCK_START:REDIS_BASE_HOST]]
     127.0.0.1 #{REDIS_BASE_HOST}
 --[[BLOCK_END:REDIS_BASE_HOST]]
 
+--[[BLOCK_START:MYSQL_BASES_CFG]]
 DB initialization
 -----------------
 
@@ -229,6 +165,7 @@ DB initialization
 
     cd ~/projects/#{PROJECT_NAME}/server/bin/
     #{PROJECT_NAME}-db-changes initialize_db #{PROJECT_NAME}
+--[[BLOCK_END:MYSQL_BASES_CFG]]
 
 Install project
 ---------------
@@ -239,6 +176,7 @@ Install project
     cd ${HOME}/projects/#{PROJECT_NAME}
     git clone gitolite@git.iphonestudio.ru:/#{PROJECT_NAME}/server
     git clone gitolite@git.iphonestudio.ru:/#{PROJECT_NAME}/deployment
+    mkdir -p ${HOME}/projects/#{PROJECT_NAME}/logs
 
 2. Setup Git hooks
 
@@ -247,7 +185,21 @@ Install project
     rm -r ${HOME}/projects/#{PROJECT_NAME}/deployment/.git/hooks
     ln -s ../etc/git/hooks ${HOME}/projects/#{PROJECT_NAME}/deployment/.git/hooks
 
-3. Install foreign rocks
+3. Install lua-nucleo
+
+    luarocks list lua-nucleo
+
+If nothing found:
+
+    cd ${HOME}/projects/#{PROJECT_NAME}/server/lib/lua-nucleo
+    sudo luarocks make rockspec/lua-nucleo-scm-1.rockspec
+
+4. Install foreign rocks
+
+Location of foreign rocks repository is to be used often in this step, so you
+might wan to save it to variable
+
+    FRR=${HOME}/projects/#{PROJECT_NAME}/server/lib/pk-foreign-rocks/rocks
 
 WARNING! Always remove all installed rocks before installation!
          See list of installed rocks with
@@ -259,61 +211,65 @@ WARNING! Always remove all installed rocks before installation!
 
 If you have rocks installed check what you miss from list. Compare
 
-    cd ${HOME}/projects/#{PROJECT_NAME}/server/lib/pk-foreign-rocks
-    find rocks -name *.rockspec
+    luarocks search --source --all --only-from=${FRR} \
+      | grep '^\S' | tail -n +5
 
 and
 
-    luarocks list
+    luarocks list | grep '^\S' | tail -n +3
 
 by using command
 
-    sudo luarocks install ${ROCK_NAME} \
-    --only-from=${HOME}/projects/#{PROJECT_NAME}/server/lib/pk-foreign-rocks/rocks
+    sudo luarocks install ${ROCK_NAME} --only-from=${FRR}
 
 ON CLEAN MACHINE ONLY:
 
-    cd ${HOME}/projects/#{PROJECT_NAME}/server/lib/pk-foreign-rocks
-    find rocks -name *.rockspec | xargs -l1 sudo luarocks install
+    luarocks search --source --all --only-from=${FRR} \
+      | grep '^\S' | tail -n +5 \
+      | xargs -l1 sudo luarocks install --only-from=${FRR}
 
-4. Install libs
+5. Install libs
 
-4.1 lua-nucleo
-
-    luarocks list lua-nucleo
-
-If nothing found:
-
-    cd ${HOME}/projects/#{PROJECT_NAME}/server/lib/lua-nucleo
-    sudo luarocks make rockspec/lua-nucleo-banner-1.rockspec
-
-4.2 lua-aplicado
+5.1 lua-aplicado
 
     luarocks list lua-aplicado
 
 If nothing found:
 
     cd ${HOME}/projects/#{PROJECT_NAME}/server/lib/lua-aplicado
-    sudo luarocks make rockspec/lua-aplicado-banner-1.rockspec
+    sudo luarocks make rockspec/lua-aplicado-scm-1.rockspec \
+      --only-from=${FRR}
 
-4.3 pk-core
+5.2 pk-core
 
     luarocks list pk-core
 
 If nothing found:
 
     cd ${HOME}/projects/#{PROJECT_NAME}/server/lib/pk-core
-    sudo luarocks make rockspec/pk-core-banner-1.rockspec
+    sudo luarocks make rockspec/pk-core-scm-1.rockspec \
+      --only-from=${FRR}
 
-4.4 pk-engine
+5.3 pk-engine
+
+    luarocks list pk-engine
+
+If nothing found:
 
     cd ${HOME}/projects/#{PROJECT_NAME}/server/lib/pk-engine/
-    ./make.sh
+    sudo luarocks make rockspec/pk-engine-scm-1.rockspec \
+      --only-from=${FRR}
 
-4.5 pk-tools
+5.4 pk-tools
 
-    cd ${HOME}/projects/#{PROJECT_NAME}/server/lib/pk-engine/
-    ./make.sh
+    luarocks list pk-tools
+
+If nothing found:
+
+    cd ${HOME}/projects/#{PROJECT_NAME}/server/lib/pk-tools/
+    sudo luarocks make rockspec/pk-tools-scm-1.rockspec \
+      --only-from=${FRR}
+
 
 Deploying to developer machine
 ------------------------------
@@ -326,6 +282,7 @@ Most likely it is localhost-<your-initials>. But ask AG.
 
 This command should not crash:
 
+    cd ${HOME}/projects/#{PROJECT_NAME}/server
     bin/deploy-rocks deploy_from_code <your-cluster-name> --dry-run
 
 If it does not print anything, you're missing deploy-rocks rock.

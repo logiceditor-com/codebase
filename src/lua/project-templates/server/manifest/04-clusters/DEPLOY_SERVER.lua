@@ -8,7 +8,12 @@ clusters[#clusters + 1] =
 {
   name = "#{DEPLOY_SERVER}";
   version_tag_suffix = "#{DEPLOY_SERVER}";
+--[[BLOCK_START:DEPLOY_SINGLE_MACHINE]]
   rocks_repo_url = "/srv/#{PROJECT_NAME}#{REMOTE_ROOT_DIR}/cluster/#{DEPLOY_SERVER}/rocks";
+--[[BLOCK_END:DEPLOY_SINGLE_MACHINE]]
+--[[BLOCK_START:DEPLOY_SEVERAL_MACHINES]]
+  rocks_repo_url = "http://#{REMOTE_ROCKS_REPO_URL}";
+--[[BLOCK_END:DEPLOY_SEVERAL_MACHINES]]
   -- TODO: Must be nginx HTTP service instead
 
   internal_config_host = "internal-config#{DEPLOY_SERVER_DOMAIN}";
@@ -18,6 +23,7 @@ clusters[#clusters + 1] =
 
   machines =
   {
+--[[BLOCK_START:DEPLOY_SINGLE_MACHINE]]
     {
       name = "#{DEPLOY_SERVER}";
       external_url = "#{DEPLOY_SERVER}";
@@ -28,7 +34,7 @@ clusters[#clusters + 1] =
 
       roles =
       {
-        { name = "rocks-repo-release" }; -- WARNING: Must be the first
+        { name = "rocks-repo-release-#{DEPLOY_SERVER}" }; -- WARNING: Must be the first
         --
         { name = "cluster-member" };
         { name = "internal-config-deploy" };
@@ -37,7 +43,7 @@ clusters[#clusters + 1] =
         { name = "#{PROJECT_NAME}-#{API_NAME}" };
 --[[BLOCK_END:API_NAME]]
 --[[BLOCK_START:JOINED_WSAPI]]
-          { name = "#{PROJECT_NAME}-#{JOINED_WSAPI}" };
+        { name = "#{PROJECT_NAME}-#{JOINED_WSAPI}" };
 --[[BLOCK_END:JOINED_WSAPI]]
 --[[BLOCK_START:SERVICE_NAME]]
         { name = "#{PROJECT_NAME}-#{SERVICE_NAME}" };
@@ -45,12 +51,32 @@ clusters[#clusters + 1] =
 --[[BLOCK_START:STATIC_NAME]]
         { name = "#{PROJECT_NAME}-static-#{STATIC_NAME}" };
 --[[BLOCK_END:STATIC_NAME]]
---[[BLOCK_START:REDIS_BASE_HOST]]
-        { name = "redis-system" };
---[[BLOCK_END:REDIS_BASE_HOST]]
+--[[BLOCK_START:REDIS_BASE_HOST_DEPLOY]]
+        { name = "#{REDIS_BASE_HOST_DEPLOY}" };
+--[[BLOCK_END:REDIS_BASE_HOST_DEPLOY]]
         { name = "mysql-db" };
       };
     };
+--[[BLOCK_END:DEPLOY_SINGLE_MACHINE]]
+--[[BLOCK_START:DEPLOY_SEVERAL_MACHINES]]
+--[[BLOCK_START:DEPLOY_MACHINE]]
+    {
+      name = "#{DEPLOY_MACHINE}";
+      external_url = "#{DEPLOY_MACHINE_EXTERNAL_URL}";
+      internal_url = "#{DEPLOY_MACHINE_INTERNAL_URL}";
+
+      -- TODO: Make sure this works, should result in call to $ hostname.
+      node_id = "$(hostname)";
+
+      roles =
+      {
+--[[BLOCK_START:ROLE_NAME]]
+        { name = "#{ROLE_NAME}" };
+--[[BLOCK_END:ROLE_NAME]]
+      };
+    };
+--[[BLOCK_END:DEPLOY_MACHINE]]
+--[[BLOCK_END:DEPLOY_SEVERAL_MACHINES]]
   };
 }
 

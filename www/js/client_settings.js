@@ -37,7 +37,7 @@ PKAdmin.client_settings = new function()
           "client_settings/update_or_insert"
         ),
       params: PK.make_admin_request_params({
-          accound_id: PK.user.get_user_id(),
+          account_id: PK.user.get_user_id(),
           settings: Ext.util.JSON.encode(table_column_settings_)
         }),
       on_success : function(result)

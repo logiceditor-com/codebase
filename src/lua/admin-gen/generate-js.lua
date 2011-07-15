@@ -328,6 +328,10 @@ do
       return false
     end
 
+    if column_data and column_data.hidden then
+      return false
+    end
+
     local custom_renderer_params, custom_filter_params = {}, {}
 
     local sortable = "false"
@@ -335,10 +339,8 @@ do
       sortable = "true"
     end
 
-    local hidden, width, index, post
+    local index, post
     if column_data then
-      hidden = column_data.hidden
-      width = column_data.width
       index = column_data.index
       post = column_data.post
       custom_renderer_params.suffix = column_data.suffix
@@ -347,8 +349,6 @@ do
       custom_filter_params.precision = column_data.precision
     end
 
-    if hidden then hidden = "true" else hidden = "false" end
-    if width == nil  then width = 100 end
     if index == nil then index = name end
 
     if field_index == 1 then
@@ -375,8 +375,6 @@ do
         Q(name)
     end
 
-    -- hidden: PKAdmin.client_settings.table_column("]] (walkers.current_table_name) [[", "]] (index) [[").hidden,
-    -- width:  PKAdmin.client_settings.table_column("]] (walkers.current_table_name) [[", "]] (index) [[").width,
     cat [[
             header: I18N(']]  (name)      [['),
             dataIndex: "]]    (index)     [[",
@@ -413,18 +411,17 @@ do
       return false
     end
 
+    if property_data and property_data.hidden then
+      return false
+    end
+
     local custom_renderer_params, custom_editor_params = {}, {}
 
-    local hidden, post
+    local post
     if property_data then
-      hidden = property_data.hidden
       post = property_data.post
       custom_renderer_params.suffix = property_data.suffix
       custom_renderer_params.precision = property_data.precision
-    end
-
-    if hidden then
-      return false
     end
 
     local read_only = false
@@ -554,7 +551,7 @@ do
       )
 
     do
-      local PRIMARY_KEY_COLUMN_PROPERTIES = { width = 50, post = 'id: "id"' }
+      local PRIMARY_KEY_COLUMN_PROPERTIES = { post = 'id: "id"' }
 
       local primary_key = wrap_field_down(function(walkers, data)
         return true, TABLE_ELEMENT_TYPES.DB_IDS, data.name,

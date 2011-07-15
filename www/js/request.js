@@ -131,7 +131,10 @@ PK.do_request = function(params)
         {
           if(response.error)
           {
-            PK.on_server_error(response.error.id);
+            if(params.on_error)
+              params.on_error(response.error)
+            else
+              PK.on_server_error(response.error.id)
           }
           else
           {

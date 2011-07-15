@@ -120,7 +120,7 @@ do
         nil,
         wrap_field_down(
             function(walkers, data)
-              return false, "STRING256", data.name
+              return false, "TEXT", data.name
             end,
             true
           )
@@ -163,16 +163,16 @@ do
       local varchar = function(size, is_optional)
         return wrap_field_down(function(walkers, data)
           size = size or assert_is_number(data[1], "bad size")
-          return false, "STRING256", data.name, is_optional
+          return false, (size <= 256 and "STRING256" or "TEXT"), data.name, is_optional
         end)
       end
 
       local text = wrap_field_down(function(walkers, data)
-        return false, "STRING256", data.name
+        return false, "TEXT", data.name
       end)
 
       local blob = wrap_field_down(function(walkers, data)
-        return false, "STRING256", data.name
+        return false, "TEXT", data.name
       end)
 
       local ref = function(is_optional)

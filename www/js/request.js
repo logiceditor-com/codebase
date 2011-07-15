@@ -102,3 +102,53 @@ PK.make_common_proxy_request_error_handler = function(on_no_items)
 PK.common_proxy_request_error_handler = PK.make_common_proxy_request_error_handler(
     function() { LOG('No items'); }
   );
+
+
+PK.do_request = function(params)
+{
+  // TODO: Must render 'waitMsg' somehow
+  Ext.Ajax.request({
+    url: params.url,
+    method: 'POST',
+    params: params.params,
+
+    failure:function(response,options)
+    {
+      PK.on_request_failure(params.url, response.status);
+    },
+
+    success:function(srv_raw_response,options)
+    {
+      var response = Ext.util.JSON.decode(srv_raw_response.responseText);
+      if(response)
+      {
+        if(response.result /*&& response.result.count == 1*/)
+        {
+          if(params.on_success)
+            params.on_success(response.result)
+        }
+        else
+        {
+          if(response.error)
+          {
+            PK.on_server_error(response.error.id);
+          }
+          else
+          {
+            CRITICAL_ERROR(
+                I18N('Sorry, please try again. Unknown server error.')
+                + ' ' + srv_raw_response.responseText
+              );
+          }
+        }
+      }
+      else
+      {
+        CRITICAL_ERROR(
+            I18N('Server answer format is invalid')
+            + ': ' + srv_raw_response.responseText
+          );
+      }
+    }
+  });
+}

@@ -20,6 +20,7 @@ do
       {
         cfg:existing_path "metamanifest_path";
         cfg:path "root_project_path";
+        cfg:existing_path "root_template_path" { default = "/" };
         cfg:boolean "debug" { default = true }; -- TODO: remove
         cfg:boolean "force" { default = true }; -- TODO: remove
       };

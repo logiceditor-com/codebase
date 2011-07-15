@@ -113,6 +113,9 @@ local write_table_handlers = function(
   local write_update_handler = make_table_handler_writer(
       "update", "update item in DB table"
     )
+  local write_update_or_insert_handler = make_table_handler_writer(
+      "update_or_insert", "update or insert item in DB table"
+    )
 
   local codeblock_before_insert_or_update = nil
 
@@ -141,6 +144,15 @@ local write_table_handlers = function(
           template_dir,
           dir_out
         )
+      if metadata.enable_update_or_insert then
+        write_update_or_insert_handler(
+            table_name,
+            codeblock_before_insert_or_update,
+            updated_fields,
+            template_dir,
+            dir_out
+          )
+      end
     end
     if not metadata.append_only and not metadata.prohibit_deletion then
       write_delete_handler(

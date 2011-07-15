@@ -40,10 +40,7 @@ PKAdmin.client_settings = new function()
           account_id: PK.user.get_user_id(),
           settings: Ext.util.JSON.encode(table_column_settings_)
         }),
-      on_success : function(result)
-      {
-        //console.log("SAVED CLIENT SETTINGS")
-      }
+      on_success : function(result) {}
     })
   }
 
@@ -59,7 +56,15 @@ PKAdmin.client_settings = new function()
       on_success : function(result)
       {
         table_column_settings_ = Ext.util.JSON.decode(result.settings);
-        //console.log("LOADED CLIENT SETTINGS:", table_column_settings_)
+      },
+      on_error : function(error)
+      {
+        if (error.id != "NOT_FOUND")
+          return
+
+        CRITICAL_ERROR(
+            I18N('Sorry, please try again. Server error: ') + error.id
+          );
       }
     })
   }

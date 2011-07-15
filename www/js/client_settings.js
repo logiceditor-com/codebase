@@ -59,7 +59,7 @@ PKAdmin.client_settings = new function()
       },
       on_error : function(error)
       {
-        if (error.id != "NOT_FOUND")
+        if (error.id == "NOT_FOUND")
           return
 
         CRITICAL_ERROR(

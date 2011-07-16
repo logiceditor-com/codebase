@@ -14,7 +14,6 @@ clusters[#clusters + 1] =
 --[[BLOCK_START:DEPLOY_SEVERAL_MACHINES]]
   rocks_repo_url = "http://#{REMOTE_ROCKS_REPO_URL}";
 --[[BLOCK_END:DEPLOY_SEVERAL_MACHINES]]
-  -- TODO: Must be nginx HTTP service instead
 
   internal_config_host = "internal-config#{DEPLOY_SERVER_DOMAIN}";
   internal_config_port = 80;
@@ -36,7 +35,8 @@ clusters[#clusters + 1] =
       {
         { name = "rocks-repo-release-#{DEPLOY_SERVER}" }; -- WARNING: Must be the first
         --
-        { name = "cluster-member" };
+        { name = "cluster-member" }; -- WARNING: Must be installed on each host
+        --
         { name = "internal-config-deploy" };
         { name = "internal-config" };
 --[[BLOCK_START:API_NAME]]
@@ -61,15 +61,19 @@ clusters[#clusters + 1] =
 --[[BLOCK_START:DEPLOY_SEVERAL_MACHINES]]
 --[[BLOCK_START:DEPLOY_MACHINE]]
     {
-      name = "#{DEPLOY_MACHINE}";
+      name = "#{DEPLOY_MACHINE}"; -- #{ABOUT_MACHINE}
+
       external_url = "#{DEPLOY_MACHINE_EXTERNAL_URL}";
       internal_url = "#{DEPLOY_MACHINE_INTERNAL_URL}";
 
-      -- TODO: Make sure this works, should result in call to $ hostname.
       node_id = "$(hostname)";
 
       roles =
       {
+--[[BLOCK_START:ROOT_DEPLOYMENT_MACHINE]]
+        { name = "rocks-repo-release-#{DEPLOY_SERVER}" };
+--[[BLOCK_END:ROOT_DEPLOYMENT_MACHINE]]
+        { name = "cluster-member" };
 --[[BLOCK_START:ROLE_NAME]]
         { name = "#{ROLE_NAME}" };
 --[[BLOCK_END:ROLE_NAME]]

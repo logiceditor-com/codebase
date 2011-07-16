@@ -1,5 +1,10 @@
 -- TODO: add syntax for escaped, underline, short
 -- keys are strings to be replaced by value strings
+
+--    false value - remove key from template
+--     true value - ignore (same as = nil, but overwrite defaults)
+--  {table} value - replicate and replace key (process blocks)
+-- "string" value - plain replace key with value (ignore blocks)
 dictionary =
 {
   PROJECT_NAME = "project-name";
@@ -19,6 +24,7 @@ dictionary =
   -- DEPLOY_MACHINE_INTERNAL_URL
   -- REMOTE_ROCKS_REPO_URL
   -- DEPLOY_SERVER_HOST (see manifest 03-roles)
+  -- ROOT_DEPLOYMENT_MACHINE
   REMOTE_ROOT_DIR = "-deployment";
 
   PROJECT_TEAM = "project-name team";

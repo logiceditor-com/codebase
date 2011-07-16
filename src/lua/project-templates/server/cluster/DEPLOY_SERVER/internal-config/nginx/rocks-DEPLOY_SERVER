@@ -1,0 +1,11 @@
+server {
+  listen rocks#{DEPLOY_SERVER_DOMAIN}:80;
+  server_name rocks#{DEPLOY_SERVER_DOMAIN};
+
+  access_log  /var/log/nginx/rocks#{DEPLOY_SERVER_DOMAIN}.access.log;
+
+  location / {
+    alias /srv/#{PROJECT_NAME}#{REMOTE_ROOT_DIR}/cluster/#{DEPLOY_SERVER}/rocks/;
+  }
+}
+

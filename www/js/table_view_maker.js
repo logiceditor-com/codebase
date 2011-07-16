@@ -55,6 +55,16 @@ PKAdmin.make_filter_panel = function(filters)
     Ext.Msg.alert(I18N('TODO'), I18N('Not implemented yet'));
   }
 
+  var exportData = function()
+  {
+    Ext.Msg.alert(I18N('TODO'), I18N('Not implemented yet'));
+  }
+
+  var drawChart = function()
+  {
+    Ext.Msg.alert(I18N('TODO'), I18N('Not implemented yet'));
+  }
+
   var disabled = !filters || filters.length < 1
 
   filter_panel = new Ext.Panel({
@@ -111,6 +121,20 @@ PKAdmin.make_filter_panel = function(filters)
           tooltip: I18N('Save filters'),
           iconCls: 'icon-save',
           handler: saveFilters
+        },
+        "-",
+        {
+          text: I18N('Export data'),
+          tooltip: I18N('Export data'),
+          iconCls: 'icon-export-data',
+          handler: exportData
+        },
+        "-",
+        {
+          text: I18N('Draw chart'),
+          tooltip: I18N('Draw chart'),
+          iconCls: 'icon-draw-chart',
+          handler: drawChart
         }
       ]
     }),

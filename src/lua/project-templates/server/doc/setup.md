@@ -54,7 +54,6 @@ APT-packages
         ntp                 \
         bc                  \
         libzmq-dev          \
-        pandoc              \
         luajit              \
         luarocks            \
         multiwatch          \
@@ -63,6 +62,11 @@ APT-packages
         libgeoip-dev        \
         libexpat-dev        \
         libmysqlclient16
+
+Development machine only:
+
+    sudo apt-get install    \
+        pandoc
 
 Other useful apt packages:
 
@@ -87,6 +91,10 @@ libwww-perl allows using GET, POST in shell
     sudo apt-get install git-core git-doc
 
 4. Setup git config
+
+This is single package, that does not belong to iphonestudio repository,
+because official git repository has new versions very often and it is reasonable
+to have them ASAP.
 
     git config --global user.name "Your Name"
     git config --global user.email "yourname@example.com"

@@ -6,6 +6,9 @@
 
 local file = function(name) return { filename = name } end
 
+local luarocks_show_rock_dir = 
+  import "lua-aplicado/shell/luarocks.lua" { "luarocks_show_rock_dir" }
+
 local NAME = "pk-webservice"
 
 local EXPORTS_LIST_NAME = PROJECT_PATH
@@ -18,8 +21,8 @@ common.www.application.api_schema_dir = PROJECT_PATH .. "schema/client_api/"
 common.www.application.have_unity_client = false
 -- common.www.application.session_checker_file_name = false
 
-common.www.application.db_tables_filename = "pk-billing/db/tables.lua"
-common.www.application.webservice_request_filename = "pk-billing/webservice/request.lua"
+common.www.application.db_tables_filename = "pk-webservice/db/tables.lua"
+common.www.application.webservice_request_filename = "pk-webservice/webservice/request.lua"
 
 common.www.application.code.exports =
 {
@@ -27,7 +30,6 @@ common.www.application.code.exports =
   file ("lua-aplicado/code/exports.lua");
   file ("pk-core/code/exports.lua");
   file ("pk-engine/code/exports.lua");
---  file (PROJECT_PATH .. "lib/pk-admin/pk-admin/code/exports.lua");
 --  TODO: FIXME: real client_api exportlist here
 --  file (EXPORTS_LIST_NAME);
 }
@@ -46,7 +48,7 @@ common.www.application.code.globals =
 
 common.www.application.generated =
 {
-  file_root = PROJECT_PATH .. "schema/" .. NAME .. "/generated/";
+  file_root = PROJECT_PATH .. "/generated/";
 
   api_version_filename = "client_api_version.lua";
   handlers_index_filename = "handlers.lua";
@@ -57,12 +59,13 @@ common.www.application.generated =
   exports_list_name = EXPORTS_LIST_NAME;
 
   context_extensions_dir_name = "ext";
-  context_extensions_list_name = "billing-lib/extensions.lua";
+  context_extensions_list_name = "pk-webservice/extensions.lua";
 
   doc_md_filename = PROJECT_PATH .. "doc/client_api.md";
   doc_pdf_filename = PROJECT_PATH .. "doc/client_api.pdf";
-  doc_latex_template_filename = common.www.application.api_schema_dir
-    .. "/doc/latex.template";
+  doc_latex_template_filename =
+    luarocks_show_rock_dir("pk-tools.apigen.doc.template")
+    .. "/" .. "src/doc/template/latex.template";
 
   base_url_prefix = "/";
 

@@ -8,8 +8,8 @@ require 'geoip.city' -- TODO: Hack. This should be handled by apigen.
 local geodb = assert(
     geoip.city.open(
         -- TODO: Do not hardcode paths!
-        "/usr/local/lib/luarocks/rocks/pk-webservice.geoip.city.data/scm-1"
-     .. "/geoip/GeoLiteCity.dat"
+        luarocks_show_rock_dir('pk-webservice.geoip.city.data')
+     .. "data/geoip/GeoLiteCity.dat"
       )
   )
 

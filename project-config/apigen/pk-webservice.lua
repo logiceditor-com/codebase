@@ -58,7 +58,7 @@ common.www.application.generated =
   exports_dir_name = "lib";
   exports_list_name = EXPORTS_LIST_NAME;
 
-  context_extensions_dir_name = "ext";
+  context_extensions_dir_name = "pk-webservice/ext";
   context_extensions_list_name = "pk-webservice/extensions.lua";
 
   doc_md_filename = PROJECT_PATH .. "doc/client_api.md";

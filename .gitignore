@@ -19,3 +19,5 @@
 
 tmp/*
 *.kate_swp
+
+generated/

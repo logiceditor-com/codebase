@@ -6,7 +6,7 @@
 
 local file = function(name) return { filename = name } end
 
-local luarocks_show_rock_dir = 
+local luarocks_show_rock_dir =
   import "lua-aplicado/shell/luarocks.lua" { "luarocks_show_rock_dir" }
 
 local NAME = "pk-webservice"

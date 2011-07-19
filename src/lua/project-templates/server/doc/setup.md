@@ -45,7 +45,6 @@ APT-packages
         liblua5.1-dev       \
         lua5.1              \
         libfcgi-dev         \
-        nginx               \
         spawn-fcgi          \
         unzip               \
         zip                 \
@@ -82,13 +81,22 @@ libwww-perl allows using GET, POST in shell
 
     sudo dpkg-reconfigure tzdata
 
-3. Install modern Git (unless provided by distribution)
+3. Install modern Git and Nginx (unless provided by distribution)
+
+Git:
 
     sudo apt-get install python-software-properties
     sudo add-apt-repository ppa:git-core/ppa
     sudo apt-get update
     sudo apt-get upgrade
     sudo apt-get install git-core git-doc
+
+Nginx:
+
+    sudo add-apt-repository ppa:nginx/stable
+    sudo apt-get update
+    sudo apt-get upgrade
+    sudo apt-get install nginx
 
 4. Setup git config
 

@@ -2,7 +2,7 @@
 -- keys are strings to be replaced by value strings
 
 --    false value - remove key from template
---     true value - ignore (same as = nil, but overwrite defaults)
+--     true value - force ignore key (same as = nil, but overwrite defaults) TODO: true?
 --  {table} value - replicate and replace key (process blocks)
 -- "string" value - plain replace key with value (ignore blocks)
 dictionary =

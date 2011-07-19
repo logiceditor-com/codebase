@@ -1,6 +1,21 @@
 #! /bin/bash
 set -e
 
+APIS=(
+--[[BLOCK_START:API_NAME]]
+    "#{API_NAME}"
+--[[BLOCK_END:API_NAME]]
+--[[BLOCK_START:JOINED_WSAPI]]
+    "#{JOINED_WSAPI}"
+--[[BLOCK_END:JOINED_WSAPI]]
+  )
+
+CLUSTERS=(
+--[[BLOCK_START:CLUSTER_NAME]]
+    "#{CLUSTER_NAME}"
+--[[BLOCK_END:CLUSTER_NAME]]
+)
+
 CLUSTER="${1}"
 
 API="${2}"
@@ -11,32 +26,17 @@ if([ -h "${ROOT}" ]) then
 fi
 ROOT=$(cd `dirname "${ROOT}"` && cd .. && pwd) # Up one level
 
+ln -sf ./etc/git/hooks/pre-commit ./.git/hooks/
+
 if [ "${CLUSTER}" = "--help" ]; then
   echo "Usage: ${0} <cluster> [<api>]" >&2
   exit 1
 fi
 
-if [ -z "${CLUSTER}"]; then
+if [ -z "${CLUSTER}" ]; then
   echo "Usage: ${0} <cluster> [<api>]" >&2
   exit 1
 fi
-
-# comment out those you don't need
-CLUSTERS=(
---[[BLOCK_START:CLUSTER_NAME]]
-    "#{CLUSTER_NAME}"
---[[BLOCK_END:CLUSTER_NAME]]
-)
-
-# comment out those you don't need
-APIS=(
---[[BLOCK_START:API_NAME]]
-    "#{API_NAME}"
---[[BLOCK_END:API_NAME]]
---[[BLOCK_START:JOINED_WSAPI]]
-    "#{JOINED_WSAPI}"
---[[BLOCK_END:JOINED_WSAPI]]
-  )
 
 if [ -z "${CLUSTER}" ]; then
   echo "------> MAKE ALL BEGIN..."
@@ -49,7 +49,7 @@ sudo luarocks make rockspec/#{PROJECT_NAME}.lib-scm-1.rockspec
 echo "------> REBUILD GENERIC STUFF END"
 
 for cluster in ${CLUSTERS[@]} ; do
-  if [ "${cluster}" == "${CLUSTERS}" ]
+  if [ "${cluster}" = "${CLUSTERS}" ]
   then
     echo "------> REBUILD STUFF FOR ${CLUSTER} BEGIN..."
     sudo luarocks make cluster/${CLUSTER}/internal-config/rockspec/#{PROJECT_NAME}.cluster-config.${CLUSTER}-scm-1.rockspec

@@ -9,7 +9,7 @@ local geodb = assert(
     geoip.city.open(
         -- TODO: Do not hardcode paths!
         luarocks_show_rock_dir('pk-webservice.geoip.city.data')
-     .. "data/geoip/GeoLiteCity.dat"
+     .. "/data/geoip/GeoLiteCity.dat"
       )
   )
 

@@ -16,7 +16,7 @@ declare 'wsapi' -- TODO: Uberhack! :(
 
 PROFILE.skip = setmetatable(tset
 {
-    "schema/client_api/client_api_version.lua",
+    "schema/client_api/client_api_version.lua";
     "schema/client_api/geoip_city/ext.lua"
 }, {
   __index = function(t, k)

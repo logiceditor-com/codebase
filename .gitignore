@@ -20,4 +20,4 @@
 tmp/*
 *.kate_swp
 
-generated/
+rockspec/pk-webservice-scm-1.rockspec

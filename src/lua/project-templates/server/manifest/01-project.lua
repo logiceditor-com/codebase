@@ -40,14 +40,14 @@ subtrees =
     git = PROJECT_PATH;
     path = "lib/pk-core";
     url = "gitolite@git.iphonestudio.ru:pk-core.git";
-    branch = "pk/banner";
+    branch = "pk/engine";
   };
   {
     name = "pk-engine";
     git = PROJECT_PATH;
     path = "lib/pk-engine";
     url = "gitolite@git.iphonestudio.ru:pk-engine.git";
-    branch = "pk/banner";
+    branch = "pk/engine";
   };
   {
     name = "pk-tools";

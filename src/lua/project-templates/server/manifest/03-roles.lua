@@ -204,7 +204,7 @@ local wsapi_service_role = function(param)
         file = wsapi_log_file;
         owner_user = "www-data";
         owner_group = "www-data";
-        mode = 600;
+        mode = 640;
       };
       --
       {

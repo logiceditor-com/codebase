@@ -1,3 +1,5 @@
+// Note: ExtJS required
+
 // Based on from http://www.manfbraun.de/cont/tech/probs/ExtMenuWithTooltip2e.js
 PK.override_menu_item_to_enable_tooltips = function()
 {

@@ -1,3 +1,5 @@
+// Note: ExtJS required
+
 PK.log_system = new function()
 {
   var events = new Array()

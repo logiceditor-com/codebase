@@ -1,3 +1,5 @@
+// Note: ExtJS required
+
 PK.init_history = function()
 {
   Ext.History.init();

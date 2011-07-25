@@ -1,3 +1,5 @@
+// Note: ExtJS required
+
 PK.navigation = new function()
 {
   var set_doc_title_ = true

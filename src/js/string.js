@@ -1,3 +1,5 @@
+// Note: ExtJS required
+
 // TODO: Ugly hakish version, generalize and refactor!
 PK.formatNumber = function(v, pres)
 {

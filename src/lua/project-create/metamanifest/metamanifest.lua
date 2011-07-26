@@ -76,6 +76,11 @@ dictionary =
 
   -- TODO: obsolete, rocks/ related, remove later
   SUBPROJ_NAME = { "pk", "project" };
+
+  ROBOTS_TXT = [[
+User-agent: *
+Disallow: /]];
+
 }
 dictionary.MYSQL_BASES_DEPLOY_CFG = [[--No bases]];
 dictionary.MYSQL_BASES_CFG = [[--No bases]];

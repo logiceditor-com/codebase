@@ -906,7 +906,7 @@ DEBUG_print(k .. "\27[32mremoved as it was\27[0m:\n" .. tostring(v))
     local defaults_path =
       assert(luarocks_show_rock_dir("pk-project-tools.pk-project-create"))
     defaults_path =
-      string.sub(defaults_path, 1, -2) .. "/src/lua/project-create/metamanifest"
+      string.sub(defaults_path, 1, -1) .. "/src/lua/project-create/metamanifest"
     -- template_path
     local metamanifest_defaults = load_project_manifest(defaults_path, "", "")
     local metamanifest_project = load_project_manifest(
@@ -927,7 +927,7 @@ DEBUG_print(k .. "\27[32mremoved as it was\27[0m:\n" .. tostring(v))
     local template_path
     if template_cli_path == "/" then
       template_path = assert(luarocks_show_rock_dir("pk-project-tools.project-templates"))
-      template_path = string.sub(template_path, 1, -2) .. "/src/lua/project-templates"
+      template_path = string.sub(template_path, 1, -1) .. "/src/lua/project-templates"
     else -- TODO: check dir exists!
       template_path = template_cli_path
     end

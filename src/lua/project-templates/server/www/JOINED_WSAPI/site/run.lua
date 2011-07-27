@@ -88,10 +88,12 @@ local fcgi_wsapi_runner_stop,
         'run'
       }
 
-local try_unwrap
+local try_unwrap,
+      log_unwrap
       = import 'pk-engine/hiredis/util.lua'
       {
-        'try_unwrap'
+        'try_unwrap',
+        'log_unwrap'
       }
 
 local try_send_system_message
@@ -213,8 +215,8 @@ local register_service = api_context_wrap(function(
       "registering service",
       service_name, node_id, pid
     )
-
-  try_unwrap(
+  api_context:hiredis():system():command("PING")
+  log_unwrap(
       "INTERNAL_ERROR",
       api_context:hiredis():system():command(
           "HMSET",
@@ -223,7 +225,7 @@ local register_service = api_context_wrap(function(
         )
     )
 
-  try_unwrap(
+  log_unwrap(
       "INTERNAL_ERROR",
       api_context:hiredis():system():command(
           "HMSET",
@@ -235,8 +237,7 @@ local register_service = api_context_wrap(function(
         )
     )
 
-  local added = try_unwrap(
-      "INTERNAL_ERROR",
+  local added = log_unwrap(
       api_context:hiredis():system():command(
           "SADD",
           "pk-services:running",
@@ -269,9 +270,8 @@ local unregister_service = api_context_wrap(function(
 
   -- Note that we do not remove service info.
   -- Assuming we will want to study it later.
-
-  try_unwrap(
-      "INTERNAL_ERROR",
+  api_context:hiredis():system():command("PING")
+  log_unwrap(
       api_context:hiredis():system():command(
           "HMSET",
           "pk-services:info:" .. service_name .. ":" .. node_id .. ":" .. pid,
@@ -279,8 +279,7 @@ local unregister_service = api_context_wrap(function(
         )
     )
 
-  try_unwrap(
-      "INTERNAL_ERROR",
+  log_unwrap(
       api_context:hiredis():system():command(
           "HMSET",
           "pk-services:info:" .. service_name .. ":" .. node_id .. ":" .. pid,
@@ -289,8 +288,7 @@ local unregister_service = api_context_wrap(function(
         )
     )
 
-  try_unwrap(
-      "INTERNAL_ERROR",
+  log_unwrap(
       api_context:hiredis():system():command(
           "SREM",
           "pk-services:running",
@@ -314,9 +312,8 @@ local update_service_info = api_context_wrap(function(
     )
 
   log("updating service info", service_name, node_id, pid)
-
-  try_unwrap(
-      "INTERNAL_ERROR",
+  api_context:hiredis():system():command("PING")
+  log_unwrap(
       api_context:hiredis():system():command(
           "HMSET",
           "pk-services:info:" .. service_name .. ":" .. node_id .. ":" .. pid,
@@ -326,8 +323,7 @@ local update_service_info = api_context_wrap(function(
 
   -- TODO: Should be done in the same call as above
   -- TODO: Remove copy-paste with register()
-  try_unwrap(
-      "INTERNAL_ERROR",
+  log_unwrap(
       api_context:hiredis():system():command(
           "HMSET",
           "pk-services:info:" .. service_name .. ":" .. node_id .. ":" .. pid,
@@ -339,8 +335,7 @@ local update_service_info = api_context_wrap(function(
     )
 
   -- Just in case someone trigger-happy deleted us.
-  try_unwrap(
-      "INTERNAL_ERROR",
+  log_unwrap(
       api_context:hiredis():system():command(
           "SADD",
           "pk-services:running",

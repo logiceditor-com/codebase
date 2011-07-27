@@ -40,9 +40,17 @@ local try_unwrap = function(error_id, res, ...)
     )
 end
 
+local log_unwrap = function(...)
+  local res, err = hiredis.unwrap_reply(...)
+  if not res then
+    log_error("unwrap failed: ", err)
+  end
+  return res
+end
 --------------------------------------------------------------------------------
 
 return
 {
   try_unwrap = try_unwrap;
+  log_unwrap = log_unwrap;
 }

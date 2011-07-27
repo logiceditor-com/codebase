@@ -117,6 +117,7 @@ return
   list_db_tables = { "pk-engine/db/info.lua" };
   list_installed_changesets = { "pk-engine/db/changeset.lua" };
   load_all_changesets = { "pk-engine/db/changeset.lua" };
+  log_unwrap = { "pk-engine/hiredis/util.lua" };
   lpush_ilist = { "pk-engine/redis/workarounds.lua" };
   luabins_response = { "pk-engine/webservice/response.lua" };
   make_api_context = { "pk-engine/webservice/client_api/api_context.lua" };

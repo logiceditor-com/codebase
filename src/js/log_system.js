@@ -2,19 +2,47 @@
 
 PK.log_system = new function()
 {
-  var events = new Array()
+  var default_gui_msg_printer_ = function(text)
+  {
+    if (window.Ext)
+    {
+      if (Ext.isReady)
+        Ext.Msg.alert('Failure', text)
+    }
+    else
+    {
+      alert(text)
+    }
+  }
 
-  // TODO: Can be uncommented - only for debug!
-  //this.events = events
+  // ------------------ private --------------------------
+
+  var events_ = new Array()
+
+  var printer_ = default_gui_msg_printer_
+
+  // ------------------ public --------------------------
+
+  this.GUI_EOL = "<br>"
+
+  this.set_printer = function(printer)
+  {
+    printer_ = printer
+  };
+
+  this.get_printer = function()
+  {
+    return printer_
+  };
 
   this.add = function(event)
   {
-    events[events.length] = event
+    events_[events_.length] = event
   };
 
   this.list = function()
   {
-    return events
+    return events_
   }
 }
 
@@ -23,10 +51,15 @@ var LOG = PK.log_system.add
 
 var GUI_ERROR = function(text)
 {
-  if (Ext.isReady)
-    Ext.Msg.alert('Failure', text)
+  if (window.Ext)
+  {
+    if (Ext.isReady)
+      Ext.Msg.alert('Failure', text)
+    else
+      LOG('GUI ERROR: ' + text)
+  }
   else
-    LOG('GUI ERROR: ' + text)
+    alert('Failure', text)
 }
 
 var CRITICAL_ERROR = function(text)
@@ -41,16 +74,17 @@ var CRITICAL_ERROR = function(text)
     tb_lines.push("**********************************")
 
     text_log = text + "\n" + tb_lines.join("\n")
-    text_gui = text + "<br>" + tb_lines.join("<br>")
+    text_gui = text + PK.log_system.GUI_EOL + tb_lines.join(PK.log_system.GUI_EOL)
   }
   else
   {
     text_log = text + "\n" + "(Stack trace not available)" + "\n\n"
-    text_gui = text + "<br>" + "(Stack trace not available)"
+    text_gui = text + PK.log_system.GUI_EOL + "(Stack trace not available)"
   }
 
   LOG("\nCRITICAL ERROR: " + text_log)
 
-  if (Ext.isReady)
-    Ext.Msg.alert('Failure', text_gui)
+  var printer = PK.log_system.get_printer()
+  if(printer)
+    printer(text_gui)
 }

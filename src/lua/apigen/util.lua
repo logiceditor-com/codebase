@@ -160,6 +160,7 @@ do
       BILLING_ACCOUNT_ID = context.string(1, 256);
       PAYMENT_ID = context.string(1, 64);
       OPTIONAL_PAYMENT_ID = context.optional(context.string(1, 64));
+      OPTIONAL_PAY_SYSTEM_ID = context.optional(context.string(1, 64));
 
 --------------------------------------------------------------------------------
 -- BEGIN POSTCARDS

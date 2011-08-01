@@ -1,4 +1,6 @@
-// Note: ExtJS required
+//------------------------------------------------------------------------------
+// Simple logging / error output system
+//------------------------------------------------------------------------------
 
 PK.log_system = new function()
 {
@@ -46,7 +48,6 @@ PK.log_system = new function()
   }
 }
 
-//var LOG = function(event) {}
 var LOG = PK.log_system.add
 
 var GUI_ERROR = function(text)
@@ -59,7 +60,7 @@ var GUI_ERROR = function(text)
       LOG('GUI ERROR: ' + text)
   }
   else
-    alert('Failure', text)
+    alert(text)
 }
 
 var CRITICAL_ERROR = function(text)
@@ -79,7 +80,7 @@ var CRITICAL_ERROR = function(text)
   else
   {
     text_log = text + "\n" + "(Stack trace not available)" + "\n\n"
-    text_gui = text + PK.log_system.GUI_EOL + "(Stack trace not available)"
+    text_gui = text // + PK.log_system.GUI_EOL + "(Stack trace not available)"
   }
 
   LOG("\nCRITICAL ERROR: " + text_log)

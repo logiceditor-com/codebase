@@ -10,7 +10,18 @@ PK.serialize_object = function(object, br)
   var text = ""
 
   for (var prop in object)
-    text += prop + ": "+ object[prop]+ br
+  {
+    var value = object[prop]
+    var type = typeof value
+    switch (type)
+    {
+      case "object":
+        text += prop + ": "+ "[Object]" + br
+        break
+      default:
+        text += prop + ": "+ value + br
+    }
+  }
 
   return text
 }

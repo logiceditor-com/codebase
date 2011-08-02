@@ -1,3 +1,21 @@
+// Note: This method has a little use since we have JSON.stringify()
+PK.serialize_object = function(object, br)
+{
+  if (br === undefined)
+    br = "\n"
+
+  if (typeof object == "string")
+    return "'" + object + "'"
+
+  var text = ""
+
+  for (var prop in object)
+    text += prop + ": "+ object[prop]+ br
+
+  return text
+}
+
+
 PK.override_object_properties = function(properties, rules, data)
 {
   if (!rules) return properties

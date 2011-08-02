@@ -60,7 +60,11 @@ var GUI_ERROR = function(text)
       LOG('GUI ERROR: ' + text)
   }
   else
-    alert(text)
+  {
+    var printer = PK.log_system.get_printer()
+    if(printer)
+      printer(text)
+  }
 }
 
 var CRITICAL_ERROR = function(text)

@@ -17,8 +17,8 @@ common.www.application.url = "http://." -- no url used
 common.www.application.api_schema_dir = PROJECT_PATH .. "#{PROJECT_NAME}-lib/schema/client_api/"
 common.www.application.have_unity_client = false
 
-common.www.application.db_tables_filename = "#{PROJECT_NAME}/db/tables.lua"
-common.www.application.webservice_request_filename = "#{PROJECT_NAME}/webservice/request.lua"
+common.www.application.db_tables_filename = "#{PROJECT_NAME}-lib/verbatim/db/tables.lua"
+common.www.application.webservice_request_filename = "#{PROJECT_NAME}-lib/verbatim/webservice/request.lua"
 
 common.www.application.code.exports =
 {
@@ -52,11 +52,11 @@ common.www.application.generated =
   data_formats_filename = "formats.lua";
   handlers_dir_name = "handlers";
 
-  exports_dir_name = "lib";
+  exports_dir_name = "#{PROJECT_NAME}-lib/lib";
   exports_list_name = EXPORTS_LIST_NAME;
 
-  context_extensions_dir_name = "ext";
-  context_extensions_list_name = "#{PROJECT_NAME}-lib/extensions.lua";
+  context_extensions_dir_name = "#{PROJECT_NAME}-lib/ext";
+  context_extensions_list_name = "#{PROJECT_NAME}-lib/extensions/extensions.lua";
 
   doc_md_filename = PROJECT_PATH .. "doc/#{PROJECT_NAME}-lib.md";
   doc_pdf_filename = PROJECT_PATH .. "doc/#{PROJECT_NAME}-lib.pdf";

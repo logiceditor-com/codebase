@@ -74,39 +74,43 @@ local MODULES
 do
   local cat, concat = make_concatter()
 
-  local filenames = find_all_files(ROOT .. "/../generated/lib", ".*%.lua$")
+  local filenames = find_all_files(ROOT .. "/../generated/#{PROJECT_NAME}-lib/lib", ".*%.lua$")
   table.sort(filenames)
   for i = 1, #filenames do
-    local name = assert(filenames[i]:match(".*/generated/(lib/.*)$"), "bad path")
+    local name = assert(filenames[i]:match(".*/generated/#{PROJECT_NAME_ESCAPED}%-lib/(lib/.*)$"), "bad path")
     cat [[
-      []] (Q("#{PROJECT_NAME}." .. name:gsub("%.lua$", ""):gsub("/", "."))) [[] = ]] (Q("#{PROJECT_NAME}-lib/generated/" .. name)) [[;
+      []] (Q("#{PROJECT_NAME}-lib." .. name:gsub("%.lua$", ""):gsub("/", "."))) [[
+] = ]] (Q("#{PROJECT_NAME}-lib/generated/#{PROJECT_NAME}-lib/" .. name)) [[;
 ]]
   end
 
-  local filenames = find_all_files(ROOT .. "/../generated/ext", ".*%.lua$")
+  local filenames = find_all_files(ROOT .. "/../generated/#{PROJECT_NAME}-lib/ext", ".*%.lua$")
   table.sort(filenames)
   for i = 1, #filenames do
-    local name = assert(filenames[i]:match(".*/generated/(ext/.*)$"), "bad path")
+    local name = assert(filenames[i]:match(".*/generated/#{PROJECT_NAME_ESCAPED}%-lib/(ext/.*)$"), "bad path")
     cat [[
-      []] (Q("#{PROJECT_NAME}." .. name:gsub("%.lua$", ""):gsub("/", "."))) [[] = ]] (Q("#{PROJECT_NAME}-lib/generated/" .. name)) [[;
+      []] (Q("#{PROJECT_NAME}-lib." .. name:gsub("%.lua$", ""):gsub("/", "."))) [[
+] = ]] (Q("#{PROJECT_NAME}-lib/generated/#{PROJECT_NAME}-lib/" .. name)) [[;
 ]]
   end
 
-  local filenames = find_all_files(ROOT .. "/../generated/#{PROJECT_NAME}", ".*%.lua$")
+  local filenames = find_all_files(ROOT .. "/../generated/#{PROJECT_NAME}-lib/verbatim", ".*%.lua$")
   table.sort(filenames)
   for i = 1, #filenames do
-    local name = assert(filenames[i]:match(".*/generated/(#{PROJECT_NAME_ESCAPED}/.*)$"), "bad path")
+    local name = assert(filenames[i]:match(".*/generated/#{PROJECT_NAME_ESCAPED}%-lib/verbatim(/.*)$"), "bad path")
     cat [[
-      []] (Q(name:gsub("%.lua$", ""):gsub("/", "."))) [[] = ]] (Q("#{PROJECT_NAME}-lib/generated/" .. name)) [[;
+      []] (Q("#{PROJECT_NAME}" .. name:gsub("%.lua$", ""):gsub("/", "."))) [[
+] = ]] (Q("#{PROJECT_NAME}-lib/generated/#{PROJECT_NAME}-lib/verbatim" .. name)) [[;
 ]]
   end
 
-  local filenames = find_all_files(ROOT .. "/../generated/#{PROJECT_NAME}-lib", ".*%.lua$")
+  local filenames = find_all_files(ROOT .. "/../generated/#{PROJECT_NAME}-lib/extensions", ".*%.lua$")
   table.sort(filenames)
   for i = 1, #filenames do
-    local name = assert(filenames[i]:match(".*/generated/(#{PROJECT_NAME_ESCAPED}%-lib/.*)$"), "bad path")
+    local name = assert(filenames[i]:match(".*/generated/#{PROJECT_NAME_ESCAPED}%-lib/(extensions/.*)$"), "bad path")
     cat [[
-      []] (Q("#{PROJECT_NAME}." .. name:gsub("%.lua$", ""):gsub("/", "."))) [[] = ]] (Q("#{PROJECT_NAME}-lib/generated/" .. name)) [[;
+      []] (Q("#{PROJECT_NAME}." .. name:gsub("%.lua$", ""):gsub("/", "."))) [[
+] = ]] (Q("#{PROJECT_NAME}-lib/generated/#{PROJECT_NAME}-lib/" .. name)) [[;
 ]]
   end
 

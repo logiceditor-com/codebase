@@ -130,6 +130,21 @@ local EXTENSIONS
         'EXTENSIONS'
       }
 
+
+local LIB_EXTENSIONS
+      = import '#{PROJECT_NAME}/extensions/extensions.lua'
+      {
+        'EXTENSIONS'
+      }
+
+local tclone,
+      tijoin_many
+      = import 'lua-nucleo/table-utils.lua'
+      {
+        'tclone',
+        'tijoin_many'
+      }
+
 -------------------------------------------------------------------------------
 
 log("loading wsapi-runner (#{API_NAME} 11)")
@@ -481,8 +496,11 @@ do
 
     local to_precache = { }
 
-    for i = 1, #EXTENSIONS do
-      local ext_info = EXTENSIONS[i]
+    local extensions = tclone(EXTENSIONS)
+    extensions = tijoin_many(extensions, LIB_EXTENSIONS)
+
+    for i = 1, #extensions do
+      local ext_info = extensions[i]
 
       local ext_data = import(ext_info[1]) ()
 

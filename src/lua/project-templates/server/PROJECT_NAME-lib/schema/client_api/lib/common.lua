@@ -1,9 +1,9 @@
-api:export "lib/common"
+api:export "util.common"
 {
   exports =
   {
     "SOME_CONSTANT";
-
+    --
     "some_function";
   };
 

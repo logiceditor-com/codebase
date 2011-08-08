@@ -15,13 +15,13 @@ common.exports =
     {
       {
         sources_dir = PROJECT_PATH .. "#{PROJECT_NAME}-lib/generated/";
-        root_dir_only = "lib/";
+        root_dir_only = "#{PROJECT_NAME}-lib/lib/";
         profile_filename = "profiles.lua";
         out_filename = "code/exports.lua";
       };
       {
         sources_dir = PROJECT_PATH .. "#{PROJECT_NAME}-lib/generated/";
-        root_dir_only = "ext/";
+        root_dir_only = "#{PROJECT_NAME}-lib/ext/";
         profile_filename = "profiles.lua";
         out_filename = "code/extensions.lua";
       };
@@ -54,7 +54,7 @@ common.www.game.generated =
   handlers_index_filename = "handlers.lua";
   data_formats_filename = "formats.lua";
   handlers_dir_name = "handlers";
-  exports_dir_name = "lib";
+  exports_dir_name = "#{PROJECT_NAME}-lib/lib";
   exports_list_name = PROJECT_PATH .. "/tools/schema/code/exports/client_api.lua";
   base_url_prefix = "/";
   unity_api_filename = "/dev/null"; -- No Unity API

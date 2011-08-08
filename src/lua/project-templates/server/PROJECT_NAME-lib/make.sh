@@ -8,8 +8,8 @@ rm -r ${PK_PROJECT_PATH}/generated/* || true
 
 ./bin/apigen #{PROJECT_NAME}-lib update_handlers
 
-mkdir -p ${PK_PROJECT_PATH}/generated/#{PROJECT_NAME}/
-cp -RP ${PK_PROJECT_PATH}/schema/verbatim/* ${PK_PROJECT_PATH}/generated/#{PROJECT_NAME}/
+mkdir -p ${PK_PROJECT_PATH}/generated/#{PROJECT_NAME}-lib/verbatim/
+cp -RP ${PK_PROJECT_PATH}/schema/verbatim/* ${PK_PROJECT_PATH}/generated/#{PROJECT_NAME}-lib/verbatim/
 
 ${PK_PROJECT_PATH}/rockspec/gen-rockspecs
 cd ${PK_ROOT_PATH} && sudo luarocks make ${PK_PROJECT_PATH}/rockspec/#{PROJECT_NAME}.lib-scm-1.rockspec

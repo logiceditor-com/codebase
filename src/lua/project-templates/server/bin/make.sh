@@ -44,9 +44,10 @@ else
   echo "------> MAKE ALL FOR ${CLUSTER} BEGIN..."
 fi
 
-echo "------> REBUILD GENERIC STUFF BEGIN..."
-sudo luarocks make rockspec/#{PROJECT_NAME}.lib-scm-1.rockspec
-echo "------> REBUILD GENERIC STUFF END"
+echo "------> REBUILD #{PROJECT_NAME}-lib BEGIN..."
+cd #{PROJECT_NAME}-lib && ./make.sh
+cd ..
+echo "------> REBUILD #{PROJECT_NAME}-lib END"
 
 for cluster in ${CLUSTERS[@]} ; do
   if [ "${cluster}" = "${CLUSTERS}" ]

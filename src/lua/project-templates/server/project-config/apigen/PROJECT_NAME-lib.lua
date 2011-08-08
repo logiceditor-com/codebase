@@ -1,22 +1,21 @@
 --------------------------------------------------------------------------------
--- api.lua: apigen configuration
+-- billing-lib.lua: apigen configuration
 --------------------------------------------------------------------------------
 -- Note that PROJECT_PATH is defined in the environment
 --------------------------------------------------------------------------------
 
 local file = function(name) return { filename = name } end
 
-local NAME = "#{API_NAME}"
+local NAME = "#{PROJECT_NAME}-lib"
 
 local EXPORTS_LIST_NAME = PROJECT_PATH
     .. "tmp/" .. NAME .. "/code/exports/client_api.lua";
 
 common.PROJECT_PATH = PROJECT_PATH
 
-common.www.application.url = "http://#{PROJECT_NAME}-#{API_NAME}/"
-common.www.application.api_schema_dir = PROJECT_PATH .. "schema/" .. NAME .. "/client_api"
+common.www.application.url = "http://." -- no url used
+common.www.application.api_schema_dir = PROJECT_PATH .. "#{PROJECT_NAME}-lib/schema/client_api/"
 common.www.application.have_unity_client = false
--- common.www.application.session_checker_file_name = false
 
 common.www.application.db_tables_filename = "#{PROJECT_NAME}/db/tables.lua"
 common.www.application.webservice_request_filename = "#{PROJECT_NAME}/webservice/request.lua"
@@ -27,7 +26,6 @@ common.www.application.code.exports =
   file (PROJECT_PATH .. "lib/lua-aplicado/lua-aplicado/code/exports.lua");
   file (PROJECT_PATH .. "lib/pk-core/pk-core/code/exports.lua");
   file (PROJECT_PATH .. "lib/pk-engine/pk-engine/code/exports.lua");
-  file (PROJECT_PATH .. "#{PROJECT_NAME}-lib/code/exports.lua");
 --  file (PROJECT_PATH .. "lib/pk-admin/pk-admin/code/exports.lua");
   --
   file (EXPORTS_LIST_NAME);
@@ -47,7 +45,7 @@ common.www.application.code.globals =
 
 common.www.application.generated =
 {
-  file_root = PROJECT_PATH .. "www/" .. NAME .. "/generated/";
+  file_root = PROJECT_PATH .. NAME .. "/generated/";
 
   api_version_filename = "client_api_version.lua";
   handlers_index_filename = "handlers.lua";
@@ -58,10 +56,10 @@ common.www.application.generated =
   exports_list_name = EXPORTS_LIST_NAME;
 
   context_extensions_dir_name = "ext";
-  context_extensions_list_name = "extensions.lua";
+  context_extensions_list_name = "#{PROJECT_NAME}-lib/extensions.lua";
 
-  doc_md_filename = PROJECT_PATH .. "doc/#{API_NAME}/client_api.md";
-  doc_pdf_filename = PROJECT_PATH .. "doc/#{API_NAME}/client_api.pdf";
+  doc_md_filename = PROJECT_PATH .. "doc/#{PROJECT_NAME}-lib.md";
+  doc_pdf_filename = PROJECT_PATH .. "doc/#{PROJECT_NAME}-lib.pdf";
   doc_latex_template_filename = common.www.application.api_schema_dir
     .. "/doc/latex.template";
 

@@ -27,6 +27,7 @@ common.www.application.code.exports =
   file (PROJECT_PATH .. "lib/lua-aplicado/lua-aplicado/code/exports.lua");
   file (PROJECT_PATH .. "lib/pk-core/pk-core/code/exports.lua");
   file (PROJECT_PATH .. "lib/pk-engine/pk-engine/code/exports.lua");
+  file (PROJECT_PATH .. "#{PROJECT_NAME}-lib/code/exports.lua");
 --  file (PROJECT_PATH .. "lib/pk-admin/pk-admin/code/exports.lua");
   --
   file (EXPORTS_LIST_NAME);

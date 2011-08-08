@@ -99,6 +99,7 @@ dictionary.APPLICATION_CONFIG =
 ignore_paths =
 {
   "server/lib/";
+  "server/PROJECT_NAME-lib/schema/client-api/lib/";
 }
 
 wrapper =

@@ -77,6 +77,8 @@ dictionary =
   -- TODO: obsolete, rocks/ related, remove later
   SUBPROJ_NAME = { "pk", "project" };
 
+  KEEP_LOGS_DAYS = "30";
+
   ROBOTS_TXT = [[
 User-agent: *
 Disallow: /]];

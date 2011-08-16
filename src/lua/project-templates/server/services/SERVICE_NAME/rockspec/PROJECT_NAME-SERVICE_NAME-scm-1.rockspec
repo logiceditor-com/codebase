@@ -14,7 +14,10 @@ dependencies = {
    "lua-nucleo >= 0.0.1",
    "lua-aplicado >= 0.0.1",
    "pk-core >= 0.0.1",
-   "pk-engine >= 0.0.1"
+   "pk-engine >= 0.0.1",
+   "wsapi-fcgi >= 1.5-1",
+   "luasocket >= 2.0.2",
+   "luajson >= 1.2.1"
 }
 build = {
    type = "none",

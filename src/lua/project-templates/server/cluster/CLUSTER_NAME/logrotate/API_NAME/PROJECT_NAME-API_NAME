@@ -2,9 +2,9 @@
 #
 /var/log/#{PROJECT_NAME}-#{API_NAME}-wsapi.log {
   #
-  # Keep logs for a month
+  # Keep logs for .. days
   #
-  rotate 30
+  rotate #{KEEP_LOGS_DAYS}
   #
   # Rotate daily
   #
@@ -28,7 +28,7 @@
   #
   # Create a log new file with these permissions
   #
-  create 600 www-data www-data
+  create 640 www-data www-data
   #
   # Tell service to let go of the old log file (works only with delaycompress on)
   #

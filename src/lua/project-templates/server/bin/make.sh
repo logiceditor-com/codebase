@@ -26,7 +26,7 @@ if([ -h "${ROOT}" ]) then
 fi
 ROOT=$(cd `dirname "${ROOT}"` && cd .. && pwd) # Up one level
 
-ln -sf ./etc/git/hooks/pre-commit ./.git/hooks/
+ln -sf ${ROOT}/etc/git/hooks/pre-commit ./.git/hooks/
 
 if [ "${CLUSTER}" = "--help" ]; then
   echo "Usage: ${0} <cluster> [<api>]" >&2

@@ -166,6 +166,15 @@ Options:
                         Default: run slow tests.
     --randomseed=<int>  Use given value as randomseed.
                         Default: `123456'.
+
+Environment variables:
+    PK_TEST_PORT_BASE   Base port for services in testcases. (default: "50000")
+    PK_TEST_DB_HOST     MySQL host (default: "localhost")
+    PK_TEST_DB_PORT     MySQL port (default: "3306")
+    PK_TEST_DB_NAME     MySQL database name (default: "pk-test")
+    PK_TEST_DB_USER     MySQL database user (default: "root")
+    PK_TEST_DB_PASSWORD MySQL database password (default: "12345")
+
 ]]
 
 local TOOL_NAME = "test"

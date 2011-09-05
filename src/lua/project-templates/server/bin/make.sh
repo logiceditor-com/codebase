@@ -26,7 +26,10 @@ if([ -h "${ROOT}" ]) then
 fi
 ROOT=$(cd `dirname "${ROOT}"` && cd .. && pwd) # Up one level
 
-ln -sf ${ROOT}/etc/git/hooks/pre-commit ./.git/hooks/
+rm -r ${HOME}/projects/#{PROJECT_NAME}/server/.git/hooks
+ln -s ../etc/git/hooks ${HOME}/projects/#{PROJECT_NAME}/server/.git/hooks
+rm -r ${HOME}/projects/#{PROJECT_NAME}/deployment/.git/hooks
+ln -s ../etc/git/hooks ${HOME}/projects/#{PROJECT_NAME}/deployment/.git/hooks
 
 if [ "${CLUSTER}" = "--help" ]; then
   echo "Usage: ${0} <cluster> [<api>]" >&2
@@ -63,7 +66,7 @@ for cluster in ${CLUSTERS[@]} ; do
       then
         echo "------> GENERATE AND INSTALL ${api} BEGIN..."
         ./bin/apigen ${api} update_handlers
-        ./bin/apigen ${api} generate_documents
+#        ./bin/apigen ${api} generate_documents
         sudo luarocks make www/${api}/rockspec/#{PROJECT_NAME}.${api}-scm-1.rockspec
         sudo luarocks make cluster/${CLUSTER}/rockspec/#{PROJECT_NAME}.nginx.${api}.${CLUSTER}-scm-1.rockspec
         echo "------> GENERATE AND INSTALL ${api} END."

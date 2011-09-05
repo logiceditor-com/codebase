@@ -62,10 +62,13 @@ APT-packages
         libexpat-dev        \
         libmysqlclient16
 
-Development machine only:
+Development machine only (documentation generation):
 
     sudo apt-get install    \
         pandoc
+        texlive-latex-recommended \
+        texlive-lang-cyrillic \
+        texlive-latex-extra \
 
 Other useful apt packages:
 
@@ -263,7 +266,7 @@ If nothing found:
 If nothing found:
 
     cd ${HOME}/projects/#{PROJECT_NAME}/server/lib/pk-core
-    sudo luarocks make rockspec/pk-core-scm-1.rockspec \
+    sudo luarocks make rockspec/pk-core-engine-1.rockspec \
       --only-from=${FRR}
 
 5.3 pk-engine
@@ -282,9 +285,10 @@ If nothing found:
 
 If nothing found:
 
-    cd ${HOME}/projects/#{PROJECT_NAME}/server/lib/pk-tools/
-    sudo luarocks make rockspec/pk-tools-scm-1.rockspec \
-      --only-from=${FRR}
+ $ (cd pk-tools && lua -e 'for _, R in
+   ipairs(loadfile("rockspec/pk-rocks-manifest.lua")().ROCKS) do
+   print(R[1]) end' | xargs -l1 -I% sudo luarocks make %
+   --only-from=../pk-foreign-rocks/rocks)
 
 
 Deploying to developer machine

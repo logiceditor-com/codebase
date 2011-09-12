@@ -16,6 +16,12 @@ CLUSTERS=(
 --[[BLOCK_END:CLUSTER_NAME]]
 )
 
+SERVICES=(
+--[[BLOCK_START:SERVICE_NAME]]
+    "#{SERVICE_NAME}"
+--[[BLOCK_END:SERVICE_NAME]]
+  )
+
 CLUSTER="${1}"
 
 API="${2}"
@@ -72,6 +78,16 @@ for cluster in ${CLUSTERS[@]} ; do
         echo "------> GENERATE AND INSTALL ${api} END."
       fi
     done
+  fi
+done
+
+echo "------> INSTALL SERVICES..."
+for service in ${SERVICES[@]} ; do
+  if [ -z "${API}" -o "${service}" == "${API}" ]
+  then
+    echo "------> INSTALL ${service} BEGIN..."
+    sudo luarocks make services/${service}/rockspec/pk-billing-${service}-scm-1.rockspec
+    echo "------> INSTALL ${service} END."
   fi
 done
 

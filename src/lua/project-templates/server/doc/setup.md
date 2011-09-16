@@ -276,7 +276,7 @@ If nothing found:
 If nothing found:
 
     cd ${HOME}/projects/#{PROJECT_NAME}/server/lib/pk-engine/
-    sudo luarocks make rockspec/pk-engine-scm-1.rockspec \
+    sudo luarocks make rockspec/pk-engine-engine-1.rockspec \
       --only-from=${FRR}
 
 5.4 pk-tools

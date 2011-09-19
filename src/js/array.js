@@ -19,3 +19,21 @@ PK.remove_holes_in_array = function(arr)
   }
   //PKLILE.timing.stop("remove_holes_in_array")
 }
+
+PK.is_value_in_array = function(arr, value)
+{
+  if(arr.constructor.toString().indexOf("Array") == -1)
+  {
+    return false;
+  }
+
+  for(var i = 0; i < arr.length; i++)
+  {
+    if(arr[i] == value)
+    {
+      return true;
+    }
+  }
+
+  return false;
+}

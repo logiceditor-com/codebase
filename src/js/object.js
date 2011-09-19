@@ -72,3 +72,21 @@ PK.override_object_properties = function(properties, rules, data)
 
   return properties
 }
+
+PK.count_properties = function(obj)
+{
+  var length = 0;
+  try
+  {
+    for(var word in obj)
+    {
+      length++;
+    }
+  }
+  catch(e)
+  {
+    CRITICAL_ERROR("It is not dictionary! " + obj);
+  }
+
+  return length;
+}

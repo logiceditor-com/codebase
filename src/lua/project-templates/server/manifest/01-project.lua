@@ -63,4 +63,11 @@ subtrees =
     url = "gitolite@git.iphonestudio.ru:pk-foreign-rocks.git";
     branch = "master";
   };
+  {
+    name = "pk-test";
+    git = PROJECT_PATH;
+    path = "lib/pk-test";
+    url = "gitolite@git.iphonestudio.ru:pk-test.git";
+    branch = "master";
+  };
 }

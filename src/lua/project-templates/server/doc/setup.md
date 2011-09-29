@@ -60,6 +60,7 @@ APT-packages
         libev-dev           \
         libgeoip-dev        \
         libexpat-dev        \
+        nginx               \
         libmysqlclient16
 
 Development machine only (documentation generation):
@@ -93,13 +94,6 @@ Git:
     sudo apt-get update
     sudo apt-get upgrade
     sudo apt-get install git-core git-doc
-
-Nginx:
-
-    sudo add-apt-repository ppa:nginx/stable
-    sudo apt-get update
-    sudo apt-get upgrade
-    sudo apt-get install nginx
 
 4. Setup git config
 
@@ -290,7 +284,6 @@ If nothing found:
    print(R[1]) end' | xargs -l1 -I% sudo luarocks make %
    --only-from=../pk-foreign-rocks/rocks)
 
-
 Deploying to developer machine
 ------------------------------
 
@@ -311,6 +304,40 @@ If it does not print anything, you're missing deploy-rocks rock.
 
     bin/deploy-rocks deploy_from_code <your-cluster-name>
 
+YOU DONE.
+
+Does it work?
+-------------
+
+    GET http://#{PROJECT_NAME}-internal-config/cfg/db/bases
+
+    GET http://#{PROJECT_NAME}-internal-config-deploy/cfg/db/bases
+--[[BLOCK_START:API_NAME]]
+
+    GET http://#{PROJECT_NAME}-#{API_NAME}
+--[[BLOCK_END:API_NAME]]
+--[[BLOCK_START:JOINED_WSAPI]]
+
+    GET http://#{PROJECT_NAME}-#{JOINED_WSAPI}
+--[[BLOCK_END:JOINED_WSAPI]]
+--[[BLOCK_START:STATIC_NAME]]
+    GET http://#{PROJECT_NAME}-#{STATIC_NAME}-static
+--[[BLOCK_END:STATIC_NAME]]
+--[[BLOCK_START:API_NAME]]
+
+sudo su - www-data -c '/usr/bin/env \
+    "PATH_INFO=/sys/info.xml" \
+    "PK_CONFIG_HOST=#{PROJECT_NAME}-internal-config" "PK_CONFIG_PORT=80" \
+    #{PROJECT_NAME}-#{API_NAME}.fcgi'
+--[[BLOCK_END:API_NAME]]
+--[[BLOCK_START:JOINED_WSAPI]]
+
+sudo su - www-data -c '/usr/bin/env \
+    "PATH_INFO=/sys/info.xml" \
+    "PK_CONFIG_HOST=#{PROJECT_NAME}-internal-config" "PK_CONFIG_PORT=80" \
+    #{PROJECT_NAME}-#{JOINED_WSAPI}.fcgi'
+--[[BLOCK_END:JOINED_WSAPI]]
+
 Other useful commands
 ---------------------
 
@@ -323,30 +350,21 @@ If you need to make any changes in /server/lib project - ask AG.
     bin/update-subtrees update
 
 2. Update api handlers
+--[[BLOCK_START:API_NAME]]
 
-   bin/apigen api update_handlers
+    bin/apigen #{API_NAME} update_handlers
+--[[BLOCK_END:API_NAME]]
+--[[BLOCK_START:JOINED_WSAPI]]
+
+    bin/apigen #{JOINED_WSAPI} update_handlers
+--[[BLOCK_END:JOINED_WSAPI]]
 
 3. Generate api documentation
-
-   bin/apigen api generate_documents
-
-Does it work?
--------------
 --[[BLOCK_START:API_NAME]]
-sudo su - www-data -c '/usr/bin/env \
-    "PATH_INFO=/sys/info.xml" \
-    "PK_CONFIG_HOST=#{PROJECT_NAME}-internal-config" "PK_CONFIG_PORT=80" \
-    #{PROJECT_NAME}-#{API_NAME}.fcgi'
 
+    bin/apigen #{API_NAME} generate_documents
 --[[BLOCK_END:API_NAME]]
+--[[BLOCK_START:JOINED_WSAPI]]
 
-sudo su - www-data -c '/usr/bin/env \
-    "PATH_INFO=/redir" \
-    "PK_CONFIG_HOST=pk-billing-internal-config" "PK_CONFIG_PORT=80" \
-    pk-billing-api.fcgi'
-
-    GET http://#{PROJECT_NAME}-internal-config/cfg/db/bases
-
-    GET http://#{PROJECT_NAME}-internal-config-deploy/cfg/db/bases
-
-    GET http://#{PROJECT_NAME}
+    bin/apigen #{JOINED_WSAPI} generate_documents
+--[[BLOCK_END:JOINED_WSAPI]]

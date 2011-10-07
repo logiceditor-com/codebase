@@ -183,6 +183,7 @@ do
       subproject,
       rocks_repo,
       current_versions,
+      need_new_versions_for_subprojects,
       dry_run,
       action
     )
@@ -270,6 +271,10 @@ do
                             )
           then
             writeln_flush("> Changed file found: ", rockspec_files[i])
+            -- here source repo is marked as new and will be tagged
+            if action.source_repo_name then
+              need_new_versions_for_subprojects[action.source_repo_name] = true
+            end
             have_rockspec_files_changed = true
             break
           else
@@ -351,6 +356,7 @@ do
       rocks_repo,
       pre_deploy_actions,
       current_versions,
+      need_new_versions_for_subprojects,
       dry_run
     )
     arguments(
@@ -360,6 +366,7 @@ do
         "table", rocks_repo,
         "table", pre_deploy_actions,
         "table", current_versions,
+        "table", need_new_versions_for_subprojects,
         "boolean", dry_run
       )
 
@@ -377,6 +384,7 @@ do
           subproject,
           rocks_repo,
           current_versions,
+          need_new_versions_for_subprojects,
           dry_run,
           action
         )

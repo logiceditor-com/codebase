@@ -405,6 +405,7 @@ do
             subproject.provides_rocks_repo[i],
             subproject.provides_rocks_repo[i].pre_deploy_actions,
             current_versions,
+            need_new_versions_for_subprojects,
             dry_run
           )
       end

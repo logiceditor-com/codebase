@@ -21,7 +21,8 @@ dependencies = {
    "lua-nucleo >= 0.0.1",
    "pk-core >= 0.0.1",
    "pk-engine >= 0.0.1",
-   "lbase64 >= 20070628-1"
+   "lbase64 >= 20070628-1",
+   "luajson >= 1.2.1"
    -- TODO: add engine dependencies!
 }
 build = {

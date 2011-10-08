@@ -238,8 +238,8 @@ by using command
 ON CLEAN MACHINE ONLY:
 
     luarocks search --source --all --only-from=${FRR} \
-      | grep '^\S' | tail -n +5 \
-      | xargs -l1 sudo luarocks install --only-from=${FRR}
+      | grep -v '^\s' | tail -n +5 \
+      | xargs -l1  sudo luarocks install --only-from=${FRR}
 
 5. Install libs
 

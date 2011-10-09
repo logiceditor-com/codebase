@@ -29,6 +29,8 @@ require 'zmq.poller'
 
 local luabins = require 'luabins'
 
+require 'bit'
+
 --------------------------------------------------------------------------------
 
 local arguments,
@@ -47,10 +49,17 @@ local empty_table
         'empty_table'
       }
 
+local EAGAIN
+      = import 'pk-engine/errno.lua'
+      {
+        'EAGAIN'
+      }
+
 --------------------------------------------------------------------------------
 
 -- TODO: Shouldn't this be done much earlier?
 -- TODO: Is this really needed?
+
 io.stdout = lfcgi.stdout
 io.stderr = lfcgi.stderr
 io.stdin = lfcgi.stdin
@@ -89,7 +98,37 @@ end
 -- Based on wsapi.fcgi.run()
 local handle_wsapi_request = function(app_run)
   --dbg("before lfcgi.accept()")
-  local status = lfcgi.accept()
+
+  -- 
+  -- This WSAPI handler executes in slightly unusual configuration: FastCGI file
+  -- descriptor (which is stdin) is shared by several processes all spawned by
+  -- multiwatch. Therefore it is not guaranteed that handle_wsapi_request() is
+  -- called if stdin has any data to read from, as another process might already
+  -- have accepted the connection and read all the data.
+  --
+  -- On the other hand, handle_wsapi_request should not block, otherwise whole
+  -- infrastructure of zmq messages controlling behaviour of processes gets
+  -- stuck, as it hangs in FCGI_Accept instead of waiting in zmq_poll.
+  --
+  -- Hence, we place socket into nonblocking mode and finish the request if we
+  -- are getting -EAGAIN.
+  --
+
+  local status = posix.setfl(0, bit.bor(posix.getfl(0), posix.O_NONBLOCK))
+
+  if status < 0 then
+    log_error("FCGI WSAPI Runner: unable to place stdin into non-blocking mode:", status)
+    stop()
+    return
+  end
+
+  status = lfcgi.accept()
+
+  if status == -EAGAIN then
+     log("FCGI WSAPI Runner: idle iteration, another process has accepted the request already")
+     return
+  end
+
   if status < 0 then
     -- Seems to be normal in CGI mode.
     log_error("FCGI WSAPI Runner: lfcgi.accept() returned error:", status)

@@ -14,6 +14,7 @@ return
   DB_INFO_URL = { "pk-engine/srv/internal_config/client.lua" };
   DELIM = { "pk-engine/history.lua" };
   DICTIONARY_NODES_URL = { "pk-engine/srv/internal_config/client.lua" };
+  EAGAIN = { "pk-engine/errno.lua" };
   EMPTY_GIF = { "pk-engine/webservice/response.lua" };
   HEARTBEAT_NODES_URL = { "pk-engine/srv/internal_config/client.lua" };
   PARTNER = { "pk-engine/webservice/partner.lua" };

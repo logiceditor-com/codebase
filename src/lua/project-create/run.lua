@@ -184,21 +184,6 @@ do
     return pattern
   end
 
-  local replace_string_in_file = function(filename, string, replace)
-    -- TODO: check on '/' and replace to s||| or s:::
-    DEBUG_print("string :", string)
-    DEBUG_print("replace :", replace)
-    if type(replace) == "table" then DEBUG_print("\27[32mreplace\27[0m:\n" .. tpretty(replace, "  ", 80)) end
-    assert(
-        shell_exec(
-            "sed",
-            "-i",
-            "s/" .. string .. "/" .. replace .. "/g",
-            filename
-          ) == 0
-      )
-  end
-
   local break_path = function(path)
     local file_dir_list = { }
     -- TODO: Check if more symbols needed in regexp!!!
@@ -440,44 +425,146 @@ DEBUG_print(k .. "\27[32mremoved as it was\27[0m:\n" .. tostring(v))
         return file_content
       end
 
-      local replace_dictionary_in_string = function(
+      local replace_pattern_in_string = function(
+          string_to_process,
+          key,
+          value,
+          data_wrapper
+        )
+        if is_string(value) then
+          --DEBUG_print("Dictionary ",  tostring(key), tostring(value))
+          local to_insert = string.gsub(value, "%%", "%%%1")
+          return string.gsub(
+              string_to_process,
+              string.gsub(data_wrapper.left, "%p", "%%%1")
+           .. string.gsub(key, "%p", "%%%1")
+           .. string.gsub(data_wrapper.right, "%p", "%%%1"),
+              to_insert
+            )
+        elseif value == false then
+          -- Remove all strings with pattern that == false
+          return string.gsub(
+              string_to_process,
+              "\n[.]*"
+           .. string.gsub(data_wrapper.left, "%p", "%%%1")
+           .. string.gsub(key, "%p", "%%%1")
+           .. string.gsub(data_wrapper.right, "%p", "%%%1")
+           .. "[.]*\n",
+              "\n"
+            )
+        else
+          assert(nil, k .. " is not string or false in manifest dictionary")
+        end
+      end
+
+      local replace_simple_dictionary_in_string = function(
           string_to_process,
           dictionary,
           data_wrapper
         )
         for k, v in pairs(dictionary) do
-          if is_string(v) then
-            -- TODO: hack?
-            local to_insert = string.gsub(v, "%%", "%%%1")
-            string_to_process = string.gsub(
-                string_to_process,
-                string.gsub(data_wrapper.left, "%p", "%%%1")
-             .. string.gsub(k, "%p", "%%%1")
-             .. string.gsub(data_wrapper.right, "%p", "%%%1"),
-                to_insert
-              )
-           -- Remove all strings with pattern that ==false
-           elseif v == false then
-            string_to_process = string.gsub(
-                string_to_process,
-                "\n[.]*"
-             .. string.gsub(data_wrapper.left, "%p", "%%%1")
-             .. string.gsub(k, "%p", "%%%1")
-             .. string.gsub(data_wrapper.right, "%p", "%%%1")
-             .. "[.]*\n",
-                "\n"
-              )
-           else
-             assert(nil, k .. " is not string or false in manifest dictionary")
-           end
+          string_to_process =
+            replace_pattern_in_string(string_to_process, k, v, data_wrapper)
         end
         return string_to_process
+      end
+
+      local replace_dictionary_with_modificators_in_string = function(
+          string_to_process,
+          dictionary,
+          data_wrapper,
+          modificator_wrapper,
+          modificators
+        )
+        for k, v in pairs(dictionary) do
+          for mod, fn in pairs(modificators) do
+            if is_string(v) and is_function(fn) then
+              local to_insert = string.gsub(fn(v), "%%", "%%%1")
+              string_to_process = string.gsub(
+                  string_to_process,
+                  string.gsub(data_wrapper.left, "%p", "%%%1")
+               .. string.gsub(k, "%p", "%%%1")
+               .. string.gsub(data_wrapper.right, "%p", "%%%1")
+               .. string.gsub(modificator_wrapper.left, "%p", "%%%1")
+               .. string.gsub(mod, "%p", "%%%1")
+               .. string.gsub(modificator_wrapper.right, "%p", "%%%1"),
+                  to_insert
+                )
+            end
+          end
+          string_to_process =
+            replace_pattern_in_string(string_to_process, k, v, data_wrapper)
+        end
+        return string_to_process
+      end
+
+      local check_string_has_patterns = function(string_to_process, data_wrapper)
+        local pattern =
+            string.gsub(data_wrapper.left, "%p", "%%%1")
+         .. '[^{}]-'
+         .. string.gsub(data_wrapper.right, "%p", "%%%1")
+        if string.find(string_to_process, pattern) == nil then
+          return false
+        end
+        return true
+      end
+
+      local check_string_has_modificators = function(
+          string_to_process,
+          data_wrapper,
+          modificator_wrapper
+        )
+        local pattern =
+            string.gsub(data_wrapper.left, "%p", "%%%1")
+         .. '[^{}]-'
+         .. string.gsub(data_wrapper.right, "%p", "%%%1")
+         .. string.gsub(modificator_wrapper.left, "%p", "%%%1")
+         .. '[^{}]-'
+         .. string.gsub(modificator_wrapper.right, "%p", "%%%1")
+        if string.find(string_to_process, pattern) == nil then
+          return false
+        end
+        return true
+      end
+
+      local replace_dictionary_in_string = function(
+          string_to_process,
+          dictionary,
+          data_wrapper,
+          modificator_wrapper,
+          modificators
+        )
+        if not check_string_has_patterns(string_to_process, data_wrapper) then
+          return string_to_process
+        end
+        if
+          not check_string_has_modificators(
+              string_to_process,
+              data_wrapper,
+              modificator_wrapper
+            )
+        then
+          return replace_simple_dictionary_in_string(
+              string_to_process,
+              dictionary,
+              data_wrapper
+            )
+        end
+
+        return replace_dictionary_with_modificators_in_string(
+            string_to_process,
+            dictionary,
+            data_wrapper,
+            modificator_wrapper,
+            modificators
+          )
       end
 
       local function replicate_and_replace_in_file_recursively(
             manifest,
             replaces_used,
             wrapper,
+            modificators,
             file_content
           )
         -- TODO: check if pattern exists in file(string)
@@ -493,7 +580,9 @@ DEBUG_print(k .. "\27[32mremoved as it was\27[0m:\n" .. tostring(v))
             file_content = replace_dictionary_in_string(
                 file_content,
                 manifest.subdictionary[v].dictionary,
-                wrapper.data
+                wrapper.data,
+                wrapper.modificator,
+                modificators
               )
             -- append data of replacement subdictionaries
             for l, w in pairs(manifest.subdictionary[v].replicate_data) do
@@ -546,6 +635,7 @@ DEBUG_print(k .. "\27[32mremoved as it was\27[0m:\n" .. tostring(v))
                     subdictionary[v[i]],
                     replaces_used_sub,
                     wrapper,
+                    modificators,
                     current_block_replica
                   )
               end
@@ -577,7 +667,9 @@ DEBUG_print(k .. "\27[32mremoved as it was\27[0m:\n" .. tostring(v))
         file_content = replace_dictionary_in_string(
             file_content,
             dictionary,
-            wrapper.data
+            wrapper.data,
+            wrapper.modificator,
+            modificators
           )
         -- DEBUG_print(file_content)
         file_content = check_trailspaces_newlines(file_content)
@@ -597,6 +689,7 @@ DEBUG_print(k .. "\27[32mremoved as it was\27[0m:\n" .. tostring(v))
             metamanifest,
             replaces_used,
             metamanifest.wrapper,
+            metamanifest.modificators,
             file_content
           )
         file = io.open(created_path, "w")

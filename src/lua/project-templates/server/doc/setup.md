@@ -282,7 +282,17 @@ If nothing found:
  $ (cd pk-tools && lua -e 'for _, R in
    ipairs(loadfile("rockspec/pk-rocks-manifest.lua")().ROCKS) do
    print(R[1]) end' | xargs -l1 -I% sudo luarocks make %
-   --only-from=../pk-foreign-rocks/rocks)
+     --only-from=../pk-foreign-rocks/rocks)
+
+5.5 pk-test
+
+    luarocks list pk-test
+
+If nothing found:
+
+    cd ${HOME}/projects/#{PROJECT_NAME}/server/lib/pk-test/
+    sudo luarocks make rockspec/pk-engine-scm-1.rockspec \
+      --only-from=${FRR}
 
 Deploying to developer machine
 ------------------------------

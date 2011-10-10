@@ -438,7 +438,7 @@ roles =
     };
     system_service =
     {
-      name = "#{SERVICE_NAME_UNDERLINE}";
+      name = "#{SERVICE_NAME}:{UNDERLINE}";
       node = "1";
     };
     deploy_rocks =

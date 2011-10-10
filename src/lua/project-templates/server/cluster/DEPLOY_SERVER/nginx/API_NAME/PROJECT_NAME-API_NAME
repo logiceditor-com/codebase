@@ -1,8 +1,8 @@
 server {
-  listen #{API_NAME}#{DEPLOY_SERVER_DOMAIN}:80;
-  server_name #{API_NAME}#{DEPLOY_SERVER_DOMAIN};
+  listen #{API_NAME}:{URLIFY}#{DEPLOY_SERVER_DOMAIN}:{URLIFY}:80;
+  server_name #{API_NAME}:{URLIFY}#{DEPLOY_SERVER_DOMAIN}:{URLIFY};
 
-  access_log  /var/log/nginx/#{PROJECT_NAME}-#{API_NAME}.access.log;
+  access_log  /var/log/nginx/#{PROJECT_NAME}:{URLIFY}-#{API_NAME}:{URLIFY}.access.log;
   set_real_ip_from 0.0.0.0/0;
   real_ip_header X-Real-IP;
 

@@ -33,6 +33,6 @@
   # Tell service to let go of the old log file (works only with delaycompress on)
   #
   postrotate
-    #{PROJECT_NAME}-execute-system-action #{SERVICE_NAME_UNDERLINE} 1 reopen_log_file
+    #{PROJECT_NAME}-execute-system-action #{SERVICE_NAME}:{UNDERLINE} 1 reopen_log_file
   endscript
 }

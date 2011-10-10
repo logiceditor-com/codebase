@@ -36,8 +36,8 @@ local log, dbg, spam, log_error = make_loggers("webservice/request", "WRQ")
 
 --------------------------------------------------------------------------------
 
-local WWW_ADMIN_CONFIG_SECTION = "#{PROJECT_NAME_UNDERLINE}"
-local WWW_APPLICATION_CONFIG_SECTION = "#{PROJECT_NAME_UNDERLINE}"
+local WWW_ADMIN_CONFIG_SECTION = "#{PROJECT_NAME}:{UNDERLINE}"
+local WWW_APPLICATION_CONFIG_SECTION = "#{PROJECT_NAME}:{UNDERLINE}"
 
 -- TODO: Maybe get rid of it?
 local get_www_admin_config = function(context)

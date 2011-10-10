@@ -292,7 +292,7 @@ If nothing found:
 If nothing found:
 
     cd ${HOME}/projects/#{PROJECT_NAME}/server/lib/pk-test/
-    sudo luarocks make rockspec/pk-engine-scm-1.rockspec \
+    sudo luarocks make rockspec/pk-test-scm-1.rockspec \
       --only-from=${FRR}
 
 Deploying to developer machine

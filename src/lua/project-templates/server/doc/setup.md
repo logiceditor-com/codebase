@@ -161,6 +161,7 @@ Also add aliases to localhost (developer machine only!):
 --[[BLOCK_END:REDIS_BASE_HOST]]
 
 --[[BLOCK_START:MYSQL_BASES_CFG]]
+
 DB initialization
 -----------------
 
@@ -284,7 +285,7 @@ If nothing found:
    print(R[1]) end' | xargs -l1 -I% sudo luarocks make %
      --only-from=../pk-foreign-rocks/rocks)
 
-5.5 pk-test
+5.5 pk-test (development machine only)
 
     luarocks list pk-test
 

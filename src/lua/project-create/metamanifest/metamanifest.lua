@@ -8,8 +8,6 @@
 dictionary =
 {
   PROJECT_NAME = "project-name";
-  PROJECT_NAME_ESCAPED = "project%-name";
-  PROJECT_NAME_UNDERLINE = "project_name";
 
   DEPLOY_SERVER = "server.name.ru";
   DEPLOY_SERVER_DOMAIN = ".2rl";
@@ -52,7 +50,6 @@ dictionary =
   STATIC_NAME_IP = "5";
 
   SERVICE_NAME = "service-name";
-  SERVICE_NAME_UNDERLINE = "service_name";
   SERVICE_NAME_SHORT = "SVN";
 
   REDIS_BASE_PORT = "6379";
@@ -109,10 +106,28 @@ wrapper =
   -- how values must be wrapped in text to be replaces,
   -- default eg. #{PROJECT_NAME}
   data  =    { left = "#{"; right = "}"; };
+  -- data with procedure eg. #{PROJECT_NAME}:{ESCAPE}
+  modificator = { left = ":{"; right = "}"; };
   -- how blocks to be replicated must be wrapped in text
   block =
   {
-    top =    { left = "--[[BLOCK_START:"; right = "]]"; };
+    top    = { left = "--[[BLOCK_START:"; right = "]]"; };
     bottom = { left = "--[[BLOCK_END:";   right = "]]"; };
   };
+}
+
+local escape_lua_pattern =
+      import 'lua-nucleo/string.lua' { 'escape_lua_pattern' }
+
+modificators =
+{
+  ESCAPED = function(input)
+    return escape_lua_pattern(input)
+  end;
+  UNDERLINE = function(input)
+    return input:gsub("-", "_")
+  end;
+  URLIFY = function(input)
+    return input:gsub("_", "-")
+  end;
 }

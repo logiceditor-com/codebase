@@ -1067,7 +1067,7 @@ do
     'text/html';
     'text/xml';
     'text/plain';
-    'text/javascript';
+    'application/javascript';
     'application/json';
     'application/octet-stream';
   }

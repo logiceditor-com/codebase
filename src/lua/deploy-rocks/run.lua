@@ -160,7 +160,7 @@ Options:
 
     --dry-run                      Go through algorythm but do nothing
 
-    --local_only                   Deploy will work without external connections
+    --local-only                   Deploy will work without external connections
                                    (debug mode included)
                                    Only for test purposes on localhost
 
@@ -375,9 +375,9 @@ local run = function(...)
 
               param.manifest_path = args[1]
               param.cluster_name  = args[3]
-              param.debug         = args["--debug"] or args["--local_only"]
               param.dry_run       = args["--dry-run"]
-              param.local_only    = args["--local_only"]
+              param.local_only    = args["--local_only"] or args["--local-only"]
+              param.debug         = args["--debug"] or param.local_only
 
               if action_name     == "deploy_from_versions_file" then
                 param.version_filename = args[4]

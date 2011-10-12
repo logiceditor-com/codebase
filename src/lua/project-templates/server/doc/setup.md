@@ -60,6 +60,7 @@ APT-packages
         libev-dev           \
         libgeoip-dev        \
         libexpat-dev        \
+        libcurl4-gnutls-dev \
         nginx               \
         libmysqlclient16
 
@@ -304,7 +305,10 @@ Most likely it is localhost-<your-initials>. But ask AG.
 
 2. Put .pub key to authorized_keys.
 
-Copy content of your personal .pub key to ~/.ssh/authorized_keys file.
+This command copies content of your personal .pub key to
+~/.ssh/authorized_keys file:
+
+    $ ssh-copy-id localhost
 
 3. Check if deploy-rocks would work
 

@@ -302,7 +302,11 @@ Deploying to developer machine
 
 Most likely it is localhost-<your-initials>. But ask AG.
 
-2. Check if deploy-rocks would work
+2. Put .pub key to authorized_keys.
+
+Copy content of your personal .pub key to ~/.ssh/authorized_keys file.
+
+3. Check if deploy-rocks would work
 
 This command should not crash:
 
@@ -311,7 +315,7 @@ This command should not crash:
 
 If it does not print anything, you're missing deploy-rocks rock.
 
-3. Deploy:
+4. Deploy:
 
     bin/deploy-rocks deploy_from_code <your-cluster-name>
 

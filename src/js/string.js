@@ -151,3 +151,17 @@ PK.fill_placeholders = function(s, ivalues)
   //PKLILE.timing.stop("fill_placeholders")
   return out
 }
+
+//NOTE: ["some ${1} text ${2}", var_1, var_2]
+// replace ${1} by var_1 and ${2} by var_2 and etc.
+PK.formatString = function(args)
+{
+  if (!args)
+    return ''
+
+  args = Array.prototype.slice.call(args)
+  var text = args.shift()
+  text = PK.fill_placeholders(text, args)
+
+  return text
+}

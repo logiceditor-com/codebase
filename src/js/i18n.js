@@ -72,6 +72,9 @@ PK.i18n = new function()
       return '*' + s + '*';
     }
 
+    arguments[0] = res
+    res = PK.formatString(arguments)
+
     return res
   }
 }

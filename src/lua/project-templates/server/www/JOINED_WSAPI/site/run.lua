@@ -144,6 +144,12 @@ local tclone,
         'tijoin_many'
       }
 
+local random_seed_from_string
+      = import 'lua-aplicado/random.lua'
+      {
+        'random_seed_from_string'
+      }
+
 -------------------------------------------------------------------------------
 
 log("loading wsapi-runner (#{JOINED_WSAPI} 11)")
@@ -562,6 +568,10 @@ local loop = function(node_id)
 
   assert(NODE_ID == nil)
   NODE_ID = node_id
+
+  math.randomseed(
+      random_seed_from_string(NODE_ID .. tostring(PID) .. tostring(os.time()))
+    )
 
   -- TODO: Take this from internal config instead!
   -- TODO: Check if nodeid is fit for filename. Fail otherwise.

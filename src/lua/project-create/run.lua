@@ -982,6 +982,39 @@ DEBUG_print(k .. "\27[32mremoved as it was\27[0m:\n" .. tostring(v))
   end
 
   ------------------------------------------------------------------------------
+
+  local unify_manifest_dictionary
+  do
+    unify_manifest_dictionary = function(dictionary)
+      for k, v in pairs(dictionary) do
+        if is_table(v) then
+          --check all values where key is number
+          local i = 1
+          while v[i] ~= nil do
+            if is_table(v[i]) then
+              if v[i].name ~= nil then
+                local name = v[i].name
+                v[name] = { }
+                for k_local, v_local in pairs(v[i]) do
+                  if k_local ~= "name" then
+                    v[name][k_local] = v[i][k_local]
+                    v[i][k_local] = nil
+                  end
+                end
+                v[i] = name
+              end
+            end
+            i = i + 1
+          end
+          v = unify_manifest_dictionary(v)
+        end
+      end --for
+      return dictionary
+    end
+  end -- do
+
+  ------------------------------------------------------------------------------
+
   create_project = function(
       metamanifest_path,
       project_path,
@@ -1007,6 +1040,13 @@ DEBUG_print(k .. "\27[32mremoved as it was\27[0m:\n" .. tostring(v))
         project_path,
         ""
       )
+    metamanifest_defaults.dictionary = unify_manifest_dictionary(
+        metamanifest_defaults.dictionary
+      )
+    metamanifest_project.dictionary = unify_manifest_dictionary(
+        metamanifest_project.dictionary
+      )
+
     local metamanifest = twithdefaults(metamanifest_project, metamanifest_defaults)
     metamanifest.project_path = project_path
 

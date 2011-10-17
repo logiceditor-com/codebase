@@ -72,6 +72,7 @@ PK.i18n = new function()
       return '*' + s + '*';
     }
 
+    // TODO: Not a very good idea to replace arguments[0]
     arguments[0] = res
     res = PK.formatString(arguments)
 

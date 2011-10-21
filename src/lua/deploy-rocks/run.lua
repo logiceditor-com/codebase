@@ -211,14 +211,13 @@ do
         deploy_from_versions_file =
           "Do you want to deploy code to `" .. param.cluster_name .. "'"
        .. " from version file `" .. param.version_filename or "" .. "'?";
-        deploy_from_versions_file =
+        partial_deploy_from_versions_file =
           "(Not recommended!) Do you want to deploy code to cluster `"
        .. param.cluster_name .. "' ONE machine `"
        .. param.machine_name .. "' "
        .. "from version file `" .. param.version_filename .. "'?"
        .. " (WARNING: Ensure you pushed changes to cluster's LR repository.)";
       }
-
       if not param.dry_run then
         if ask_user(
             messages[CONFIG[TOOL_NAME].action.name],

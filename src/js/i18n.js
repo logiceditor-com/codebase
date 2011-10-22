@@ -51,20 +51,24 @@ PK.i18n = new function()
 
   this.text = function(s, return_false_if_not_found)
   {
+    var loc_text = ""
+
     if (current_language_ === undefined)
     {
       CRITICAL_ERROR("Current language not set! Text: " + s)
-      return '!!!' + s + '!!!';
+      loc_text = '<' + s + '>';
     }
-
-    if (!language_packs_[current_language_])
+    else if (!language_packs_[current_language_])
     {
       CRITICAL_ERROR("No language pack for " + current_language_ + ". Text: " + s)
-      return '!!!' + s + '!!!';
+      loc_text = '<' + s + '>';
+    }
+    else
+    {
+      loc_text = language_packs_[current_language_][s];
     }
 
-    var res = language_packs_[current_language_][s];
-    if(res === undefined)
+    if(loc_text === undefined)
     {
       if (return_false_if_not_found)
         return false
@@ -73,10 +77,10 @@ PK.i18n = new function()
     }
 
     // TODO: Not a very good idea to replace arguments[0]
-    arguments[0] = res
-    res = PK.formatString(arguments)
+    arguments[0] = loc_text
+    loc_text = PK.formatString(arguments)
 
-    return res
+    return loc_text
   }
 }
 

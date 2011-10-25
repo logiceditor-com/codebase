@@ -84,6 +84,8 @@ dictionary =
 User-agent: *
 Disallow: /]];
 
+  EMPTY_LISTEN = false;
+  NORMAL_LISTEN = { "true" };
 }
 dictionary.MYSQL_BASES_DEPLOY_CFG = [[--No bases]];
 dictionary.MYSQL_BASES_CFG = [[--No bases]];

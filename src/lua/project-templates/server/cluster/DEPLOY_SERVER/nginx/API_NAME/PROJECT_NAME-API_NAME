@@ -1,5 +1,10 @@
 server {
+--[[BLOCK_START:EMPTY_LISTEN]]
+  listen 80;
+--[[BLOCK_END:EMPTY_LISTEN]]
+--[[BLOCK_START:NORMAL_LISTEN]]
   listen #{API_NAME}:{URLIFY}#{DEPLOY_SERVER_DOMAIN}:{URLIFY}:80;
+--[[BLOCK_END:NORMAL_LISTEN]]
   server_name #{API_NAME}:{URLIFY}#{DEPLOY_SERVER_DOMAIN}:{URLIFY};
 
   access_log  /var/log/nginx/#{PROJECT_NAME}:{URLIFY}-#{API_NAME}:{URLIFY}.access.log;

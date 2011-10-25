@@ -46,6 +46,15 @@ subprojects =
             local_path = PROJECT_PATH .. "/lib/pk-core/";
             manifest = PROJECT_PATH .. "/lib/pk-core/rockspec/pk-rocks-manifest.lua"
           };
+--[[BLOCK_START:PK_ADMIN]]
+          --
+          {
+            tool = "add_rocks_from_pk_rocks_manifest";
+            source_repo_name = "#{PROJECT_NAME}";
+            local_path = PROJECT_PATH .. "/lib/pk-admin/";
+            manifest = PROJECT_PATH .. "/lib/pk-admin/rockspec/pk-rocks-manifest.lua"
+          };
+--[[BLOCK_END:PK_ADMIN]]
           --
           {
             tool = "add_rocks_from_pk_rocks_manifest";
@@ -60,6 +69,7 @@ subprojects =
             local_path = PROJECT_PATH .. "/lib/pk-tools/";
             manifest = PROJECT_PATH .. "/lib/pk-tools/rockspec/pk-rocks-manifest.lua"
           };
+--[[BLOCK_START:PK_TEST]]
           --
           {
             tool = "add_rocks_from_pk_rocks_manifest";
@@ -67,6 +77,7 @@ subprojects =
             local_path = PROJECT_PATH .. "/lib/pk-test/";
             manifest = PROJECT_PATH .. "/lib/pk-test/rockspec/pk-rocks-manifest.lua"
           };
+--[[BLOCK_END:PK_TEST]]
         };
       };
       --

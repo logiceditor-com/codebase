@@ -42,6 +42,15 @@ subtrees =
     url = "gitolite@git.iphonestudio.ru:pk-core.git";
     branch = "pk/engine";
   };
+--[[BLOCK_START:PK_ADMIN]]
+  {
+    name = "pk-admin";
+    git = PROJECT_PATH;
+    path = "lib/pk-admin";
+    url = "gitolite@git.iphonestudio.ru:pk-admin.git";
+    branch = "pk/engine";
+  };
+--[[BLOCK_END:PK_ADMIN]]
   {
     name = "pk-engine";
     git = PROJECT_PATH;
@@ -63,6 +72,7 @@ subtrees =
     url = "gitolite@git.iphonestudio.ru:pk-foreign-rocks.git";
     branch = "master";
   };
+--[[BLOCK_START:PK_TEST]]
   {
     name = "pk-test";
     git = PROJECT_PATH;
@@ -70,4 +80,5 @@ subtrees =
     url = "gitolite@git.iphonestudio.ru:pk-test.git";
     branch = "master";
   };
+--[[BLOCK_END:PK_TEST]]
 }

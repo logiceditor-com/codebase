@@ -36,6 +36,10 @@ dictionary =
 
   API_TEST_HANDLERS = false;
 
+  -- default libs
+  PK_TEST = { "true" }; -- intended table with string
+  PK_ADMIN = false;
+
   API_NAME = "api";
   -- use this EXCLUSIVELY for each api service
   API_NAME_IP = "3";

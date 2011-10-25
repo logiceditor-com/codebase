@@ -309,7 +309,7 @@ do
           replicate_data[#replicate_data + 1] = k
         elseif v == true then -- TODO: subject to revise
           dictionary[k] = nil
-DEBUG_print(k .. "\27[32mremoved as it was\27[0m:\n" .. tostring(v))
+          DEBUG_print(k .. "\27[32mremoved as it was\27[0m:\n" .. tostring(v))
         end
       end
 
@@ -324,7 +324,7 @@ DEBUG_print(k .. "\27[32mremoved as it was\27[0m:\n" .. tostring(v))
         --end
         replicate_data[data] = { }
         for j = 1, #replicate do
-          local name = string.sub(data, 1, -2) .. "_" .. j
+          local name = string.sub(data, 1, -2) .. "_" .. string.format("%03d", j)
           dictionary[name] = replicate[j]
           replicate_data[data][j] = name
           subdictionary[name] = replicate[replicate[j]]
@@ -953,7 +953,11 @@ DEBUG_print(k .. "\27[32mremoved as it was\27[0m:\n" .. tostring(v))
 
   --clean_up_replicate_data-----------------------------------------------------
 
-  local function clean_up_generated_data_recursively(metamanifest, path, file_dir_structure)
+  local function clean_up_generated_data_recursively(
+      metamanifest,
+      path,
+      file_dir_structure
+    )
     for filename, structure in pairs(file_dir_structure) do
       if filename ~= "FLAGS" then
         local filepath = path .. "/" .. filename
@@ -966,12 +970,19 @@ DEBUG_print(k .. "\27[32mremoved as it was\27[0m:\n" .. tostring(v))
           local pattern_used = get_dictionary_pattern(filename, metamanifest)
 
           if #pattern_used > 0 then
-            DEBUG_print("\27[33mRemoved: " .. string.sub(filepath, #metamanifest.project_path + 2) .. "\27[0m")
+            DEBUG_print(
+                "\27[33mRemoved: "
+             .. string.sub(filepath, #metamanifest.project_path + 2)
+             .. "\27[0m"
+              )
             remove_recursively(filepath)
           else
             local attr = assert(lfs.attributes(filepath))
             if attr.mode == "directory" then
-              DEBUG_print("\27[32mChecked:\27[0m " .. string.sub(filepath, #metamanifest.project_path + 2))
+              DEBUG_print(
+                  "\27[32mChecked:\27[0m "
+               .. string.sub(filepath, #metamanifest.project_path + 2)
+                )
               clean_up_generated_data_recursively(metamanifest, filepath, structure)
             end
           end

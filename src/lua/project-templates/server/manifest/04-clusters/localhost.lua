@@ -47,6 +47,7 @@ local localhost_config = function(name)
           { name = "#{REDIS_BASE_HOST}" };
 --[[BLOCK_END:REDIS_BASE_HOST]]
           { name = "mysql-db" };
+          { name = "pk-test" };
         };
       };
     };

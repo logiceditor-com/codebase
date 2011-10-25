@@ -460,4 +460,16 @@ roles =
     deployment_actions = { };
   };
 --[[BLOCK_END:REDIS_BASE_HOST]]
+  --
+  {
+    name = "pk-test";
+    deployment_actions =
+    {
+      {
+        tool = "deploy_rocks";
+        "pk-test";
+      };
+      deploy_rocks;
+    };
+  };
 }

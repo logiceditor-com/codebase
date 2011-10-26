@@ -55,7 +55,7 @@ dictionary =
 
   SERVICE_NAME = "service-name";
   SERVICE_NAME_SHORT = "SVN";
-
+  SERVICE_FCGI_CHILDREN = "10";
   REDIS_BASE_PORT = "6379";
   REDIS_BASE_HOST = "pk-billing-redis-system";
 

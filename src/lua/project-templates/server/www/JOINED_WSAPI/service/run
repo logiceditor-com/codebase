@@ -14,7 +14,7 @@ FCGIPROGRAM="/usr/local/bin/#{PROJECT_NAME}-#{JOINED_WSAPI}.fcgi"
 FCGISOCKET="/tmp/#{PROJECT_NAME}-#{JOINED_WSAPI}.socket"
 
 ## Number of forks
-FCGI_CHILDREN=10
+FCGI_CHILDREN=#{SERVICE_FCGI_CHILDREN}
 
 ## if this script is run as root switch to the following user
 USERID=www-data

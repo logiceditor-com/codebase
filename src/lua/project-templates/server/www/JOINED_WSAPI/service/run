@@ -30,16 +30,11 @@ mkdir -p /var/run/#{PROJECT_NAME}/#{JOINED_WSAPI}/control/$NODE_ID
 chown www-data:www-data /var/run/#{PROJECT_NAME}/#{JOINED_WSAPI}/control/$NODE_ID
 sudo chmod 775 /var/run/#{PROJECT_NAME}/#{JOINED_WSAPI}/control/$NODE_ID
 
-ALLOWED_ENV=""
-
 EX="$SPAWNFCGI -n -s $FCGISOCKET -u $USERID -U $SOCKUSERID -- $MULTIWATCH -f $FCGI_CHILDREN $FCGIPROGRAM"
 
-# copy the allowed environment variables
-E=
-
-for i in $ALLOWED_ENV; do
-  E="$E $i=${!i}"
-done
+# get extra environment variables
+EXTRA_ENV="/etc/default/#{PROJECT_NAME}.#{JOINED_WSAPI}"
+E=$(cat $EXTRA_ENV)
 
 # clean environment and set up a new one
 exec env - $E $EX

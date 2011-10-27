@@ -15,5 +15,9 @@ exec 2>&1
 #EX="/usr/sbin/chroot --userspec=$USERSPEC $ROOT $PROGRAM"
 EX="/bin/su - $USERID -c -- $PROGRAM"
 
+# get extra environment variables
+EXTRA_ENV="/etc/default/#{PROJECT_NAME}.#{SERVICE_NAME}"
+E=$(cat $EXTRA_ENV)
+
 # clean environment and set up a new one
-exec env - $EX
+exec env - $E $EX

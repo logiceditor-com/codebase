@@ -60,6 +60,11 @@ local plain_service_role = function(param)
   local logrotate_rock_name = assert(param.logrotate.rock_name)
   local logrotate_config_path = assert(param.logrotate.config_path)
 
+  assert(param.shellenv)
+  local shellenv_service_name = assert(param.shellenv.service_name)
+  local shellenv_rock_name = assert(param.shellenv.rock_name)
+  local shellenv_env_path = assert(param.shellenv.env_path)
+
   assert(param.system_service)
   local system_service_name = assert(param.system_service.name)
   local system_service_node = assert(param.system_service.node)
@@ -73,8 +78,10 @@ local plain_service_role = function(param)
     tool = "deploy_rocks";
     "pk-tools.pk-ensure-runit-service-enabled";
     "pk-tools.pk-ensure-logrotate-enabled";
+    "pk-tools.pk-ensure-shellenv-enabled";
     "#{PROJECT_NAME}.tools.#{PROJECT_NAME}-execute-system-action";
     logrotate_rock_name;
+    shellenv_rock_name;
   }
 
   return
@@ -132,6 +139,17 @@ local plain_service_role = function(param)
             ;
         };
       };
+      --
+      {
+        tool = "remote_exec";
+        {
+          'sudo', 'pk-ensure-shellenv-enabled',
+          shellenv_service_name,
+          '$(luarocks show --rock-dir ' .. shellenv_rock_name
+          .. ')/' .. shellenv_env_path
+            ;
+        };
+      };
     };
   }
 end
@@ -159,6 +177,11 @@ local wsapi_service_role = function(param)
   local logrotate_rock_name = assert(param.logrotate.rock_name)
   local logrotate_config_path = assert(param.logrotate.config_path)
 
+  assert(param.shellenv)
+  local shellenv_service_name = assert(param.shellenv.service_name)
+  local shellenv_rock_name = assert(param.shellenv.rock_name)
+  local shellenv_env_path = assert(param.shellenv.env_path)
+
   assert(param.system_service)
   local system_service_name = assert(param.system_service.name)
   local system_service_node = assert(param.system_service.node)
@@ -173,9 +196,11 @@ local wsapi_service_role = function(param)
     "pk-tools.pk-ensure-runit-service-enabled";
     "pk-tools.pk-ensure-nginx-site-enabled";
     "pk-tools.pk-ensure-logrotate-enabled";
+    "pk-tools.pk-ensure-shellenv-enabled";
     "pk-tools.pk-node-id";
     "#{PROJECT_NAME}.tools.#{PROJECT_NAME}-execute-system-action";
     nginx_rock_name;
+    shellenv_rock_name;
   }
 
   if logrotate_rock_name ~= nginx_rock_name then
@@ -244,6 +269,17 @@ local wsapi_service_role = function(param)
           'sudo', 'pk-ensure-logrotate-enabled',
            '$(luarocks show --rock-dir ' .. logrotate_rock_name
            .. ')/' .. logrotate_config_path
+            ;
+        };
+      };
+      --
+      {
+        tool = "remote_exec";
+        {
+          'sudo', 'pk-ensure-shellenv-enabled',
+          shellenv_service_name,
+           '$(luarocks show --rock-dir ' .. shellenv_rock_name
+           .. ')/' .. shellenv_env_path
             ;
         };
       };
@@ -366,6 +402,12 @@ roles =
       rock_name = "#{PROJECT_NAME}.nginx.#{API_NAME}.${CLUSTER_NAME}";
       config_path = "cluster/${CLUSTER_NAME}/logrotate/#{API_NAME}/#{PROJECT_NAME}-#{API_NAME}";
     };
+    shellenv =
+    {
+      rock_name = "#{PROJECT_NAME}.shellenv.#{API_NAME}.${CLUSTER_NAME}";
+      service_name = "#{PROJECT_NAME}.#{API_NAME}";
+      env_path = "cluster/${CLUSTER_NAME}/shellenv/#{API_NAME}/#{PROJECT_NAME}-#{API_NAME}";
+    };
     runit =
     {
       service_name = "#{PROJECT_NAME}.#{API_NAME}";
@@ -403,6 +445,12 @@ roles =
       rock_name = "#{PROJECT_NAME}.nginx.#{JOINED_WSAPI}.${CLUSTER_NAME}";
       config_path = "cluster/${CLUSTER_NAME}/logrotate/#{JOINED_WSAPI}/#{PROJECT_NAME}-#{JOINED_WSAPI}";
     };
+    shellenv =
+    {
+      rock_name = "#{PROJECT_NAME}.shellenv.#{JOINED_WSAPI}.${CLUSTER_NAME}";
+      service_name = "#{PROJECT_NAME}.#{JOINED_WSAPI}";
+      env_path = "cluster/${CLUSTER_NAME}/shellenv/#{JOINED_WSAPI}/#{PROJECT_NAME}-#{JOINED_WSAPI}";
+    };
     runit =
     {
       service_name = "#{PROJECT_NAME}.#{JOINED_WSAPI}";
@@ -430,6 +478,12 @@ roles =
     {
       rock_name = "#{PROJECT_NAME}-#{SERVICE_NAME}";
       config_path = "services/#{SERVICE_NAME}/logrotate/#{PROJECT_NAME}-#{SERVICE_NAME}";
+    };
+    shellenv =
+    {
+      rock_name = "#{PROJECT_NAME}.shellenv.#{SERVICE_NAME}.${CLUSTER_NAME}";
+      service_name = "#{PROJECT_NAME}.#{SERVICE_NAME}";
+      env_path = "cluster/${CLUSTER_NAME}/shellenv/#{SERVICE_NAME}/#{PROJECT_NAME}-#{SERVICE_NAME}";
     };
     runit =
     {

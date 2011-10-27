@@ -52,6 +52,12 @@ for i = 1, #CLUSTERS do
     "cluster/" .. name .. "/rockspec/"
  .. "#{PROJECT_NAME}.nginx.#{API_NAME}." .. name .. "-scm-1.rockspec";
   }
+  ROCKS[#ROCKS + 1] =
+  {
+    ["x-cluster-name"] = name;
+    "cluster/" .. name .. "/rockspec/"
+ .. "#{PROJECT_NAME}.shellenv.#{API_NAME}." .. name .. "-scm-1.rockspec";
+  }
 
 --[[BLOCK_END:API_NAME]]
 --[[BLOCK_START:JOINED_WSAPI]]
@@ -61,8 +67,22 @@ for i = 1, #CLUSTERS do
     "cluster/" .. name .. "/rockspec/"
  .. "#{PROJECT_NAME}.nginx.#{JOINED_WSAPI}." .. name .. "-scm-1.rockspec";
   }
+  ROCKS[#ROCKS + 1] =
+  {
+    ["x-cluster-name"] = name;
+    "cluster/" .. name .. "/rockspec/"
+ .. "#{PROJECT_NAME}.shellenv.#{JOINED_WSAPI}." .. name .. "-scm-1.rockspec";
+  }
 
 --[[BLOCK_END:JOINED_WSAPI]]
+--[[BLOCK_START:SERVICE_NAME]]
+  ROCKS[#ROCKS + 1] =
+  {
+    ["x-cluster-name"] = name;
+    "cluster/" .. name .. "/rockspec/"
+ .. "#{PROJECT_NAME}.shellenv.#{SERVICE_NAME}." .. name .. "-scm-1.rockspec";
+  };
+--[[BLOCK_END:SERVICE_NAME]]
 --[[BLOCK_START:STATIC_NAME]]
   ROCKS[#ROCKS + 1] =
   {

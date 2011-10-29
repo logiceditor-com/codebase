@@ -57,12 +57,6 @@ local find_all_files,
         'get_filename_from_path'
       }
 
-local load_tools_cli_data_schema
-      = import 'pk-core/tools_cli_config.lua'
-      {
-        'load_tools_cli_data_schema'
-      }
-
 local load_tools_cli_data_schema,
       load_tools_cli_config,
       print_tools_cli_config_usage,

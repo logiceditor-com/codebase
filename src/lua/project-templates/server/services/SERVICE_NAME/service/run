@@ -13,7 +13,7 @@ exec 2>&1
 #ROOT="/"
 #USERSPEC="www-data:www-data"
 #EX="/usr/sbin/chroot --userspec=$USERSPEC $ROOT $PROGRAM"
-EX="/bin/su - $USERID -c -- $PROGRAM"
+EX="/bin/su $USERID -c -- $PROGRAM"
 
 # get extra environment variables
 EXTRA_ENV="/etc/pk-services/#{PROJECT_NAME}.#{SERVICE_NAME}"

@@ -15,7 +15,9 @@ if [ -z "${SHELLENV_FILENAME}" ]; then
   exit 2
 fi
 
-SHELLENV_PATH=/etc/default
+SHELLENV_PATH=/etc/pk-services
+
+mkdir -p "${SHELLENV_PATH}"
 
 if [ ! "$(readlink '${SHELLENV_PATH}/${SERVICE_NAME}')" == "${SHELLENV_FILENAME}" ]; then
   rm -f "${SHELLENV_PATH}/${SERVICE_NAME}"

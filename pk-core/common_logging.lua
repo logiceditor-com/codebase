@@ -9,11 +9,15 @@ local twithdefaults
       }
 
 local LOG_LEVEL,
+      LOG_FLUSH_MODE,
+      FLUSH_SECONDS_DEFAULT,
       wrap_file_sink,
       make_common_logging_config
       = import 'lua-nucleo/log.lua'
       {
         'LOG_LEVEL',
+        'LOG_FLUSH_MODE',
+        'FLUSH_SECONDS_DEFAULT',
         'wrap_file_sink',
         'make_common_logging_config'
       }
@@ -43,6 +47,10 @@ do
     -- Empty; everything is enabled by default.
   }
 
+  local flush_seconds = FLUSH_SECONDS_DEFAULT
+
+  local log_flush_config = LOG_FLUSH_MODE.EVERY_N_SECONDS
+
   local LOGGING_SYSTEM_ID = ""
 
   create_common_stdout_logging = function(
@@ -59,6 +67,10 @@ do
       and twithdefaults(log_module_config, LOG_MODULE_CONFIG)
        or LOG_MODULE_CONFIG
 
+    local get_time = function()
+      return socket.gettime()
+    end
+
     logging_system_id = logging_system_id or LOGGING_SYSTEM_ID
 
     pipe = pipe or io.stdout
@@ -68,9 +80,13 @@ do
         wrap_file_sink(pipe),
         make_common_logging_config(
             log_level_config,
-            log_module_config
+            log_module_config,
+            log_flush_config,
+            flush_seconds
           ),
-        get_current_logsystem_date_microsecond
+        get_current_logsystem_date_microsecond,
+        nil,
+        get_time
       )
   end
 end

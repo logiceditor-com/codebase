@@ -16,7 +16,7 @@ exec 2>&1
 EX="/bin/su - $USERID -c -- $PROGRAM"
 
 # get extra environment variables
-EXTRA_ENV="/etc/default/#{PROJECT_NAME}.#{SERVICE_NAME}"
+EXTRA_ENV="/etc/pk-services/#{PROJECT_NAME}.#{SERVICE_NAME}"
 E=$(cat $EXTRA_ENV)
 
 # clean environment and set up a new one

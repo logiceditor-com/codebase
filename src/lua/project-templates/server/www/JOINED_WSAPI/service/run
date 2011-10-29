@@ -33,7 +33,7 @@ sudo chmod 775 /var/run/#{PROJECT_NAME}/#{JOINED_WSAPI}/control/$NODE_ID
 EX="$SPAWNFCGI -n -s $FCGISOCKET -u $USERID -U $SOCKUSERID -- $MULTIWATCH -f $FCGI_CHILDREN $FCGIPROGRAM"
 
 # get extra environment variables
-EXTRA_ENV="/etc/default/#{PROJECT_NAME}.#{JOINED_WSAPI}"
+EXTRA_ENV="/etc/pk-services/#{PROJECT_NAME}.#{JOINED_WSAPI}"
 E=$(cat $EXTRA_ENV)
 
 # clean environment and set up a new one

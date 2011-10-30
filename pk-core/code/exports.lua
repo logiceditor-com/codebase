@@ -7,6 +7,7 @@
 
 return
 {
+  build_config_dsl = { "pk-core/config_dsl.lua" };
   call = { "pk-core/error.lua" };
   check_globals = { "pk-core/api_globals.lua" };
   classify_globals = { "pk-core/api_globals.lua" };
@@ -26,6 +27,7 @@ return
   generate_globals_header = { "pk-core/api_globals.lua" };
   get_common_logging_system = { "pk-core/log.lua" };
   get_current_logsystem_date_microsecond = { "pk-core/log.lua" };
+  get_data_walkers = { "pk-core/config_dsl.lua" };
   is_common_logging_system_initialized = { "pk-core/log.lua" };
   list_globals_in_handler = { "pk-core/api_globals.lua" };
   load_data_schema = { "pk-core/walk_data_with_schema.lua" };

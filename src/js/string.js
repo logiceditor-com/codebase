@@ -152,16 +152,15 @@ PK.fill_placeholders = function(s, ivalues)
   return out
 }
 
-//NOTE: ["some ${1} text ${2}", var_1, var_2]
-// replace ${1} by var_1 and ${2} by var_2 and etc.
-PK.formatString = function(args)
+// Note: PK.formatString("some ${1} text ${2}", var_1, var_2) will replace ${1} by var_1 and ${2} by var_2 and etc.
+PK.formatString = function()
 {
-  if (!args)
-    return ''
+  if (arguments.length < 1)
+    return undefined
 
-  args = Array.prototype.slice.call(args)
-  var text = args.shift()
-  text = PK.fill_placeholders(text, args)
+  var ivalues = Array.prototype.slice.call(arguments)
+  var text = ivalues.shift()
+  text = PK.fill_placeholders(text, ivalues)
 
   return text
 }

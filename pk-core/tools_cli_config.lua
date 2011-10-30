@@ -49,6 +49,24 @@ local load_data_schema
         'load_data_schema'
       }
 
+local do_in_environment,
+      dostring_in_environment,
+      make_config_environment
+      = import 'lua-nucleo/sandbox.lua'
+      {
+        'do_in_environment',
+        'dostring_in_environment',
+        'make_config_environment'
+      }
+
+local load_all_files,
+      find_all_files
+      = import 'lua-aplicado/filesystem.lua'
+      {
+        'load_all_files',
+        'find_all_files'
+      }
+
 local empty_table,
       tclone,
       twithdefaults,

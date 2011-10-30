@@ -1,5 +1,7 @@
 PK.i18n = new function()
 {
+  var instance_ = this
+
   var language_packs_ = new Object
   var current_language_ = undefined
 
@@ -49,8 +51,11 @@ PK.i18n = new function()
 
   //----------------------------------------------------------------------------
 
-  this.text = function(s, return_false_if_not_found)
+  this.raw_text = function(s)
   {
+    // TODO: Maybe add next assert?
+    //assert(s !== undefined, "No parameter for raw_text")
+
     var loc_text = ""
 
     if (current_language_ === undefined)
@@ -68,20 +73,35 @@ PK.i18n = new function()
       loc_text = language_packs_[current_language_][s];
     }
 
+    return loc_text
+  }
+
+  //----------------------------------------------------------------------------
+
+  this.text = function(s)
+  {
+    var loc_text = instance_.raw_text(s)
+
     if(loc_text === undefined)
     {
-      if (return_false_if_not_found)
-        return false
       //LOGG("'" + s + "' : '',");
       return '*' + s + '*';
     }
 
-    // TODO: Not a very good idea to replace arguments[0]
-    arguments[0] = loc_text
-    loc_text = PK.formatString(arguments)
+    var fs_args = []
+    if (arguments.length > 1)
+    {
+      fs_args = Array.prototype.slice.call(arguments, 1)
+    }
 
-    return loc_text
+    fs_args.unshift(loc_text)
+
+    var result = PK.formatString.apply(window, fs_args)
+    //console.log(loc_text, ' -> ', result, fs_args)
+
+    return result
   }
+
 }
 
 var I18N = PK.i18n.text

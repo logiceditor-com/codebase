@@ -134,7 +134,9 @@ PK.fill_placeholders = function(s, ivalues)
         CRITICAL_ERROR(
             "Too big value placeholder number: " + ivalues.length + '<=' + num
           )
-        LOG(Ext.encode(data_with_ph))
+        LOG("s: " + s)
+        LOG("ivalues: " + Ext.encode(ivalues))
+        LOG("Data: " + Ext.encode(data_with_ph))
       }
     }
     else if (values && values[data_with_ph[i]] !== undefined)

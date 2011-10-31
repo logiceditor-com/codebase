@@ -84,6 +84,7 @@ PK.i18n = new function()
 
     if(loc_text === undefined)
     {
+      //console.log("not found string: `" + s + "`")
       //LOGG("'" + s + "' : '',");
       return '*' + s + '*';
     }

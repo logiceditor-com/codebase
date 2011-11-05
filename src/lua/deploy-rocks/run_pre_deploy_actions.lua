@@ -284,6 +284,40 @@ do
         end
 
         if not have_rockspec_files_changed then
+          local rock_types_used =
+          {
+            ".all.rock";
+            ".linux-x86.rock";
+            ".linux-x86_64.rock";
+          }
+          local no_bundle = true
+          for i = 1, #rock_types_used do
+            local rock_filename = name .. "-" .. data.version .. rock_types_used[i]
+            local rock_path = path .. "/" .. rock_filename
+            writeln_flush("-> Checking rock bundle: ", rock_path)
+            if does_file_exist(rock_path) then
+              no_bundle = false
+              if
+                git_is_file_changed_between_revisions(
+                    path .. "/",
+                    rock_filename,
+                    current_versions[subproject.name],
+                    "HEAD"
+                  )
+              then
+                writeln_flush("-> Rock bundle changed: ", rock_path)
+                have_rockspec_files_changed = true
+                break
+              end
+            end
+          end
+          if no_bundle then
+            writeln_flush("-> No rock bundle found: ", name)
+            have_rockspec_files_changed = true
+          end
+        end
+
+        if not have_rockspec_files_changed then
           writeln_flush("--> No files changed in ", filename)
         else
           if dry_run then

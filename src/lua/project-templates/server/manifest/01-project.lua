@@ -26,21 +26,21 @@ subtrees =
     git = PROJECT_PATH;
     path = "lib/lua-nucleo";
     url = "https://github.com/lua-nucleo/lua-nucleo.git";
-    branch = "pk/engine";
+    branch = "master";
   };
   {
     name = "lua-aplicado";
     git = PROJECT_PATH;
     path = "lib/lua-aplicado";
     url = "https://github.com/lua-aplicado/lua-aplicado.git";
-    branch = "pk/engine";
+    branch = "master";
   };
   {
     name = "pk-core";
     git = PROJECT_PATH;
     path = "lib/pk-core";
     url = "gitolite@git.iphonestudio.ru:pk-core.git";
-    branch = "pk/engine";
+    branch = "master";
   };
 --[[BLOCK_START:PK_ADMIN]]
   {
@@ -48,7 +48,7 @@ subtrees =
     git = PROJECT_PATH;
     path = "lib/pk-admin";
     url = "gitolite@git.iphonestudio.ru:pk-admin.git";
-    branch = "pk/engine";
+    branch = "master";
   };
 --[[BLOCK_END:PK_ADMIN]]
   {
@@ -56,7 +56,7 @@ subtrees =
     git = PROJECT_PATH;
     path = "lib/pk-engine";
     url = "gitolite@git.iphonestudio.ru:pk-engine.git";
-    branch = "pk/engine";
+    branch = "master";
   };
   {
     name = "pk-tools";

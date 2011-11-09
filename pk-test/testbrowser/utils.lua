@@ -25,22 +25,7 @@ local get_domain_and_path = function(url)
   return (split.host .. ":" .. port), split.path
 end
 
--- should be in nucleo
-local startswith = function(str, prefix)
-  local plen = #prefix
-  return (#str >= plen) and (str:sub(1, plen) == prefix)
-end
-
--- should be in nucleo
-local endswith = function(str, suffix)
-  local slen = #suffix
-  local len = #str
-  return (len >= slen) and (str:sub(-slen, -1) == suffix)
-end
-
 return
 {
     get_domain_and_path = get_domain_and_path;
-    startswith = startswith;
-    endswith = endswith;
 }

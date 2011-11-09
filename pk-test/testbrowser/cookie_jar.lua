@@ -6,12 +6,16 @@ require 'getdate'
 
 local trim,
       split_by_char,
-      kv_concat
+      kv_concat,
+      starts_with,
+      ends_with
       = import 'lua-nucleo/string.lua'
       {
         'trim',
         'split_by_char',
         'kv_concat',
+        'starts_with',
+        'ends_with'
       }
 
 local ordered_pairs
@@ -36,14 +40,10 @@ local arguments,
         'method_arguments'
       }
 
-local get_domain_and_path,
-      startswith,
-      endswith
+local get_domain_and_path
       = import 'pk-test/testbrowser/utils.lua'
       {
-        'get_domain_and_path',
-        'startswith',
-        'endswith'
+        'get_domain_and_path'
       }
 
 local parse_cookie
@@ -67,12 +67,12 @@ do
     local cookies = {}
 
     for d, domain_cookies in pairs(jar) do
-      if endswith(d, domain) then
+      if ends_with(d, domain) then
         -- extra check: wildcard or exact match
         -- TODO: test for wildcards
-        if startswith(d, ".") or d == domain then
+        if starts_with(d, ".") or d == domain then
           for k, v in pairs(domain_cookies) do
-            if startswith(v.path, path) then
+            if starts_with(v.path, path) then
               cookies[k] = v.value
             end
           end

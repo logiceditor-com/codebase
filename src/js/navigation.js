@@ -1,4 +1,11 @@
-// Note: ExtJS required
+//------------------------------------------------------------------------------
+// Common navigation for our topic system
+//------------------------------------------------------------------------------
+//
+// Note:
+//   1) ExtJS required
+//   2) Localization for 'Page title prefix' required
+//
 
 PK.navigation = new function()
 {

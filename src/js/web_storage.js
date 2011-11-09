@@ -1,6 +1,10 @@
 //------------------------------------------------------------------------------
 // Web Storage
 //------------------------------------------------------------------------------
+//
+//  Note: Localization for 'ERROR: no localStorage() support!'
+//        and 'WebStorage ERROR: QUOTA_EXCEEDED_ERR' must be implemented in user code
+//
 
 PK.WebStorage = new function()
 {
@@ -15,7 +19,7 @@ PK.WebStorage = new function()
   {
     if (window.localStorage === undefined)
     {
-      CRITICAL_ERROR('ERROR: no localStorage() support!');
+      CRITICAL_ERROR(I18N('ERROR: no localStorage() support!'));
       return false;
     }
     available_ = true;
@@ -49,7 +53,7 @@ PK.WebStorage = new function()
     {
       if (e == QUOTA_EXCEEDED_ERR)
       {
-        CRITICAL_ERROR('WebStorage ERROR: QUOTA_EXCEEDED_ERR');
+        CRITICAL_ERROR(I18N('WebStorage ERROR: QUOTA_EXCEEDED_ERR'));
         return false;
       }
     }

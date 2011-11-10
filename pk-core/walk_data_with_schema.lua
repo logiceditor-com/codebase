@@ -46,11 +46,13 @@ local assert_is_nil,
       }
 
 local tkeys,
-      tclone
+      tclone,
+      empty_table
       = import 'lua-nucleo/table-utils.lua'
       {
         'tkeys',
-        'tclone'
+        'tclone',
+        'empty_table'
       }
 
 local do_nothing
@@ -552,6 +554,7 @@ local load_data_walkers = function(chunk, extra_env)
             return "break"
           end
 
+          data.default = data.default or empty_table
           local node = get_value(
               self,
               info,

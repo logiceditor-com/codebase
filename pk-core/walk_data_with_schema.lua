@@ -554,7 +554,9 @@ local load_data_walkers = function(chunk, extra_env)
             return "break"
           end
 
-          data.default = data.default or empty_table
+          if not info.optional then
+            data.default = data.default or empty_table
+          end
           local node = get_value(
               self,
               info,

@@ -570,9 +570,13 @@ local loop = function(node_id)
   assert(NODE_ID == nil)
   NODE_ID = node_id
 
-  math.randomseed(
-      random_seed_from_string(NODE_ID .. tostring(PID) .. tostring(os.time()))
-    )
+  do
+    local random_seed = random_seed_from_string(
+        NODE_ID .. tostring(PID) .. tostring(os.time())
+      )
+    math.randomseed(random_seed)
+    log("random seed set:", random_seed)
+  end
 
   -- TODO: Take this from internal config instead!
   -- TODO: Check if nodeid is fit for filename. Fail otherwise.

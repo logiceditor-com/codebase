@@ -7,6 +7,7 @@ server {
 --[[BLOCK_END:NORMAL_LISTEN]]
   server_name #{API_NAME}:{URLIFY}#{DEPLOY_SERVER_DOMAIN}:{URLIFY};
 
+  error_log  /var/log/nginx/#{PROJECT_NAME}:{URLIFY}-#{API_NAME}:{URLIFY}.error.log;
   access_log  /var/log/nginx/#{PROJECT_NAME}:{URLIFY}-#{API_NAME}:{URLIFY}.access.log;
   set_real_ip_from 0.0.0.0/0;
   real_ip_header X-Real-IP;

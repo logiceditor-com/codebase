@@ -7,6 +7,7 @@ server {
 --[[BLOCK_END:NORMAL_LISTEN]]
   server_name rocks#{DEPLOY_SERVER_DOMAIN};
 
+  error_log  /var/log/nginx/rocks#{DEPLOY_SERVER_DOMAIN}.error.log;
   access_log  /var/log/nginx/rocks#{DEPLOY_SERVER_DOMAIN}.access.log;
 
   location / {

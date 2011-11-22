@@ -176,10 +176,15 @@ DB initialization
     create database `#{PROJECT_NAME}`;
     '
 
-3. Initialize databases
+3. Create main and deploy user (not necessary at developer machine, but necessary at test machine)
 
-    cd ~/projects/#{PROJECT_NAME}/server/bin/
-    #{PROJECT_NAME}-db-changes initialize_db #{PROJECT_NAME}
+    mysql -uroot -p <<< 'CREATE USER "#{PROJECT_NAME}-main"@"localhost" IDENTIFIED BY "some_pass";'
+    mysql -uroot -p <<< 'CREATE USER "#{PROJECT_NAME}-depl"@"localhost" IDENTIFIED BY "some_pass";'
+
+4. Initialize databases - MUST BE DONE AFTER PROJECT HAS BEEN DEPLOYED FIRST TIME
+
+    cd ~/projects/#{PROJECT_NAME}/server/backoffice/database/bin
+    ./#{PROJECT_NAME}-backoffice-initialize-db
 --[[BLOCK_END:MYSQL_BASES_CFG]]
 
 Install project

@@ -242,6 +242,7 @@ do
           INTERNAL_CONFIG_DEPLOY_HOST = cluster_info.internal_config_deploy_host;
           INTERNAL_CONFIG_DEPLOY_PORT = cluster_info.internal_config_deploy_port;
           MACHINE_NODE_ID = assert(machine.node_id);
+          MACHINE_NAME = assert(machine.name);
         }
       )
   end
@@ -346,7 +347,12 @@ do
       role_args,
       action
     )
-    local rocks_must_be_installed = action
+    local rocks_must_be_installed = { }
+    for i = 1, #action do
+      rocks_must_be_installed[i] = fill_cluster_info_placeholders(
+          manifest, cluster_info, machine, action[i]
+        )
+    end
     assert(#rocks_must_be_installed > 0, "deploy_rocks: no rocks specified")
 
     local dry_run = param.dry_run

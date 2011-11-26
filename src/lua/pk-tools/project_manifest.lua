@@ -54,6 +54,7 @@ do
   local ignored_placeholders = tset
   {
     "MACHINE_NODE_ID";
+    "MACHINE_NAME";
   }
 
   local mt =

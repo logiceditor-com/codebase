@@ -125,8 +125,9 @@ local handle_wsapi_request = function(app_run)
   status = lfcgi.accept()
 
   if status == -EAGAIN then
-     log("FCGI WSAPI Runner: idle iteration, another process has accepted the request already")
-     return
+    dbg("FCGI WSAPI Runner: idle iteration, another process has accepted the request already (not an error)")
+    -- Not stopping, will wait for the next iteration
+    return
   end
 
   if status < 0 then

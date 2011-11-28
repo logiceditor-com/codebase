@@ -105,7 +105,7 @@ local run_tests_in_path = function(
     error("no tests to match filter string `" .. test_case_filter .. "'")
   end
 
-  run_tests(
+  local _, errs = run_tests(
       filtered,
       {
         strict_mode = strict;
@@ -113,6 +113,8 @@ local run_tests_in_path = function(
         -- TODO: Support quick!
       }
     )
+
+  return (#errs) -- qty of failed tests
 end
 
 --------------------------------------------------------------------------------
@@ -145,12 +147,12 @@ test: test runner
 
 Usage:
 
-    ./test.sh [test-case-filter] [options]
+    pk-test [test-case-filter] [options]
 
 Examples:
 
-    ./test.sh "0099"
-    ./test.sh "^subdir/.*string.*" --quick
+    pk-test "0099"
+    pk-test "^subdir/.*string.*" --quick
 
 Options:
 
@@ -160,8 +162,11 @@ Options:
                         Default: run slow tests.
     --randomseed=<int>  Use given value as randomseed.
                         Default: `123456'.
+    --test-cases-path   Set path to test cases.
+                        Default: /test/cases.
 
 Environment variables:
+
     PK_TEST_PORT_BASE   Base port for services in testcases. (default: "50000")
     PK_TEST_DB_HOST     MySQL host (default: "localhost")
     PK_TEST_DB_PORT     MySQL port (default: "3306")
@@ -217,7 +222,7 @@ local run = function(...)
     os.exit(1)
   end
 
-  run_tests_in_path(
+  local failed_test_qty = run_tests_in_path(
       CONFIG[TOOL_NAME].test_cases_path,
       CONFIG[TOOL_NAME].test_case_filename_pattern,
       CONFIG[TOOL_NAME].test_case_filter,
@@ -225,6 +230,10 @@ local run = function(...)
       CONFIG[TOOL_NAME].strict,
       CONFIG[TOOL_NAME].quick
     )
+
+  if failed_test_qty ~= 0 then
+    os.exit(1)
+  end
 end
 
 --------------------------------------------------------------------------------

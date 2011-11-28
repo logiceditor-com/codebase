@@ -30,6 +30,12 @@
   #
   create 640 www-data www-data
   #
+  # Archive old versions of log files adding a daily extension like YYYYMMDD
+  # instead of simply adding a number.
+  # The extension may be configured using the dateformat option.
+  #
+  dateext
+  #
   # Tell service to let go of the old log file (works only with delaycompress on)
   #
   postrotate

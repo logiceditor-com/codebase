@@ -598,7 +598,7 @@ ACTIONS.update_handlers = function()
   log("Removing", out_file_root.."/"..out_handlers_dir_name.."/*")
   assert(
       os.execute( -- TODO: Use lfs.
-          'rm -rf "' .. out_file_root..'/'..out_handlers_dir_name..'/*"'
+          'rm -rf "' .. out_file_root..'/'..out_handlers_dir_name..'/"*'
         ) == 0
     )
 
@@ -743,7 +743,7 @@ ACTIONS.update_all = function()
   log("Removing", out_file_root.."/"..out_handlers_dir_name.."/*")
   assert(
       os.execute( -- TODO: Use lfs.
-          'rm -rf "' .. out_file_root..'/'..out_handlers_dir_name..'/*"'
+          'rm -rf "' .. out_file_root..'/'..out_handlers_dir_name..'/"*'
         ) == 0
     )
 

@@ -111,6 +111,8 @@ do
   }
 
   local flush_seconds = 1
+  -- Magic const length is not flushed by system, number got from tests
+  local LOG_FLUSH_BUFSIZE = (2048 * 0.75)
 
   local log_flush_config = LOG_FLUSH_MODE[tostring(os.getenv("PK_LOGFLUSH"))]
     or LOG_FLUSH_MODE.EVERY_N_SECONDS
@@ -134,7 +136,8 @@ do
           LOG_LEVEL_CONFIG,
           LOG_MODULE_CONFIG,
           log_flush_config,
-          flush_seconds
+          flush_seconds,
+          LOG_FLUSH_BUFSIZE
         )
       local log_file = assert(io.open(log_file_name, "a"))
 
@@ -151,22 +154,9 @@ do
         return socket.gettime()
       end
 
-      local sink
-      do
-        if log_flush_config == LOG_FLUSH_MODE.ALWAYS then
-          function sink(v)
-            log_file:write(v)
-            if v == END_OF_LOG_MESSAGE then
-              flush() -- TODO: ?! Slow.
-            end
-            return sink
-          end
-        else
-          function sink(v)
-            log_file:write(v)
-            return sink
-          end
-        end
+      local function sink(v)
+        log_file:write(v)
+        return sink
       end
 
       create_common_logging_system(

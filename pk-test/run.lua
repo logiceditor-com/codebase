@@ -164,6 +164,9 @@ Options:
                         Default: `123456'.
     --test-cases-path   Set path to test cases.
                         Default: /test/cases.
+    --rockless          Run pk-test from local git repository instead of
+                        installed rock. This option is intended for pk-test
+                        development only.
 
 Environment variables:
 

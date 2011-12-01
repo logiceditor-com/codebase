@@ -181,7 +181,7 @@ local try_send_system_message = function(
           {
             NODE_ID = service_node;
           }
-        )
+        ):gsub("/$", "") -- Trim trailing slash (if any)
 
       local mask = zmq_info.mask
 

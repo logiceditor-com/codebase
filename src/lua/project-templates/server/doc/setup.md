@@ -62,7 +62,8 @@ APT-packages
         libexpat-dev        \
         libcurl4-gnutls-dev \
         nginx               \
-        libmysqlclient16
+        libmysqlclient16    \
+        libssl-dev
 
 Development machine only (documentation generation):
 

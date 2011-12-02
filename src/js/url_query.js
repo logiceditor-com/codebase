@@ -10,6 +10,13 @@ PK.Query = new function()
   {
     query_params_ = $.parseQuery()
 
+    // TODO: FIXME: Remove when correct implementation of parseQuery would be used
+    //              Current implementation returns {"":"undefined"} on empty query
+    if (PK.count_properties(query_params_) == 1 && query_params_[""] == "undefined")
+    {
+      query_params_ = {}
+    }
+
     if (query_patcher)
       query_patcher(query_params_)
 

@@ -55,6 +55,7 @@ APT-packages
         libzmq-dev          \
         luajit              \
         luarocks            \
+        luarocks-dev        \
         multiwatch          \
         redis-server        \
         libev-dev           \
@@ -287,10 +288,10 @@ If nothing found:
 
 If nothing found:
 
- $ (cd pk-tools && lua -e 'for _, R in
-   ipairs(loadfile("rockspec/pk-rocks-manifest.lua")().ROCKS) do
-   print(R[1]) end' | xargs -l1 -I% sudo luarocks make %
-     --only-from=../pk-foreign-rocks/rocks)
+  $ (cd ${HOME}/projects/pk-hb/server/lib/pk-tools && lua -e 'for _, R in
+    ipairs(loadfile("rockspec/pk-rocks-manifest.lua")().ROCKS) do
+    print(R[1]) end' | xargs -l1 -I% sudo luarocks make %
+    --only-from=../pk-foreign-rocks/rocks)
 
 5.5 pk-test (development machine only)
 

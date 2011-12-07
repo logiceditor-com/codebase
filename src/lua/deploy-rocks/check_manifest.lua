@@ -179,6 +179,12 @@ do
       subproject.local_path = subproject.local_path
         or manifest.project_path .. "/" .. name
 
+      local path = subproject.local_path
+      local info = git_read(path, "rev-parse", "--abbrev-ref", "HEAD")
+      write_flush("Current branch of ", name, " repository: ", info)
+      info = git_read(path, "rev-parse", "HEAD")
+      write_flush("HEAD of ", name, " repository: ", info)
+
       if subproject.no_deploy then
         writeln_flush("--> Skipping no-deploy subproject `", name, "'.")
       else

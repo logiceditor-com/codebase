@@ -23,6 +23,8 @@ local REQUIRE_GLOBALS =
   hiredis = "hiredis";
   zmq = "zmq";
   lxp = "lxp";
+  ssl = "ssl";  -- this is from "luasec"
+  ltn12 = "ltn12";
 }
 
 --------------------------------------------------------------------------------

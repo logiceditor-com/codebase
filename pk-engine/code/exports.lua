@@ -63,6 +63,7 @@ return
   common_http_redirect = { "pk-engine/webservice/response.lua" };
   common_json_error = { "pk-engine/webservice/response.lua" };
   common_luabins_error = { "pk-engine/webservice/response.lua" };
+  common_send_http_request = { "pk-engine/http.lua" };
   common_text_error = { "pk-engine/webservice/response.lua" };
   common_xml_error = { "pk-engine/webservice/response.lua" };
   connect = { "pk-engine/connector.lua" };
@@ -195,6 +196,7 @@ return
   schedule_cron = { "pk-engine/cron.lua" };
   send_bytes = { "pk-engine/net/buffered_connection.lua", "pk-engine/srv/copas_conn.lua", "pk-engine/srv/raw_conn.lua" };
   send_fetch = { "pk-engine/srv/channel/client.lua" };
+  send_http_request = { "pk-engine/http.lua" };
   stop = { "pk-engine/webservice/fcgi_wsapi_runner.lua" };
   string = { "pk-engine/webservice/client_api/check.lua" };
   string_enum = { "pk-engine/webservice/client_api/check.lua" };

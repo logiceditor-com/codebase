@@ -185,6 +185,9 @@ ACTIONS.update = function()
               "merged " .. git_remote_name .. " as a subtree to " .. subtree_path,
               false -- Not interactive
             )
+
+          log("pruning git repo ", git_remote_name, " in ", git_dir)
+          git_exec(git_dir, 'remote', 'prune', git_remote_name)
         end
       else
         log("pulling subtree", git_remote_name)
@@ -194,6 +197,9 @@ ACTIONS.update = function()
             git_remote_name,
             branch_to_update
           )
+
+        log("pruning git repo ", git_remote_name, " in ", git_dir)
+        git_exec(git_dir, 'remote', 'prune', git_remote_name)
       end
     end
   end

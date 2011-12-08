@@ -86,7 +86,7 @@ PK.split_using_placeholders = function(s, keys)
 
   var splitted = s.split(SEPARATOR)
 
-  //LOG("Splitting " + s + " using " + Ext.encode(keys) + " : " + Ext.encode(splitted))
+  //LOG("Splitting " + s + " using " + JSON.stringify(keys, null, 4) + " : " + JSON.stringify(splitted, null, 4))
 
 
   var result = []
@@ -134,9 +134,14 @@ PK.fill_placeholders = function(s, ivalues)
         CRITICAL_ERROR(
             "Too big value placeholder number: " + ivalues.length + '<=' + num
           )
+        if(window.console && console.log)
+        {
+          console.log("[PK.fill_placeholders] failed on data:", s, ivalues, data_with_ph)
+        }
+
         LOG("s: " + s)
-        LOG("ivalues: " + Ext.encode(ivalues))
-        LOG("Data: " + Ext.encode(data_with_ph))
+        LOG("ivalues: " + JSON.stringify(ivalues, null, 4))
+        LOG("Data: " + JSON.stringify(data_with_ph, null, 4))
       }
     }
     else if (values && values[data_with_ph[i]] !== undefined)

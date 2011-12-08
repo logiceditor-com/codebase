@@ -76,6 +76,12 @@ local update_file,
         'create_path_to_file'
       }
 
+local remove_recursively
+      = import 'lua-aplicado/shell/filesystem.lua'
+      {
+        'remove_recursively'
+      }
+
 local load_schema
       = import 'apigen/load_schema.lua'
       {
@@ -311,7 +317,7 @@ local generate_documents = function(
 
   if not keep_tmp then
     log("removing", tmpdir)
-    assert(os.execute("rm -r '" .. tmpdir .. "'") == 0)
+    remove_recursively(tmpdir)
   else
     log("NOT removing", tmpdir, "as configured")
   end
@@ -596,11 +602,7 @@ ACTIONS.update_handlers = function()
 
   -- TODO: Detect obsolete files and fail instead of this!
   log("Removing", out_file_root.."/"..out_handlers_dir_name.."/*")
-  assert(
-      os.execute( -- TODO: Use lfs.
-          'rm -rf "' .. out_file_root..'/'..out_handlers_dir_name..'/"*'
-        ) == 0
-    )
+  remove_recursively(out_file_root .. '/' .. out_handlers_dir_name .. '/*')
 
   local api = load_schema(api_schema_dir)
   -- TODO: URGENT! make validation possible before generate_exports_list
@@ -741,14 +743,11 @@ ACTIONS.update_all = function()
 
   -- TODO: Detect obsolete files and fail instead of this!
   log("Removing", out_file_root.."/"..out_handlers_dir_name.."/*")
-  assert(
-      os.execute( -- TODO: Use lfs.
-          'rm -rf "' .. out_file_root..'/'..out_handlers_dir_name..'/"*'
-        ) == 0
-    )
+  remove_recursively(out_file_root .. '/' .. out_handlers_dir_name .. '/*')
 
   local api = load_schema(api_schema_dir)
-  validate_schema(known_exports, allowed_requires, allowed_globals, api) -- TODO: See update_handlers for hack with generate_exports_list
+  validate_schema(known_exports, allowed_requires, allowed_globals, api)
+  -- TODO: See update_handlers for hack with generate_exports_list
 
   -- Note: unconditionally overriding files.
 

@@ -109,6 +109,20 @@ do
         source = ltn12.source.string(request_body);
         sink = ltn12.sink.table(response_body);
       }
+
+      -- luasec require to specify both options: key and certificate
+      -- documentation: http://www.inf.puc-rio.br/~brunoos/luasec/reference.html
+      -- key - path to the file that contains the key (in PEM format).
+      -- certificate - Path to the file that contains the chain certificates. These must be in
+      --   PEM format and must be sorted starting from the subject's certificate (client or server),
+      --   followed by intermediate CA certificates if applicable, and ending at the highest level CA.
+      if ssl_options.key == nil and ssl_options.certificate ~= nil
+        or ssl_options.key ~= nil and ssl_options.certificate == nil
+      then
+        ssl_options.key = ssl_options.certificate or ssl_options.key
+        ssl_options.certificate = ssl_options.key or ssl_options.certificate
+      end
+
       request = toverride_many(request, ssl_options)
       res, code, response_headers = ssl.https.request(request)
     else

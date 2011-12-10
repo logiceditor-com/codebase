@@ -81,11 +81,11 @@ local SCHEMA = create_config_schema()
 
 local CONFIG, ARGS
 
-local EXTRA_HELP 
+local EXTRA_HELP
 --------------------------------------------------------------------------------
 
 ACTIONS.update = function()
-  local param = freeform_table_value(CONFIG.update_config.action.param)  
+  local param = freeform_table_value(CONFIG.update_config.action.param)
   local manifest_path = param.manifest_path
   local subtree_name = param.subtree_name
   local branch_name = param.branch_name

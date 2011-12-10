@@ -118,9 +118,8 @@ do
     return res, code, response_headers, response_body
   end
 
-  local common_impl = function(api_context, request, check_response_code)
+  local common_impl = function(request, check_response_code)
     arguments(
-        "table", api_context,
         "table", request,
         "boolean", check_response_code
       )
@@ -177,22 +176,20 @@ do
       response_headers
   end
 
-  send_http_request = function(api_context, request)
+  send_http_request = function(request)
     arguments(
-        "table", api_context,
         "table", request
       )
 
-    return common_impl(api_context, request, false)
+    return common_impl(request, false)
   end
 
-  common_send_http_request = function(api_context, request)
+  common_send_http_request = function(request)
     arguments(
-        "table", api_context,
         "table", request
       )
 
-    return common_impl(api_context, request, true)
+    return common_impl(request, true)
   end
 end
 

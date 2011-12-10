@@ -35,7 +35,8 @@ local git_load_config,
       git_has_untracked_files,
       git_get_tracking_branch_name_of_HEAD,
       git_are_branches_different,
-      git_read
+      git_read,
+      git_exec
       = import 'lua-aplicado/shell/git.lua'
       {
         'git_load_config',
@@ -48,7 +49,8 @@ local git_load_config,
         'git_has_untracked_files',
         'git_get_tracking_branch_name_of_HEAD',
         'git_are_branches_different',
-        'git_read'
+        'git_read',
+        'git_exec'
       }
 
 local load_project_manifest

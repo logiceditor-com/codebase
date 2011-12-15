@@ -14,4 +14,3 @@ server {
     alias /srv/#{PROJECT_NAME}#{REMOTE_ROOT_DIR}/cluster/#{DEPLOY_SERVER}/rocks/;
   }
 }
-

@@ -317,7 +317,7 @@ local generate_documents = function(
 
   if not keep_tmp then
     log("removing", tmpdir)
-    remove_recursively(tmpdir)
+    remove_recursively(tmpdir, true)
   else
     log("NOT removing", tmpdir, "as configured")
   end
@@ -602,7 +602,7 @@ ACTIONS.update_handlers = function()
 
   -- TODO: Detect obsolete files and fail instead of this!
   log("Removing", out_file_root.."/"..out_handlers_dir_name.."/*")
-  remove_recursively(out_file_root .. '/' .. out_handlers_dir_name .. '/*')
+  remove_recursively(out_file_root .. '/' .. out_handlers_dir_name .. '/*', true)
 
   local api = load_schema(api_schema_dir)
   -- TODO: URGENT! make validation possible before generate_exports_list
@@ -743,7 +743,7 @@ ACTIONS.update_all = function()
 
   -- TODO: Detect obsolete files and fail instead of this!
   log("Removing", out_file_root.."/"..out_handlers_dir_name.."/*")
-  remove_recursively(out_file_root .. '/' .. out_handlers_dir_name .. '/*')
+  remove_recursively(out_file_root .. '/' .. out_handlers_dir_name .. '/*', true)
 
   local api = load_schema(api_schema_dir)
   validate_schema(known_exports, allowed_requires, allowed_globals, api)

@@ -44,10 +44,12 @@ local tpretty
         'tpretty'
       }
 
-local find_all_files
+local find_all_files,
+      does_file_exist
       = import 'lua-aplicado/filesystem.lua'
       {
-        'find_all_files'
+        'find_all_files',
+        'does_file_exist'
       }
 
 local make_loggers
@@ -118,12 +120,21 @@ local list = function(
       }
     )
 
-  local files = find_all_files(
-      root_dir_only and (sources_dir .. "/" .. root_dir_only) or sources_dir,
-      "%.lua$"
-    )
+  local files
+  local dir = root_dir_only and (sources_dir .. "/" .. root_dir_only) or sources_dir
+  if not does_file_exist(dir) then
+    -- TODO: Shouldn't we crash here?
+    --              sources_dir is cfg:path, not cfg:existing_path though
+    log("warning: sources dir does not exist", dir)
+    files = { }
+  else
+    files = find_all_files(
+        root_dir_only and (sources_dir .. "/" .. root_dir_only) or sources_dir,
+        "%.lua$"
+      )
 
-  table.sort(files)
+    table.sort(files)
+  end
 
   for i = 1, #files do
     local filename = files[i]

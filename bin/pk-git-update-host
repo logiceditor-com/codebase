@@ -80,8 +80,12 @@ ssh ${HOST} ${CMD} || true # Ignoring error
 #          Never do this on a developer machine.
 echo "---> Resetting '${HOST}' to current '${DESTBRANCH}' branch"
 
-CMD="${GIT} fetch ${SRCREMOTE}; ${GIT} checkout -f ${DESTBRANCH}; ${GIT} reset --hard ${SRCREMOTE}/${SRCBRANCH}; ${GIT} clean -fdx"
-ssh ${HOST} ${CMD}
+# NOTE: Use "&&", not ";". We need to catch all errors here.
+CMD="${GIT} fetch ${SRCREMOTE}"
+CMD="${CMD} && ${GIT} checkout -f ${DESTBRANCH}"
+CMD="${CMD} && ${GIT} reset --hard ${SRCREMOTE}/${SRCBRANCH}"
+CMD="${CMD} && ${GIT} clean -fdx"
+ssh ${HOST} "${CMD}"
 
 # TODO: Unsafe hack! This slows down deployment and requires sudo privileges!
 #       Fix umask instead.

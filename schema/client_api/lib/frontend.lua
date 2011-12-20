@@ -41,6 +41,18 @@ api:extend_context "frontend.cache" (function()
 
     --get request
     local request_status = pkb_get_transaction_status(api_context, request.request_id)
+    if request_status ~= PKB_TRANSACTION_STATUS.NOT_FOUND then
+      -- if transaction found -> always save subtransaction
+      if currency_price ~= project_price then
+        -- save subtransaction with amount in subpaysystem currency
+        local subtransaction =
+        {
+          amount = currency_price;
+        }
+        api_context:ext("subtransactions.cache"):try_set(api_context, request.request_id, subtransaction)
+      end
+    end
+
     if request_status == PKB_TRANSACTION_STATUS.REJECTED_BY_APP then
       -- send error: account not found
       return nil, "ACCOUNT_NOT_FOUND", "Request " .. request.request_id .. " rejected by application"
@@ -91,15 +103,6 @@ api:extend_context "frontend.cache" (function()
       -- VK
       elseif paysystem.id == VK_PAYSYSTEM_ID then
         form.request_id = request.request_id
-      end
-
-      if currency_price ~= project_price then
-        -- save subtransaction with amount in subpaysystem currency
-        local subtransaction =
-        {
-          amount = currency_price;
-        }
-        api_context:ext("subtransactions.cache"):try_set(api_context, request.request_id, subtransaction)
       end
 
       log(

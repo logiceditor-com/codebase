@@ -70,6 +70,7 @@ api:export "lib/const"
         ["wmu"] = "U%price%";
         ["wme"] = "E%price%";
       };
+      [VK_PAYSYSTEM_ID] = "%price%";
     }
 
     local PKB_COMMON_PREFIX = "spp:"

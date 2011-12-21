@@ -78,20 +78,17 @@ api:export "lib/paysystems/vkontakte"
 
       local ok, response = pcall(json_decode, response_body,  decode_options)
       if not ok then
+        log_error("[vk_withdraw_votes] failed to parse:", response_body)
         local err = "parse error: " .. response
-        return nil, nil, err
+        return nil, err
       elseif response == nil or response.error ~= nil or response.response == nil then
-        local err = "UNKNOWN"
-        if response.error and response.error.id then
-          -- We successfully parse VK error code, and throw it to level up
-          return nil, response.error.id, nil
-        end
-        return nil, nil, "VK returned error: " .. err
+        local err = response and response.error or "UNKNOWN"
+        return nil, "VK returned error: " .. tostring(err)
       end
 
       log("[vk_withdraw_votes] OK, ", money_amount, user_id)
 
-      return response.response.transferred, nil, nil
+      return response.response.transferred
     end
   end
 }

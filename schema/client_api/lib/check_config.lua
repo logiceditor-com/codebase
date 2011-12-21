@@ -60,48 +60,6 @@ api:export "check_config"
 
     --------------------------------------------------------------------------------
 
-    local parse_config_arguments = function(canonicalization_map, ...)
-      arguments("table", canonicalization_map)
-
-      local n = select("#", ...)
-
-      local args = { }
-
-      local i = 1
-      while i <= n do
-        local arg = select(i, ...)
-        if arg:match("^%-%-[^%-=].-=.*$") then
-          -- TODO: Optimize. Do not do double matching
-          local name, value = arg:match("^(%-%-[^%-=].-)=(.*)$")
-          assert(name)
-          assert(value)
-          args[canonicalization_map[name] or name] = value
-        elseif arg:match("^%-[^%-].*$") then
-          local name = arg
-
-          i = i + 1
-          local value = select(i, ...)
-
-          args[canonicalization_map[name] or name] = value
-        elseif arg:match("^%-%-[^%-].*$") then
-          -- TODO: Optimize. Do not do double matching
-          local name, value = arg, true
-          assert(name)
-          assert(value)
-          args[canonicalization_map[name] or name] = value
-        else
-          local name = canonicalization_map[arg] or arg
-          args[#args + 1] = name
-          args[name] = true
-        end
-        i = i + 1
-      end
-
-      return args
-    end
-
-    --------------------------------------------------------------------------------
-
     local raw_config_table_key = unique_object()
 
     local raw_config_table_callback = function(t)

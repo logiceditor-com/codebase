@@ -121,6 +121,7 @@ api:export "lib/const"
       };
     }
 
+    -- taken from QIWI: OnlineStoresProtocols_XML.pdf (https://docs.google.com/viewer?a=v&pid=explorer&chrome=true&srcid=0B55lDW7kaJMSNmFhZWQ3NDAtOTIwYy00OTMxLWI0OTEtZWUxMjE0MjU2ZWJh&hl=ru)
     local QIWI_ERROR_CODES =
     {
       [0] = "The operation completed successfully";
@@ -129,7 +130,7 @@ api:export "lib/const"
       [210] = "The bill was not found";
       [215] = "The bill with this txn-id already exists";
       [241] = "The payment amount is too small";
-      [242] = "Exceeded maximum payment amount – 15 000 RUB";
+      [242] = "Exceeded maximum payment amount – 15 000 RUB"; -- maximum payment amount limited by QIWI
       [278] = "Maximum bill list retrieval interval exceeded";
       [298] = "Agent doesn't exist in the system";
       [300] = "Unknown error";

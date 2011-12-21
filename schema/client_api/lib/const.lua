@@ -35,6 +35,7 @@ api:export "lib/const"
     "QIWI_DEFAULT_USE_ACCEPT_CALL";
 
     -- VK CONSTS --
+    "VK_API_URL";
     "VK_QUEUE_SIZE";
     "VK_QUEUE_PART_SIZE";
 
@@ -141,6 +142,7 @@ api:export "lib/const"
     }
 
     -- VK CONSTS --
+    local VK_API_URL = "http://api.vkontakte.ru/api.php"
     local VK_QUEUE_SIZE = 5000
     local VK_QUEUE_PART_SIZE = 900
 

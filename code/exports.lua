@@ -65,6 +65,7 @@ return
   RH_REQUEST_QUEUE_KEY = { "pk-billing-lib/lib/lib/rq.lua" };
   SUBPAYSYSTEMS_FIELDS_LIST = { "pk-billing-lib/lib/lib/settings.lua" };
   TEST_PAYSYSTEM_ID = { "pk-billing-lib/lib/lib/const.lua" };
+  VK_API_URL = { "pk-billing-lib/lib/lib/const.lua" };
   VK_PAYSYSTEM_ID = { "pk-billing-lib/lib/lib/const.lua" };
   VK_QUEUE_PART_SIZE = { "pk-billing-lib/lib/lib/const.lua" };
   VK_QUEUE_SIZE = { "pk-billing-lib/lib/lib/const.lua" };
@@ -128,6 +129,7 @@ return
   rh_check_request = { "pk-billing-lib/lib/lib/rq.lua" };
   stats_calc_counter = { "pk-billing-lib/lib/lib/stats.lua" };
   stats_get_counter = { "pk-billing-lib/lib/lib/stats.lua" };
+  vk_withdraw_votes = { "pk-billing-lib/lib/lib/paysystems/vkontakte.lua" };
   webmoney_error_handler = { "pk-billing-lib/lib/lib/paysystems/webmoney.lua" };
   webmoney_request = { "pk-billing-lib/lib/lib/paysystems/webmoney.lua" };
   webmoney_response_handler = { "pk-billing-lib/lib/lib/paysystems/webmoney.lua" };

@@ -62,14 +62,8 @@ api:export "check_config"
 
     local raw_config_table_key = unique_object()
 
-    local raw_config_table_callback = function(t)
-      return t
-    end
-
     local load_config
     do
-      local callbacks = { [raw_config_table_key] = raw_config_table_callback }
-
       load_config = function(
           schema,
           CONFIG -- config table here

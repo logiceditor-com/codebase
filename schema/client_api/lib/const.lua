@@ -69,6 +69,7 @@ api:export "lib/const"
         ["wmz"] = "Z%price%";
         ["wmu"] = "U%price%";
         ["wme"] = "E%price%";
+        ["wmr"] = "R%price%";
       };
       [VK_PAYSYSTEM_ID] = "%price%";
     }

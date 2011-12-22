@@ -1,3 +1,9 @@
+//----------------------------------------------------------------------------
+// Cookies
+//----------------------------------------------------------------------------
+// Note: jQuery required
+//
+
 PK.check_namespace('Cookies');
 
 PK.Cookies.set_longlive_cookie = function(key, value, options)

@@ -15,12 +15,14 @@ api:export "lib/const"
 
     -- common project consts
     "PKB_COMMON_PREFIX";
+    "PKB_COMMON_CACHE_PREFIX";
     "PKB_DEFAULT_TRANSACTION_TTL";
     "PKB_MIN_TRANSSACTION_AMOUNT";
     "PKB_ALLOWED_AMOUNTS_TYPES";
     "PKB_AMOUNTS_TYPE_FIXED";
     "PKB_AMOUNTS_TYPE_RANDOM";
     "PKB_DEFAULT_ALLOWED_AMOUNT_TYPE";
+    "PKB_TIME_FILTER_OUT_FORMAT";
 
     -- QIWI consts --
     "QIWI_API_URL";
@@ -76,8 +78,10 @@ api:export "lib/const"
     }
 
     local PKB_COMMON_PREFIX = "spp:"
+    local PKB_COMMON_CACHE_PREFIX = PKB_COMMON_PREFIX .. "cache:"
     local PKB_DEFAULT_TRANSACTION_TTL = 1080
     local PKB_MIN_TRANSSACTION_AMOUNT = 0.01
+    local PKB_TIME_FILTER_OUT_FORMAT = "%d/%m/%Y %H:%M %z"
 
     local PKB_AMOUNTS_TYPE_FIXED = "fixed"
     local PKB_AMOUNTS_TYPE_RANDOM = "random"

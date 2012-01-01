@@ -85,6 +85,14 @@ local make_config_environment
         'make_config_environment'
       }
 
+local dump_nodes
+      = import 'pk-core/dump_nodes.lua'
+      {
+        'dump_nodes'
+      }
+
+--------------------------------------------------------------------------------
+
 local load_tools_cli_data_schema
 do
   local extra_env =

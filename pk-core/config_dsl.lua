@@ -103,12 +103,6 @@ local load_data_walkers,
         'load_data_schema'
       }
 
-local dump_nodes
-      = import 'pk-core/dump_nodes.lua'
-      {
-        'dump_nodes'
-      }
-
 --------------------------------------------------------------------------------
 
 local log, dbg, spam, log_error = make_loggers("pk-core/config_dsl", "CDL")

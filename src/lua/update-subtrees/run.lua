@@ -81,7 +81,27 @@ local SCHEMA = create_config_schema()
 
 local CONFIG, ARGS
 
-local EXTRA_HELP
+local EXTRA_HELP = [[
+
+update-subtrees: automated Git subtree update script
+
+Usage:
+
+    update-subtrees update [subtree-name] [options]
+
+Options:
+
+    --subtree-name        Update only specified subtree, skip others.
+
+    --feature-branch      Update all subtrees from a given feature-branch
+                          instead of a default one. Warning: use with caution!
+
+Example:
+
+    update-subtrees update
+
+]]
+
 --------------------------------------------------------------------------------
 
 ACTIONS.update = function()

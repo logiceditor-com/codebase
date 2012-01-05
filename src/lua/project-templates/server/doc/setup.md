@@ -24,6 +24,13 @@ APT-packages
     echo "deb http://ubuntu.iphonestudio.ru unstable main" \
       | sudo tee -a /etc/apt/sources.list.d/ubuntu.iphonestudio.ru.list
 
+Check if iphonestudio repository is really enabled.
+
+    apt-cache policy | grep iphonestudio
+
+'ubuntu.iphonestudio.ru' must be listed in the output. If it isn't, repeat
+commands above.
+
     sudo apt-get update
     sudo apt-get upgrade
 
@@ -31,6 +38,13 @@ APT-packages
 
     echo "deb http://ubuntu-dev.iphonestudio.ru unstable main" \
       | sudo tee -a /etc/apt/sources.list.d/ubuntu-dev.iphonestudio.ru.list
+
+Check if developer iphonestudio repository is really enabled.
+
+    apt-cache policy | grep iphonestudio
+
+'ubuntu-dev.iphonestudio.ru' must be listed in the output. If it isn't, repeat
+commands above.
 
     sudo apt-get update
     sudo apt-get upgrade
@@ -83,6 +97,23 @@ libwww-perl allows using GET, POST in shell
         iotop \
         dstat \
         htop
+
+1.2.1 Ensure that you have the latest version of luarocks
+
+    luarocks --version
+
+Expected output:
+
+    luarocks 2.0.6
+    LuaRocks main command-line interface
+
+1.2.2 Ensure that luarocks is installed in /usr/bin/luarocks
+
+    which luarocks
+
+Expected output:
+
+    /usr/bin/luarocks
 
 2. Ensure that machine is in Europe/Moscow timezone.
 

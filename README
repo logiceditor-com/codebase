@@ -8,20 +8,3 @@ All rights reserved.
 
 Copyright (c) 2009-2010, Alexander Gladysh <agladysh@gmail.com>
 Copyright (c) 2009-2010, Dmitry Potapov <dmitry.v.potapov@gmail.com>
-
-This project depends on lua-nucleo and lua-aplicado
-
-http://github.com/lua-nucleo/lua-nucleo
-http://github.com/lua-aplicado/lua-aplicado
-
-This project also depends on pk-core and pk-test
-
-These dependencies are intentionally not added as subtrees.
-To run tests, add following symlinks:
-
-test/lua-nucleo -> lua-nucleo/lua-nucleo
-test/lua-aplicado -> lua-aplicado/lua-aplicado
-test/pk-core -> pk-core/pk-core
-test/pk-test -> pk-test/pk-test
-test/test.lua -> pk-test/util/test.lua
-test/test.sh -> pk-test/util/test.sh

@@ -24,6 +24,8 @@ api:export "lib/const"
     "PKB_DEFAULT_ALLOWED_AMOUNT_TYPE";
     "PKB_TIME_FILTER_OUT_FORMAT";
     "PKB_TIME_FILTER_IN_FORMAT";
+    "PKB_PAYMENTS_CACHE_TTL";
+    "PKB_RELOAD_PAYMENTS_CACHE_TTL";
 
     -- QIWI consts --
     "QIWI_API_URL";
@@ -84,6 +86,9 @@ api:export "lib/const"
     local PKB_MIN_TRANSSACTION_AMOUNT = 0.01
     local PKB_TIME_FILTER_OUT_FORMAT = "%d/%m/%Y %H:%M %z"
     local PKB_TIME_FILTER_IN_FORMAT = "(%d+)/(%d+)/(%d+) (%d+):(%d+)"
+
+    local PKB_PAYMENTS_CACHE_TTL = 600
+    local PKB_RELOAD_PAYMENTS_CACHE_TTL = 600
 
     local PKB_AMOUNTS_TYPE_FIXED = "fixed"
     local PKB_AMOUNTS_TYPE_RANDOM = "random"

@@ -23,6 +23,7 @@ api:export "lib/const"
     "PKB_AMOUNTS_TYPE_RANDOM";
     "PKB_DEFAULT_ALLOWED_AMOUNT_TYPE";
     "PKB_TIME_FILTER_OUT_FORMAT";
+    "PKB_TIME_FILTER_IN_FORMAT";
 
     -- QIWI consts --
     "QIWI_API_URL";
@@ -82,6 +83,7 @@ api:export "lib/const"
     local PKB_DEFAULT_TRANSACTION_TTL = 1080
     local PKB_MIN_TRANSSACTION_AMOUNT = 0.01
     local PKB_TIME_FILTER_OUT_FORMAT = "%d/%m/%Y %H:%M %z"
+    local PKB_TIME_FILTER_IN_FORMAT = "(%d+)/(%d+)/(%d+) (%d+):(%d+)"
 
     local PKB_AMOUNTS_TYPE_FIXED = "fixed"
     local PKB_AMOUNTS_TYPE_RANDOM = "random"

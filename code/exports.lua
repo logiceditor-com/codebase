@@ -39,11 +39,14 @@ return
   PKB_DEFAULT_TRANSACTION_TTL = { "pk-billing-lib/lib/lib/const.lua" };
   PKB_HACK_TRANSACTIONS_SET = { "pk-billing-lib/lib/lib/common.lua" };
   PKB_MIN_TRANSSACTION_AMOUNT = { "pk-billing-lib/lib/lib/const.lua" };
+  PKB_PAYMENTS_CACHE_TTL = { "pk-billing-lib/lib/lib/const.lua" };
   PKB_QIWIM_QUEUE = { "pk-billing-lib/lib/lib/common.lua" };
+  PKB_RELOAD_PAYMENTS_CACHE_TTL = { "pk-billing-lib/lib/lib/const.lua" };
   PKB_REQUEST_FIELDS = { "pk-billing-lib/lib/lib/common.lua" };
   PKB_REQUEST_OPTIONAL_FIELDS = { "pk-billing-lib/lib/lib/common.lua" };
   PKB_RESULT_CODES = { "pk-billing-lib/lib/lib/common.lua" };
   PKB_RESULT_CODES_SET = { "pk-billing-lib/lib/lib/common.lua" };
+  PKB_TIME_FILTER_IN_FORMAT = { "pk-billing-lib/lib/lib/const.lua" };
   PKB_TIME_FILTER_OUT_FORMAT = { "pk-billing-lib/lib/lib/const.lua" };
   PKB_TIME_INTERVAL = { "pk-billing-lib/lib/lib/common.lua" };
   PKB_TRANSACTIONS_DONE_KEY = { "pk-billing-lib/lib/lib/common.lua" };

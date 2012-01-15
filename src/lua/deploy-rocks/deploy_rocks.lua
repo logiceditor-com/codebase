@@ -223,7 +223,12 @@ local write_current_versions = function(manifest, cluster_info, new_versions)
 
   filename = filename .. "-" .. i .. ".lua"
 
-  assert(write_file(filename, "return\n" .. tpretty(new_versions, "  ", 80)))
+  assert(
+      write_file(
+          filename,
+          "return\n" .. tpretty(new_versions, "  ", 80) .. "\n"
+        )
+    )
 
   return filename
 end

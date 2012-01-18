@@ -40,12 +40,14 @@ PK.formatNumber = function(value, precision)
 // Based on http://javascript.crockford.com/remedial.html
 PK.entityify_and_escape_quotes = function (s)
 {
-  if(typeof(s) == "number")
-    return s
+  if (typeof(s) == "number")
+  {
+    return s;
+  }
   //PKLILE.timing.start("entityify_and_escape_quotes")
-  var result = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+  var result = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   //PKLILE.timing.stop("entityify_and_escape_quotes")
-  return result
+  return result;
 }
 
 // TODO: Note:

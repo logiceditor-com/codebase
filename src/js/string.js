@@ -50,61 +50,46 @@ PK.entityify_and_escape_quotes = function (s)
   return result;
 }
 
-// TODO: Note:
-//   1. 's' must contain no separators!
-//   2. Very non-optimal, reduce to one iteration
-PK.split_using_placeholders = function(s, keys)
+/**
+ * Split using placeholders like '${1}', '${2}' .. '${n}' or '${key}' (from keys).
+ *
+ * @param source
+ * @param keys
+ */
+PK.split_using_placeholders = function(source, keys)
 {
-  //PKLILE.timing.start("split_using_placeholders")
-  var SEPARATOR = '{%_SEP_%}'
-
-  var num_placehoders = 0, placeholder_found = true
-
-  while (true)
-  {
-    num_placehoders++
-    var placeholder = '${' + num_placehoders + '}'
-    if( s.indexOf(placeholder) < 0 )
-      break
-    s = s.replace(placeholder, SEPARATOR + placeholder + SEPARATOR)
-  }
-  num_placehoders--
-
-  if(keys)
+  var result = [];
+  var pattern = '(\\$\\{[0-9]+\\})';
+  if (keys && keys.length)
   {
     for (var i = 0; i < keys.length; i++)
     {
-      var placeholder = '${' + keys[i] + '}'
-      if( s.indexOf(placeholder) >= 0 )
-      {
-        s = s.replace(placeholder, SEPARATOR + placeholder + SEPARATOR)
-      }
+      pattern += '|(\\$\\{'+keys[i]+'\\})';
     }
   }
-
-  var splitted = s.split(SEPARATOR)
-
-  //LOG("Splitting " + s + " using " + JSON.stringify(keys, null, 4) + " : " + JSON.stringify(splitted, null, 4))
-
-
-  var result = []
-  for(var i = 0; i < splitted.length; i++)
+  var pieces = source.split(new RegExp(pattern));
+  for (var n = 0; n < pieces.length; n++)
   {
-    if (splitted[i].match(/\$\{\d+\}/g))
+    if (pieces[n] != undefined)
     {
-      result.push(Number(splitted[i].replace(/[\$\{\}]/g, "")))
+      var item = pieces[n];
+      if (item.substr(0, 2) == '${' && item.substr(item.length - 1) == '}')
+      {
+        var key = item.substr(2, item.length - 3);
+        var key_number = Number(key);
+        if (!isNaN(key_number))
+        {
+          if (key_number == key_number.toFixed(0))
+          {
+            item = key_number;
+          }
+        }
+      }
+      result.push(item);
     }
-    else if (splitted[i] != "")
-    {
-      result.push(splitted[i])
-    }
-
   }
-
-  //PKLILE.timing.stop("split_using_placeholders")
-  return result
+  return result;
 }
-
 
 //TODO: Use 'values' also (and generate keys from them)
 PK.fill_placeholders = function(s, ivalues)

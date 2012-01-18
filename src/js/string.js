@@ -1,45 +1,41 @@
-// Note: ExtJS required
+/**
+ * String functions.
+ */
 
-// TODO: Ugly hakish version, generalize and refactor!
-PK.formatNumber = function(v, pres)
+/**
+ * Prepend value with 0 if length < precision.
+ *
+ * @param value
+ * @param precision
+ */
+PK.formatNumber = function(value, precision)
 {
-  if(pres === undefined)
-    pres = 4;
-
-  if (pres == 4)
+  var parts = value.toString().split('.');
+  var int_part = parts[0];
+  if (parts.length > 1)
   {
-    if (v < 10) return "000" + v
-    if (v < 100) return "00" + v
-    if (v < 1000) return "0" + v
-    if (v >= 10000)
-    {
-      CRITICAL_ERROR("Can't format big number!")
-      return v
-    }
-  }
-  else if (pres == 3)
-  {
-    if (v < 10) return "00" + v;
-    if (v < 100) return "0" + v;
-    if (v >= 1000)
-    {
-      CRITICAL_ERROR("Can't format big number!")
-      return v
-    }
-  }
-  else if (pres == 2)
-  {
-    if (v < 10) return "0" + v;
-    if (v >= 100)
-    {
-      CRITICAL_ERROR("Can't format big number!")
-      return v
-    }
+    CRITICAL_ERROR("Can't format not integer number!");
   }
 
-  return v;
-};
+  if (precision === undefined)
+    precision = 4;
 
+  if (precision < 2)
+    return value;
+
+  if (int_part.length < precision)
+  {
+    return new Array(precision - int_part.length + 1).join('0') + int_part;
+  }
+  else if (int_part.length == precision)
+  {
+    return value;
+  }
+  else
+  {
+    CRITICAL_ERROR("Can't format big number!");
+  }
+}
 
 // Based on http://javascript.crockford.com/remedial.html
 PK.entityify_and_escape_quotes = function (s)

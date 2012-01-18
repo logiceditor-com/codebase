@@ -150,15 +150,19 @@ PK.fill_placeholders = function(source, ivalues, values)
   return result.join('');
 }
 
-// Note: PK.formatString("some ${1} text ${2}", var_1, var_2) will replace ${1} by var_1 and ${2} by var_2 and etc.
+/**
+ * PK.formatString("some ${1} text ${2}", var_1, var_2) will replace ${1} by var_1 and ${2} by var_2 and etc.
+ */
 PK.formatString = function()
 {
   if (arguments.length < 1)
-    return undefined
+  {
+    return undefined;
+  }
 
-  var ivalues = Array.prototype.slice.call(arguments)
-  var text = ivalues.shift()
-  text = PK.fill_placeholders(text, ivalues)
+  var ivalues = Array.prototype.slice.call(arguments);
+  var text = ivalues.shift();
+  text = PK.fill_placeholders(text, ivalues);
 
-  return text
+  return text;
 }

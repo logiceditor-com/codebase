@@ -91,55 +91,63 @@ PK.split_using_placeholders = function(source, keys)
   return result;
 }
 
-//TODO: Use 'values' also (and generate keys from them)
-PK.fill_placeholders = function(s, ivalues)
+/**
+ * Fill placeholders with values.
+ *
+ * @param source
+ * @param ivalues Array
+ * @param values Object
+ */
+PK.fill_placeholders = function(source, ivalues, values)
 {
-  var keys = undefined, values = undefined
-  var data_with_ph = PK.split_using_placeholders(s, keys)
-  if (!data_with_ph)
-    return s
-
-  //PKLILE.timing.start("fill_placeholders")
-
-  var result = []
-
-  for(var i = 0; i < data_with_ph.length; i++)
+  var keys = undefined;
+  var placeholders_values = undefined;
+  if (values)
   {
-    if (typeof(data_with_ph[i]) == "number")
+    keys = [];
+    placeholders_values = {};
+    for (var key in values)
     {
-      var num = data_with_ph[i] - 1
+      keys.push(key);
+      placeholders_values["${"+key+"}"] = values[key];
+    }
+  }
+  var pieces = PK.split_using_placeholders(source, keys);
+  var result = [];
+  for (var n = 0; n < pieces.length; n++) {
+    var item = pieces[n];
+    if (placeholders_values)
+    {
+      if (placeholders_values[item])
+      {
+        item = placeholders_values[item];
+      }
+    }
+    if (typeof(item) == 'number' && ivalues)
+    {
+      var num = item - 1;
       if (ivalues.length > num)
       {
-        result = result.concat(ivalues[num])
+        item = ivalues[num];
       }
       else
       {
         CRITICAL_ERROR(
-            "Too big value placeholder number: " + ivalues.length + '<=' + num
-          )
+          "Too big value placeholder number: " + ivalues.length + '<=' + num
+        );
         if(window.console && console.log)
         {
-          console.log("[PK.fill_placeholders] failed on data:", s, ivalues, data_with_ph)
+          console.log("[PK.fill_placeholders] failed on data:", source, ivalues, pieces);
         }
 
-        LOG("s: " + s)
-        LOG("ivalues: " + JSON.stringify(ivalues, null, 4))
-        LOG("Data: " + JSON.stringify(data_with_ph, null, 4))
+        LOG("source: " + source);
+        LOG("ivalues: " + JSON.stringify(ivalues, null, 4));
+        LOG("Data: " + JSON.stringify(pieces, null, 4));
       }
     }
-    else if (values && values[data_with_ph[i]] !== undefined)
-    {
-      result.push(values[data_with_ph[i]])
-    }
-    else
-    {
-      result.push(data_with_ph[i])
-    }
+    result.push(item);
   }
-
-  var out = result.join('')
-  //PKLILE.timing.stop("fill_placeholders")
-  return out
+  return result.join('');
 }
 
 // Note: PK.formatString("some ${1} text ${2}", var_1, var_2) will replace ${1} by var_1 and ${2} by var_2 and etc.

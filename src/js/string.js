@@ -132,7 +132,6 @@ PK.fill_placeholders = function(source, ivalues, values)
     }
   }
   var pieces = PK.split_using_placeholders(source, keys);
-  console.log(placeholders_values);
   var result = [];
   for (var n = 0; n < pieces.length; n++) {
     var item = pieces[n];

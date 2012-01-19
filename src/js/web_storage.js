@@ -19,7 +19,7 @@ PK.WebStorage = new function()
   {
     if (window.localStorage === undefined)
     {
-      CRITICAL_ERROR(I18N('ERROR: no localStorage() support!'));
+      LOG(I18N('ERROR: no localStorage() support!'));
       return false;
     }
     available_ = true;
@@ -53,7 +53,7 @@ PK.WebStorage = new function()
     {
       if (e == QUOTA_EXCEEDED_ERR)
       {
-        CRITICAL_ERROR(I18N('WebStorage ERROR: QUOTA_EXCEEDED_ERR'));
+        LOG(I18N('WebStorage ERROR: QUOTA_EXCEEDED_ERR'));
         return false;
       }
     }

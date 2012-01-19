@@ -1,6 +1,6 @@
-/**
- * String functions.
- */
+//------------------------------------------------------------------------------
+// String functions
+//------------------------------------------------------------------------------
 
 /**
  * Prepend value with 0 if length < precision.
@@ -10,6 +10,12 @@
  */
 PK.formatNumber = function(value, precision)
 {
+  value = Number(value);
+  if (isNaN(value))
+  {
+    CRITICAL_ERROR("Wrong value!");
+  }
+
   var parts = value.toString().split('.');
   var int_part = parts[0];
   if (parts.length > 1)
@@ -18,10 +24,19 @@ PK.formatNumber = function(value, precision)
   }
 
   if (precision === undefined)
+  {
     precision = 4;
+  }
 
-  if (precision < 2)
-    return value;
+  precision = Number(precision);
+  if (isNaN(precision))
+  {
+    CRITICAL_ERROR("Wrong precision!");
+  }
+
+  if (precision < 1) {
+    CRITICAL_ERROR("Can't format with precision < 1!");
+  }
 
   if (int_part.length < precision)
   {
@@ -37,7 +52,11 @@ PK.formatNumber = function(value, precision)
   }
 }
 
-// Based on http://javascript.crockford.com/remedial.html
+/**
+ * Based on http://javascript.crockford.com/remedial.html
+ *
+ * @param s
+ */
 PK.entityify_and_escape_quotes = function (s)
 {
   if (typeof(s) == "number")
@@ -113,6 +132,7 @@ PK.fill_placeholders = function(source, ivalues, values)
     }
   }
   var pieces = PK.split_using_placeholders(source, keys);
+  console.log(placeholders_values);
   var result = [];
   for (var n = 0; n < pieces.length; n++) {
     var item = pieces[n];
@@ -121,6 +141,8 @@ PK.fill_placeholders = function(source, ivalues, values)
       if (placeholders_values[item])
       {
         item = placeholders_values[item];
+        result.push(item);
+        continue;
       }
     }
     if (typeof(item) == 'number' && ivalues)
@@ -129,13 +151,15 @@ PK.fill_placeholders = function(source, ivalues, values)
       if (ivalues.length > num)
       {
         item = ivalues[num];
+        result.push(item);
+        continue;
       }
       else
       {
         CRITICAL_ERROR(
           "Too big value placeholder number: " + ivalues.length + '<=' + num
         );
-        if(window.console && console.log)
+        if (window.console && console.log)
         {
           console.log("[PK.fill_placeholders] failed on data:", source, ivalues, pieces);
         }

@@ -12,6 +12,12 @@ declare 'copcall'
 declare 'coxpcall'
 require 'coxpcall'
 
+-- copas should be loaded before socket.http (used by few tests)
+-- TODO: Resolve issue with importing, copas and socket.http shouldn't
+--       depend/conflict each other at load time
+--       https://redmine.iphonestudio.ru/issues/3230
+require 'copas'
+
 --------------------------------------------------------------------------------
 
 local log, dbg, spam, log_error

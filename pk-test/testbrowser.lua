@@ -2,32 +2,23 @@
 -- pk-test/testbrowser.lua: cookie based testbrowser
 --------------------------------------------------------------------------------
 
--- TODO: remove declare when https://redmine.iphonestudio.ru/issues/962
---       will be fixed
-declare 'curl'
-require 'luacurl'
-
-local trim,
-      split_by_char,
-      kv_concat
-      = import 'lua-nucleo/string.lua'
+local send_http_request
+      = import 'pk-engine/http.lua'
       {
-        'trim',
-        'split_by_char',
-        'kv_concat',
+        'send_http_request'
       }
 
-local ordered_pairs
-      = import 'lua-nucleo/tdeepequals.lua'
+local is_table
+      = import 'lua-nucleo/type.lua'
       {
-        'ordered_pairs'
+        'is_table'
       }
 
-local tremap_to_array,
+local tclone,
       toverride_many
       = import 'lua-nucleo/table-utils.lua'
       {
-        'tremap_to_array',
+        'tclone',
         'toverride_many'
       }
 
@@ -61,65 +52,44 @@ local make_cookie_jar
 
 local make_testbrowser
 do
-  --  Internal function: Let's hide all knowledge about curl inside
-  local perform = function(self, url)
+  --  Internal function: Let's hide all knowledge about implementation details
+  local perform = function(self, method, url, request_headers, request_body)
     method_arguments(self,
-        "string", url
+        "string", method,
+        "string", url,
+        "table", request_headers,
+        "string", request_body
       )
 
     local domain, path = get_domain_and_path(url)
 
-    -- data callback
-    local data_fn = function(stream, buf)
-      self.body = self.body .. buf
-      return #buf
-    end
+    self.cookie_jar:set_headers(request_headers, domain, path)
 
-    -- status/header callback
-    local header_fn = function(stream, buf)
-      local header, value = buf:match("([^:]+):%s+(.*)")
-      if header and value then
-        if header:lower() == "set-cookie" then
-          local status = self.cookie_jar:store_cookie(value, domain, path)
-          self.cookies_status = toverride_many(self.cookies_status, status)
-        end
-      end
-      return #buf
-    end
+    local request =
+      {
+        method = method;
+        url = url;
+        ssl_options = self.ssl_options;
+        request_headers = request_headers;
+        request_body = request_body;
+      }
 
-    local curl_setopt = function(curl_object, ...)
-      local success, error_message, error_code = curl_object:setopt(...)
-      if not success then
-        error("Curl error " .. error_message)
-      end
-    end
+    self.body, self.code, self.response_headers = send_http_request(request)
 
-    local headers = {}
-
-    self.cookie_jar:set_headers(headers, domain, path)
-
-    local c = curl.new()
-    curl_setopt(c, curl.OPT_URL, url)
-    curl_setopt(c, curl.OPT_HTTPHEADER,
-      unpack(
-        tremap_to_array(
-            function(header, value)
-              return header .. ": " .. value
-            end,
-            headers
+    -- Update cookies for any valid response
+    if self.body and is_table(self.response_headers) then
+      -- "set-cookie" in lowercase, because socket.http :lower() it
+      local set_cookie_header = self.response_headers["set-cookie"]
+      if set_cookie_header then
+        local status = self.cookie_jar:store_cookie(
+            set_cookie_header,
+            domain,
+            path
           )
-      )
-    )
-    curl_setopt(c, curl.OPT_WRITEFUNCTION, data_fn)
-    curl_setopt(c, curl.OPT_HEADERFUNCTION, header_fn)
-
-    local code, err = c:perform()
-    if not code then
-      c:close()
-      error("curl error: " .. err)
+        self.cookies_status = toverride_many(self.cookies_status, status)
+      end
     end
-    self.code = c:getinfo(curl.INFO_RESPONSE_CODE)
-    self.content_type = c:getinfo(curl.INFO_CONTENT_TYPE)
+
   end
 
   local clear = function(self)
@@ -128,12 +98,14 @@ do
       self.cookies_status = {};
   end
 
-  local GET = function(self, url)
+  local GET = function(self, url, request_headers)
+    request_headers = request_headers or {}
     method_arguments(self,
-        "string", url
+        "string", url,
+        "table", request_headers
       )
     self:clear()
-    perform(self, url)
+    perform(self, "GET", url, request_headers, "")
     return self.code
   end
 
@@ -144,6 +116,7 @@ do
       code = 0;
       body = "";
       cookies_status = {};
+      ssl_options = {};
       cookie_jar = make_cookie_jar();
 
       -- methods

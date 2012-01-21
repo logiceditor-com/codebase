@@ -89,7 +89,7 @@ PK.split_using_placeholders = function(source, keys)
   var pieces = source.split(new RegExp(pattern));
   for (var n = 0; n < pieces.length; n++)
   {
-    if (pieces[n] != undefined)
+    if (pieces[n] != undefined && pieces[n] !== "")
     {
       var item = pieces[n];
       if (item.substr(0, 2) == '${' && item.substr(item.length - 1) == '}')

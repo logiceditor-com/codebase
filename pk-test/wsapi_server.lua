@@ -34,6 +34,8 @@ do
       --          loop, usually being run from a fork, so the above limitation
       --          is bearable.
 
+      config_host = config_host or host
+      config_port = config_port or port
       arguments(
           "string", host,
           "number", port,

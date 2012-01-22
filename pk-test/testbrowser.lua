@@ -109,6 +109,19 @@ do
     return self.code
   end
 
+  local POST = function(self, url, request_body, request_headers)
+    request_body = request_body or ""
+    request_headers = request_headers or {}
+    method_arguments(self,
+        "string", url,
+        "string", request_body,
+        "table", request_headers
+      )
+    self:clear()
+    perform(self, "POST", url, request_headers, request_body)
+  end
+
+
   make_testbrowser = function()
     local browser =
     {
@@ -121,6 +134,7 @@ do
 
       -- methods
       GET = GET;
+      POST = POST;
 
       -- Internal, but public
       clear = clear;

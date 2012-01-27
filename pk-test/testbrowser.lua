@@ -48,6 +48,14 @@ local make_cookie_jar
         'make_cookie_jar'
       }
 
+local ensure_equals,
+      ensure_strequals
+      = import 'lua-nucleo/ensure.lua'
+      {
+        'ensure_equals',
+        'ensure_strequals'
+      }
+
 --------------------------------------------------------------------------------
 
 local make_testbrowser
@@ -98,6 +106,16 @@ do
       self.cookies_status = {};
   end
 
+  local ensure_response = function(self, message, code, body)
+    method_arguments(self,
+        "string", message,
+        "number", code,
+        "string", body
+      )
+    ensure_equals(message, code, self.code)
+    ensure_strequals(message, body, self.body)
+  end
+
   local GET = function(self, url, request_headers)
     request_headers = request_headers or {}
     method_arguments(self,
@@ -135,6 +153,9 @@ do
       -- methods
       GET = GET;
       POST = POST;
+
+      -- assertion helpers
+      ensure_response = ensure_response;
 
       -- Internal, but public
       clear = clear;

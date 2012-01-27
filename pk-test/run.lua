@@ -83,7 +83,8 @@ local run_tests_in_path = function(
     test_case_filter,
     randomseed,
     strict,
-    quick
+    quick,
+    fail_on_first_error
   )
   arguments(
       "string", test_cases_path,
@@ -91,7 +92,8 @@ local run_tests_in_path = function(
       "string", test_case_filter,
       "number", randomseed,
       "boolean", strict,
-      "boolean", quick
+      "boolean", quick,
+      "boolean", fail_on_first_error
     )
 
   local test_files = find_all_files(test_cases_path, test_case_filename_pattern)
@@ -117,6 +119,7 @@ local run_tests_in_path = function(
         strict_mode = strict;
         seed_value = randomseed;
         -- TODO: Support quick!
+        fail_on_first_error = fail_on_first_error;
       }
     )
 
@@ -140,6 +143,7 @@ local create_config_schema = function()
 
         cfg:boolean "strict" { default = false };
         cfg:boolean "quick" { default = false };
+        cfg:boolean "fail_on_first_error" { default = false };
       };
     }
   end)
@@ -166,6 +170,8 @@ Options:
                         Default: run tests in relaxed mode.
     --quick             Don't run slow tests.
                         Default: run slow tests.
+    --fail-on-first-error Stop running tests on first error
+                        Default: run all tests.
     --randomseed=<int>  Use given value as randomseed.
                         Default: `123456'.
     --test-cases-path   Set path to test cases.
@@ -206,6 +212,7 @@ local run = function(...)
         param.strict = not not args["--strict"]
         param.quick = not not args["--quick"]
         param.randomseed = args["--randomseed"]
+        param.fail_on_first_error = not not args["--fail-on-first-error"]
 
         return
         {
@@ -237,7 +244,8 @@ local run = function(...)
       CONFIG[TOOL_NAME].test_case_filter,
       CONFIG[TOOL_NAME].randomseed,
       CONFIG[TOOL_NAME].strict,
-      CONFIG[TOOL_NAME].quick
+      CONFIG[TOOL_NAME].quick,
+      CONFIG[TOOL_NAME].fail_on_first_error
     )
 
   if failed_test_qty ~= 0 then

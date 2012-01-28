@@ -134,7 +134,6 @@ return
   rh_check_request = { "pk-billing-lib/lib/lib/rq.lua" };
   stats_calc_counter = { "pk-billing-lib/lib/lib/stats.lua" };
   stats_get_counter = { "pk-billing-lib/lib/lib/stats.lua" };
-  vk_withdraw_votes = { "pk-billing-lib/lib/lib/paysystems/vkontakte.lua" };
   webmoney_error_handler = { "pk-billing-lib/lib/lib/paysystems/webmoney.lua" };
   webmoney_request = { "pk-billing-lib/lib/lib/paysystems/webmoney.lua" };
   webmoney_response_handler = { "pk-billing-lib/lib/lib/paysystems/webmoney.lua" };

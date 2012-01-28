@@ -51,6 +51,7 @@ return
   SIGXFSZ = { "pk-engine/signal.lua" };
   TASK_PROCESSOR_GROUPS_URL = { "pk-engine/srv/internal_config/client.lua" };
   TASK_PROCESSOR_NODES_URL = { "pk-engine/srv/internal_config/client.lua" };
+  VK_API_URL = { "pk-engine/webservice/partner/vkontakte.lua" };
   WAIT_MARKER = { "pk-engine/srv/channel/client.lua" };
   WWW_ADMIN_INFO_URL = { "pk-engine/srv/internal_config/client.lua" };
   WWW_GAME_INFO_URL = { "pk-engine/srv/internal_config/client.lua" };
@@ -171,6 +172,7 @@ return
   make_tcp_connector = { "pk-engine/connector.lua" };
   make_timestamp = { "pk-engine/crontab.lua" };
   make_url_handler_wrapper = { "pk-engine/webservice/client_api/url_handler_wrapper.lua" };
+  make_vk_api = { "pk-engine/webservice/partner/vkontakte.lua" };
   make_xml_schema_builder = { "pk-engine/xml_schema_builder.lua" };
   metadata_makers = { "pk-engine/form_handler_builder/metadata.lua" };
   nonnegative_integer = { "pk-engine/webservice/client_api/check.lua" };

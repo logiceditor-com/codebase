@@ -35,7 +35,14 @@ api:extend_context "frontend.cache" (function()
       --save request in queue
       request.status = PKB_TRANSACTION_STATUS.WAITING_CONFIRMATION_BY_APP
       request.id = api_context:ext("request_queue.cache"):try_set(api_context, request)
-
+      if paysystem.id == VK_PAYSYSTEM_ID and currency_price ~= project_price then
+        -- save subtransaction with amount in subpaysystem currency
+        local subtransaction =
+        {
+          amount = currency_price;
+        }
+        api_context:ext("subtransactions.cache"):try_set(api_context, request.id, subtransaction)
+      end
       return { request_id = request.id }
     end
 

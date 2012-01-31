@@ -51,7 +51,7 @@ api:export "lib/paysystems/od"
           "table", request
         )
 
-      local hash = od_create_hash("check", request, application)
+      local hash = od_create_hash("check", request, application.config['od_shop_password'])
       if trim(hash) ~= trim(request.key) then
         log("[od/check] incorrect key of request: ", hash, "/", request.key)
         return od_build_response("check", OD_RESPONSE_CODE_NO, request)
@@ -107,7 +107,7 @@ api:export "lib/paysystems/od"
           "table", request
         )
 
-      local hash = od_create_hash("payment", request, application)
+      local hash = od_create_hash("payment", request, application.config['od_shop_password'])
       if trim(hash) ~= trim(request.key) then
         log("[od/payment] incorrect key of request: ", hash, "/", request.key)
         return od_build_response("payment", OD_RESPONSE_CODE_NO, request)

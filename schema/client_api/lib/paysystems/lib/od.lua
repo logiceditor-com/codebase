@@ -32,23 +32,18 @@ api:export "lib/paysystems/lib/od"
     local OD_RESPONSE_CODE_NO = "NO";
     local OD_RESPONSE_CODE_YES = "YES";
 
-    local od_create_hash = function(method, request, app)
+    local od_create_hash = function(method, request, od_shop_password)
       arguments(
           "string", method,
           "table", request,
-          "table", app
+          "string", od_shop_password
         )
-
-      app.config = app.config or { }
-      if not app.config['od_shop_password'] then
-        return nil, "OD shop password in config app = " .. app.id .. " is absent"
-      end
 
       local hash = ""
       if method:lower() == "check" then
-        hash = "0" .. request.userid .. "0" .. app.config['od_shop_password']
+        hash = "0" .. request.userid .. "0" .. od_shop_password
       elseif method:lower() == "payment" then
-        hash = request.amount .. request.userid .. request.paymentid .. app.config['od_shop_password']
+        hash = request.amount .. request.userid .. request.paymentid .. od_shop_password
       end
 
       local md5 = require 'md5'

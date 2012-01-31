@@ -90,3 +90,15 @@ PK.count_properties = function(obj)
 
   return length;
 }
+
+/*
+  { name1: 1, name2: 2 } => { 1: name1, 2: name2 }
+*/
+
+PK.Swap_keys_and_values = function(value_by_name)
+{
+  var name_by_value = {}
+  for (var name in value_by_name)
+    name_by_value[value_by_name[name]] = name
+  return name_by_value
+}

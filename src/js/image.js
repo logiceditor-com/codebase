@@ -1,31 +1,41 @@
 //-----------------------------------------------------------------------------
-// image.js: A set of utilities working with DOM images
+// Utilities working with DOM images
 //-----------------------------------------------------------------------------
 
-// TODO: Rename
-function onImageLoadingError(evt)
+/**
+ * Log image loading error.
+ *
+ * @param evt
+ */
+PK.image_loading_error = function(evt)
 {
-  console.log(this, evt)
-  var src = (this && this.src) ? this.src : "(invalid image)"
-  PKHB.ERROR(I18N('Failed to load: ${1}', src))
-  this.loading_failure = true
+  console.log(this, evt);
+  var src = (this && this.src) ? this.src : "(invalid image)";
+  GUI_ERROR(I18N('Failed to load: ${1}', src));
+  this.loading_failure = true;
 }
 
 
-// TODO: Rename
-function hbe_checkIsImageLoaded(img)
+/**
+ * Check is image loaded.
+ *
+ * @param img
+ */
+PK.check_is_image_loaded = function(img)
 {
   // During the onload event, IE correctly identifies any images that
   // weren’t downloaded as not complete. Others should too. Gecko-based
   // browsers act like NS4 in that they report this incorrectly.
-  if(!img || !img.complete){
+  if (!img || !img.complete)
+  {
     return false;
   }
 
   // However, they do have two very useful properties: naturalWidth and
   // naturalHeight. These give the true size of the image. If it failed
   // to load, either of these should be zero.
-  if(typeof img.naturalWidth != "undefined" && img.naturalWidth == 0){
+  if (typeof img.naturalWidth != "undefined" && img.naturalWidth == 0)
+  {
     return false;
   }
 
@@ -34,11 +44,17 @@ function hbe_checkIsImageLoaded(img)
 }
 
 
-// TODO: Rename
-function hbe_checkIsImageLoadedOrFailed(img)
+/**
+ * Check is image loaded or failed.
+ *
+ * @param img
+ */
+PK.check_is_image_loaded_or_failed = function(img)
 {
-  if(hbe_checkIsImageLoaded(img))
+  if(PK.check_is_image_loaded(img))
+  {
     return true;
+  }
 
   return img && img.loading_failure;
 }

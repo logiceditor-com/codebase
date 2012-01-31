@@ -19,7 +19,7 @@ api:export "lib/appn_queue"
     local json_encode = require 'json.encode'
 
     local APPN_REQUEST_QUEUE_KEY = "app-notificator:queue";
-    local TRANSACTION_VISIBLE_FIELDS = { "stime", "amount", "id", "uid" }
+    local TRANSACTION_VISIBLE_FIELDS = { "stime", "amount", "id", "uid", "paysystem_subid", "paysystem_id" }
 
     -- TODO: generalize all create_*_request functions, reuse in all services
     -- https://redmine.iphonestudio.ru/issues/2779
@@ -73,7 +73,8 @@ api:export "lib/appn_queue"
       for i = 1, #transactions do
         local payment = transactions[i]
         xml = xml .. [[
-        <payment stime="]] .. payment.stime .. [[" amount = "]] .. payment.amount .. [[">
+        <payment stime="]] .. payment.stime .. [[" amount="]] .. payment.amount .. [["
+             paysystem_subid="]] .. payment.paysystem_subid .. [[" paysystem_id="]] ..payment.paysystem_id .. [[">
            <id><![CDATA[]] .. payment.id .. [=[]]></id>
            <uid><![CDATA[]=] .. payment.uid .. [=[]]></uid>
         </payment>

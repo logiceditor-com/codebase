@@ -7,7 +7,7 @@ PKEngine.UserInputHandlers = new function()
   var user_input_provider_;
 
   //  Core thing, should be moved into pk-core-js later
-  var hbe_prepare_event_ = function(e)
+  var prepare_event_ = function(e)
   {
     if (e === undefined)
     {
@@ -17,7 +17,7 @@ PKEngine.UserInputHandlers = new function()
   }
 
   //  Core thing, should be moved into pk-core-js later
-  var hbe_prevent_event_ = function(e)
+  var prevent_event_ = function(e)
   {
     if(e.preventDefault)
       e.preventDefault()
@@ -107,13 +107,13 @@ PKEngine.UserInputHandlers = new function()
     {
       if(!input_handling_is_enabled_())
         return 0;
-      e = hbe_prepare_event_(e)
+      e = prepare_event_(e)
 
       var mouse_coords = get_cursor_coords_(e);
 
       PKEngine.GUI.Viewport.on_mouse_down(mouse_coords.x, mouse_coords.y)
 
-      hbe_prevent_event_(e)
+      prevent_event_(e)
     }
     catch (e)
     {
@@ -133,13 +133,13 @@ PKEngine.UserInputHandlers = new function()
     {
       if(!input_handling_is_enabled_())
         return 0;
-      e = hbe_prepare_event_(e)
+      e = prepare_event_(e)
 
       var mouse_coords = get_cursor_coords_(e);
 
       PKEngine.GUI.Viewport.on_click(mouse_coords.x, mouse_coords.y)
 
-      hbe_prevent_event_(e)
+      prevent_event_(e)
     }
     catch (e)
     {
@@ -159,13 +159,13 @@ PKEngine.UserInputHandlers = new function()
     {
       if(!input_handling_is_enabled_())
         return 0;
-      e = hbe_prepare_event_(e)
+      e = prepare_event_(e)
 
       var mouse_coords = get_cursor_coords_(e);
 
       PKEngine.GUI.Viewport.on_mouse_move(mouse_coords.x, mouse_coords.y);
 
-      hbe_prevent_event_(e)
+      prevent_event_(e)
     }
     catch (e)
     {

@@ -66,7 +66,7 @@ PKEngine.Button = PKEngine.Control.extend(
     this.pressed_ = true;
     PKEngine.GUI.Viewport.request_redraw();
 
-    hbe_stopAndPlayAudio('Button');
+    PKEngine.SoundSystem.stop_and_play('Button');
 
     return true;
   },

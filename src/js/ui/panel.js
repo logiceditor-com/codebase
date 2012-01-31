@@ -522,7 +522,7 @@ PKEngine.GUI.makeBasePanel = function(panel_class_name, whole_config)
       if (!visible_)
         return;
 
-      hbe_resetShadow();
+      PKEngine.reset_shadow();
 
       if (background_config_.draw_common_background && common_background_)
       {

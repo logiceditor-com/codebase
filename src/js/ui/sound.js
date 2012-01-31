@@ -32,7 +32,7 @@ PKEngine.SoundSystem = new function()
   this.SwitchOn()
 }
 
-function hbe_returnSoundExtensionByBrowserSupport()
+PKEngine.SoundSystem.return_sound_extension_by_browser_support = function()
 {
   var sound_types =
   [
@@ -68,7 +68,7 @@ function hbe_returnSoundExtensionByBrowserSupport()
   return format
 }
 
-function hbe_stopAndPlayAudio(sound, loop)
+PKEngine.SoundSystem.stop_and_play = function(sound, loop)
 {
   if (!PKEngine.SoundSystem.IsOn())
     return;
@@ -107,7 +107,7 @@ function hbe_stopAndPlayAudio(sound, loop)
   }
 }
 
-function hbe_stopAudioExcept(exceptions)
+PKEngine.SoundSystem.stop_except = function(exceptions)
 {
   if (!PKEngine.SoundSystem.IsOn())
     return;
@@ -122,7 +122,7 @@ function hbe_stopAudioExcept(exceptions)
   }
 }
 
-function hbe_stopAudio(sound)
+PKEngine.SoundSystem.stop = function(sound)
 {
   if (!PKEngine.SoundSystem.IsOn())
     return;

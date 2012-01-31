@@ -56,7 +56,7 @@ PKEngine.SoundStore = new function()
   this.load_sounds = function(config)
   {
     var store = this,
-      soundFormat = hbe_returnSoundExtensionByBrowserSupport();
+      soundFormat = PKEngine.SoundSystem.return_sound_extension_by_browser_support();
 
     loaded_sounds_ = 0;
     total_sounds_ = PK.count_properties(PKEngine.SoundConfig.Sounds);

@@ -4,11 +4,11 @@
 
 PKEngine.initialize_error_window = function ()
 {
-  if (hbe_checkIsImageLoaded($('#error_window_bg')[0]) &&
-      hbe_checkIsImageLoaded($('#error_label')[0]) &&
-      hbe_checkIsImageLoaded($('#spacer_top')[0]) &&
-      hbe_checkIsImageLoaded($('#spacer_bottom')[0]) &&
-      hbe_checkIsImageLoaded($('#close_button')[0]))
+  if (check_is_image_loaded($('#error_window_bg')[0]) &&
+    check_is_image_loaded($('#error_label')[0]) &&
+    check_is_image_loaded($('#spacer_top')[0]) &&
+    check_is_image_loaded($('#spacer_bottom')[0]) &&
+    check_is_image_loaded($('#close_button')[0]))
   {
     $('.errorWindowInner').show();
   }

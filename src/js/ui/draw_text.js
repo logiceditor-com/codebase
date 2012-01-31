@@ -35,7 +35,7 @@ var setFontProperties = function(params)
 
   var font_style = font_properties.size + "pt " + font_properties.family
 
-  hbe_resetShadow()
+  PKEngine.reset_shadow()
 
   if (font_properties.shadow == true)
   {
@@ -69,5 +69,5 @@ var drawText = function(text, x, y, params)
   }
   game_field_2d_cntx.restore()
 
-  hbe_resetShadow()
+  PKEngine.reset_shadow()
 }

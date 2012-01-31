@@ -122,7 +122,7 @@ function checkLoadedData()
     if(pb_width > Loader_line_img.width){
       pb_width = Loader_line_img.width;
     }
-    hbe_resetShadow();
+    PKEngine.reset_shadow();
     game_field_2d_cntx.drawImage(
       Loader_line_img,
       0, 0,

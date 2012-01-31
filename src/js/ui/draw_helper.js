@@ -43,15 +43,15 @@ var ToggleSound = function()
     {
       PKEngine.SoundSystem.SwitchOff();
 
-      hbe_stopAudioExcept(['Button']);
+      PKEngine.SoundSystem.stop_except(['Button']);
     }
     else
     {
       PKEngine.SoundSystem.SwitchOn();
       audio_btn_state = 'on';
-      hbe_stopAndPlayAudio('Button');
+      PKEngine.SoundSystem.stop_and_play('Button');
       if(PKEngine.GUI.Viewport.get_current_screen() == PKEngine.GUIControls.SCREEN_NAMES.GameScreen)
-        hbe_stopAndPlayAudio('Music', true);
+        PKEngine.SoundSystem.stop_and_play('Music', true);
     }
   }
 
@@ -60,7 +60,7 @@ var ToggleSound = function()
 
 //------------------------------------------------------------------------------
 
-function hbe_resetShadow()
+PKEngine.reset_shadow = function()
 {
   game_field_2d_cntx.strokeStyle = 'rgba(0,0,0,0)';
   game_field_2d_cntx.shadowColor = 'rgba(0,0,0,0)';

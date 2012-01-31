@@ -2,9 +2,9 @@
 // Region class (a set of rectangles actually)
 //------------------------------------------------------------------------------
 
-PKHB.check_namespace('GUI')
+PKEngine.check_namespace('GUI')
 
-PKHB.GUI.Region = new function()
+PKEngine.GUI.Region = new function()
 {
 
 this.make = function() { return new function()

@@ -2,7 +2,7 @@
 // Platform
 //------------------------------------------------------------------------------
 
-PKHB.Platform = new function()
+PKEngine.Platform = new function()
 {
   var platform_type_;
   var DETECT_IPAD_ONLY_ = true;
@@ -60,7 +60,7 @@ PKHB.Platform = new function()
   // Note: Normally you should never call this method, it's left only for quickfixes!
   this.get_type = function()
   {
-    PKHB.ERROR(I18N("PKHB.Platform.get_type called! Call this function only for quickfixes!"))
+    PKEngine.ERROR(I18N("PKEngine.Platform.get_type called! Call this function only for quickfixes!"))
 
     return platform_type_;
   }

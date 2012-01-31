@@ -2,7 +2,7 @@
 // Button
 //------------------------------------------------------------------------------
 
-PKHB.Button = PKHB.Control.extend(
+PKEngine.Button = PKEngine.Control.extend(
 {
   pressed_: false,
 
@@ -43,7 +43,7 @@ PKHB.Button = PKHB.Control.extend(
       return
     this.state = state;
 
-    PKHB.GUI.Viewport.request_redraw();
+    PKEngine.GUI.Viewport.request_redraw();
   },
 
   get_state: function()
@@ -58,13 +58,13 @@ PKHB.Button = PKHB.Control.extend(
       if (this.pressed_)
       {
         this.pressed_ = true;
-        PKHB.GUI.Viewport.request_redraw();
+        PKEngine.GUI.Viewport.request_redraw();
       }
       return false;
     }
 
     this.pressed_ = true;
-    PKHB.GUI.Viewport.request_redraw();
+    PKEngine.GUI.Viewport.request_redraw();
 
     hbe_stopAndPlayAudio('Button');
 
@@ -80,14 +80,14 @@ PKHB.Button = PKHB.Control.extend(
       return false;
 
     this.pressed_ = false;
-    PKHB.GUI.Viewport.request_redraw();
+    PKEngine.GUI.Viewport.request_redraw();
 
     return is_on_me;
   },
 
   draw: function()
   {
-    PKHB.GUI.Viewport.notify_control_draw_start();
+    PKEngine.GUI.Viewport.notify_control_draw_start();
 
     if (!this.visible)
     {
@@ -118,7 +118,7 @@ PKHB.Button = PKHB.Control.extend(
 
     var image = this.states[this.state];
 
-    var tl_corner = PKHB.Anchoring.calc_tl_corner(
+    var tl_corner = PKEngine.Anchoring.calc_tl_corner(
       this.x, this.y,
       this.anchor_x, this.anchor_y,
       image.width, image.height

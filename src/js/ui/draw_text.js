@@ -53,9 +53,9 @@ var setFontProperties = function(params)
 var drawText = function(text, x, y, params)
 {
   if(x === undefined || x == "center")
-    x = PKHB.GUIControls.get_center().x
+    x = PKEngine.GUIControls.get_center().x
   if(y === undefined || y == "center")
-    y = PKHB.GUIControls.get_center().y
+    y = PKEngine.GUIControls.get_center().y
 
   setFontProperties(params);
 

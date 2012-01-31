@@ -2,7 +2,7 @@
 // Label
 //------------------------------------------------------------------------------
 
-PKHB.Label = PKHB.Control.extend(
+PKEngine.Label = PKEngine.Control.extend(
 {
   width: 0,
   height: 0,
@@ -68,7 +68,7 @@ PKHB.Label = PKHB.Control.extend(
 
   draw: function()
   {
-    PKHB.GUI.Viewport.notify_control_draw_start()
+    PKEngine.GUI.Viewport.notify_control_draw_start()
 
     if (!this.visible)
     {

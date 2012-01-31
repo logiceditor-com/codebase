@@ -27,7 +27,7 @@ var InitLoader = function(img_path, lang, onload)
     .error(
         function ()
         {
-          PKHB.ERROR(I18N('Cant load loader background!'));
+          PKEngine.ERROR(I18N('Cant load loader background!'));
         }
     )
     .appendTo($('#div_loader'))[0];
@@ -41,7 +41,7 @@ var InitLoader = function(img_path, lang, onload)
     .error(
         function ()
         {
-          PKHB.ERROR(I18N('Cant load loader progress bar!'));
+          PKEngine.ERROR(I18N('Cant load loader progress bar!'));
         }
     )
     .appendTo($('#resources'))[0];
@@ -83,7 +83,7 @@ var switch_to_canvas = function()
   $('#div_loader').hide();
   game_field_2d_cntx.drawImage(Loader_back_img, 0, 0);
   Loader_back_img.is_drawn = true;
-  PKHB.GUI.Viewport.show_game_field()
+  PKEngine.GUI.Viewport.show_game_field()
 }
 
 //------------------------------------------------------------------------------
@@ -103,15 +103,15 @@ function checkLoadedData()
 
   // graphics
 
-  var loading_progress = PKHB.GraphicsStore.count_loaded();
-  var all_resources = PKHB.GraphicsStore.count_total();
+  var loading_progress = PKEngine.GraphicsStore.count_loaded();
+  var all_resources = PKEngine.GraphicsStore.count_total();
 
   // audio
 
-  if (!PKHB.SoundSystem.IsDisabled())
+  if (!PKEngine.SoundSystem.IsDisabled())
   {
-    loading_progress += PKHB.SoundStore.count_loaded();
-    all_resources += PKHB.SoundStore.count_total();
+    loading_progress += PKEngine.SoundStore.count_loaded();
+    all_resources += PKEngine.SoundStore.count_total();
   }
 
   if(loading_progress > g_last_loading_progress)
@@ -127,8 +127,8 @@ function checkLoadedData()
       Loader_line_img,
       0, 0,
       pb_width, Loader_line_img.height,
-      PKHB.GUIControls.get_loader_parameters().line_coords.x,
-      PKHB.GUIControls.get_loader_parameters().line_coords.y,
+      PKEngine.GUIControls.get_loader_parameters().line_coords.x,
+      PKEngine.GUIControls.get_loader_parameters().line_coords.y,
       pb_width, Loader_line_img.height
     );
   }
@@ -136,7 +136,7 @@ function checkLoadedData()
   if (loading_progress >= all_resources)
   {
     g_resources_loaded = true;
-    PKHB.GameEngine.MainLoop.start(1000, PKHB.CustomMainLoopActions);
+    PKEngine.GameEngine.MainLoop.start(1000, PKEngine.CustomMainLoopActions);
     onResourceLoadingComplete()
     return;
   }
@@ -154,5 +154,5 @@ function ResourcesAreLoaded()
 
 var onResourceLoadingComplete = function()
 {
-  PKHB.iPadAdd2Home.show();
+  PKEngine.iPadAdd2Home.show();
 }

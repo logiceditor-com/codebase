@@ -2,9 +2,9 @@
 // Panel class
 //------------------------------------------------------------------------------
 
-PKHB.check_namespace('GUI')
+PKEngine.check_namespace('GUI')
 
-PKHB.GUI.makeBasePanel = function(panel_class_name, whole_config)
+PKEngine.GUI.makeBasePanel = function(panel_class_name, whole_config)
 {
   assert(panel_class_name, I18N('No panel class name'))
   assert(whole_config, I18N('No config for panel class ${1}', panel_class_name))
@@ -21,7 +21,7 @@ PKHB.GUI.makeBasePanel = function(panel_class_name, whole_config)
 
     var panel_class_name_ = panel_class_name
 
-    var common_background_ = PKHB.GUIControls.get_common_background()
+    var common_background_ = PKEngine.GUIControls.get_common_background()
 
     var config_ = whole_config.class_config
 
@@ -71,7 +71,7 @@ PKHB.GUI.makeBasePanel = function(panel_class_name, whole_config)
 
     var label_font_ = config_ && config_.fonts && config_.fonts['default'] ? config_.fonts['default'] : undefined
     if (!label_font_)
-      label_font_ = PKHB.GUIControls.get_common_font()
+      label_font_ = PKEngine.GUIControls.get_common_font()
 
     var image_resources_ = {}
     var images_ = {}, labels_ = {}, buttons_ = {}
@@ -108,12 +108,12 @@ PKHB.GUI.makeBasePanel = function(panel_class_name, whole_config)
         var instance_config = config_.panels[name]
 
         var child_class_config = assert(
-            PKHB.GUIControls.get_control_config(instance_config['class']),
+            PKEngine.GUIControls.get_control_config(instance_config['class']),
             I18N('Undefined panel class: ${1}', instance_config['class'])
           )
 
         var maker = assert(
-            PKHB.GUIControlFactory[instance_config['class']],
+            PKEngine.GUIControlFactory[instance_config['class']],
             I18N('Cannot create panel: ${1}', instance_config['class'])
           )
 
@@ -143,7 +143,7 @@ PKHB.GUI.makeBasePanel = function(panel_class_name, whole_config)
                 typeof image_set[key] == 'string',
                 I18N('Bad image set src: ${1}', global_class_name_(name))
               )
-              image_resources_[name][key] = PKHB.GraphicsStore.add(
+              image_resources_[name][key] = PKEngine.GraphicsStore.add(
                   global_class_name_(name) + "." + key, image_set[key] + ANTI_CACHE,
                   checkLoadedData, onImageLoadingError
                 )
@@ -156,7 +156,7 @@ PKHB.GUI.makeBasePanel = function(panel_class_name, whole_config)
               typeof image_resource_config_[name] == 'string',
               I18N('Bad image set src: ${1}', global_class_name_(name))
             )
-            image_resources_[name] = PKHB.GraphicsStore.add(
+            image_resources_[name] = PKEngine.GraphicsStore.add(
                 global_class_name_(name), image_resource_config_[name] + ANTI_CACHE,
                 checkLoadedData, onImageLoadingError
               )
@@ -194,15 +194,15 @@ PKHB.GUI.makeBasePanel = function(panel_class_name, whole_config)
           {
             if (typeof resource == "string")
             {
-              resource = PKHB.GraphicsStore.get(resource)
+              resource = PKEngine.GraphicsStore.get(resource)
             }
             else
             {
-              resource = PKHB.GraphicsStore.get(resource.group, resource.key)
+              resource = PKEngine.GraphicsStore.get(resource.group, resource.key)
             }
           }
 
-          images_[name] = new PKHB.Image(x, y, resource);
+          images_[name] = new PKEngine.Image(x, y, resource);
           if (image.visible !== undefined)
           {
             images_[name].set_visible(image.visible);
@@ -236,7 +236,7 @@ PKHB.GUI.makeBasePanel = function(panel_class_name, whole_config)
             params.size = label_font_.size
           }
 
-          labels_[name] = new PKHB.Label(x, y, label.width, label.height,
+          labels_[name] = new PKEngine.Label(x, y, label.width, label.height,
               label.clickable, text, params
           );
           if (label.visible !== undefined)
@@ -268,7 +268,7 @@ PKHB.GUI.makeBasePanel = function(panel_class_name, whole_config)
 
           if (button_config['img_on'])
           {
-            states['on'] = PKHB.GraphicsStore.add(
+            states['on'] = PKEngine.GraphicsStore.add(
               name, button_config['img_on'] + ANTI_CACHE,
               checkLoadedData, onImageLoadingError
             )
@@ -276,7 +276,7 @@ PKHB.GUI.makeBasePanel = function(panel_class_name, whole_config)
 
           if (button_config['img_off'])
           {
-            states['off'] = PKHB.GraphicsStore.add(
+            states['off'] = PKEngine.GraphicsStore.add(
               name, button_config['img_off'] + ANTI_CACHE,
               checkLoadedData, onImageLoadingError
             );
@@ -284,7 +284,7 @@ PKHB.GUI.makeBasePanel = function(panel_class_name, whole_config)
 
           if (button_config['img_prsd'])
           {
-            states['pressed'] = PKHB.GraphicsStore.add(
+            states['pressed'] = PKEngine.GraphicsStore.add(
               name, button_config['img_prsd'] + ANTI_CACHE,
               checkLoadedData, onImageLoadingError
             );
@@ -292,7 +292,7 @@ PKHB.GUI.makeBasePanel = function(panel_class_name, whole_config)
 
           var x = client2parentX ? client2parentX(button_config.x) : button_config.x,
               y = client2parentY ? client2parentY(button_config.y) : button_config.y;
-          buttons_[name] = new PKHB.Button(x, y, states);
+          buttons_[name] = new PKEngine.Button(x, y, states);
 
           buttons_[name].set_visible(
               button_config.visible !== undefined ? button_config.visible : DEFAULT_BUTTON_VISIBILITY
@@ -344,7 +344,7 @@ PKHB.GUI.makeBasePanel = function(panel_class_name, whole_config)
     this.set_control_origin = function(name, x, y, container, type_name, method_name)
     {
       var control = container[name]
-      if (!control) { PKHB.ERROR(I18N('${1} not found: ${2}', type_name, instance_child_name_(name))); return }
+      if (!control) { PKEngine.ERROR(I18N('${1} not found: ${2}', type_name, instance_child_name_(name))); return }
       if (!method_name)
       {
         if (x !== undefined)  control.x = x
@@ -366,7 +366,7 @@ PKHB.GUI.makeBasePanel = function(panel_class_name, whole_config)
       var image = images_[name]
       if (!image)
       {
-        PKHB.ERROR(I18N('Image not found: ${1}', instance_child_name_(name)))
+        PKEngine.ERROR(I18N('Image not found: ${1}', instance_child_name_(name)))
         return
       }
 
@@ -378,7 +378,7 @@ PKHB.GUI.makeBasePanel = function(panel_class_name, whole_config)
       var label = labels_[name]
       if (!label)
       {
-        PKHB.ERROR(I18N('Label not found: ${1}', instance_child_name_(name)))
+        PKEngine.ERROR(I18N('Label not found: ${1}', instance_child_name_(name)))
         return
       }
 
@@ -395,7 +395,7 @@ PKHB.GUI.makeBasePanel = function(panel_class_name, whole_config)
       var button = buttons_[name]
       if (!button)
       {
-        PKHB.ERROR(I18N('Button not found: ${1}', instance_child_name_(name)))
+        PKEngine.ERROR(I18N('Button not found: ${1}', instance_child_name_(name)))
         return
       }
 
@@ -501,7 +501,7 @@ PKHB.GUI.makeBasePanel = function(panel_class_name, whole_config)
 
       visible_ = true
 
-      PKHB.GUI.Viewport.request_redraw()
+      PKEngine.GUI.Viewport.request_redraw()
     }
 
     this.hide = function()
@@ -510,14 +510,14 @@ PKHB.GUI.makeBasePanel = function(panel_class_name, whole_config)
 
       visible_ = false
 
-      PKHB.GUI.Viewport.request_redraw()
+      PKEngine.GUI.Viewport.request_redraw()
     }
 
     //--------------------------------------------------------------------------
 
     this.draw = function()
     {
-      PKHB.GUI.Viewport.notify_control_draw_start()
+      PKEngine.GUI.Viewport.notify_control_draw_start()
 
       if (!visible_)
         return;
@@ -527,16 +527,16 @@ PKHB.GUI.makeBasePanel = function(panel_class_name, whole_config)
       if (background_config_.draw_common_background && common_background_)
       {
         game_field_2d_cntx.drawImage(
-            PKHB.GraphicsStore.get(common_background_),
+            PKEngine.GraphicsStore.get(common_background_),
             0, 0,
-            PKHB.GUIControls.get_size().width, PKHB.GUIControls.get_size().height
+            PKEngine.GUIControls.get_size().width, PKEngine.GUIControls.get_size().height
           );
       }
 
       if (background_config_.image)
       {
         DrawImage(
-            PKHB.GraphicsStore.get(background_config_.image),
+            PKEngine.GraphicsStore.get(background_config_.image),
             client2parentX(background_config_.x), client2parentY(background_config_.y)
           );
       }

@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 
 
-PKHB.GameEngine.MainLoop = new function()
+PKEngine.GameEngine.MainLoop = new function()
 {
   var instance_ = this
 
@@ -24,7 +24,7 @@ PKHB.GameEngine.MainLoop = new function()
     {
       // Handle events (from server)
       if (can_process_events_)
-        PKHB.EventQueue.run()
+        PKEngine.EventQueue.run()
 
       if (custom_main_loop_actions_)
         custom_main_loop_actions_()
@@ -32,16 +32,16 @@ PKHB.GameEngine.MainLoop = new function()
 
       // Note: It's useless to move it to separate callback since
       //       JS uses cooperative multitasking still
-      if (PKHB.GUI.Renderer)
+      if (PKEngine.GUI.Renderer)
       {
-        PKHB.GUI.Renderer.render()
+        PKEngine.GUI.Renderer.render()
       }
     }
     catch (e)
     {
       var err_msg = e.toString ? e.toString() : JSON.stringify(e,null,4)
       if (e && window.console && console.log) console.log("exception stack:", e.stack)
-      PKHB.ERROR(I18N('[PKHB.GameEngine.MainLoop] exception: ${1}', err_msg));
+      PKEngine.ERROR(I18N('[PKEngine.GameEngine.MainLoop] exception: ${1}', err_msg));
     }
   }
 

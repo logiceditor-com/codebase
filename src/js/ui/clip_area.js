@@ -2,9 +2,9 @@
 // Clip area for canvas 2D context
 //------------------------------------------------------------------------------
 
-PKHB.check_namespace('GUI')
+PKEngine.check_namespace('GUI')
 
-PKHB.GUI.ClipArea = new function()
+PKEngine.GUI.ClipArea = new function()
 {
   this.set = function(area)
   {

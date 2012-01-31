@@ -2,7 +2,7 @@
 // Server protocol description and checks
 //------------------------------------------------------------------------------
 
-PKHB.ClientAPI = new function()
+PKEngine.ClientAPI = new function()
 {
   var supported_version_
 
@@ -26,7 +26,7 @@ PKHB.ClientAPI = new function()
       return true
     }
 
-    PKHB.ERROR( I18N(
+    PKEngine.ERROR( I18N(
         'Invalid API version: expected ${1}, got ${2}',
         JSON.stringify(supported_version_, null, 4),
         JSON.stringify(received_version, null, 4)

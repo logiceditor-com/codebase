@@ -2,9 +2,9 @@
 // Renderer
 //------------------------------------------------------------------------------
 
-PKHB.check_namespace('GUI')
+PKEngine.check_namespace('GUI')
 
-PKHB.GUI.Renderer = new function()
+PKEngine.GUI.Renderer = new function()
 {
   var PERIOD_ = 1000 // ms
   var FPS_RECT_ = { top: 0, left: 0, bottom: 50, right: 100 }
@@ -88,7 +88,7 @@ PKHB.GUI.Renderer = new function()
   {
     count_fps_()
 
-    PKHB.GUI.Viewport.draw()
+    PKEngine.GUI.Viewport.draw()
 
     if (must_draw_fps_)
       draw_fps_()

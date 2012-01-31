@@ -2,7 +2,7 @@
 // GUI Controls
 //------------------------------------------------------------------------------
 
-PKHB.GUIControls = new function()
+PKEngine.GUIControls = new function()
 {
   var config_ = {}
 
@@ -51,7 +51,7 @@ PKHB.GUIControls = new function()
               typeof image_set[key] == 'string',
               I18N('Bad image set src: ${1}', (panel_name_ + "." + name))
             )
-            PKHB.GraphicsStore.add(
+            PKEngine.GraphicsStore.add(
                 name + "." + key, image_set[key] + ANTI_CACHE,
                 checkLoadedData, onImageLoadingError
               )
@@ -64,7 +64,7 @@ PKHB.GUIControls = new function()
             typeof image_config_[name] == 'string',
             I18N('Bad image set src: ${1}', (panel_name_ + "." + name))
           )
-          PKHB.GraphicsStore.add(
+          PKEngine.GraphicsStore.add(
               name, image_config_[name] + ANTI_CACHE,
               checkLoadedData, onImageLoadingError
             )
@@ -77,7 +77,7 @@ PKHB.GUIControls = new function()
     {
       var class_name = control_name
 
-      var screen = assert(PKHB.GUIControlFactory[class_name](), I18N('Cannot create panel: ${1}', class_name))
+      var screen = assert(PKEngine.GUIControlFactory[class_name](), I18N('Cannot create panel: ${1}', class_name))
 
       this.screens_by_class_name_[control_name] = screen
 

@@ -37,20 +37,20 @@ var ToggleSound = function()
 {
   var audio_btn_state = 'off';
 
-  if (!PKHB.SoundSystem.IsDisabled())
+  if (!PKEngine.SoundSystem.IsDisabled())
   {
-    if (PKHB.SoundSystem.IsOn())
+    if (PKEngine.SoundSystem.IsOn())
     {
-      PKHB.SoundSystem.SwitchOff();
+      PKEngine.SoundSystem.SwitchOff();
 
       hbe_stopAudioExcept(['Button']);
     }
     else
     {
-      PKHB.SoundSystem.SwitchOn();
+      PKEngine.SoundSystem.SwitchOn();
       audio_btn_state = 'on';
       hbe_stopAndPlayAudio('Button');
-      if(PKHB.GUI.Viewport.get_current_screen() == PKHB.GUIControls.SCREEN_NAMES.GameScreen)
+      if(PKEngine.GUI.Viewport.get_current_screen() == PKEngine.GUIControls.SCREEN_NAMES.GameScreen)
         hbe_stopAndPlayAudio('Music', true);
     }
   }

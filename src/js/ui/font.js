@@ -2,7 +2,7 @@
 // Font
 //------------------------------------------------------------------------------
 
-PKHB.Fonts = new function()
+PKEngine.Fonts = new function()
 {
   this.measureText = function(font, text)
   {

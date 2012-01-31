@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 
 
-PKHB.SocialNetAPI = new function()
+PKEngine.SocialNetAPI = new function()
 {
   this.UNSUPPORTED_API_METHOD = function()
   {
@@ -35,7 +35,7 @@ PKHB.SocialNetAPI = new function()
     this.NETWORK_NAMES[this.NETWORK_TYPE.OK] = 'odnoklassniki'
   }
 
-  this.NETWORK_ID_BY_NAME = PKHB.Swap_keys_and_values(this.NETWORK_NAMES)
+  this.NETWORK_ID_BY_NAME = PKEngine.Swap_keys_and_values(this.NETWORK_NAMES)
 
   //----------------------------------------------------------------------------
 
@@ -75,30 +75,30 @@ PKHB.SocialNetAPI = new function()
     {
       if (!this.NETWORK_ID_BY_NAME[social_network_name])
       {
-        PKHB.ERROR(I18N('Unknown social net: ${1}', social_network_name))
+        PKEngine.ERROR(I18N('Unknown social net: ${1}', social_network_name))
       }
       else
       {
         if (this.NETWORK_ID_BY_NAME[social_network_name] == this.NETWORK_TYPE.AUTHLESS)
         {
           social_network_type = this.NETWORK_TYPE.AUTHLESS
-          api = PKHB.SocialNetAPIImpl.Authless
+          api = PKEngine.SocialNetAPIImpl.Authless
         }
         else if (this.NETWORK_ID_BY_NAME[social_network_name] == this.NETWORK_TYPE.VK)
         {
           // Note: this is used to search in social_net_config
           social_network_type = this.NETWORK_TYPE.VK
 
-          api = PKHB.SocialNetAPIImpl.VK_External
+          api = PKEngine.SocialNetAPIImpl.VK_External
         }
         else if (this.NETWORK_ID_BY_NAME[social_network_name] == this.NETWORK_TYPE.MM)
         {
           social_network_type = this.NETWORK_TYPE.MM
-          api = PKHB.SocialNetAPIImpl.MM_External
+          api = PKEngine.SocialNetAPIImpl.MM_External
         }
         else if (this.NETWORK_ID_BY_NAME[social_network_name] == this.NETWORK_TYPE.OK)
         {
-          PKHB.ERROR(I18N("TODO: 'odnoklassniki' are not supported yet!"))
+          PKEngine.ERROR(I18N("TODO: 'odnoklassniki' are not supported yet!"))
         }
       }
     }
@@ -109,22 +109,22 @@ PKHB.SocialNetAPI = new function()
       if (window.VK)
       {
         social_network_type = this.NETWORK_TYPE.VK
-        api = PKHB.SocialNetAPIImpl.VK_Internal
+        api = PKEngine.SocialNetAPIImpl.VK_Internal
       }
       else if(window.mailru)
       {
         social_network_type = this.NETWORK_TYPE.MM
-        api = PKHB.SocialNetAPIImpl.MM_Internal
+        api = PKEngine.SocialNetAPIImpl.MM_Internal
       }
       else if (window.FAPI)
       {
         social_network_type = this.NETWORK_TYPE.OK
-        api = PKHB.SocialNetAPIImpl.OK_Internal
+        api = PKEngine.SocialNetAPIImpl.OK_Internal
       }
     }
     else
     {
-      PKHB.ERROR(I18N("Invalid parameters for PKHB.SocialNetAPI.init() call!"))
+      PKEngine.ERROR(I18N("Invalid parameters for PKEngine.SocialNetAPI.init() call!"))
     }
 
     assert(social_network_type, I18N("Failed to set social net api!"))
@@ -143,9 +143,9 @@ PKHB.SocialNetAPI = new function()
 // authless
 //------------------------------------------------------------------------------
 
-PKHB.check_namespace('SocialNetAPIImpl')
+PKEngine.check_namespace('SocialNetAPIImpl')
 
-PKHB.SocialNetAPIImpl.Authless = new function()
+PKEngine.SocialNetAPIImpl.Authless = new function()
 {
   var id_
 
@@ -166,7 +166,7 @@ PKHB.SocialNetAPIImpl.Authless = new function()
 
   this.has_method = function(name)
   {
-    return this[name] && this[name] != PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
+    return this[name] && this[name] != PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
   }
 
   this.login = function(callback)
@@ -174,22 +174,22 @@ PKHB.SocialNetAPIImpl.Authless = new function()
     callback({
         id: id_,
         session: "<authless session>",
-        networkID: PKHB.SocialNetAPI.NETWORK_TYPE.AUTHLESS
+        networkID: PKEngine.SocialNetAPI.NETWORK_TYPE.AUTHLESS
       })
     return true
   }
 
   //TODO: Implement supported methods
-  this.get_currency_name = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_app_id = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_billing_app_id = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_uid = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_friends = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_profiles = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_balance = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.payment = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.invite = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.wallPost = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_currency_name = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_app_id = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_billing_app_id = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_uid = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_friends = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_profiles = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_balance = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.payment = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.invite = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.wallPost = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
 }
 
 
@@ -197,9 +197,9 @@ PKHB.SocialNetAPIImpl.Authless = new function()
 // vkontakte
 //------------------------------------------------------------------------------
 
-PKHB.check_namespace('SocialNetAPIImpl')
+PKEngine.check_namespace('SocialNetAPIImpl')
 
-PKHB.SocialNetAPIImpl.VK_Internal = new function()
+PKEngine.SocialNetAPIImpl.VK_Internal = new function()
 {
   var test_mode_;
   var app_id_;
@@ -263,7 +263,7 @@ PKHB.SocialNetAPIImpl.VK_Internal = new function()
 
   this.has_method = function(name)
   {
-    return this[name] && this[name] != PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
+    return this[name] && this[name] != PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
   }
 
   this.login = function(callback)
@@ -271,7 +271,7 @@ PKHB.SocialNetAPIImpl.VK_Internal = new function()
     callback({
         id: viewer_id_,
         session: auth_key_, // Note: Could be 'sid_', but be must give auth_key here
-        networkID:  PKHB.SocialNetAPI.NETWORK_TYPE.VK
+        networkID:  PKEngine.SocialNetAPI.NETWORK_TYPE.VK
       })
     return true
   }
@@ -418,7 +418,7 @@ PKHB.SocialNetAPIImpl.VK_Internal = new function()
 }
 
 
-PKHB.SocialNetAPIImpl.VK_External = new function()
+PKEngine.SocialNetAPIImpl.VK_External = new function()
 {
   var test_mode_;
   var app_id;
@@ -472,7 +472,7 @@ PKHB.SocialNetAPIImpl.VK_External = new function()
 
   this.has_method = function(name)
   {
-    return this[name] && this[name] != PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
+    return this[name] && this[name] != PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
   }
 
   this.login = function(callback)
@@ -485,7 +485,7 @@ PKHB.SocialNetAPIImpl.VK_External = new function()
         callback({
             id: response.session.mid,
             session: 0, // Note: Could be 'response.session.sid', but we don't need session here
-            networkID:  PKHB.SocialNetAPI.NETWORK_TYPE.VK_EXTERNAL
+            networkID:  PKEngine.SocialNetAPI.NETWORK_TYPE.VK_EXTERNAL
           })
       }
       else
@@ -538,9 +538,9 @@ PKHB.SocialNetAPIImpl.VK_External = new function()
   }
 
   // Not supported
-  this.get_balance = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.payment = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.invite = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_balance = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.payment = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.invite = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
 
   // TODO: Share with VK_Internal
   this.wallPost = function(uid, msg, image_name, post_id, link)
@@ -596,9 +596,9 @@ PKHB.SocialNetAPIImpl.VK_External = new function()
 //------------------------------------------------------------------------------
 
 
-PKHB.check_namespace('SocialNetAPIImpl')
+PKEngine.check_namespace('SocialNetAPIImpl')
 
-PKHB.SocialNetAPIImpl.MM_Internal = new function()
+PKEngine.SocialNetAPIImpl.MM_Internal = new function()
 {
   var vid_, session_key_
 
@@ -618,26 +618,26 @@ PKHB.SocialNetAPIImpl.MM_Internal = new function()
 
   this.has_method = function(name)
   {
-    return this[name] && this[name] != PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
+    return this[name] && this[name] != PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
   }
 
   this.login = function(callback)
   {
     callback({
         id: vid_, session: session_key_,
-        networkID: PKHB.SocialNetAPI.NETWORK_TYPE.MM
+        networkID: PKEngine.SocialNetAPI.NETWORK_TYPE.MM
       })
     return true
   }
 
   //TODO: Implement
-  this.get_currency_name = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_app_id = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_billing_app_id = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_uid = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_friends = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_profiles = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_balance = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_currency_name = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_app_id = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_billing_app_id = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_uid = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_friends = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_profiles = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_balance = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
 
   this.payment = function(id, service_name, price, callbacks)
   {
@@ -646,7 +646,7 @@ PKHB.SocialNetAPIImpl.MM_Internal = new function()
     return true
   }
 
-  this.invite = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.invite = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
 
   this.wallPost = function(uid, msg, image_name, post_id, link)
   {
@@ -657,7 +657,7 @@ PKHB.SocialNetAPIImpl.MM_Internal = new function()
 }
 
 
-PKHB.SocialNetAPIImpl.MM_External = new function()
+PKEngine.SocialNetAPIImpl.MM_External = new function()
 {
   this.init = function(social_network_config, query_params, callback)
   {
@@ -676,7 +676,7 @@ PKHB.SocialNetAPIImpl.MM_External = new function()
 
   this.has_method = function(name)
   {
-    return this[name] && this[name] != PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
+    return this[name] && this[name] != PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
   }
 
   this.login = function(callback)
@@ -687,7 +687,7 @@ PKHB.SocialNetAPIImpl.MM_External = new function()
       {
         callback({
             id: session.vid, session: session.session_key,
-            networkID: PKHB.SocialNetAPI.NETWORK_TYPE.MM
+            networkID: PKEngine.SocialNetAPI.NETWORK_TYPE.MM
           })
       }
       else
@@ -701,16 +701,16 @@ PKHB.SocialNetAPIImpl.MM_External = new function()
   }
 
   //TODO: Implement supported methods
-  this.get_currency_name = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_app_id = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_billing_app_id = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_uid = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_friends = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_profiles = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_balance = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.payment = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.invite = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.wallPost = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_currency_name = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_app_id = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_billing_app_id = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_uid = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_friends = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_profiles = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_balance = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.payment = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.invite = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.wallPost = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
 }
 
 
@@ -719,9 +719,9 @@ PKHB.SocialNetAPIImpl.MM_External = new function()
 //------------------------------------------------------------------------------
 
 
-PKHB.check_namespace('SocialNetAPIImpl')
+PKEngine.check_namespace('SocialNetAPIImpl')
 
-PKHB.SocialNetAPIImpl.OK_Internal = new function()
+PKEngine.SocialNetAPIImpl.OK_Internal = new function()
 {
   var logged_user_id_, session_key_
 
@@ -736,26 +736,26 @@ PKHB.SocialNetAPIImpl.OK_Internal = new function()
 
   this.has_method = function(name)
   {
-    return this[name] && this[name] != PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
+    return this[name] && this[name] != PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
   }
 
   this.login = function(callback)
   {
     callback({
         id: logged_user_id_, session: session_key_,
-        networkID: PKHB.SocialNetAPI.NETWORK_TYPE.OK
+        networkID: PKEngine.SocialNetAPI.NETWORK_TYPE.OK
       })
     return true
   }
 
   //TODO: Implement supported methods
-  this.get_currency_name = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_app_id = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_billing_app_id = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_uid = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_friends = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_profiles = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.get_balance = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_currency_name = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_app_id = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_billing_app_id = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_uid = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_friends = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_profiles = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.get_balance = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
 
   this.payment = function(id, service_name, price, callbacks)
   {
@@ -764,6 +764,6 @@ PKHB.SocialNetAPIImpl.OK_Internal = new function()
   }
 
   //TODO: Implement supported methods
-  this.invite = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
-  this.wallPost = PKHB.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.invite = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  this.wallPost = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
 }

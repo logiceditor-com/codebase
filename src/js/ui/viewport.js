@@ -2,9 +2,9 @@
 // Viewport container
 //------------------------------------------------------------------------------
 
-PKHB.check_namespace('GUI')
+PKEngine.check_namespace('GUI')
 
-PKHB.GUI.Viewport = new function()
+PKEngine.GUI.Viewport = new function()
 {
   // NOTE: first element - last viewed screen
   //       list type - [{'screen':screen_name, 'params':param_1}, ...]
@@ -20,7 +20,7 @@ PKHB.GUI.Viewport = new function()
 
   var show_screen_ = function(screen, param_1)
   {
-    PKHB.GUIControls.get_screen(screen).show(param_1)
+    PKEngine.GUIControls.get_screen(screen).show(param_1)
     instance_.request_redraw(screen, param_1)
   }
 
@@ -70,10 +70,10 @@ PKHB.GUI.Viewport = new function()
 
 
     // NOTE: Return to game_field only when get training status. May be game was ended.
-    if (do_additional_checks && this.get_previous_screen() == PKHB.GUIControls.SCREEN_NAMES.GameScreen)
+    if (do_additional_checks && this.get_previous_screen() == PKEngine.GUIControls.SCREEN_NAMES.GameScreen)
     {
       ajax_getTrainingStatus( function(game_state) {
-          PKHB.User.notify_training_data(game_state)
+          PKEngine.User.notify_training_data(game_state)
 
           if(game_state.error != undefined)
           {
@@ -85,7 +85,7 @@ PKHB.GUI.Viewport = new function()
                 return;
 
               case "NOT_AVAILABLE":
-                PKHB.GUI.Go_to_main_menu(false)
+                PKEngine.GUI.Go_to_main_menu(false)
                 return;
 
               case "NOT_ENOUGH_MONEY":
@@ -93,17 +93,17 @@ PKHB.GUI.Viewport = new function()
                 return;
 
               default:
-                PKHB.GUI.Go_to_main_menu(false)
+                PKEngine.GUI.Go_to_main_menu(false)
             }
 
-            PKHB.Ajax.on_soft_error_received("training_status", game_state.error);
+            PKEngine.Ajax.on_soft_error_received("training_status", game_state.error);
             return;
           }
 
           // TODO: A bit hakish, but we should remove current screen from history
           screens_list_.shift()
 
-          PKHB.GameEngine.GameInstance.on_received_training_status(game_state)
+          PKEngine.GameEngine.GameInstance.on_received_training_status(game_state)
         })
       return
     }
@@ -152,7 +152,7 @@ PKHB.GUI.Viewport = new function()
 
     if (this.is_ready() && notify_current_screen_if_possible)
     {
-      var current_screen = PKHB.GUIControls.get_screen(this.get_current_screen())
+      var current_screen = PKEngine.GUIControls.get_screen(this.get_current_screen())
       if (current_screen && current_screen.request_redraw)
         current_screen.request_redraw()
     }
@@ -188,7 +188,7 @@ PKHB.GUI.Viewport = new function()
 
     is_drawing_ = true
 
-    PKHB.GUIControls.get_screen(this.get_current_screen()).draw()
+    PKEngine.GUIControls.get_screen(this.get_current_screen()).draw()
 
     is_drawing_ = false
   }
@@ -200,7 +200,7 @@ PKHB.GUI.Viewport = new function()
     if(!this.is_ready())
       return false
 
-    PKHB.GUIControls.get_screen(this.get_current_screen()).on_mouse_down(x, y)
+    PKEngine.GUIControls.get_screen(this.get_current_screen()).on_mouse_down(x, y)
   }
 
   this.on_click = function(x, y)
@@ -208,7 +208,7 @@ PKHB.GUI.Viewport = new function()
     if(!this.is_ready())
       return false
 
-    PKHB.GUIControls.get_screen(this.get_current_screen()).on_click(x, y)
+    PKEngine.GUIControls.get_screen(this.get_current_screen()).on_click(x, y)
   }
 
   this.on_mouse_move = function(x, y)
@@ -216,7 +216,7 @@ PKHB.GUI.Viewport = new function()
     if(!this.is_ready())
       return false
 
-    PKHB.GUIControls.get_screen(this.get_current_screen()).on_mouse_move(x, y)
+    PKEngine.GUIControls.get_screen(this.get_current_screen()).on_mouse_move(x, y)
   }
 
   //----------------------------------------------------------------------------

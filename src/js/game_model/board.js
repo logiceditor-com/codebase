@@ -2,9 +2,9 @@
 // board.js: Generalized board for turn-based board game with chips, match-3 like
 //------------------------------------------------------------------------------
 
-PKHB.check_namespace('GameEngine')
+PKEngine.check_namespace('GameEngine')
 
-PKHB.GameEngine.Board = new function()
+PKEngine.GameEngine.Board = new function()
 {
 
 //----------------------------------------------------------------------------
@@ -53,8 +53,8 @@ this.init = function(chips)
   // TODO: Must have such parameters?  Seems we don't need them here
   var CELL_W = 16, CELL_H = 16, POS_X = 0, POS_Y = 0
 
-  topology_ = PKHB.GameEngine.Topology.make_topology(
-    PKHB.GameEngine.Topology.TOPOLOGY_TYPE.SQUARE,
+  topology_ = PKEngine.GameEngine.Topology.make_topology(
+    PKEngine.GameEngine.Topology.TOPOLOGY_TYPE.SQUARE,
     width_, height_,
     CELL_W, CELL_H, POS_X, POS_Y
   )
@@ -153,7 +153,7 @@ this.get_chip = function(cell)
 
 this.cell_is_empty = function(cell)
 {
-  return chips_[cell.x][cell.y] == PKHB.GameEngine.Board.EMPTY_CHIP
+  return chips_[cell.x][cell.y] == PKEngine.GameEngine.Board.EMPTY_CHIP
 }
 
 
@@ -163,7 +163,7 @@ this.cell_is_empty = function(cell)
 
 this.remove_chip = function(cell)
 {
-  chips_[cell.x][cell.y] = PKHB.GameEngine.Board.EMPTY_CHIP
+  chips_[cell.x][cell.y] = PKEngine.GameEngine.Board.EMPTY_CHIP
 
   on_change_(false, [cell])
 }
@@ -246,7 +246,7 @@ this.fill_chips = function(chips, fail_on_difference)
   assert(chips && chips.length > 0)
   if (fail_on_difference === undefined) fail_on_difference = false
 
-  var filled_chips = PKHB.GameEngine.Board.make_chips(assert(width_), assert(height_))
+  var filled_chips = PKEngine.GameEngine.Board.make_chips(assert(width_), assert(height_))
 
   for(var x = 0; x < width_; x++)
     for(var y = 0; y < height_; y++)
@@ -266,7 +266,7 @@ this.fill_chips = function(chips, fail_on_difference)
 //           console.log("[RECEIVED CHIPS]")
 //           console.log(PKHB.GameEngine.Board.chips2string(chips))
 //           console.log("Difference in coords:", x, y)
-          PKHB.ERROR(I18N('Attempted to change non-empty chips!'))
+          PKEngine.ERROR(I18N('Attempted to change non-empty chips!'))
         }
       }
     }
@@ -285,7 +285,7 @@ this.burn_chips = function(min_length_to_burn)
 {
   //console.log("[Board.burn_chips]:", PK.clone(this.get_chips()))
 
-  var burned_chips = PKHB.GameEngine.Board.make_cell_list()
+  var burned_chips = PKEngine.GameEngine.Board.make_cell_list()
 
   // Determine burned
 
@@ -297,12 +297,12 @@ this.burn_chips = function(min_length_to_burn)
       {
         var chip = this.get_chip(cell)
 
-        var left = topology_.get_adjacent_cell(cell, PKHB.GameEngine.Topology.ADJACENCY_DIRECTION.LEFT)
+        var left = topology_.get_adjacent_cell(cell, PKEngine.GameEngine.Topology.ADJACENCY_DIRECTION.LEFT)
         if(!left || this.get_chip(left) != chip)
         {
           var ray = this.run_ray(
               cell,
-              PKHB.GameEngine.Topology.ADJACENCY_DIRECTION.RIGHT,
+              PKEngine.GameEngine.Topology.ADJACENCY_DIRECTION.RIGHT,
               this.make_same_cell_type_indicator(chip),
               true, // check start cell
               true  // stop at first unsatisfying cell
@@ -312,12 +312,12 @@ this.burn_chips = function(min_length_to_burn)
             burned_chips = burned_chips.concat(ray)
         }
 
-        var up = topology_.get_adjacent_cell(cell, PKHB.GameEngine.Topology.ADJACENCY_DIRECTION.UP)
+        var up = topology_.get_adjacent_cell(cell, PKEngine.GameEngine.Topology.ADJACENCY_DIRECTION.UP)
         if(!up || this.get_chip(up) != chip)
         {
           var ray = this.run_ray(
               cell,
-              PKHB.GameEngine.Topology.ADJACENCY_DIRECTION.DOWN,
+              PKEngine.GameEngine.Topology.ADJACENCY_DIRECTION.DOWN,
               this.make_same_cell_type_indicator(chip),
               true, // check start cell
               true  // stop at first unsatisfying cell
@@ -350,7 +350,7 @@ this.shift_chips_down = function()
 {
   //console.log("[Board.shift_chips_down]:", PK.clone(this.get_chips()))
 
-  var shift_chips = PKHB.GameEngine.Board.make_chip_move_list()
+  var shift_chips = PKEngine.GameEngine.Board.make_chip_move_list()
 
   for(var x = 0; x < width_; x++)
   {
@@ -402,7 +402,7 @@ this.make_chips = function(width, height)
   for(var x = 0; x < width; x++)
   {
     var column = []
-    for(var y = 0; y < height; y++) column.push(PKHB.GameEngine.Board.EMPTY_CHIP)
+    for(var y = 0; y < height; y++) column.push(PKEngine.GameEngine.Board.EMPTY_CHIP)
     chips.push(column)
   }
 

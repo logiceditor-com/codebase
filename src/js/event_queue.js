@@ -2,7 +2,7 @@
 // Queue of events which should be run
 //------------------------------------------------------------------------------
 
-PKHB.EventQueue = new function()
+PKEngine.EventQueue = new function()
 {
   var queue_ = []
 

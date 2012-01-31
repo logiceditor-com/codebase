@@ -1,4 +1,4 @@
-PKHB.Log_window = new function ()
+PKEngine.Log_window = new function ()
 {
   var br_ = '<br>'
 
@@ -15,7 +15,7 @@ PKHB.Log_window = new function ()
 
     log_window.innerHTML = text
 
-    PKHB.GUI.Viewport.hide_game_field()
+    PKEngine.GUI.Viewport.hide_game_field()
     log_window.style.display = 'block'
   }
 
@@ -26,7 +26,7 @@ PKHB.Log_window = new function ()
       return
 
     log_window.style.display = 'none'
-    PKHB.GUI.Viewport.show_game_field()
+    PKEngine.GUI.Viewport.show_game_field()
   }
 
   this.toggle = function()
@@ -36,8 +36,8 @@ PKHB.Log_window = new function ()
       return
 
     if (log_window.style.display == 'block')
-      PKHB.Log_window.hide()
+      PKEngine.Log_window.hide()
     else
-      PKHB.Log_window.show()
+      PKEngine.Log_window.show()
   }
 }

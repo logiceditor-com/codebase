@@ -2,7 +2,7 @@
 //  Sound and music
 //------------------------------------------------------------------------------
 
-PKHB.SoundSystem = new function()
+PKEngine.SoundSystem = new function()
 {
   var state_;
 
@@ -42,7 +42,7 @@ function hbe_returnSoundExtensionByBrowserSupport()
 
   if (!window.Audio)
   {
-    PKHB.SoundSystem.Disable();
+    PKEngine.SoundSystem.Disable();
     return;
   }
 
@@ -60,8 +60,8 @@ function hbe_returnSoundExtensionByBrowserSupport()
 
   if (format == undefined)
   {
-    PKHB.ERROR(I18N('Sound format undefined!'));
-    PKHB.SoundSystem.Disable();
+    PKEngine.ERROR(I18N('Sound format undefined!'));
+    PKEngine.SoundSystem.Disable();
     return;
   }
 
@@ -70,10 +70,10 @@ function hbe_returnSoundExtensionByBrowserSupport()
 
 function hbe_stopAndPlayAudio(sound, loop)
 {
-  if (!PKHB.SoundSystem.IsOn())
+  if (!PKEngine.SoundSystem.IsOn())
     return;
 
-  var audio = PKHB.SoundStore.get(sound).handler;
+  var audio = PKEngine.SoundStore.get(sound).handler;
 
   try
   {
@@ -103,32 +103,32 @@ function hbe_stopAndPlayAudio(sound, loop)
   }
   catch(e)
   {
-    PKHB.ERROR(I18N('Error pause and play audio: ${1}', audio.src));
+    PKEngine.ERROR(I18N('Error pause and play audio: ${1}', audio.src));
   }
 }
 
 function hbe_stopAudioExcept(exceptions)
 {
-  if (!PKHB.SoundSystem.IsOn())
+  if (!PKEngine.SoundSystem.IsOn())
     return;
 
-  var sounds = PKHB.SoundStore.get_all_sounds();
+  var sounds = PKEngine.SoundStore.get_all_sounds();
 
   for(var i = 0; i < sounds.length; i++)
   {
     if (exceptions.indexOf(sounds[i]) < 0) {
-      PKHB.SoundStore.get(sounds[i]).handler.pause();
+      PKEngine.SoundStore.get(sounds[i]).handler.pause();
     }
   }
 }
 
 function hbe_stopAudio(sound)
 {
-  if (!PKHB.SoundSystem.IsOn())
+  if (!PKEngine.SoundSystem.IsOn())
     return;
 
-  var audio = PKHB.SoundStore.get(sound).handler;
-  if (!PKHB.SoundSystem.IsOn())
+  var audio = PKEngine.SoundStore.get(sound).handler;
+  if (!PKEngine.SoundSystem.IsOn())
     return
 
   try
@@ -139,6 +139,6 @@ function hbe_stopAudio(sound)
   }
   catch(e)
   {
-    PKHB.ERROR(I18N('Error pause and play audio: ${1}', audio.src));
+    PKEngine.ERROR(I18N('Error pause and play audio: ${1}', audio.src));
   }
 }

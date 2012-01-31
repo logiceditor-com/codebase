@@ -133,16 +133,16 @@ var AjaxRequestHelper = new function()
   }
 }
 
-PKHB.check_namespace("Ajax")
+PKEngine.check_namespace("Ajax")
 
-PKHB.Ajax.PRINT_RECEIVED_DATA = false
+PKEngine.Ajax.PRINT_RECEIVED_DATA = false
 
-PKHB.Ajax.do_request = function(name, type, post_data, event_maker, on_error)
+PKEngine.Ajax.do_request = function(name, type, post_data, event_maker, on_error)
 {
   //console.log("Ajax name:", name)
   //console.log(window.printStackTrace().join("\n"))
 
-  on_error = on_error || PKHB.Ajax.default_error_handler;
+  on_error = on_error || PKEngine.Ajax.default_error_handler;
 
   $.ajax(
       AjaxRequestHelper.formUrl(name),
@@ -152,7 +152,7 @@ PKHB.Ajax.do_request = function(name, type, post_data, event_maker, on_error)
           //'dataType' : "json", // TODO: Hack (non-working, BTW), to be removed
           'success' : function(data_in, textStatus, jqXHR)
           {
-            if (PKHB.Ajax.PRINT_RECEIVED_DATA)
+            if (PKEngine.Ajax.PRINT_RECEIVED_DATA)
             {
               console.log("[Ajax.do_request]: " + name, PK.clone(data_in), textStatus, jqXHR)
             }
@@ -169,7 +169,7 @@ PKHB.Ajax.do_request = function(name, type, post_data, event_maker, on_error)
             }
             catch (ex)
             {
-              PKHB.ERROR(I18N('Unable to parse server response for request "${1}"', name));
+              PKEngine.ERROR(I18N('Unable to parse server response for request "${1}"', name));
               return;
             }
 
@@ -177,7 +177,7 @@ PKHB.Ajax.do_request = function(name, type, post_data, event_maker, on_error)
             {
               if(event_maker)
               {
-                PKHB.EventQueue.push(event_maker(data));
+                PKEngine.EventQueue.push(event_maker(data));
               }
             }
             else
@@ -195,7 +195,7 @@ PKHB.Ajax.do_request = function(name, type, post_data, event_maker, on_error)
                )
             {
               LOG("ServerConnectionError = " + JSON.stringify(jqXHR));
-              PKHB.GUI.Viewport.show_screen(PKHB.GUIControls.SCREEN_NAMES.ServerConnectionError);
+              PKEngine.GUI.Viewport.show_screen(PKEngine.GUIControls.SCREEN_NAMES.ServerConnectionError);
               return;
             }
             on_error(name, textStatus, jqXHR);
@@ -204,7 +204,7 @@ PKHB.Ajax.do_request = function(name, type, post_data, event_maker, on_error)
     );
 }
 
-PKHB.Ajax.default_error_handler = function(name, textStatus, jqXHR)
+PKEngine.Ajax.default_error_handler = function(name, textStatus, jqXHR)
 {
   var loc_text_status = I18N("Ajax error NULL")
   switch (textStatus)
@@ -215,7 +215,7 @@ PKHB.Ajax.default_error_handler = function(name, textStatus, jqXHR)
     case 'parsererror' : loc_text_status = I18N("Ajax error PARSERERROR"); break;
   }
 
-  PKHB.ERROR(
+  PKEngine.ERROR(
       I18N("Bad server answer!") + "<br>"
       + I18N("Request URL: ${1}", name) + "<br>"
       + I18N("Text error: ${1}", loc_text_status) + "<br>"
@@ -225,13 +225,13 @@ PKHB.Ajax.default_error_handler = function(name, textStatus, jqXHR)
 };
 
 
-PKHB.Ajax.on_soft_error_received = function(name, error)
+PKEngine.Ajax.on_soft_error_received = function(name, error)
 {
   assert(error)
 
   var error_text = error.id ? String(error.id) : JSON.stringify(error)
 
-  PKHB.ERROR(
+  PKEngine.ERROR(
       I18N("Bad server answer!") + "<br>"
       + I18N("Request URL: ${1}", name) + "<br>"
       + I18N("Text error: ${1}", error_text) + "<br>"

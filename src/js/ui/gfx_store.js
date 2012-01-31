@@ -2,7 +2,7 @@
 // Graphics store
 //------------------------------------------------------------------------------
 
-PKHB.GraphicsStore = new function()
+PKEngine.GraphicsStore = new function()
 {
   var images_ = {}
 
@@ -67,7 +67,7 @@ PKHB.GraphicsStore = new function()
     {
       if (fail_if_not_found)
       {
-        PKHB.ERROR(I18N('No image: ${1}', (name + (key !== undefined ? ("." + key) : "" ))))
+        PKEngine.ERROR(I18N('No image: ${1}', (name + (key !== undefined ? ("." + key) : "" ))))
       }
       return undefined
     }

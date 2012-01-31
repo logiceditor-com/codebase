@@ -2,9 +2,9 @@
 // topology.js: Work with topology nets
 //-----------------------------------------------------------------------------
 
-PKHB.check_namespace('GameEngine')
+PKEngine.check_namespace('GameEngine')
 
-PKHB.GameEngine.Topology = new function()
+PKEngine.GameEngine.Topology = new function()
 {
 
 //------------------------------------------------------------------------------
@@ -72,21 +72,21 @@ this.cell_h = cell_h
 this.get_closest_direction = function(int_start, int_end)
 {
   if (!int_start || !int_end)
-    return PKHB.GameEngine.Topology.ADJACENCY_DIRECTION.NONE
+    return PKEngine.GameEngine.Topology.ADJACENCY_DIRECTION.NONE
 
   var x = int_end.x - int_start.x
   var y = int_end.y - int_start.y
 
   if ( x > 0 && x > Math.abs(y) )
-    return PKHB.GameEngine.Topology.ADJACENCY_DIRECTION.RIGHT
+    return PKEngine.GameEngine.Topology.ADJACENCY_DIRECTION.RIGHT
 
   if ( x < 0 && -x > Math.abs(y) )
-    return PKHB.GameEngine.Topology.ADJACENCY_DIRECTION.LEFT
+    return PKEngine.GameEngine.Topology.ADJACENCY_DIRECTION.LEFT
 
   if ( y > 0 )
-    return PKHB.GameEngine.Topology.ADJACENCY_DIRECTION.DOWN
+    return PKEngine.GameEngine.Topology.ADJACENCY_DIRECTION.DOWN
 
-  return PKHB.GameEngine.Topology.ADJACENCY_DIRECTION.UP
+  return PKEngine.GameEngine.Topology.ADJACENCY_DIRECTION.UP
 }
 
 
@@ -108,13 +108,13 @@ this.cell_is_valid = function(cell)
 this.get_adjacency_direction_to = function(cell, other_cell)
 {
   if (!this.cell_is_valid(cell) || !this.cell_is_valid(other_cell) )
-    return PKHB.GameEngine.Topology.ADJACENCY_DIRECTION.NONE
+    return PKEngine.GameEngine.Topology.ADJACENCY_DIRECTION.NONE
 
-  for (var i = 0; i < PKHB.GameEngine.Topology.VALID_ADJACENCY_DIRECTIONS.length; i++)
+  for (var i = 0; i < PKEngine.GameEngine.Topology.VALID_ADJACENCY_DIRECTIONS.length; i++)
   {
     var neighbour_in_dir = this.get_adjacent_cell(
         cell,
-        PKHB.GameEngine.Topology.VALID_ADJACENCY_DIRECTIONS[i]
+        PKEngine.GameEngine.Topology.VALID_ADJACENCY_DIRECTIONS[i]
       )
 
     if (
@@ -122,10 +122,10 @@ this.get_adjacency_direction_to = function(cell, other_cell)
         neighbour_in_dir.x == other_cell.x &&
         neighbour_in_dir.y == other_cell.y
       )
-      return PKHB.GameEngine.Topology.VALID_ADJACENCY_DIRECTIONS[i]
+      return PKEngine.GameEngine.Topology.VALID_ADJACENCY_DIRECTIONS[i]
   }
 
-  return PKHB.GameEngine.Topology.ADJACENCY_DIRECTION.NONE
+  return PKEngine.GameEngine.Topology.ADJACENCY_DIRECTION.NONE
 }
 
 
@@ -174,11 +174,11 @@ this.get_adjacent_cells = function(cell)
 
   var neighbours = []
 
-  for (var i = 0; i < PKHB.GameEngine.Topology.VALID_ADJACENCY_DIRECTIONS.length; i++)
+  for (var i = 0; i < PKEngine.GameEngine.Topology.VALID_ADJACENCY_DIRECTIONS.length; i++)
   {
     var neighbour_in_dir = this.get_adjacent_cell(
         cell,
-        PKHB.GameEngine.Topology.VALID_ADJACENCY_DIRECTIONS[i]
+        PKEngine.GameEngine.Topology.VALID_ADJACENCY_DIRECTIONS[i]
       )
 
     if (neighbour_in_dir)

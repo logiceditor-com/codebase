@@ -3,7 +3,7 @@
 // based on library https://github.com/cubiq/add-to-homescreen
 //------------------------------------------------------------------------------
 
-PKHB.iPadAdd2Home = new function()
+PKEngine.iPadAdd2Home = new function()
 {
   //NOTE: set in init() function
   var must_show_add2home_tip_screen_ = false;
@@ -157,7 +157,7 @@ PKHB.iPadAdd2Home = new function()
 
   this.init = function(platform_type)
   {
-    if (platform_type == PKHB.Platform.TYPE.IPAD)
+    if (platform_type == PKEngine.Platform.TYPE.IPAD)
       must_show_add2home_tip_screen_ = true;
   }
 

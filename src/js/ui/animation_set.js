@@ -2,9 +2,9 @@
 // AnimationSet - container for animations
 //------------------------------------------------------------------------------
 
-PKHB.check_namespace('GUI')
+PKEngine.check_namespace('GUI')
 
-PKHB.GUI.AnimationSet = new function()
+PKEngine.GUI.AnimationSet = new function()
 {
 
 // Animation makers
@@ -121,7 +121,7 @@ this.make = function(on_complete) { return new function()
 
     var timestamp = PK.Time.get_current_timestamp()
 
-    var drawn_region = PKHB.GUI.Region.make()
+    var drawn_region = PKEngine.GUI.Region.make()
 
     var complete = true
     for(var i = 0; i < animators_.length; i++)

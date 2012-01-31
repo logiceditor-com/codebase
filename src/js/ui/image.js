@@ -2,7 +2,7 @@
 // Image
 //------------------------------------------------------------------------------
 
-PKHB.Image = PKHB.Control.extend(
+PKEngine.Image = PKEngine.Control.extend(
 {
   image: undefined,
 
@@ -16,13 +16,13 @@ PKHB.Image = PKHB.Control.extend(
 
   set_image: function(image)
   {
-    assert(!image || typeof image == 'object', I18N("[PKHB.Image.set_image]: Invalid type of given image!"))
+    assert(!image || typeof image == 'object', I18N("[PKEngine.Image.set_image]: Invalid type of given image!"))
     this.image = image;
   },
 
   draw: function()
   {
-    PKHB.GUI.Viewport.notify_control_draw_start()
+    PKEngine.GUI.Viewport.notify_control_draw_start()
 
     if (!this.visible || !this.image)
     {
@@ -43,18 +43,18 @@ var DrawImage = function(image, x, y, anchor_x, anchor_y, transparency, clip_are
 
   if (!image)
   {
-    PKHB.ERROR(I18N('Tried to draw non-existing image!'))
+    PKEngine.ERROR(I18N('Tried to draw non-existing image!'))
     return
   }
 
-  var tl_corner = PKHB.Anchoring.calc_tl_corner(x, y, anchor_x, anchor_y, image.width, image.height)
+  var tl_corner = PKEngine.Anchoring.calc_tl_corner(x, y, anchor_x, anchor_y, image.width, image.height)
 
 
   var preserved_properties = changeContextProperties({ globalAlpha: transparency })
 
   if (clip_area)
   {
-    PKHB.GUI.ClipArea.set(clip_area)
+    PKEngine.GUI.ClipArea.set(clip_area)
   }
 
   if (rotation_in_rad)
@@ -75,7 +75,7 @@ var DrawImage = function(image, x, y, anchor_x, anchor_y, transparency, clip_are
 
   if (clip_area)
   {
-    PKHB.GUI.ClipArea.restore()
+    PKEngine.GUI.ClipArea.restore()
   }
 
   changeContextProperties(preserved_properties)

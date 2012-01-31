@@ -2,7 +2,7 @@
 // Sound store
 //------------------------------------------------------------------------------
 
-PKHB.SoundStore = new function()
+PKEngine.SoundStore = new function()
 {
   var sounds_ = {};
   var loaded_sounds_ = 0;
@@ -59,7 +59,7 @@ PKHB.SoundStore = new function()
       soundFormat = hbe_returnSoundExtensionByBrowserSupport();
 
     loaded_sounds_ = 0;
-    total_sounds_ = PK.count_properties(PKHB.SoundConfig.Sounds);
+    total_sounds_ = PK.count_properties(PKEngine.SoundConfig.Sounds);
 
     for(var sound in config.Sounds)
     {

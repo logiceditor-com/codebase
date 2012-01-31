@@ -1,4 +1,4 @@
-PKHB.Control = Class.extend(
+PKEngine.Control = Class.extend(
 {
   x: 0,
   y: 0,
@@ -20,7 +20,7 @@ PKHB.Control = Class.extend(
       return;
 
     this.enabled = true;
-    PKHB.GUI.Viewport.request_redraw();
+    PKEngine.GUI.Viewport.request_redraw();
   },
 
   disable: function()
@@ -29,7 +29,7 @@ PKHB.Control = Class.extend(
       return;
 
     this.enabled = false;
-    PKHB.GUI.Viewport.request_redraw();
+    PKEngine.GUI.Viewport.request_redraw();
   },
 
   set_anchor: function(anchor_x, anchor_y)
@@ -77,7 +77,7 @@ PKHB.Control = Class.extend(
       return;
 
     this.visible = true;
-    PKHB.GUI.Viewport.request_redraw();
+    PKEngine.GUI.Viewport.request_redraw();
   },
 
   hide: function()
@@ -86,7 +86,7 @@ PKHB.Control = Class.extend(
       return;
 
     this.visible = false;
-    PKHB.GUI.Viewport.request_redraw();
+    PKEngine.GUI.Viewport.request_redraw();
   },
 
   draw: function()

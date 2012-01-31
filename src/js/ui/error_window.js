@@ -2,7 +2,7 @@
 // error_window.js: Slightly customized error window (not a member of our control hierarchy)
 //-----------------------------------------------------------------------------
 
-PKHB.initialize_error_window = function ()
+PKEngine.initialize_error_window = function ()
 {
   if (hbe_checkIsImageLoaded($('#error_window_bg')[0]) &&
       hbe_checkIsImageLoaded($('#error_label')[0]) &&
@@ -14,13 +14,13 @@ PKHB.initialize_error_window = function ()
   }
 }
 
-PKHB.ERROR = function(text)
+PKEngine.ERROR = function(text)
 {
   var now = new Date(PK.Time.get_current_timestamp());
   var cur_date = now.getDate() + '-' + (now.getMonth() + 1) + '-' + now.getFullYear();
   var date = '[' + cur_date + ' ' + now.toLocaleTimeString() + ']';
 
-  var text = date + ' user: ' + PKHB.get_common_post_data() + '<br>' + text;
+  var text = date + ' user: ' + PKEngine.get_common_post_data() + '<br>' + text;
 
   CRITICAL_ERROR(text);
 }

@@ -2,7 +2,7 @@
 // Callbacks handling UI events: mouse, keyboard etc.
 //------------------------------------------------------------------------------
 
-PKHB.UserInputHandlers = new function()
+PKEngine.UserInputHandlers = new function()
 {
   var user_input_provider_;
 
@@ -32,7 +32,7 @@ PKHB.UserInputHandlers = new function()
 
   var input_handling_is_enabled_ = function()
   {
-    if (!PKHB.GUI.Viewport.is_ready())
+    if (!PKEngine.GUI.Viewport.is_ready())
       return false
 
     if (additional_input_handling_preventor_)
@@ -61,7 +61,7 @@ PKHB.UserInputHandlers = new function()
 
     switch (platform_type)
     {
-      case PKHB.Platform.TYPE.IPAD:
+      case PKEngine.Platform.TYPE.IPAD:
         get_cursor_coords_ = function(e)
         {
           var coords_shift = get_coords_shift_();
@@ -78,9 +78,9 @@ PKHB.UserInputHandlers = new function()
           return true
         }
 
-        user_input_provider_.ontouchstart = PKHB.UserInputHandlers.on_mouse_down;
-        user_input_provider_.ontouchend = PKHB.UserInputHandlers.on_mouse_up;
-        user_input_provider_.ontouchmove = PKHB.UserInputHandlers.on_mouse_move;
+        user_input_provider_.ontouchstart = PKEngine.UserInputHandlers.on_mouse_down;
+        user_input_provider_.ontouchend = PKEngine.UserInputHandlers.on_mouse_up;
+        user_input_provider_.ontouchmove = PKEngine.UserInputHandlers.on_mouse_move;
       break;
 
       default:
@@ -93,9 +93,9 @@ PKHB.UserInputHandlers = new function()
           };
         }
 
-        user_input_provider_.onmousedown = PKHB.UserInputHandlers.on_mouse_down;
-        user_input_provider_.onmouseup = PKHB.UserInputHandlers.on_mouse_up;
-        user_input_provider_.onmousemove = PKHB.UserInputHandlers.on_mouse_move;
+        user_input_provider_.onmousedown = PKEngine.UserInputHandlers.on_mouse_down;
+        user_input_provider_.onmouseup = PKEngine.UserInputHandlers.on_mouse_up;
+        user_input_provider_.onmousemove = PKEngine.UserInputHandlers.on_mouse_move;
     }
   }
 
@@ -111,7 +111,7 @@ PKHB.UserInputHandlers = new function()
 
       var mouse_coords = get_cursor_coords_(e);
 
-      PKHB.GUI.Viewport.on_mouse_down(mouse_coords.x, mouse_coords.y)
+      PKEngine.GUI.Viewport.on_mouse_down(mouse_coords.x, mouse_coords.y)
 
       hbe_prevent_event_(e)
     }
@@ -119,7 +119,7 @@ PKHB.UserInputHandlers = new function()
     {
       var err_msg = e.toString ? e.toString() : JSON.stringify(e,null,4)
       if (e && window.console && console.log) console.log("exception stack:", e.stack)
-      PKHB.ERROR(I18N('[PKHB.UserInputHandlers.on_mouse_down] exception: ${1}', err_msg));
+      PKEngine.ERROR(I18N('[PKEngine.UserInputHandlers.on_mouse_down] exception: ${1}', err_msg));
     }
 
     return false;
@@ -137,7 +137,7 @@ PKHB.UserInputHandlers = new function()
 
       var mouse_coords = get_cursor_coords_(e);
 
-      PKHB.GUI.Viewport.on_click(mouse_coords.x, mouse_coords.y)
+      PKEngine.GUI.Viewport.on_click(mouse_coords.x, mouse_coords.y)
 
       hbe_prevent_event_(e)
     }
@@ -145,7 +145,7 @@ PKHB.UserInputHandlers = new function()
     {
       var err_msg = e.toString ? e.toString() : JSON.stringify(e,null,4)
       if (e && window.console && console.log) console.log("exception stack:", e.stack)
-      PKHB.ERROR(I18N('[PKHB.UserInputHandlers.on_mouse_up] exception: ${1}', err_msg));
+      PKEngine.ERROR(I18N('[PKEngine.UserInputHandlers.on_mouse_up] exception: ${1}', err_msg));
     }
 
     return false;
@@ -163,7 +163,7 @@ PKHB.UserInputHandlers = new function()
 
       var mouse_coords = get_cursor_coords_(e);
 
-      PKHB.GUI.Viewport.on_mouse_move(mouse_coords.x, mouse_coords.y);
+      PKEngine.GUI.Viewport.on_mouse_move(mouse_coords.x, mouse_coords.y);
 
       hbe_prevent_event_(e)
     }
@@ -171,7 +171,7 @@ PKHB.UserInputHandlers = new function()
     {
       var err_msg = e.toString ? e.toString() : JSON.stringify(e,null,4)
       if (e && window.console && console.log) console.log("exception stack:", e.stack)
-      PKHB.ERROR(I18N('[PKHB.UserInputHandlers.on_mouse_move] exception: ${1}', err_msg));
+      PKEngine.ERROR(I18N('[PKEngine.UserInputHandlers.on_mouse_move] exception: ${1}', err_msg));
     }
 
     return false;

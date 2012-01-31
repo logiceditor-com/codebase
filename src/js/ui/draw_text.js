@@ -5,7 +5,8 @@
 var setFontProperties = function(params)
 {
 
-  var font_properties = {}
+  var font_properties = {};
+  var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();
 
   PK.override_object_properties(
       font_properties,
@@ -59,6 +60,7 @@ var drawText = function(text, x, y, params)
 
   setFontProperties(params);
 
+  var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();
   var text_lines = text.split("\n")
   game_field_2d_cntx.save()
   game_field_2d_cntx.translate(x, y)

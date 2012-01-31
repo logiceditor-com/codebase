@@ -47,6 +47,7 @@ PKEngine.GUI.Renderer = new function()
 
   var draw_fps_ = function()
   {
+    var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();
     game_field_2d_cntx.clearRect(
         FPS_RECT_.left, FPS_RECT_.top,
         FPS_RECT_.right - FPS_RECT_.left, FPS_RECT_.bottom - FPS_RECT_.top

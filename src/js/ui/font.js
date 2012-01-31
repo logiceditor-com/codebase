@@ -12,6 +12,7 @@ PKEngine.Fonts = new function()
 
     setFontProperties(font);
 
+    var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();
     var size = game_field_2d_cntx.measureText("" + text).width;
 
     changeContextProperties(preserved_context_properties)

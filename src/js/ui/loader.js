@@ -81,6 +81,7 @@ var switch_to_canvas = function()
 {
   //Hide temporary div to prevent influence on layout
   $('#div_loader').hide();
+  var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();
   game_field_2d_cntx.drawImage(Loader_back_img, 0, 0);
   Loader_back_img.is_drawn = true;
   PKEngine.GUI.Viewport.show_game_field()
@@ -123,6 +124,7 @@ function checkLoadedData()
       pb_width = Loader_line_img.width;
     }
     PKEngine.reset_shadow();
+    var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();
     game_field_2d_cntx.drawImage(
       Loader_line_img,
       0, 0,

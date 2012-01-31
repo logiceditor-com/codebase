@@ -9,6 +9,4 @@ var MAXIMUM_FPS = 30;
 
 //------------------------------------------------------------------------------
 
-var game_field_2d_cntx;
-
-var RESOURCES_LOADING_TIMEOUT = 30000 // in ms.
+var RESOURCES_LOADING_TIMEOUT = 30000; // in ms.

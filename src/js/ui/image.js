@@ -49,7 +49,7 @@ var DrawImage = function(image, x, y, anchor_x, anchor_y, transparency, clip_are
 
   var tl_corner = PKEngine.Anchoring.calc_tl_corner(x, y, anchor_x, anchor_y, image.width, image.height)
 
-
+  var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();
   var preserved_properties = changeContextProperties({ globalAlpha: transparency })
 
   if (clip_area)

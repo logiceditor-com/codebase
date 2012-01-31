@@ -6,6 +6,7 @@ PKEngine.check_namespace('GUI')
 
 PKEngine.GUI.ClipArea = new function()
 {
+  var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();
   this.set = function(area)
   {
     if (!area.length)

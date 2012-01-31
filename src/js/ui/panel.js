@@ -523,6 +523,7 @@ PKEngine.GUI.makeBasePanel = function(panel_class_name, whole_config)
         return;
 
       PKEngine.reset_shadow();
+      var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();
 
       if (background_config_.draw_common_background && common_background_)
       {

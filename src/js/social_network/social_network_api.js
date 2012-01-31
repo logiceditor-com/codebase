@@ -35,7 +35,7 @@ PKEngine.SocialNetAPI = new function()
     this.NETWORK_NAMES[this.NETWORK_TYPE.OK] = 'odnoklassniki'
   }
 
-  this.NETWORK_ID_BY_NAME = PKEngine.Swap_keys_and_values(this.NETWORK_NAMES)
+  this.NETWORK_ID_BY_NAME = PK.swap_keys_and_values(this.NETWORK_NAMES);
 
   //----------------------------------------------------------------------------
 

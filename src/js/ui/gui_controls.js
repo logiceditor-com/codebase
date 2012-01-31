@@ -53,7 +53,7 @@ PKEngine.GUIControls = new function()
             )
             PKEngine.GraphicsStore.add(
                 name + "." + key, image_set[key] + ANTI_CACHE,
-                checkLoadedData, onImageLoadingError
+                checkLoadedData, image_loading_error
               )
           }
         }
@@ -66,7 +66,7 @@ PKEngine.GUIControls = new function()
           )
           PKEngine.GraphicsStore.add(
               name, image_config_[name] + ANTI_CACHE,
-              checkLoadedData, onImageLoadingError
+              checkLoadedData, image_loading_error
             )
         }
       }

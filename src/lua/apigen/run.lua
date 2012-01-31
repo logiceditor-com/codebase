@@ -791,9 +791,7 @@ local create_session_checker
           out_file_root .. out_handlers_index_filename,
           generate_url_handler_index(
               api,
-              {
-                HEADER = header;
-              },
+              header,
               out_handlers_dir_name,
               out_data_formats_filename,
               out_base_url_prefix

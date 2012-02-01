@@ -377,7 +377,7 @@ api:export "lib/common"
               "[pkb_check_price] saved and received amount not equals. add transaction to hackset"
             )
           pkb_add_transaction_to_hackset(api_context, transaction_id)
-          log("[pkb_check_price] add transaction to hack-set", transaction_id)
+          log_error("[pkb_check_price] add transaction to hack-set", transaction_id)
         else
           api_context:ext("history.cache"):try_append(
               api_context,
@@ -385,7 +385,7 @@ api:export "lib/common"
               "[pkb_check_price] saved and received amount not equals. add transaction to antihackset"
             )
           pkb_add_transaction_to_antihackset(api_context, transaction_id)
-          log("[pkb_check_price] add transaction to antihack-set", transaction_id)
+          log_error("[pkb_check_price] add transaction to antihack-set", transaction_id)
         end
     end
 

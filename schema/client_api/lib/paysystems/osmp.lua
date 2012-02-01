@@ -87,7 +87,7 @@ api:export "lib/paysystems/osmp"
             .. ", amount = "
             .. tostring(not pkb_price_equals(qiwi_amount, transaction.amount))
 
-          log(
+          log_error(
               "[qiwi/payment] saved and received data for transaction "
                 .. transaction.transaction_id
                 .. " does not match: ",
@@ -127,7 +127,7 @@ api:export "lib/paysystems/osmp"
       local qiwi_amount = tonumber(request.sum) * 100
 
       if request.account ~= request.account:match("%d+") then
-        log("[osmp/check] incorrect format of account: ", request.account)
+        log_error("[osmp/check] incorrect format of account: ", request.account)
         return osmp_build_response("INCORRECT_ACCOUNT_FORMAT", request)
       end
 
@@ -168,7 +168,7 @@ api:export "lib/paysystems/osmp"
             pkb_request
           )
         if not res then
-          log("[osmp/check] qiwi_save_transaction error: ", err)
+          log_error("[osmp/check] qiwi_save_transaction error: ", err)
           api_context:ext("history.cache"):try_append(
               api_context,
               pkb_request.transaction_id,
@@ -206,7 +206,7 @@ api:export "lib/paysystems/osmp"
           is_table(result)
           and tonumber(result.status) == PKB_TRANSACTION_STATUS.REJECTED_BY_APP
         then
-          log("[osmp/check] Account not found: ", request)
+          log_error("[osmp/check] Account not found: ", request)
           api_context:ext("history.cache"):try_append(
               api_context,
               pkb_request.transaction_id,
@@ -232,7 +232,7 @@ api:export "lib/paysystems/osmp"
           transaction.status ~= PKB_TRANSACTION_STATUS.CONFIRMED_BY_PAYSYSTEM and
           transaction.status ~= PKB_TRANSACTION_STATUS.CLOSED_BY_APP
         then
-          log(
+          log_error(
               "[osmp/check] incorrect status of transaction: ",
               transaction.transaction_id,
               ", status ",
@@ -247,7 +247,7 @@ api:export "lib/paysystems/osmp"
           return osmp_build_response("FAIL", request)
         end
         if transaction.status == PKB_TRANSACTION_STATUS.REJECTED_BY_APP then
-          log(
+          log_error(
               "[osmp/check] account: ",
               request.account,
               " not found in application: ",
@@ -309,7 +309,7 @@ api:export "lib/paysystems/osmp"
         return osmp_build_response("OK", request)
       end
       if transaction.status ~= PKB_TRANSACTION_STATUS.CONFIRMED_BY_APP then
-        log(
+        log_error(
             "[osmp/pay] incorrect status ",
             transaction.status,
             " of t_id: ",

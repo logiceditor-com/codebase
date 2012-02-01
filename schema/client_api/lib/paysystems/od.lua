@@ -57,7 +57,7 @@ api:export "lib/paysystems/od"
           application.config['od_shop_password']
         )
       if trim(hash) ~= trim(request.key) then
-        log("[od/check] incorrect key of request: ", hash, "/", request.key)
+        log_error("[od/check] incorrect key of request: ", hash, "/", request.key)
         return od_build_response("check", OD_RESPONSE_CODE_NO, request)
       end
 
@@ -67,7 +67,7 @@ api:export "lib/paysystems/od"
         )
 
       if not next(transaction) then
-        log("[od/check] transaction ", request.userid, " not found ")
+        log_error("[od/check] transaction ", request.userid, " not found ")
         return od_build_response("check", OD_RESPONSE_CODE_NO, request)
       end
 
@@ -80,7 +80,7 @@ api:export "lib/paysystems/od"
       transaction.status = tonumber(transaction.status)
 
       if not OD_CHECK_ALLOWED_STATUS[transaction.status] then
-        log(
+        log_error(
             "[od/check] transaction ",
             request.userid,
             " have incorrect status ",
@@ -125,7 +125,7 @@ api:export "lib/paysystems/od"
           application.config['od_shop_password']
         )
       if trim(hash) ~= trim(request.key) then
-        log("[od/payment] incorrect key of request: ", hash, "/", request.key)
+        log_error("[od/payment] incorrect key of request: ", hash, "/", request.key)
         return od_build_response("payment", OD_RESPONSE_CODE_NO, request)
       end
 
@@ -138,7 +138,7 @@ api:export "lib/paysystems/od"
       transaction.transaction_id = request.userid
 
       if not next(transaction) then
-        log("[od/payment] transaction ", request.userid, " not found ")
+        log_error("[od/payment] transaction ", request.userid, " not found ")
         return od_build_response("payment", OD_RESPONSE_CODE_NO, request)
       end
 
@@ -151,7 +151,7 @@ api:export "lib/paysystems/od"
       local transaction_status = tonumber(transaction.status)
 
       if not OD_PAYMENT_ALLOWED_STATUS[transaction_status] then
-        log(
+        log_error(
             "[od/payment] transaction ",
             request.userid,
             " have incorrect status ",
@@ -179,7 +179,7 @@ api:export "lib/paysystems/od"
 
       local tamount = tonumber(transaction.amount)
       if not pkb_price_equals(od_amount, tamount) then
-        log(
+        log_error(
             "[od/payment] saved and received amounts are not equals ",
             tamount,
             "/",
@@ -198,7 +198,7 @@ api:export "lib/paysystems/od"
         transaction.paysystem_id ~= OD_PAYSYSTEM_ID
         or transaction.appid ~= application.id
       then
-        log(
+        log_error(
             "[od/payment] saved and received data not equals ",
             transaction,
             request

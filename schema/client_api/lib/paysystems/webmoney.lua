@@ -87,7 +87,7 @@ api:export "lib/paysystems/webmoney"
           .. ") and received ("
           .. wm_amount
           .. ") amount not equals"
-        log(
+        log_error(
             "[wm][",
             request.transaction_id,
             "] Saved (",
@@ -117,7 +117,7 @@ api:export "lib/paysystems/webmoney"
       local wallet = request.LMI_PAYEE_PURSE:upper()
       if not wm_wallets[wallet] then
         history[#history + 1] = "[wm] Unknown wallet: " .. wallet
-        log("[wm][", request.transaction_id ,"] Unknown wallet: " .. wallet)
+        log_error("[wm][", request.transaction_id ,"] Unknown wallet: " .. wallet)
         return wm_build_response(
             api_context,
             "UNKNOWN_WALLET",
@@ -135,7 +135,7 @@ api:export "lib/paysystems/webmoney"
           .. ") and received from WM ("
           .. request.LMI_MODE
           .. ") not equals"
-        log(
+        log_error(
             "[wm][",
             request.transaction_id,
             "] WM mode in application (",
@@ -158,7 +158,7 @@ api:export "lib/paysystems/webmoney"
         if transaction.status ~= PKB_TRANSACTION_STATUS.CONFIRMED_BY_APP then
           history[#history + 1] = "[wm/check] incorrect status of transaction: "
             .. transaction.status
-          log(
+          log_error(
               "[wm/check][",
               request.transaction_id ,
               "] incorrect status of transaction: ",
@@ -184,7 +184,7 @@ api:export "lib/paysystems/webmoney"
         local res, err = wm_check_fields("payment", request)
         if not res then
           history[#history + 1] = "[wm/payment] error: " .. err
-          log("[wm/payment][", request.transaction_id ,"] error: " .. err)
+          log_error("[wm/payment][", request.transaction_id ,"] error: " .. err)
           return wm_build_response(api_context, "BAD_INPUT", request, history)
         end
 
@@ -196,7 +196,7 @@ api:export "lib/paysystems/webmoney"
         local hash, err = wm_create_hash(request)
         if not hash then
           history[#history + 1] = "[wm/payment] failed to create hash: " .. err
-          log(
+          log_error(
               "[wm/payment][",
               request.transaction_id,
               "] failed to create hash: ",
@@ -209,7 +209,7 @@ api:export "lib/paysystems/webmoney"
             .. request.LMI_HASH
             .. ", required: "
             .. hash
-          log(
+          log_error(
               "[wm/payment][",
               request.transaction_id,
               "] incorrect hash. Received: ",
@@ -228,7 +228,7 @@ api:export "lib/paysystems/webmoney"
         if not WM_ALLOWED_PAYMENT_STATUSES[transaction.status] then
           history[#history + 1] = "[wm] incorrect status of transaction: "
             .. transaction.status
-          log(
+          log_error(
               "[wm][",
               request.transaction_id,
               "] incorrect status of transaction: ",

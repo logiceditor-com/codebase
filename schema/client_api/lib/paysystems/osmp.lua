@@ -226,12 +226,7 @@ api:export "lib/paysystems/osmp"
         return osmp_build_response("WAIT_RESULT", request)
       elseif transaction then
         osmp_rm_request(api_context, transaction.transaction_id)
-        if
-          transaction.status ~= PKB_TRANSACTION_STATUS.CONFIRMED_BY_APP and
-          transaction.status ~= PKB_TRANSACTION_STATUS.REJECTED_BY_APP and
-          transaction.status ~= PKB_TRANSACTION_STATUS.CONFIRMED_BY_PAYSYSTEM and
-          transaction.status ~= PKB_TRANSACTION_STATUS.CLOSED_BY_APP
-        then
+        if not OSMP_ALLOWED_PAYMENT_STATUS[transaction.status] then
           log_error(
               "[osmp/check] incorrect status of transaction: ",
               transaction.transaction_id,
@@ -291,10 +286,7 @@ api:export "lib/paysystems/osmp"
 
       local src_t = tclone(transaction)
 
-      if
-        transaction.status == PKB_TRANSACTION_STATUS.CLOSED_BY_APP or
-        transaction.status == PKB_TRANSACTION_STATUS.CONFIRMED_BY_PAYSYSTEM
-      then
+      if OSMP_CLOSED_PAYMENTS[transaction.status] then
         log(
             "[osmp/pay] duplicate request (code = 0) for t_id: ",
             transaction.transaction_id,

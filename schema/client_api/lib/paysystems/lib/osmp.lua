@@ -3,6 +3,8 @@ api:export "lib/paysystems/lib/osmp"
   exports =
   {
     "OSMP_ERROR_CODES";
+    "OSMP_ALLOWED_PAYMENT_STATUS";
+    "OSMP_CLOSED_PAYMENTS";
 
     "osmp_save_transaction";
     "osmp_search_transaction";
@@ -28,9 +30,20 @@ api:export "lib/paysystems/lib/osmp"
       ["WAIT_RESULT"] = 1;
       ["INCORRECT_ACCOUNT_FORMAT"] = 4;
     };
-
-    local OSMP_REQUEST_TIMEOUT = 20;
-    local OSMP_TXNIDS = "qiwi:txn_id:transactions:";
+    local OSMP_ALLOWED_PAYMENT_STATUS =
+    {
+       PKB_TRANSACTION_STATUS.CONFIRMED_BY_APP;
+       PKB_TRANSACTION_STATUS.REJECTED_BY_APP;
+       PKB_TRANSACTION_STATUS.CONFIRMED_BY_PAYSYSTEM;
+       PKB_TRANSACTION_STATUS.CLOSED_BY_APP;
+    }
+    local OSMP_CLOSED_PAYMENTS = tset
+    {
+      PKB_TRANSACTION_STATUS.CONFIRMED_BY_PAYSYSTEM;
+      PKB_TRANSACTION_STATUS.CLOSED_BY_APP;
+    }
+    local OSMP_REQUEST_TIMEOUT = 20
+    local OSMP_TXNIDS = "qiwi:txn_id:transactions:"
 
     local osmp_save_transaction = function(api_context, appid, request)
       arguments(

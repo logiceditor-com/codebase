@@ -5,6 +5,8 @@ api:export "lib/paysystems/lib/webmoney"
     --data
     "WM_ERROR_CODES";
     "wm_saved_fields";
+    "WM_ALLOWED_PAYMENT_STATUSES";
+    "WM_CLOSED_PAYMENTS";
 
     --methods
     "wm_build_response";
@@ -56,6 +58,17 @@ api:export "lib/paysystems/lib/webmoney"
       "LMI_SYS_INVS_NO";
       "LMI_SYS_TRANS_NO";
       "LMI_SYS_TRANS_DATE";
+    }
+    local WM_ALLOWED_PAYMENT_STATUSES = tset
+    {
+      PKB_TRANSACTION_STATUS.CONFIRMED_BY_APP;
+      PKB_TRANSACTION_STATUS.CONFIRMED_BY_PAYSYSTEM;
+      PKB_TRANSACTION_STATUS.CLOSED_BY_APP;
+    }
+    local WM_CLOSED_PAYMENTS = tset
+    {
+      PKB_TRANSACTION_STATUS.CONFIRMED_BY_PAYSYSTEM;
+      PKB_TRANSACTION_STATUS.CLOSED_BY_APP;
     }
 
     local wm_build_response = function(api_context, code, request, history)

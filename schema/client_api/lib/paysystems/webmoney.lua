@@ -132,20 +132,13 @@ api:export "lib/paysystems/webmoney"
           return wm_build_response(api_context, "INCORRECT_HASH", request, history)
         end
 
-        if
-          transaction.status ~= PKB_TRANSACTION_STATUS.CONFIRMED_BY_APP and
-          transaction.status ~= PKB_TRANSACTION_STATUS.CONFIRMED_BY_PAYSYSTEM and
-          transaction.status ~= PKB_TRANSACTION_STATUS.CLOSED_BY_APP
-        then
+        if not WM_ALLOWED_PAYMENT_STATUSES[transaction.status] then
           history[#history + 1] = "[wm] incorrect status of transaction: " .. transaction.status
           log("[wm][", request.transaction_id ,"] incorrect status of transaction: " .. transaction.status)
           return wm_build_response(api_context, "INCORRECT_STATUS", request, history)
         end
 
-        if
-          transaction.status == PKB_TRANSACTION_STATUS.CONFIRMED_BY_PAYSYSTEM or
-          transaction.status == PKB_TRANSACTION_STATUS.CLOSED_BY_APP
-        then
+        if WM_CLOSED_PAYMENTS[transaction.status] then
           -- duplicate request
           history[#history + 1] = "[wm/payment] duplicate request"
           log("[wm/payment][", request.transaction_id ,"] duplicate request")

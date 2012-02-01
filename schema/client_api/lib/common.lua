@@ -49,6 +49,7 @@ api:export "lib/common"
     "pkb_send_http_request";
 
     "pkb_price_equals";
+    "pkb_check_price";
     "pkb_tfieldsort_tonumber";
   };
 
@@ -360,6 +361,32 @@ api:export "lib/common"
           "number", saved
         )
       return epsilon_equals(received, saved, 1)
+    end
+    
+    local pkb_check_price = function(api_context, transaction_id, paysystem_amount, transaction_amount)
+      arguments(
+          "table", api_context,
+          "string", transaction_id,
+          "number", paysystem_amount,
+          "number", transaction_amount
+        )
+        if paysystem_amount < transaction_amount then
+          api_context:ext("history.cache"):try_append(
+              api_context,
+              transaction_id,
+              "[pkb_check_price] saved and received amount not equals. add transaction to hackset"
+            )
+          pkb_add_transaction_to_hackset(api_context, transaction_id)
+          log("[pkb_check_price] add transaction to hack-set", transaction_id)
+        else
+          api_context:ext("history.cache"):try_append(
+              api_context,
+              transaction_id,
+              "[pkb_check_price] saved and received amount not equals. add transaction to antihackset"
+            )
+          pkb_add_transaction_to_antihackset(api_context, transaction_id)
+          log("[pkb_check_price] add transaction to antihack-set", transaction_id)
+        end
     end
 
     local pkb_tfieldsort_tonumber = function(t, k)

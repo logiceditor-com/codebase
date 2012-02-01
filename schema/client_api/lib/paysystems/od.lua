@@ -152,23 +152,7 @@ api:export "lib/paysystems/od"
       local tamount = tonumber(transaction.amount)
       if not pkb_price_equals(od_amount, tamount) then
         log("[od/payment] saved and received amounts are not equals ", tamount, "/", od_amount, transaction.transaction_id)
-        if tamount > od_amount then
-          api_context:ext("history.cache"):try_append(
-              api_context,
-              request.userid,
-              "[payment] saved and received amount not equals. add transaction to hackset"
-            )
-          log("[od/payment] add transaction to hack-set", transaction.transaction_id)
-          pkb_add_transaction_to_hackset(api_context, transaction.transaction_id)
-        else
-          pkb_add_transaction_to_antihackset(api_context, transaction.transaction_id)
-          api_context:ext("history.cache"):try_append(
-              api_context,
-              request.userid,
-              "[payment] saved and received amount not equals. add transaction to antihackset"
-            )
-          log("[od/payment] antihack", transaction.transaction_id)
-        end
+        pkb_check_price(api_context, transaction.transaction_id, od_amount, tamount)
         transaction.amount = od_amount
       end
       if transaction.paysystem_id ~= OD_PAYSYSTEM_ID or transaction.appid ~= application.id then

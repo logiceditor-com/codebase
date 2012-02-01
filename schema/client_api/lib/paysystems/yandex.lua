@@ -96,10 +96,8 @@ api:export "lib/paysystems/yandex"
       payment.amount = tonumber(payment.amount)
       local orderSumAmount = request.orderSumAmount * 100
       if not pkb_price_equals(orderSumAmount, payment.amount) then
+        pkb_check_price(api_context, transaction_id, orderSumAmount, payment.amount)
         payment.amount = orderSumAmount
-        pkb_add_transaction_to_hackset(api_context, transaction_id)
-        api_context:ext("history.cache"):try_append(api_context, request.customerNumber, " Add transaction to hackset (saved and received amounts not equals)")
-        log("[ya/check] WARNING!!! transaction and received from yandex amounts are not equals", transaction_id, payment.amount, request.orderSumAmount)
       end
 
       payment.status = tonumber(payment.status) or PKB_TRANSACTION_STATUS.INVALID
@@ -182,10 +180,8 @@ api:export "lib/paysystems/yandex"
       payment.amount = tonumber(payment.amount)
       local orderSumAmount = request.orderSumAmount * 100
       if not pkb_price_equals(orderSumAmount, payment.amount) then
+        pkb_check_price(api_context, transaction_id, orderSumAmount, payment.amount)
         payment.amount = orderSumAmount
-        pkb_add_transaction_to_hackset(api_context, transaction_id)
-        api_context:ext("history.cache"):try_append(api_context, request.customerNumber, " Add transaction to hackset (saved and received amounts not equals)")
-        log("[ya/paymentaviso] WARNING!!! transaction and received from yandex amounts are not equals", transaction_id, payment.amount, request.orderSumAmount)
       end
 
       payment.status = tonumber(payment.status) or PKB_TRANSACTION_STATUS.INVALID

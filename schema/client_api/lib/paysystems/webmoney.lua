@@ -74,11 +74,7 @@ api:export "lib/paysystems/webmoney"
         history[#history + 1] = "[wm] Saved (" .. transaction_amount .. ") and received (" .. wm_amount .. ") amount not equals"
         log("[wm][", request.transaction_id ,"] Saved (", transaction_amount, ") and received (", wm_amount, ") amount not equals")
         -- save in cheaters
-        if wm_amount < transaction_amount then
-          pkb_add_transaction_to_hackset(api_context, request.transaction_id)
-        else
-          pkb_add_transaction_to_antihackset(api_context, request.transaction_id)
-        end
+        pkb_check_price(api_context, request.transaction_id, wm_amount, transaction_amount)
         local rate = pkb_get_rate(application, WM_PAYSYSTEM_ID, transaction.paysystem_subid)
         transaction.amount = math.floor(wm_amount * rate)
         subtransaction.amount = wm_amount

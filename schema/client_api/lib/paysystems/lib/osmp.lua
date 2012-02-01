@@ -76,7 +76,7 @@ api:export "lib/paysystems/lib/osmp"
           api_context,
           transaction_id
         )
-      if next(transaction) then
+      if not tisempty(transaction) then
         transaction.transaction_id = transaction_id
       else
         transaction = nil

@@ -43,7 +43,10 @@ api:export "lib/paysystems/lib/od"
       if method:lower() == "check" then
         hash = "0" .. request.userid .. "0" .. od_shop_password
       elseif method:lower() == "payment" then
-        hash = request.amount .. request.userid .. request.paymentid .. od_shop_password
+        hash = request.amount
+          .. request.userid
+          .. request.paymentid
+          .. od_shop_password
       end
 
       local md5 = require 'md5'

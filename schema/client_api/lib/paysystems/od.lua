@@ -51,13 +51,20 @@ api:export "lib/paysystems/od"
           "table", request
         )
 
-      local hash = od_create_hash("check", request, application.config['od_shop_password'])
+      local hash = od_create_hash(
+          "check",
+          request,
+          application.config['od_shop_password']
+        )
       if trim(hash) ~= trim(request.key) then
         log("[od/check] incorrect key of request: ", hash, "/", request.key)
         return od_build_response("check", OD_RESPONSE_CODE_NO, request)
       end
 
-      local transaction = api_context:ext("transactions.cache"):try_get(api_context, request.userid)
+      local transaction = api_context:ext("transactions.cache"):try_get(
+          api_context,
+          request.userid
+        )
 
       if not next(transaction) then
         log("[od/check] transaction ", request.userid, " not found ")
@@ -73,7 +80,12 @@ api:export "lib/paysystems/od"
       transaction.status = tonumber(transaction.status)
 
       if not OD_CHECK_ALLOWED_STATUS[transaction.status] then
-        log("[od/check] transaction ", request.userid, " have incorrect status ", transaction.status)
+        log(
+            "[od/check] transaction ",
+            request.userid,
+            " have incorrect status ",
+            transaction.status
+          )
         api_context:ext("history.cache"):try_append(
             api_context,
             request.userid,
@@ -107,7 +119,11 @@ api:export "lib/paysystems/od"
           "table", request
         )
 
-      local hash = od_create_hash("payment", request, application.config['od_shop_password'])
+      local hash = od_create_hash(
+          "payment",
+          request,
+          application.config['od_shop_password']
+        )
       if trim(hash) ~= trim(request.key) then
         log("[od/payment] incorrect key of request: ", hash, "/", request.key)
         return od_build_response("payment", OD_RESPONSE_CODE_NO, request)
@@ -115,7 +131,10 @@ api:export "lib/paysystems/od"
 
       local od_amount = tonumber(request.amount) * 100
 
-      local transaction = api_context:ext("transactions.cache"):try_get(api_context, request.userid)
+      local transaction = api_context:ext("transactions.cache"):try_get(
+          api_context,
+          request.userid
+        )
       transaction.transaction_id = request.userid
 
       if not next(transaction) then
@@ -123,12 +142,21 @@ api:export "lib/paysystems/od"
         return od_build_response("payment", OD_RESPONSE_CODE_NO, request)
       end
 
-      api_context:ext("history.cache"):try_append(api_context, request.userid, " Payment request: " .. tserialize(request))
+      api_context:ext("history.cache"):try_append(
+          api_context,
+          request.userid,
+          " Payment request: " .. tserialize(request)
+        )
 
       local transaction_status = tonumber(transaction.status)
 
       if not OD_PAYMENT_ALLOWED_STATUS[transaction_status] then
-        log("[od/payment] transaction ", request.userid, " have incorrect status ", transaction.status)
+        log(
+            "[od/payment] transaction ",
+            request.userid,
+            " have incorrect status ",
+            transaction.status
+          )
         api_context:ext("history.cache"):try_append(
             api_context,
             request.userid,
@@ -151,12 +179,30 @@ api:export "lib/paysystems/od"
 
       local tamount = tonumber(transaction.amount)
       if not pkb_price_equals(od_amount, tamount) then
-        log("[od/payment] saved and received amounts are not equals ", tamount, "/", od_amount, transaction.transaction_id)
-        pkb_check_price(api_context, transaction.transaction_id, od_amount, tamount)
+        log(
+            "[od/payment] saved and received amounts are not equals ",
+            tamount,
+            "/",
+            od_amount,
+            transaction.transaction_id
+          )
+        pkb_check_price(
+            api_context,
+            transaction.transaction_id,
+            od_amount,
+            tamount
+          )
         transaction.amount = od_amount
       end
-      if transaction.paysystem_id ~= OD_PAYSYSTEM_ID or transaction.appid ~= application.id then
-        log("[od/payment] saved and received data not equals ", transaction, request)
+      if
+        transaction.paysystem_id ~= OD_PAYSYSTEM_ID
+        or transaction.appid ~= application.id
+      then
+        log(
+            "[od/payment] saved and received data not equals ",
+            transaction,
+            request
+          )
         api_context:ext("history.cache"):try_append(
             api_context,
             request.userid,
@@ -172,7 +218,11 @@ api:export "lib/paysystems/od"
       transaction.pay_stime = os.time()
       transaction.paysystem_subid = request.paymode
 
-      api_context:ext("transactions.cache"):try_set(api_context, transaction, src_t)
+      api_context:ext("transactions.cache"):try_set(
+          api_context,
+          transaction,
+          src_t
+        )
 
       log("[od/payment] transaction payment successfully: ", request.userid)
       api_context:ext("history.cache"):try_append(

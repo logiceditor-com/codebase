@@ -100,12 +100,7 @@ api:export "lib/paysystems/osmp"
             )
           return fail(
               "BAD_INPUT",
-              "[qiwi/payment] saved and received data for transaction "
-                .. transaction.transaction_id
-                .. " does not match: saved: "
-                .. tstr(transaction)
-                .. ", received:"
-                .. tstr(request)
+              "[qiwi/payment] saved and received data for transaction does not match"
             )
         end
         transaction.status = tonumber(transaction.status)

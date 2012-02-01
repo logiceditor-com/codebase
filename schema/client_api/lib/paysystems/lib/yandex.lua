@@ -44,7 +44,9 @@ api:export "lib/paysystems/lib/yandex"
 
       app.config = app.config or { }
       if not app.config['ya_shop_password'] then
-        return nil, "Yandex shop password in config app = " .. app.id .. " is absent"
+        return
+          nil,
+          "Yandex shop password in config app = " .. app.id .. " is absent"
       end
 
       local md5fields = { }
@@ -67,7 +69,11 @@ api:export "lib/paysystems/lib/yandex"
     local ya_create_response = function(code, request)
       local currencyTime = os.date("%Y-%m-%dT%H:%M:%S") .. "+04:00"
       local xml = [[<response performedDatetime = "]] .. currencyTime .. [[">
-  <result code="]] .. tostring(code) .. [[" action="]] .. (tostring(request.action) or "NIL") .. [[" shopId="]] .. (tostring(request.shopId) or "NIL") .. [[" invoiceId="]] .. (tostring(request.invoiceId) or "NIL") .. [[" />
+  <result code="]] .. tostring(code)
+    .. [[" action="]] .. (tostring(request.action) or "NIL")
+    .. [[" shopId="]] .. (tostring(request.shopId) or "NIL")
+    .. [[" invoiceId="]] .. (tostring(request.invoiceId) or "NIL")
+    .. [[" />
 </response>]];
 
       return xml

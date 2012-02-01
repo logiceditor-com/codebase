@@ -79,7 +79,11 @@ api:export "lib/paysystems/lib/webmoney"
           "table", history
         )
 
-      api_context:ext("history.cache"):try_append(api_context, request.transaction_id, history)
+      api_context:ext("history.cache"):try_append(
+          api_context,
+          request.transaction_id,
+          history
+        )
       code = WM_ERROR_CODES[code] or code
 
       return html_response(code)
@@ -145,7 +149,11 @@ api:extend_context "webmoney.cache" (function()
       end
     end
 
-    api_context:ext("subtransactions.cache"):try_set(api_context, transaction_id, transaction)
+    api_context:ext("subtransactions.cache"):try_set(
+        api_context,
+        transaction_id,
+        transaction
+      )
   end
 
   local factory = function()

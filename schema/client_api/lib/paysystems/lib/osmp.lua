@@ -46,7 +46,12 @@ api:export "lib/paysystems/lib/osmp"
 
       local res = try_unwrap(
           "INTERNAL_ERROR",
-          cache:command("HMSET", OSMP_TXNIDS .. appid, "txn:" .. request.payment_id, request.transaction_id)
+          cache:command(
+              "HMSET",
+              OSMP_TXNIDS .. appid,
+              "txn:" .. request.payment_id,
+              request.transaction_id
+            )
         )
       return tostring(res) == "OK"
     end
@@ -67,7 +72,10 @@ api:export "lib/paysystems/lib/osmp"
         return nil
       end
 
-      local transaction = api_context:ext("transactions.cache"):try_get(api_context, transaction_id)
+      local transaction = api_context:ext("transactions.cache"):try_get(
+          api_context,
+          transaction_id
+        )
       if next(transaction) then
         transaction.transaction_id = transaction_id
       else
@@ -95,7 +103,14 @@ api:export "lib/paysystems/lib/osmp"
           "table", request
         )
 
-      log("[qiwi/payment] action:", request.command or "", ";result:", code,";txn_id:", request.txn_id)
+      log(
+          "[qiwi/payment] action:",
+          request.command or "",
+          ";result:",
+          code,
+          ";txn_id:",
+          request.txn_id
+        )
 
       code = OSMP_ERROR_CODES[code] or code
       local body = osmp_create_response(code, request)
@@ -121,7 +136,10 @@ api:export "lib/paysystems/lib/osmp"
       end
 
       local key, transaction_id = data[1], data[2]
-      local transaction = api_context:ext("transactions.cache"):try_get(api_context, transaction_id)
+      local transaction = api_context:ext("transactions.cache"):try_get(
+          api_context,
+          transaction_id
+        )
 
       return transaction
     end

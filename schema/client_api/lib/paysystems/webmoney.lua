@@ -81,10 +81,7 @@ api:export "lib/paysystems/webmoney"
         )
       local wm_amount = tonumber(request.LMI_PAYMENT_AMOUNT) * 100
 
-      if
-        wm_amount < transaction_amount - 1
-        or wm_amount >  transaction_amount + 1
-      then
+      if not pkb_price_equals(wm_amount, transaction_amount) then
         history[#history + 1] = "[wm] Saved ("
           .. transaction_amount
           .. ") and received ("
@@ -92,7 +89,7 @@ api:export "lib/paysystems/webmoney"
           .. ") amount not equals"
         log(
             "[wm][",
-            request.transaction_id ,
+            request.transaction_id,
             "] Saved (",
             transaction_amount,
             ") and received (",

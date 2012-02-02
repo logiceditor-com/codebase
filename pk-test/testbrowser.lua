@@ -101,9 +101,9 @@ do
   end
 
   local clear = function(self)
-      self.body = "";
-      self.code = 0;
-      self.cookies_status = {};
+    self.body = ""
+    self.code = 0
+    self.cookies_status = { }
   end
 
   local ensure_response = function(self, message, code, body)
@@ -117,7 +117,7 @@ do
   end
 
   local GET = function(self, url, request_headers)
-    request_headers = request_headers or {}
+    request_headers = request_headers or { }
     method_arguments(self,
         "string", url,
         "table", request_headers
@@ -129,7 +129,7 @@ do
 
   local POST = function(self, url, request_body, request_headers)
     request_body = request_body or ""
-    request_headers = request_headers or {}
+    request_headers = request_headers or { }
     method_arguments(self,
         "string", url,
         "string", request_body,
@@ -146,8 +146,8 @@ do
       -- public fields
       code = 0;
       body = "";
-      cookies_status = {};
-      ssl_options = {};
+      cookies_status = { };
+      ssl_options = { };
       cookie_jar = make_cookie_jar();
 
       -- methods

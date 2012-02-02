@@ -64,7 +64,7 @@ do
         "string", path
       )
     local jar = self.jar_
-    local cookies = {}
+    local cookies = { }
 
     for d, domain_cookies in pairs(jar) do
       if ends_with(d, domain) then
@@ -128,7 +128,7 @@ do
 
     local cookie_for_domain = jar[domain]
     if not cookie_for_domain then
-      cookie_for_domain = {}
+      cookie_for_domain = { }
       jar[domain] = cookie_for_domain
     end
     if cookie_for_domain[cookie.name] then
@@ -155,7 +155,7 @@ do
       set_headers = set_headers;
 
       -- private
-      jar_ = {};
+      jar_ = { };
     }
     return obj
   end

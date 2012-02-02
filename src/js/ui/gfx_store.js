@@ -80,7 +80,7 @@ PKEngine.GraphicsStore = new function()
   {
     var img = this.get(name, key, false)
 
-    return img && check_is_image_loaded(images_[name])
+    return img && PK.check_is_image_loaded(images_[name])
   }
 
 
@@ -89,7 +89,7 @@ PKEngine.GraphicsStore = new function()
     var num = 0
 
     for(var name in images_)
-      if (check_is_image_loaded(images_[name]))
+      if (PK.check_is_image_loaded(images_[name]))
         num++
 
     return num

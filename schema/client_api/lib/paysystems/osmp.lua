@@ -50,7 +50,7 @@ api:export "lib/paysystems/osmp"
         api_context:ext("history.cache"):try_append(
             api_context,
             transaction.transaction_id,
-            "Payment request: " .. tserialize(request)
+            "Payment request: " .. tstr(request)
           )
       end
 

@@ -74,7 +74,7 @@ api:export "lib/paysystems/od"
       api_context:ext("history.cache"):try_append(
           api_context,
           request.userid,
-          " Check request: " .. tserialize(request)
+          " Check request: " .. tstr(request)
         )
 
       transaction.status = tonumber(transaction.status)
@@ -145,7 +145,7 @@ api:export "lib/paysystems/od"
       api_context:ext("history.cache"):try_append(
           api_context,
           request.userid,
-          " Payment request: " .. tserialize(request)
+          " Payment request: " .. tstr(request)
         )
 
       local transaction_status = tonumber(transaction.status)
@@ -160,7 +160,7 @@ api:export "lib/paysystems/od"
         api_context:ext("history.cache"):try_append(
             api_context,
             request.userid,
-            "[payment] incorrect status" .. tserialize(request)
+            "[payment] incorrect status" .. tstr(request)
           )
         return od_build_response("payment", OD_RESPONSE_CODE_NO, request)
       end

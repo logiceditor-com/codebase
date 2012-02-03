@@ -70,7 +70,7 @@ api:export "lib/paysystems/yandex"
       api_context:ext("history.cache"):try_append(
           api_context,
           request.customerNumber,
-          " Check request: " .. tserialize(request)
+          " Check request: " .. tstr(request)
         )
 
       if request.action ~= "Check" then
@@ -190,7 +190,7 @@ api:export "lib/paysystems/yandex"
       api_context:ext("history.cache"):try_append(
           api_context,
           request.customerNumber,
-          " Payment request: " .. tserialize(request)
+          " Payment request: " .. tstr(request)
         )
 
       if request.action ~= "PaymentSuccess" then

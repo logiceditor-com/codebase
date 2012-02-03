@@ -13,6 +13,11 @@ return
   APP_FIELDS_LIST = { "pk-billing-lib/lib/lib/settings.lua" };
   INTERNAL_CALL_HANDLERS = { "pk-billing-lib/lib/lib/service_extensions.lua" };
   JSON_REQUEST_FORMAT = { "pk-billing-lib/lib/lib/const.lua" };
+  KAYAKO_TICKET_AUTO_USER_ID = { "pk-billing-lib/lib/lib/const.lua" };
+  KAYAKO_TICKET_METHOD = { "pk-billing-lib/lib/lib/const.lua" };
+  KAYAKO_TICKET_PERIOD_ID = { "pk-billing-lib/lib/lib/const.lua" };
+  KAYAKO_TICKET_STATUS_ID = { "pk-billing-lib/lib/lib/const.lua" };
+  KAYAKO_TICKET_TEXT_FORMAT = { "pk-billing-lib/lib/lib/const.lua" };
   LUABINS_REQUEST_FORMAT = { "pk-billing-lib/lib/lib/const.lua" };
   MULTICURRENCY_PAYSYSTEMS = { "pk-billing-lib/lib/lib/const.lua" };
   OD_CHECK_REQUEST = { "pk-billing-lib/lib/lib/paysystems/lib/od.lua" };

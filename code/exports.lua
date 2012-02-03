@@ -26,6 +26,8 @@ return
   OD_PAYSYSTEM_ID = { "pk-billing-lib/lib/lib/const.lua" };
   OD_RESPONSE_CODE_NO = { "pk-billing-lib/lib/lib/paysystems/lib/od.lua" };
   OD_RESPONSE_CODE_YES = { "pk-billing-lib/lib/lib/paysystems/lib/od.lua" };
+  OSMP_ALLOWED_PAYMENT_STATUS = { "pk-billing-lib/lib/lib/paysystems/lib/osmp.lua" };
+  OSMP_CLOSED_PAYMENTS = { "pk-billing-lib/lib/lib/paysystems/lib/osmp.lua" };
   OSMP_ERROR_CODES = { "pk-billing-lib/lib/lib/paysystems/lib/osmp.lua" };
   OSMP_PAYSYSTEM_ID = { "pk-billing-lib/lib/lib/const.lua" };
   OSMP_REQUEST_KEY = { "pk-billing-lib/lib/lib/common.lua" };
@@ -80,6 +82,8 @@ return
   VK_QUEUE_PART_SIZE = { "pk-billing-lib/lib/lib/const.lua" };
   VK_QUEUE_SIZE = { "pk-billing-lib/lib/lib/const.lua" };
   VK_REQUEST_TIMEOUT = { "pk-billing-lib/lib/lib/common.lua" };
+  WM_ALLOWED_PAYMENT_STATUSES = { "pk-billing-lib/lib/lib/paysystems/lib/webmoney.lua" };
+  WM_CLOSED_PAYMENTS = { "pk-billing-lib/lib/lib/paysystems/lib/webmoney.lua" };
   WM_DEFAULT_MODE = { "pk-billing-lib/lib/lib/const.lua" };
   WM_ERROR_CODES = { "pk-billing-lib/lib/lib/paysystems/lib/webmoney.lua" };
   WM_MODES = { "pk-billing-lib/lib/lib/const.lua" };
@@ -121,6 +125,7 @@ return
   osmp_search_transaction = { "pk-billing-lib/lib/lib/paysystems/lib/osmp.lua" };
   pkb_add_transaction_to_antihackset = { "pk-billing-lib/lib/lib/common.lua" };
   pkb_add_transaction_to_hackset = { "pk-billing-lib/lib/lib/common.lua" };
+  pkb_check_price = { "pk-billing-lib/lib/lib/common.lua" };
   pkb_get_amounts_from_set = { "pk-billing-lib/lib/lib/common.lua" };
   pkb_get_amounts_range = { "pk-billing-lib/lib/lib/common.lua" };
   pkb_get_rate = { "pk-billing-lib/lib/lib/common.lua" };

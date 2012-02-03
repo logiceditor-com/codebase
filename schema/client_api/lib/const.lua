@@ -54,6 +54,13 @@ api:export "lib/const"
     "XML_REQUEST_FORMAT";
     "LUABINS_REQUEST_FORMAT";
     "ALLOWED_REQEUST_FORMAT";
+
+    -- kayako tocket constant
+    "KAYAKO_TICKET_METHOD";
+    "KAYAKO_TICKET_STATUS_ID";
+    "KAYAKO_TICKET_PERIOD_ID";
+    "KAYAKO_TICKET_AUTO_USER_ID";
+    "KAYAKO_TICKET_TEXT_FORMAT";
   };
 
   handler = function()
@@ -171,5 +178,12 @@ api:export "lib/const"
     local XML_REQUEST_FORMAT = "xml"
     local LUABINS_REQUEST_FORMAT = "luabins"
     local ALLOWED_REQEUST_FORMAT = tset { JSON_REQUEST_FORMAT, XML_REQUEST_FORMAT, LUABINS_REQUEST_FORMAT }
+
+    -- kayako const
+    local KAYAKO_TICKET_METHOD = "/Tickets/Ticket"
+    local KAYAKO_TICKET_STATUS_ID = "1"
+    local KAYAKO_TICKET_PERIOD_ID = "1"
+    local KAYAKO_TICKET_AUTO_USER_ID = "1"
+    local KAYAKO_TICKET_TEXT_FORMAT = "Аккаунт в банке %s\r\nНазвание игры %s\r\n\r\n%s"
   end
 }

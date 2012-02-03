@@ -6,7 +6,6 @@ PKEngine.check_namespace('GUI')
 
 PKEngine.GUI.ClipArea = new function()
 {
-  var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();
   this.set = function(area)
   {
     if (!area.length)
@@ -14,6 +13,7 @@ PKEngine.GUI.ClipArea = new function()
       area = [ area ]
     }
 
+    var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();
     game_field_2d_cntx.save();
     game_field_2d_cntx.beginPath();
 
@@ -30,6 +30,7 @@ PKEngine.GUI.ClipArea = new function()
 
   this.restore = function()
   {
+    var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();
     game_field_2d_cntx.restore();
   }
 }

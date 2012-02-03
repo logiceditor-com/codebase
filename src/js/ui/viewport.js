@@ -4,6 +4,7 @@
 
 PKEngine.check_namespace('GUI')
 
+// TODO: #3264 Class including project-dependent code
 PKEngine.GUI.Viewport = new function()
 {
   // NOTE: first element - last viewed screen
@@ -73,8 +74,10 @@ PKEngine.GUI.Viewport = new function()
     if (do_additional_checks && this.get_previous_screen() == PKEngine.GUIControls.SCREEN_NAMES.GameScreen)
     {
       ajax_getTrainingStatus( function(game_state) {
-          PKEngine.User.notify_training_data(game_state)
+          // TODO: #3264 PKHB.User - project-dependent
+          // PKEngine.User.notify_training_data(game_state)
 
+          // TODO: #3264 Project-dependent
           if(game_state.error != undefined)
           {
             switch(game_state.error)

@@ -2,6 +2,8 @@
 // Evil global variables
 //------------------------------------------------------------------------------
 
+// TODO: #3264 Remove it
+
 var ANTI_CACHE = "?" + PK.Time.get_current_timestamp();
 
 // runFrame

@@ -2,10 +2,12 @@
 //  Ajax request helper
 //------------------------------------------------------------------------------
 
+// TODO: #3264 Class including project-dependent code
 var AjaxRequestHelper = new function()
 {
   var service_urls_ = {};
 
+  // TODO: #3264 Project-dependent code
   var service_name_by_request_name_ =
   {
     'config'                          : 'config',

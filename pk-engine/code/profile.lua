@@ -21,6 +21,8 @@ PROFILE.skip = setmetatable(tset
   "pk-engine/fake_uuids.lua"; -- Contains linear data array
   "pk-engine/srv/channel/main.lua"; -- Too low-level
   "pk-engine/module.lua"; -- Too low-level
+   -- Exports rarely used symbols, obscuring some commonly used module names.
+   "pk-engine/webservice/client_api/check.lua";
 }, {
   __index = function(t, k)
     -- Excluding files outside of pk-engine/ and inside pk-engine/code

@@ -74,7 +74,6 @@ return
   create_auth_key = { "pk-engine/webservice/partner/moy_mir.lua", "pk-engine/webservice/partner/vkontakte.lua" };
   create_changeset_table = { "pk-engine/db/changeset.lua" };
   create_channel_persistent_connections = { "pk-engine/srv/channel/static_multifetcher.lua" };
-  db_id = { "pk-engine/webservice/client_api/check.lua" };
   delete_all = { "pk-engine/db/query.lua" };
   delete_by_id = { "pk-engine/db/query.lua" };
   delete_many = { "pk-engine/db/query.lua" };
@@ -89,7 +88,6 @@ return
   ev_protect = { "pk-engine/net/ev-server.lua" };
   ev_tcp_server_loop = { "pk-engine/srv/channel/server.lua" };
   fetch = { "pk-engine/srv/channel/client.lua" };
-  file = { "pk-engine/webservice/client_api/check.lua" };
   find_id = { "pk-engine/srv/dictionary/client.lua" };
   find_key = { "pk-engine/srv/dictionary/client.lua" };
   get_by_data = { "pk-engine/db/query.lua" };
@@ -106,13 +104,10 @@ return
   html_renderer_makers = { "pk-engine/form_handler_builder/html_renderer.lua" };
   html_response = { "pk-engine/webservice/response.lua" };
   http_request = { "pk-engine/connector.lua" };
-  ilist = { "pk-engine/webservice/client_api/check.lua" };
   increment_counter = { "pk-engine/db/query.lua" };
   info = { "pk-engine/srv/channel/client.lua", "pk-engine/srv/dictionary/client.lua", "pk-engine/srv/heartbeat/client.lua" };
   info_keys = { "pk-engine/form_handler_builder/util.lua" };
   insert_one = { "pk-engine/db/query.lua" };
-  int_enum = { "pk-engine/webservice/client_api/check.lua" };
-  integer = { "pk-engine/webservice/client_api/check.lua" };
   is_changeset_installed = { "pk-engine/db/changeset.lua" };
   javascript_response = { "pk-engine/webservice/response.lua" };
   json_response = { "pk-engine/webservice/response.lua" };
@@ -175,9 +170,6 @@ return
   make_vk_api = { "pk-engine/webservice/partner/vkontakte.lua" };
   make_xml_schema_builder = { "pk-engine/xml_schema_builder.lua" };
   metadata_makers = { "pk-engine/form_handler_builder/metadata.lua" };
-  nonnegative_integer = { "pk-engine/webservice/client_api/check.lua" };
-  number = { "pk-engine/webservice/client_api/check.lua" };
-  positive_integer = { "pk-engine/webservice/client_api/check.lua" };
   postquery_for_data = { "pk-engine/db/query.lua" };
   push_task = { "pk-engine/hiredis/system.lua" };
   put = { "pk-engine/srv/channel/client.lua", "pk-engine/srv/dictionary/client.lua", "pk-engine/srv/heartbeat/client.lua" };
@@ -200,12 +192,9 @@ return
   send_fetch = { "pk-engine/srv/channel/client.lua" };
   send_http_request = { "pk-engine/http.lua" };
   stop = { "pk-engine/webservice/fcgi_wsapi_runner.lua" };
-  string = { "pk-engine/webservice/client_api/check.lua" };
-  string_enum = { "pk-engine/webservice/client_api/check.lua" };
   string_receiver = { "pk-engine/srv/client.lua" };
   subtract_values_one = { "pk-engine/db/query.lua" };
   tcp_server_loop = { "pk-engine/srv/channel/server.lua", "pk-engine/srv/dictionary/server.lua", "pk-engine/srv/heartbeat/server.lua" };
-  text = { "pk-engine/webservice/client_api/check.lua" };
   text_response = { "pk-engine/webservice/response.lua" };
   try_flush_tasks = { "pk-engine/hiredis/system.lua" };
   try_get_next_task_blocking = { "pk-engine/hiredis/system.lua" };
@@ -215,7 +204,6 @@ return
   try_unwrap = { "pk-engine/hiredis/util.lua" };
   update_one = { "pk-engine/db/query.lua" };
   update_or_insert_one = { "pk-engine/db/query.lua" };
-  uuid = { "pk-engine/webservice/client_api/check.lua" };
   validator_makers = { "pk-engine/form_handler_builder/validator.lua" };
   wrap_read_write = { "pk-engine/srv/base_conn.lua" };
   wsapi_send = { "pk-engine/webservice/wsapi.lua" };

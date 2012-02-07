@@ -170,7 +170,9 @@ PKEngine.GUI.makeBasePanel = function(panel_class_name, whole_config)
         {
           var image = image_config_[name],
               x = client2parentX ? client2parentX(image.x) : image.x,
-              y = client2parentY ? client2parentY(image.y) : image.y;
+              y = client2parentY ? client2parentY(image.y) : image.y,
+              width = image.width ? image.width : undefined,
+              height = image.height ? image.height : undefined;
 
           var resource = undefined;
           if (image.resource)
@@ -202,7 +204,7 @@ PKEngine.GUI.makeBasePanel = function(panel_class_name, whole_config)
             }
           }
 
-          images_[name] = new PKEngine.Image(x, y, resource);
+          images_[name] = new PKEngine.Image(x, y, width, height, resource);
           if (image.visible !== undefined)
           {
             images_[name].set_visible(image.visible);
@@ -291,8 +293,10 @@ PKEngine.GUI.makeBasePanel = function(panel_class_name, whole_config)
           }
 
           var x = client2parentX ? client2parentX(button_config.x) : button_config.x,
-              y = client2parentY ? client2parentY(button_config.y) : button_config.y;
-          buttons_[name] = new PKEngine.Button(x, y, states);
+              y = client2parentY ? client2parentY(button_config.y) : button_config.y,
+              width = button_config.width ? button_config.width : undefined,
+              height = button_config.height ? button_config.height : undefined;
+          buttons_[name] = new PKEngine.Button(x, y, width, height, states, state);
 
           buttons_[name].set_visible(
               button_config.visible !== undefined ? button_config.visible : DEFAULT_BUTTON_VISIBILITY
@@ -523,7 +527,6 @@ PKEngine.GUI.makeBasePanel = function(panel_class_name, whole_config)
         return;
 
       PKEngine.reset_shadow();
-      var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();
 
       if (background_config_.draw_common_background && common_background_)
       {

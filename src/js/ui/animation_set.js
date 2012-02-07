@@ -210,7 +210,7 @@ var make_moving_object_ = function(params) { return new function() {
         y : start_pos_.y + (end_pos_.y - start_pos_.y) * ratio
       }
 
-    DrawImage(image_, current_pos.x, current_pos.y, undefined, undefined, undefined, clip_area_)
+    DrawImage(image_, current_pos.x, current_pos.y, undefined, undefined, undefined, undefined, undefined, clip_area_)
 
     drawn_region.add_rect(
         current_pos.x, current_pos.y,
@@ -260,7 +260,7 @@ var make_disappearing_object_ = function(params) { return new function() {
         "Current transparency is too big: " + String(transparency) + " > " + String(last_transparency_)
       )
 
-    DrawImage(image_, pos_.x, pos_.y, undefined, undefined, transparency, clip_area_)
+    DrawImage(image_, pos_.x, pos_.y, undefined, undefined, undefined, undefined, transparency, clip_area_)
 
     drawn_region.add_rect(pos_.x, pos_.y, pos_.x + image_.width, pos_.y + image_.height)
 

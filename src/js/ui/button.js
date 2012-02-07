@@ -11,25 +11,38 @@ PKEngine.Button = PKEngine.Control.extend(
   states: {},
   state: 'off',
 
-  init: function(x, y, states)
+  width: undefined,
+  height: undefined,
+
+  init: function(x, y, width, height, states, initial_state)
   {
     this.x = x;
     this.y = y;
     this.states = states;
+    this.state = initial_state;
+    var image = this.states[this.state];
+    if (image)
+    {
+      this.width = image.width;
+      this.height = image.height;
+    }
+    this.set_size(width, height);
+  },
+
+  set_size: function(width, height)
+  {
+    if (width) { this.width = width; }
+    if (height) { this.height = height; }
   },
 
   get_width: function()
   {
-    var image = this.states[this.state];
-
-    return image.width;
+    return this.width;
   },
 
   get_height: function()
   {
-    var image = this.states[this.state];
-
-    return image.height;
+    return this.height;
   },
 
   set_states: function(states)
@@ -40,7 +53,10 @@ PKEngine.Button = PKEngine.Control.extend(
   set_state: function(state)
   {
     if (this.state === state)
-      return
+    {
+      return;
+    }
+
     this.state = state;
 
     PKEngine.GUI.Viewport.request_redraw();
@@ -77,7 +93,9 @@ PKEngine.Button = PKEngine.Control.extend(
 
     // Don't react if was not pressed before
     if (!this.pressed_)
+    {
       return false;
+    }
 
     this.pressed_ = false;
     PKEngine.GUI.Viewport.request_redraw();
@@ -97,7 +115,9 @@ PKEngine.Button = PKEngine.Control.extend(
     var image = this.states[this.state];
 
     if (this.pressed_ && this.states['pressed'])
+    {
       image = this.states['pressed'];
+    }
 
     if (!image.complete)
     {
@@ -105,28 +125,33 @@ PKEngine.Button = PKEngine.Control.extend(
       return;
     }
 
-    DrawImage(image, this.x, this.y, this.anchor_x,  this.anchor_y);
+    DrawImage(image, this.x, this.y, this.width, this.height, this.anchor_x,  this.anchor_y);
   },
 
   is_on_control_: function(x, y)
   {
-    // FIXME Move method to Control
+    // FIXME: Move method to Control
     if (!this.enabled || !this.visible)
     {
       return false;
     }
 
-    var image = this.states[this.state];
+    if (!this.width || !this.height)
+    {
+      var image = this.states[this.state];
+      if (!this.width) { this.width = image.width; }
+      if (!this.height) { this.height = image.height; }
+    }
 
     var tl_corner = PKEngine.Anchoring.calc_tl_corner(
       this.x, this.y,
       this.anchor_x, this.anchor_y,
-      image.width, image.height
+      this.width, this.height
     );
 
     return (
-      x >= tl_corner.x && x <= tl_corner.x + image.width &&
-      y >= tl_corner.y && y <= tl_corner.y + image.height
+      x >= tl_corner.x && x <= tl_corner.x + this.width &&
+      y >= tl_corner.y && y <= tl_corner.y + this.height
     )
   }
 })

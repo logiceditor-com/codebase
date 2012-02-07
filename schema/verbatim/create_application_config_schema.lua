@@ -109,6 +109,8 @@ do
         cfg:optional_freeform_table "amounts_to_pay";
         cfg:optional_freeform_table "rates";
 
+        cfg:optional_freeform_table "currency_templates";
+
         cfg:optional_string "ssl_certificate_path";
         cfg:optional_string "ssl_certificate_password";
       };

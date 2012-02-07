@@ -4,18 +4,17 @@
 
 PKEngine.check_namespace('GUI')
 
-// TODO: #3264 Class including project-dependent code
 PKEngine.GUI.Viewport = new function()
 {
   // NOTE: first element - last viewed screen
   //       list type - [{'screen':screen_name, 'params':param_1}, ...]
-  var screens_list_ = []
-  var MAX_SCREENS_LIST_LENGTH = 10
+  this.screens_list_ = [];
+  this.MAX_screens_list_LENGTH = 10;
 
-  var is_drawing_
-  var must_redraw_
+  this.is_drawing_ = undefined;
+  this.must_redraw_ = undefined;
 
-  var instance_ = this
+  var instance_ = this;
 
   //----------------------------------------------------------------------------
 
@@ -34,89 +33,37 @@ PKEngine.GUI.Viewport = new function()
 
   this.get_current_screen = function()
   {
-    if (screens_list_.length == 0)
+    if (this.screens_list_.length == 0)
       return false
 
-    return screens_list_[0].screen
+    return this.screens_list_[0].screen
   }
 
   this.get_current_screen_data = function()
   {
-    if (screens_list_.length == 0)
+    if (this.screens_list_.length == 0)
       return false
 
-    return screens_list_[0]
+    return this.screens_list_[0]
   }
 
   //----------------------------------------------------------------------------
 
   this.get_previous_screen = function()
   {
-    if (screens_list_.length < 2)
+    if (this.screens_list_.length < 2)
       return false
 
-    return screens_list_[1].screen
+    return this.screens_list_[1].screen
   }
 
   //----------------------------------------------------------------------------
 
-  this.return_to_previous_screen = function(do_additional_checks)
+  this.return_to_previous_screen = function()
   {
-    //console.log(
-    //    "[PKHB.GUIControls.Viewport.return_to_previous_screen]",
-    //    do_additional_checks, this.get_current_screen_data(), this.get_previous_screen()
-    //  )
-
-    if (do_additional_checks === undefined) do_additional_checks = true
-
-
-    // NOTE: Return to game_field only when get training status. May be game was ended.
-    if (do_additional_checks && this.get_previous_screen() == PKEngine.GUIControls.SCREEN_NAMES.GameScreen)
-    {
-      ajax_getTrainingStatus( function(game_state) {
-          // TODO: #3264 PKHB.User - project-dependent
-          // PKEngine.User.notify_training_data(game_state)
-
-          // TODO: #3264 Project-dependent
-          if(game_state.error != undefined)
-          {
-            switch(game_state.error)
-            {
-              case "TRAINING_IN_PROGRESS":
-                // Tried to start a new game, but a has a game in progress
-                ajax_getTrainingStatus();
-                return;
-
-              case "NOT_AVAILABLE":
-                PKEngine.GUI.Go_to_main_menu(false)
-                return;
-
-              case "NOT_ENOUGH_MONEY":
-                GUI_ERROR(I18N('Not enough money, please, refill your account'));
-                return;
-
-              default:
-                PKEngine.GUI.Go_to_main_menu(false)
-            }
-
-            PKEngine.Ajax.on_soft_error_received("training_status", game_state.error);
-            return;
-          }
-
-          // TODO: A bit hakish, but we should remove current screen from history
-          screens_list_.shift()
-
-          PKEngine.GameEngine.GameInstance.on_received_training_status(game_state)
-        })
-      return
-    }
-
-
-    screens_list_.shift()
-
-    var screen_data = this.get_current_screen_data()
-
-    show_screen_(screen_data.screen, screen_data.params)
+    this.screens_list_.shift();
+    var screen_data = this.get_current_screen_data();
+    show_screen_(screen_data.screen, screen_data.params);
   }
 
   //----------------------------------------------------------------------------
@@ -125,11 +72,11 @@ PKEngine.GUI.Viewport = new function()
   {
     //console.log("[PKHB.GUIControls.Viewport.show_screen]", screen)
 
-    screens_list_.unshift({'screen':screen, 'params':param_1})
+    this.screens_list_.unshift({'screen':screen, 'params':param_1})
 
-    if (screens_list_.length > MAX_SCREENS_LIST_LENGTH)
-      for (var i=0; i<(screens_list_.length - MAX_SCREENS_LIST_LENGTH); i++)
-        screens_list_.pop()
+    if (this.screens_list_.length > this.MAX_screens_list_LENGTH)
+      for (var i=0; i<(this.screens_list_.length - this.MAX_screens_list_LENGTH); i++)
+        this.screens_list_.pop()
 
     show_screen_(screen, param_1)
 
@@ -143,7 +90,7 @@ PKEngine.GUI.Viewport = new function()
   {
     //console.log("[PKHB.GUIControls.Viewport.request_redraw]", notify_current_screen_if_possible)
 
-    if(must_redraw_)
+    if(this.must_redraw_)
       return
 
     if (notify_current_screen_if_possible === undefined)
@@ -151,7 +98,7 @@ PKEngine.GUI.Viewport = new function()
       notify_current_screen_if_possible = true
     }
 
-    must_redraw_ = true
+    this.must_redraw_ = true
 
     if (this.is_ready() && notify_current_screen_if_possible)
     {
@@ -165,12 +112,12 @@ PKEngine.GUI.Viewport = new function()
 
   this.is_drawing = function()
   {
-    return is_drawing_
+    return this.is_drawing_
   }
 
   this.notify_control_draw_start = function()
   {
-    assert(is_drawing_, I18N("Viewport: Tried to draw control outside of draw"))
+    assert(this.is_drawing_, I18N("Viewport: Tried to draw control outside of draw"))
   }
 
   //----------------------------------------------------------------------------
@@ -180,20 +127,20 @@ PKEngine.GUI.Viewport = new function()
     if(!this.is_ready())
       return false
 
-    assert(!is_drawing_, I18N("Viewport: Tried to call draw recursively"))
+    assert(!this.is_drawing_, I18N("Viewport: Tried to call draw recursively"))
 
-    if (!must_redraw_)
+    if (!this.must_redraw_)
       return
 
     //console.log("[PKHB.GUI.Viewport.draw]")
 
-    must_redraw_ = false
+    this.must_redraw_ = false
 
-    is_drawing_ = true
+    this.is_drawing_ = true
 
     PKEngine.GUIControls.get_screen(this.get_current_screen()).draw()
 
-    is_drawing_ = false
+    this.is_drawing_ = false
   }
 
   //----------------------------------------------------------------------------
@@ -220,19 +167,5 @@ PKEngine.GUI.Viewport = new function()
       return false
 
     PKEngine.GUIControls.get_screen(this.get_current_screen()).on_mouse_move(x, y)
-  }
-
-  //----------------------------------------------------------------------------
-
-  this.show_game_field = function()
-  {
-    $('#div_loader').hide();
-    $('#game_field').show();
-  }
-
-  this.hide_game_field = function()
-  {
-    $('#div_loader').hide();
-    $('#game_field').hide();
   }
 }

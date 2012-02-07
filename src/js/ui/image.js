@@ -100,6 +100,8 @@ var DrawImage = function(image, x, y, width, height, anchor_x, anchor_y, transpa
     PKEngine.GUI.ClipArea.set(clip_area)
   }
 
+  var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();
+
   if (rotation_in_rad)
   {
     game_field_2d_cntx.save()

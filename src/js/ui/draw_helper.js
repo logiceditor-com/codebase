@@ -34,34 +34,6 @@ var changeContextProperties = function(properties)
 
 //------------------------------------------------------------------------------
 
-// TODO: Move out to separate file?
-var ToggleSound = function()
-{
-  var audio_btn_state = 'off';
-
-  if (!PKEngine.SoundSystem.IsDisabled())
-  {
-    if (PKEngine.SoundSystem.IsOn())
-    {
-      PKEngine.SoundSystem.SwitchOff();
-
-      PKEngine.SoundSystem.stop_except(['Button']);
-    }
-    else
-    {
-      PKEngine.SoundSystem.SwitchOn();
-      audio_btn_state = 'on';
-      PKEngine.SoundSystem.stop_and_play('Button');
-      if(PKEngine.GUI.Viewport.get_current_screen() == PKEngine.GUIControls.SCREEN_NAMES.GameScreen)
-        PKEngine.SoundSystem.stop_and_play('Music', true);
-    }
-  }
-
-  return audio_btn_state
-}
-
-//------------------------------------------------------------------------------
-
 PKEngine.reset_shadow = function()
 {
   var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();

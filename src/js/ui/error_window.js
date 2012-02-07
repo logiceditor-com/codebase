@@ -20,8 +20,7 @@ PKEngine.ERROR = function(text)
   var cur_date = now.getDate() + '-' + (now.getMonth() + 1) + '-' + now.getFullYear();
   var date = '[' + cur_date + ' ' + now.toLocaleTimeString() + ']';
 
-  // TODO: #3264 Uncomment or remove - get_common_post_data from PKHB
-//  var text = date + ' user: ' + PKHB.get_common_post_data() + '<br>' + text;
+  var text = date + '<br>' + text;
 
   CRITICAL_ERROR(text);
 }

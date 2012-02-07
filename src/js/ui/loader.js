@@ -84,7 +84,7 @@ var switch_to_canvas = function()
   var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();
   game_field_2d_cntx.drawImage(Loader_back_img, 0, 0);
   Loader_back_img.is_drawn = true;
-  // TODO: #3264 Project-dependent
+  // TODO: #3264 Refactor it
   PKEngine.GUI.Viewport.show_game_field();
 }
 
@@ -139,7 +139,8 @@ function checkLoadedData()
   if (loading_progress >= all_resources)
   {
     g_resources_loaded = true;
-    PKEngine.GameEngine.MainLoop.start(1000, PKEngine.CustomMainLoopActions);
+    // TODO: #3264 Refactor it
+    PKEngine.GameEngine.MainLoop.start(1000, PKHB.CustomMainLoopActions);
     onResourceLoadingComplete()
     return;
   }

@@ -4,15 +4,18 @@
 
 PKEngine.check_namespace('GUI')
 
+/**
+ * Viewport object
+ */
 PKEngine.GUI.Viewport = new function()
 {
   // NOTE: first element - last viewed screen
   //       list type - [{'screen':screen_name, 'params':param_1}, ...]
   this.screens_list_ = [];
-  this.MAX_screens_list_LENGTH = 10;
+  var MAX_SCREENS_LIST_LENGTH = 10;
 
-  this.is_drawing_ = undefined;
-  this.must_redraw_ = undefined;
+  var is_drawing_;
+  var must_redraw_;
 
   var instance_ = this;
 
@@ -59,11 +62,22 @@ PKEngine.GUI.Viewport = new function()
 
   //----------------------------------------------------------------------------
 
-  this.return_to_previous_screen = function()
+  this.return_to_previous_screen = function(additional_checker)
   {
-    this.screens_list_.shift();
-    var screen_data = this.get_current_screen_data();
-    show_screen_(screen_data.screen, screen_data.params);
+    //console.log(
+    //    "[PKHB.GUIControls.Viewport.return_to_previous_screen]",
+    //    do_additional_checks, this.get_current_screen_data(), this.get_previous_screen()
+    //  )
+
+    if (additional_checker)
+    {
+      var need_continue = additional_checker();
+      if (!need_continue) return;
+    }
+
+    this.screens_list_.shift()
+    var screen_data = this.get_current_screen_data()
+    show_screen_(screen_data.screen, screen_data.params)
   }
 
   //----------------------------------------------------------------------------
@@ -74,8 +88,8 @@ PKEngine.GUI.Viewport = new function()
 
     this.screens_list_.unshift({'screen':screen, 'params':param_1})
 
-    if (this.screens_list_.length > this.MAX_screens_list_LENGTH)
-      for (var i=0; i<(this.screens_list_.length - this.MAX_screens_list_LENGTH); i++)
+    if (this.screens_list_.length > MAX_SCREENS_LIST_LENGTH)
+      for (var i=0; i<(this.screens_list_.length - MAX_SCREENS_LIST_LENGTH); i++)
         this.screens_list_.pop()
 
     show_screen_(screen, param_1)
@@ -90,7 +104,7 @@ PKEngine.GUI.Viewport = new function()
   {
     //console.log("[PKHB.GUIControls.Viewport.request_redraw]", notify_current_screen_if_possible)
 
-    if(this.must_redraw_)
+    if(must_redraw_)
       return
 
     if (notify_current_screen_if_possible === undefined)
@@ -98,7 +112,7 @@ PKEngine.GUI.Viewport = new function()
       notify_current_screen_if_possible = true
     }
 
-    this.must_redraw_ = true
+    must_redraw_ = true
 
     if (this.is_ready() && notify_current_screen_if_possible)
     {
@@ -112,12 +126,12 @@ PKEngine.GUI.Viewport = new function()
 
   this.is_drawing = function()
   {
-    return this.is_drawing_
+    return is_drawing_
   }
 
   this.notify_control_draw_start = function()
   {
-    assert(this.is_drawing_, I18N("Viewport: Tried to draw control outside of draw"))
+    assert(is_drawing_, I18N("Viewport: Tried to draw control outside of draw"))
   }
 
   //----------------------------------------------------------------------------
@@ -127,20 +141,20 @@ PKEngine.GUI.Viewport = new function()
     if(!this.is_ready())
       return false
 
-    assert(!this.is_drawing_, I18N("Viewport: Tried to call draw recursively"))
+    assert(!is_drawing_, I18N("Viewport: Tried to call draw recursively"))
 
-    if (!this.must_redraw_)
+    if (!must_redraw_)
       return
 
     //console.log("[PKHB.GUI.Viewport.draw]")
 
-    this.must_redraw_ = false
+    must_redraw_ = false
 
-    this.is_drawing_ = true
+    is_drawing_ = true
 
     PKEngine.GUIControls.get_screen(this.get_current_screen()).draw()
 
-    this.is_drawing_ = false
+    is_drawing_ = false
   }
 
   //----------------------------------------------------------------------------
@@ -167,5 +181,21 @@ PKEngine.GUI.Viewport = new function()
       return false
 
     PKEngine.GUIControls.get_screen(this.get_current_screen()).on_mouse_move(x, y)
+  }
+
+  //----------------------------------------------------------------------------
+
+  // TODO: #3264 Refactor it
+  this.show_game_field = function()
+  {
+    $('#div_loader').hide();
+    $('#game_field').show();
+  }
+
+  // TODO: #3264 Refactor it
+  this.hide_game_field = function()
+  {
+    $('#div_loader').hide();
+    $('#game_field').hide();
   }
 }

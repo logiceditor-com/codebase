@@ -244,11 +244,18 @@ local update_version_symlink = function(
   local versions_current_filename = expected_path .. "/versions-current.lua"
 
   if new_versions_filename:sub(1, 1) ~= "/" then -- TODO: ?!
-    new_versions_filename = assert(manifest.project_path) .. "/" .. new_versions_filename
+    new_versions_filename = assert(
+        manifest.project_path,
+        'project_path is not defined in the manifest (perhaps system valiable $PROJECT_PATH is missing)'
+      )
+      .. "/" .. new_versions_filename
   end
 
   local path, filename = splitpath(new_versions_filename)
-  assert(path == expected_path)
+  assert(
+      path == expected_path,
+      "Path to new version-current.lua doesn't match manifest.local_cluster_versions_path"
+    )
 
   remove_file(versions_current_filename)
   create_symlink_from_to(filename, versions_current_filename)

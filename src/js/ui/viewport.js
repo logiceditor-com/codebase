@@ -65,7 +65,7 @@ PKEngine.GUI.Viewport = new function()
   this.return_to_previous_screen = function(additional_checker)
   {
     //console.log(
-    //    "[PKHB.GUIControls.Viewport.return_to_previous_screen]",
+    //    "[PKEngine.GUIControls.Viewport.return_to_previous_screen]",
     //    do_additional_checks, this.get_current_screen_data(), this.get_previous_screen()
     //  )
 
@@ -84,7 +84,7 @@ PKEngine.GUI.Viewport = new function()
 
   this.show_screen = function(screen, param_1)
   {
-    //console.log("[PKHB.GUIControls.Viewport.show_screen]", screen)
+    //console.log("[PKEngine.GUIControls.Viewport.show_screen]", screen)
 
     this.screens_list_.unshift({'screen':screen, 'params':param_1})
 
@@ -102,7 +102,7 @@ PKEngine.GUI.Viewport = new function()
 
   this.request_redraw = function(notify_current_screen_if_possible)
   {
-    //console.log("[PKHB.GUIControls.Viewport.request_redraw]", notify_current_screen_if_possible)
+    //console.log("[PKEngine.GUIControls.Viewport.request_redraw]", notify_current_screen_if_possible)
 
     if(must_redraw_)
       return
@@ -146,7 +146,7 @@ PKEngine.GUI.Viewport = new function()
     if (!must_redraw_)
       return
 
-    //console.log("[PKHB.GUI.Viewport.draw]")
+    //console.log("[PKEngine.GUI.Viewport.draw]")
 
     must_redraw_ = false
 

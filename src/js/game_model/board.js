@@ -262,9 +262,9 @@ this.fill_chips = function(chips, fail_on_difference)
         if (fail_on_difference && chips_[x][y] != chips[x][y])
         {
 //           console.log("[OWN CHIPS]")
-//           console.log(PKHB.GameEngine.Board.chips2string(chips_))
+//           console.log(PKEngine.GameEngine.Board.chips2string(chips_))
 //           console.log("[RECEIVED CHIPS]")
-//           console.log(PKHB.GameEngine.Board.chips2string(chips))
+//           console.log(PKEngine.GameEngine.Board.chips2string(chips))
 //           console.log("Difference in coords:", x, y)
           PKEngine.ERROR(I18N('Attempted to change non-empty chips!'))
         }

@@ -264,7 +264,7 @@ this.get_cell_from_point = function(px, py)
         returns { x: x_coord_in_cells, y: y_coord_in_cells }
   }
 
-  @param {integer}   type : Type of topology, Only PKHB.Topology.SQUARE is supported now
+  @param {integer}   type : Type of topology, Only PKEngine.Topology.SQUARE is supported now
   @param {integer}      w : Width of field view (in cells)
   @param {integer}      h : Height of field view  (in cells)
   @param {integer} cell_w : Width of field cell (in px)

@@ -279,5 +279,5 @@ api:export "lib/paysystems/webmoney"
         return wm_build_response(api_context, "OK", request, history)
       end
     end
-  end
+  end;
 }

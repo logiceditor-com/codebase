@@ -308,5 +308,5 @@ api:export "lib/paysystems/yandex"
       return ya_build_response("OK", request)
     end
 
-  end
+  end;
 }

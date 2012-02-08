@@ -85,5 +85,5 @@ api:export "check_config"
       end
     end
 
-  end
+  end;
 }

@@ -88,5 +88,5 @@ api:export "lib/paysystems/lib/yandex"
       local body = ya_create_response(code, request)
       return xml_response(body)
     end
-  end
+  end;
 }

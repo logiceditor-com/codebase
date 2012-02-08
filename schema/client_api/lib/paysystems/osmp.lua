@@ -335,5 +335,5 @@ api:export "lib/paysystems/osmp"
         )
       return osmp_build_response("OK", request)
     end
-  end
+  end;
 }

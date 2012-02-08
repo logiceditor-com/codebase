@@ -185,5 +185,5 @@ api:export "lib/const"
     local KAYAKO_TICKET_PERIOD_ID = "1"
     local KAYAKO_TICKET_AUTO_USER_ID = "1"
     local KAYAKO_TICKET_TEXT_FORMAT = "Аккаунт в банке %s\r\nНазвание игры %s\r\n\r\n%s"
-  end
+  end;
 }

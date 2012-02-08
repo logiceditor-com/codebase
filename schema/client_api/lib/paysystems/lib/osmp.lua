@@ -169,5 +169,5 @@ api:export "lib/paysystems/lib/osmp"
 
       try_unwrap("INTERNAL_ERROR", cache:command("DEL", key))
     end
-  end
+  end;
 }

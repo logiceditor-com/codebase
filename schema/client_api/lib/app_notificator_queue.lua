@@ -37,7 +37,7 @@ api:export "lib/appn_queue"
               version = api_context:game_config().app_api_version;
               method = "payment";
               payments = transactions;
-            }
+            };
           }
         )
       return res
@@ -56,7 +56,7 @@ api:export "lib/appn_queue"
               version = api_context:game_config().app_api_version;
               method = "payment";
               payments = transactions;
-            }
+            };
           }
         )
       return payment
@@ -330,7 +330,7 @@ api:export "lib/appn_queue"
         appn_handle_response(api_context, application.id, ids, transactions, app_response, params or { })
       end
     end
-  end
+  end;
 }
 
 api:extend_context "app_notificator.queue" (function()

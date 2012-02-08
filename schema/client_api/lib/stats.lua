@@ -90,5 +90,5 @@ api:export "lib/stats"
           cache:command("HINCRBY", counter_key, "status:" .. tostring(new_status), 1)
         )
     end
-  end
+  end;
 }

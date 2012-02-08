@@ -127,7 +127,7 @@ api:export "lib/paysystems/lib/webmoney"
       hash_fields = table.concat(hash_fields)
       return md5.sumhexa(hash_fields):upper()
     end
-  end
+  end;
 }
 
 api:extend_context "webmoney.cache" (function()

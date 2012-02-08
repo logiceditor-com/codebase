@@ -103,5 +103,5 @@ api:export "lib/paysystems/lib/od"
       end
       return xml_response(body)
     end
-  end
+  end;
 }

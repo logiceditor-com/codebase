@@ -5,7 +5,7 @@ api:export "lib/settings"
     --data
     "APP_FIELDS_LIST";
     "PAYSYSTEMS_FIELDS_LIST";
-    "SUBPAYSYSTEMS_FIELDS_LIST",
+    "SUBPAYSYSTEMS_FIELDS_LIST";
 
     "APPS_LIST";
     "PAYSYSTEMS_LIST";
@@ -21,7 +21,7 @@ api:export "lib/settings"
 
     local APPS_LIST = "applications"
     local PAYSYSTEMS_LIST = "paysystems"
-  end
+  end;
 }
 
 api:extend_context "settings.cache" (function()

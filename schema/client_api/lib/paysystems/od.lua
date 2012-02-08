@@ -232,5 +232,5 @@ api:export "lib/paysystems/od"
         )
       return od_build_response("payment", OD_RESPONSE_CODE_YES, request)
     end
-  end
+  end;
 }

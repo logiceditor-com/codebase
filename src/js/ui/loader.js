@@ -2,6 +2,9 @@
 // Loading of resources: check, draw
 //------------------------------------------------------------------------------
 
+// TODO: #3264 Must use a parameter for Loader.init() instead of this
+PKEngine.CustomMainLoopActions = false
+
 // TODO: Make a singleton, remove all global variables
 
 var Loader_back_img
@@ -11,6 +14,7 @@ var preloader_resource_count = 0;
 
 //------------------------------------------------------------------------------
 
+// TODO: #3264 Many hardcoded names, think about moving them to loader's config
 var InitLoader = function(img_path, lang, onload)
 {
   $('<div id="resources" style="position: absolute; left: 10000px">')
@@ -65,6 +69,7 @@ var InitLoader = function(img_path, lang, onload)
 
 //------------------------------------------------------------------------------
 
+// TODO: #3264 Hardcoded name
 var check_preloader_ready = function()
 {
   preloader_resource_count += 1;
@@ -79,7 +84,8 @@ var check_preloader_ready = function()
 
 var switch_to_canvas = function()
 {
-  //Hide temporary div to prevent influence on layout
+  // Hide temporary div to prevent influence on layout
+  // TODO: #3264 Hardcoded name
   $('#div_loader').hide();
   var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();
   game_field_2d_cntx.drawImage(Loader_back_img, 0, 0);
@@ -139,8 +145,8 @@ function checkLoadedData()
   if (loading_progress >= all_resources)
   {
     g_resources_loaded = true;
-    // TODO: #3264 Refactor it
-    PKEngine.GameEngine.MainLoop.start(1000, PKHB.CustomMainLoopActions);
+    // TODO: #3264 It seems custom_main_loop_actions must be a parameter for Loader.init()
+    PKEngine.GameEngine.MainLoop.start(1000, PKEngine.CustomMainLoopActions);
     onResourceLoadingComplete()
     return;
   }
@@ -156,6 +162,7 @@ function ResourcesAreLoaded()
 
 //------------------------------------------------------------------------------
 
+// TODO: #3264 Seems it should be a callback provided by user code
 var onResourceLoadingComplete = function()
 {
   PKEngine.iPadAdd2Home.show();

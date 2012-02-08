@@ -74,7 +74,7 @@ api:export "lib/paysystems/lib/yandex"
     .. [[" shopId="]] .. (tostring(request.shopId) or "NIL")
     .. [[" invoiceId="]] .. (tostring(request.invoiceId) or "NIL")
     .. [[" />
-</response>]];
+</response>]]
 
       return xml
     end

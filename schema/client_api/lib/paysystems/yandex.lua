@@ -15,8 +15,8 @@ api:export "lib/paysystems/yandex"
   };
 
   handler = function()
-    local YANDEX_CHECK_REQUEST = "check";
-    local YANDEX_PAYMENT_REQUEST = "payment";
+    local YANDEX_CHECK_REQUEST = "check"
+    local YANDEX_PAYMENT_REQUEST = "payment"
 
     local yandex_response_handler = function(body)
       return xml_response(body)

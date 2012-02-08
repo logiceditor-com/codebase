@@ -18,7 +18,7 @@ api:export "lib/appn_queue"
     local json_decode_util = require 'json.decode.util'
     local json_encode = require 'json.encode'
 
-    local APPN_REQUEST_QUEUE_KEY = "app-notificator:queue";
+    local APPN_REQUEST_QUEUE_KEY = "app-notificator:queue"
     local TRANSACTION_VISIBLE_FIELDS = { "stime", "amount", "id", "uid", "paysystem_subid", "paysystem_id" }
 
     -- TODO: generalize all create_*_request functions, reuse in all services
@@ -151,7 +151,7 @@ api:export "lib/appn_queue"
 
       local url = application.api.urls.payment
       if application.api.use_url_query == true then
-        url = url .. "?method=payment";
+        url = url .. "?method=payment"
       end
 
       local response_body, err = pkb_send_http_request(

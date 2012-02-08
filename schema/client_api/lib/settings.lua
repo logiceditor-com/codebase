@@ -14,13 +14,13 @@ api:export "lib/settings"
   };
 
   handler = function()
-    local PAYSYSTEMS_FIELDS_LIST = { "id", "title", "create_form_script", "config" };
+    local PAYSYSTEMS_FIELDS_LIST = { "id", "title", "create_form_script", "config" }
     local OPTIONAL_PAYSYSTEMS_FIELDS = tset { "create_form_script" }
-    local SUBPAYSYSTEMS_FIELDS_LIST = { "id", "title" };
-    local APP_FIELDS_LIST = { "id", "title", "api_url" , "api_format" , "config"};
+    local SUBPAYSYSTEMS_FIELDS_LIST = { "id", "title" }
+    local APP_FIELDS_LIST = { "id", "title", "api_url" , "api_format" , "config"}
 
-    local APPS_LIST = "applications";
-    local PAYSYSTEMS_LIST = "paysystems";
+    local APPS_LIST = "applications"
+    local PAYSYSTEMS_LIST = "paysystems"
   end
 }
 

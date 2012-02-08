@@ -26,11 +26,11 @@ api:export "lib/paysystems/lib/od"
       ["INTERNAL_ERROR"] = "Внутренняя ошибка системы";
       ["INCORRECT_AMOUNT"] = "Некорректная сумма оплаты";
       ["INCORRECT_DATA"] = "Внутренняя ошибка системы";
-    };
-    local OD_CHECK_REQUEST = "check";
-    local OD_PAYMENT_REQUEST = "payment";
-    local OD_RESPONSE_CODE_NO = "NO";
-    local OD_RESPONSE_CODE_YES = "YES";
+    }
+    local OD_CHECK_REQUEST = "check"
+    local OD_PAYMENT_REQUEST = "payment"
+    local OD_RESPONSE_CODE_NO = "NO"
+    local OD_RESPONSE_CODE_YES = "YES"
 
     local od_create_hash = function(method, request, od_shop_password)
       arguments(
@@ -67,11 +67,11 @@ api:export "lib/paysystems/lib/od"
       local xml = [[<?xml version="1.0" encoding="UTF-8"?>
 <result>
   <id>]] .. (request.transaction_id or request.userid) .. [[</id>
-  <code>]] .. code .. [[</code>]];
+  <code>]] .. code .. [[</code>]]
       if comment then
-        xml = xml .. [[<comment>]] .. comment .. [[</comment>]];
+        xml = xml .. [[<comment>]] .. comment .. [[</comment>]]
       end
-      xml = xml .. [[</result>]];
+      xml = xml .. [[</result>]]
 
       return xml
     end
@@ -83,7 +83,7 @@ api:export "lib/paysystems/lib/od"
       local xml = [[<?xml version="1.0" encoding="UTF-8"?>
 <result>
   <code>]] .. code:upper() .. [[</code>
-</result>]];
+</result>]]
 
       return xml
     end

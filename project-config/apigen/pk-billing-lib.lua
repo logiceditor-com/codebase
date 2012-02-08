@@ -9,7 +9,7 @@ local file = function(name) return { filename = name } end
 local NAME = "pk-billing-lib"
 
 local EXPORTS_LIST_NAME = PROJECT_PATH
-    .. "tmp/" .. NAME .. "/code/exports/client_api.lua";
+    .. "tmp/" .. NAME .. "/code/exports/client_api.lua"
 
 common.PROJECT_PATH = PROJECT_PATH
 

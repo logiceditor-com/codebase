@@ -29,7 +29,7 @@ api:export "lib/paysystems/lib/osmp"
       ["INTERNAL_ERROR"] = 1;
       ["WAIT_RESULT"] = 1;
       ["INCORRECT_ACCOUNT_FORMAT"] = 4;
-    };
+    }
     local OSMP_ALLOWED_PAYMENT_STATUS =
     {
        PKB_TRANSACTION_STATUS.CONFIRMED_BY_APP;

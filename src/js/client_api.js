@@ -4,11 +4,11 @@
 
 PKEngine.ClientAPI = new function()
 {
-  var supported_version_
+  var supported_version_;
 
   this.init = function(supported_version)
   {
-    supported_version_ = supported_version
+    supported_version_ = supported_version;
   }
 
   this.check_version = function(received_version)
@@ -23,15 +23,15 @@ PKEngine.ClientAPI = new function()
         )
       )
     {
-      return true
+      return true;
     }
 
     PKEngine.ERROR( I18N(
         'Invalid API version: expected ${1}, got ${2}',
         JSON.stringify(supported_version_, null, 4),
         JSON.stringify(received_version, null, 4)
-      ))
+      ));
 
-    return false
+    return false;
   }
 }

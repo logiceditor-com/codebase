@@ -19,9 +19,11 @@ PK.log_system = new function()
 
   // ------------------ private --------------------------
 
-  var events_ = new Array()
+  var events_ = new Array();
 
-  var printer_ = default_gui_msg_printer_
+  var printer_ = default_gui_msg_printer_;
+
+  var custom_error_handlers = [];
 
   // ------------------ public --------------------------
 
@@ -45,6 +47,23 @@ PK.log_system = new function()
   this.list = function()
   {
     return events_
+  }
+
+  /**
+   * Add function to critical error handling process
+   * callback = function (text) { ... return text }
+   */
+  this.add_custom_error_handler = function (callback)
+  {
+    custom_error_handlers.push(callback);
+  }
+
+  /**
+   * Get functions to critical error handling process
+   */
+  this.get_custom_error_handlers = function ()
+  {
+    return custom_error_handlers;
   }
 }
 
@@ -70,6 +89,12 @@ var GUI_ERROR = function(text)
 var CRITICAL_ERROR = function(text)
 {
   var text_gui, text_log
+
+  var custom_handlers = PK.log_system.get_custom_error_handlers();
+  for (var i = 0; i < custom_handlers.length; i++)
+  {
+    text = custom_handlers[i](text);
+  }
 
   if (window.printStackTrace)
   {

@@ -90,7 +90,6 @@ var switch_to_canvas = function()
   var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();
   game_field_2d_cntx.drawImage(Loader_back_img, 0, 0);
   Loader_back_img.is_drawn = true;
-  // TODO: #3416 Refactor it
   PKEngine.GUI.Viewport.show_game_field();
 }
 

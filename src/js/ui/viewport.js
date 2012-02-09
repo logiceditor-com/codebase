@@ -12,6 +12,10 @@ PKEngine.GUI.Viewport = new function()
   // NOTE: first element - last viewed screen
   //       list type - [{'screen':screen_name, 'params':param_1}, ...]
   this.screens_list_ = [];
+  this.game_field_id = "game_field";
+  this.loader_id = "div_loader";
+  this.previous_screen_additional_checks = undefined;
+
   var MAX_SCREENS_LIST_LENGTH = 10;
 
   var is_drawing_;
@@ -28,6 +32,13 @@ PKEngine.GUI.Viewport = new function()
   }
 
   //----------------------------------------------------------------------------
+
+  this.init = function (game_field_id, loader_id, previous_screen_additional_checks)
+  {
+    this.game_field_id = game_field_id;
+    this.loader_id = loader_id;
+    this.previous_screen_additional_checks = previous_screen_additional_checks;
+  }
 
   this.is_ready = function()
   {
@@ -62,16 +73,16 @@ PKEngine.GUI.Viewport = new function()
 
   //----------------------------------------------------------------------------
 
-  this.return_to_previous_screen = function(additional_checker)
+  this.return_to_previous_screen = function()
   {
     //console.log(
     //    "[PKEngine.GUIControls.Viewport.return_to_previous_screen]",
     //    do_additional_checks, this.get_current_screen_data(), this.get_previous_screen()
     //  )
 
-    if (additional_checker)
+    if (this.previous_screen_additional_checks)
     {
-      var need_continue = additional_checker();
+      var need_continue = this.previous_screen_additional_checks();
       if (!need_continue) return;
     }
 
@@ -185,17 +196,15 @@ PKEngine.GUI.Viewport = new function()
 
   //----------------------------------------------------------------------------
 
-  // TODO: #3264 Refactor it
   this.show_game_field = function()
   {
-    $('#div_loader').hide();
-    $('#game_field').show();
+    $('#'+this.loader_id).hide();
+    $('#'+this.game_field_id).show();
   }
 
-  // TODO: #3264 Refactor it
   this.hide_game_field = function()
   {
-    $('#div_loader').hide();
-    $('#game_field').hide();
+    $('#'+this.loader_id).hide();
+    $('#'+this.game_field_id).hide();
   }
 }

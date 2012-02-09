@@ -5,14 +5,27 @@
 PKEngine.ClientAPI = new function()
 {
   var supported_version_;
+  var received_version_;
 
   this.init = function(supported_version)
   {
     supported_version_ = supported_version;
   }
 
+  this.get_client_version = function()
+  {
+    return supported_version_;
+  }
+
+  this.get_server_version = function()
+  {
+    return received_version_;
+  }
+
   this.check_version = function(received_version)
   {
+    received_version_ = received_version;
+
     if (
         received_version &&
         received_version.name == supported_version_.name &&

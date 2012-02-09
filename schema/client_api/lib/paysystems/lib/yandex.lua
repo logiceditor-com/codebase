@@ -62,7 +62,6 @@ api:export "lib/paysystems/lib/yandex"
 
       md5fields = table.concat(md5fields, ";")
 
-      local md5 = require 'md5'
       return md5.sumhexa(md5fields):upper()
     end
 

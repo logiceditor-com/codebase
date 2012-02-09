@@ -184,7 +184,6 @@ api:export "lib/common"
     end
 
     local pkb_get_transaction_id = function()
-      local uuid = require 'uuid'
       return uuid.new()
     end
 

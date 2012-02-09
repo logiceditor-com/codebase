@@ -49,7 +49,6 @@ api:export "lib/paysystems/lib/od"
           .. od_shop_password
       end
 
-      local md5 = require 'md5'
       return md5.sumhexa(hash)
     end
 

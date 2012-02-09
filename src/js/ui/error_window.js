@@ -14,16 +14,22 @@ PKEngine.initialize_error_window = function ()
   }
 }
 
-
-// TODO: #3264 Must rework whole schema with CRITICAL_ERROR, PKEngine.ERROR and <Project>.ERROR
-//             since pk-core & pk-engine-js must output error in the same way as user code does!
-PKEngine.ERROR = function(text)
+/**
+ * Initialize error handling system
+ * @param callback Custom function: function (text) { ... return text }
+ */
+PKEngine.initialize_error_handling = function (callback)
 {
-  var now = new Date(PK.Time.get_current_timestamp());
-  var cur_date = now.getDate() + '-' + (now.getMonth() + 1) + '-' + now.getFullYear();
-  var date = '[' + cur_date + ' ' + now.toLocaleTimeString() + ']';
+  PK.log_system.add_custom_error_handler(function (text)
+  {
+    var now = new Date(PK.Time.get_current_timestamp());
+    var cur_date = now.getDate() + '-' + (now.getMonth() + 1) + '-' + now.getFullYear();
+    var date = '[' + cur_date + ' ' + now.toLocaleTimeString() + ']';
 
-  var text = date + '<br>' + text;
-
-  CRITICAL_ERROR(text);
+    return date + '<br>' + text;
+  });
+  if (callback)
+  {
+    PK.log_system.add_custom_error_handler(callback);
+  }
 }

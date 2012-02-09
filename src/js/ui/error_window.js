@@ -14,6 +14,9 @@ PKEngine.initialize_error_window = function ()
   }
 }
 
+
+// TODO: #3264 Must rework whole schema with CRITICAL_ERROR, PKEngine.ERROR and <Project>.ERROR
+//             since pk-core & pk-engine-js must output error in the same way as user code does!
 PKEngine.ERROR = function(text)
 {
   var now = new Date(PK.Time.get_current_timestamp());

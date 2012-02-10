@@ -2,13 +2,9 @@
 // Constants
 //------------------------------------------------------------------------------
 
-// TODO: #3264 Remove it
-
-var ANTI_CACHE = "?" + PK.Time.get_current_timestamp();
-
-// runFrame
-var MAXIMUM_FPS = 30;
-
-//------------------------------------------------------------------------------
-
-var RESOURCES_LOADING_TIMEOUT = 30000; // in ms.
+PKEngine.Const =
+{
+  ANTI_CACHE: "",
+  MAXIMUM_FPS: 30,
+  RESOURCES_LOADING_TIMEOUT: 30000 // in ms.
+}

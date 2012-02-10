@@ -2,110 +2,183 @@
 // Loading of resources: check, draw
 //------------------------------------------------------------------------------
 
-// TODO: #3416 Must use a parameter for Loader.init() instead of this
-PKEngine.CustomMainLoopActions = false
-
-// TODO: #3416 Make a singleton, remove all global variables
-
-var Loader_back_img
-var Loader_line_img
-var preloader_initialized_callback;
-var preloader_resource_count = 0;
-
-//------------------------------------------------------------------------------
-
-// TODO: #3416 Many hardcoded names, think about moving them to loader's config
-var InitLoader = function(img_path, lang, onload)
+/**
+ * Loader
+ */
+PKEngine.Loader = new function ()
 {
-  $('<div id="resources" style="position: absolute; left: 10000px">')
-      .appendTo($('#div_loader'));
+  this.loader_back_img = undefined;
+  this.loader_line_img = undefined;
+  this.preloader_resource_count = 0;
 
-  preloader_initialized_callback = onload;
+  /**
+   * Callback
+   */
+  this.custom_main_loop_actions = undefined;
 
-  Loader_back_img = $('<img>',
-      {
-        id: 'preloader_background',
-        src: img_path + "loader/preloader_" + lang + ".jpg"
-      }
-    ).load(check_preloader_ready)
-    .error(
-        function ()
-        {
-          CRITICAL_ERROR(I18N('Cant load loader background!'));
-        }
-    )
-    .appendTo($('#div_loader'))[0];
+  /**
+   * Callback
+   */
+  this.on_preloader_initialized = undefined;
 
-  Loader_line_img = $('<img>',
-      {
-        id: 'preloader_progressbar',
-        src: img_path + "loader/loader_line.png"
-      }
-    ).load(check_preloader_ready)
-    .error(
-        function ()
-        {
-          CRITICAL_ERROR(I18N('Cant load loader progress bar!'));
-        }
-    )
-    .appendTo($('#resources'))[0];
+  /**
+   * Callback
+   */
+  this.on_resource_loading_complete = undefined;
 
-  $('<img/>', { src: img_path + "spacer_top.png", id: "spacer_top" })
-    .load(check_preloader_ready)
-    .appendTo($('#resources'));
-  $('<img/>', { src: img_path + "spacer_bottom.png", id: "spacer_bottom" })
-    .load(check_preloader_ready)
-    .appendTo($('#resources'));
-  $('<img/>', { src: img_path + "error/" + lang + "/label_error.png", id: "error_label" })
-    .load(check_preloader_ready)
-    .appendTo($('#resources'));
-  $('<img/>', { src: img_path + "buttons/" + lang + "/btn_close.png", id: "close_button" })
-    .load(check_preloader_ready)
-    .appendTo($('#resources'));
-  $('<img/>', { src: img_path + "error/bg_window.jpg", id: "error_window_bg" })
-    .load(check_preloader_ready)
-    .appendTo($('#resources'));
+  this.img_path = '';
+  this.lang = undefined;
+
+  this.last_loading_progress = 0;
+  this.resources_loaded = false;
+
+  /**
+  * Dom ids
+  */
+  this.loader_id = 'div_loader';
+  this.resources_id = 'resources';
 }
 
-//------------------------------------------------------------------------------
-
-// TODO: #3416 Hardcoded name
-var check_preloader_ready = function()
+/**
+ * Set loader params
+ *
+ * @param params (Object)
+ */
+PKEngine.Loader.set_params = function (params)
 {
-  preloader_resource_count += 1;
-
-  if (preloader_resource_count > $('#resources img').length)
+  if (params.custom_main_loop_actions)
   {
-    preloader_initialized_callback();
+    this.custom_main_loop_actions = params.custom_main_loop_actions;
+  }
+  if (params.on_preloader_initialized)
+  {
+    this.on_preloader_initialized = params.on_preloader_initialized;
+  }
+  if (params.on_resource_loading_complete)
+  {
+    this.on_resource_loading_complete = params.on_resource_loading_complete;
+  }
+  if (params.img_path)
+  {
+    this.img_path = params.img_path;
+  }
+  if (params.lang)
+  {
+    this.lang = params.lang;
+  }
+  if (params.loader_id)
+  {
+    this.loader_id = params.loader_id;
+  }
+  if (params.resources_id)
+  {
+    this.resources_id = params.resources_id;
   }
 }
 
-//------------------------------------------------------------------------------
+/**
+ * Initialize loader with params
+ *
+ * @param params (Object)
+ *  - custom_main_loop_actions
+ *  - on_preloader_initialized
+ *  - on_resource_loading_complete
+ *  - img_path
+ *  - lang
+ *  - loader_id
+ *  - resources_id
+ */
+PKEngine.Loader.init = function (params)
+{
+  PKEngine.Loader.set_params(params);
 
-var switch_to_canvas = function()
+  $('<div id="'+PKEngine.Loader.resources_id+'" style="position: absolute; left: 10000px">')
+      .appendTo($('#' + PKEngine.Loader.loader_id));
+
+  PKEngine.Loader.loader_back_img = $('<img>',
+      {
+        id: 'preloader_background',
+        src: PKEngine.Loader.img_path + "loader/preloader_" + PKEngine.Loader.lang + ".jpg"
+      }
+    ).load(PKEngine.Loader.check_preloader_ready)
+    .error(
+        function ()
+        {
+          PKEngine.ERROR(I18N('Cant load loader background!'));
+        }
+    )
+    .appendTo($('#' + PKEngine.Loader.loader_id))[0];
+
+  PKEngine.Loader.loader_line_img = $('<img>',
+      {
+        id: 'preloader_progressbar',
+        src: PKEngine.Loader.img_path + "loader/loader_line.png"
+      }
+    ).load(PKEngine.Loader.check_preloader_ready)
+    .error(
+        function ()
+        {
+          PKEngine.ERROR(I18N('Cant load loader progress bar!'));
+        }
+    )
+    .appendTo($('#' + PKEngine.Loader.resources_id))[0];
+
+  $('<img/>', { src: PKEngine.Loader.img_path + "spacer_top.png", id: "spacer_top" })
+    .load(PKEngine.Loader.check_preloader_ready)
+    .appendTo($('#' + PKEngine.Loader.resources_id));
+  $('<img/>', { src: PKEngine.Loader.img_path + "spacer_bottom.png", id: "spacer_bottom" })
+    .load(PKEngine.Loader.check_preloader_ready)
+    .appendTo($('#' + PKEngine.Loader.resources_id));
+  $('<img/>', { src: PKEngine.Loader.img_path + "error/" + PKEngine.Loader.lang + "/label_error.png", id: "error_label" })
+    .load(PKEngine.Loader.check_preloader_ready)
+    .appendTo($('#' + PKEngine.Loader.resources_id));
+  $('<img/>', { src: PKEngine.Loader.img_path + "buttons/" + PKEngine.Loader.lang + "/btn_close.png", id: "close_button" })
+    .load(PKEngine.Loader.check_preloader_ready)
+    .appendTo($('#' + PKEngine.Loader.resources_id));
+  $('<img/>', { src: PKEngine.Loader.img_path + "error/bg_window.jpg", id: "error_window_bg" })
+    .load(PKEngine.Loader.check_preloader_ready)
+    .appendTo($('#' + PKEngine.Loader.resources_id));
+}
+
+/**
+ * Check if preloader ready
+ */
+PKEngine.Loader.check_preloader_ready = function ()
+{
+  PKEngine.Loader.preloader_resource_count += 1;
+
+  if (PKEngine.Loader.preloader_resource_count > $('#' + PKEngine.Loader.resources_id + ' img').length)
+  {
+    if (PKEngine.Loader.on_preloader_initialized)
+    {
+      PKEngine.Loader.on_preloader_initialized();
+    }
+  }
+}
+
+/**
+ * Switch to canvas, show game field
+ */
+PKEngine.Loader.switch_to_canvas = function ()
 {
   // Hide temporary div to prevent influence on layout
-  // TODO: #3416 Hardcoded name
-  $('#div_loader').hide();
+  $('#' + PKEngine.Loader.loader_id).hide();
   var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();
-  game_field_2d_cntx.drawImage(Loader_back_img, 0, 0);
-  Loader_back_img.is_drawn = true;
+  game_field_2d_cntx.drawImage(PKEngine.Loader.loader_back_img, 0, 0);
+  PKEngine.Loader.loader_back_img.is_drawn = true;
   PKEngine.GUI.Viewport.show_game_field();
 }
 
-//------------------------------------------------------------------------------
-
-var g_last_loading_progress = 0
-var g_resources_loaded = false
-
-function checkLoadedData()
+/**
+ * Check loaded data
+ */
+PKEngine.Loader.check_loaded_data = function ()
 {
-  if (g_resources_loaded)
-    return
+  if (PKEngine.Loader.resources_loaded) return;
 
-  if (!Loader_back_img.is_drawn)
+  if (!PKEngine.Loader.loader_back_img.is_drawn)
   {
-    switch_to_canvas();
+    PKEngine.Loader.switch_to_canvas();
   }
 
   // graphics
@@ -121,48 +194,45 @@ function checkLoadedData()
     all_resources += PKEngine.SoundStore.count_total();
   }
 
-  if(loading_progress > g_last_loading_progress)
+  if(loading_progress > PKEngine.Loader.last_loading_progress)
   {
-    g_last_loading_progress = loading_progress
+    PKEngine.Loader.last_loading_progress = loading_progress;
 
-    var pb_width = Math.ceil(Loader_line_img.width * loading_progress / all_resources);
-    if(pb_width > Loader_line_img.width){
-      pb_width = Loader_line_img.width;
+    var pb_width = Math.ceil(PKEngine.Loader.loader_line_img.width * loading_progress / all_resources);
+    if (pb_width > PKEngine.Loader.loader_line_img.width)
+    {
+      pb_width = PKEngine.Loader.loader_line_img.width;
     }
     PKEngine.reset_shadow();
     var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();
     game_field_2d_cntx.drawImage(
-      Loader_line_img,
+      PKEngine.Loader.loader_line_img,
       0, 0,
-      pb_width, Loader_line_img.height,
+      pb_width, PKEngine.Loader.loader_line_img.height,
       PKEngine.GUIControls.get_loader_parameters().line_coords.x,
       PKEngine.GUIControls.get_loader_parameters().line_coords.y,
-      pb_width, Loader_line_img.height
+      pb_width, PKEngine.Loader.loader_line_img.height
     );
   }
 
   if (loading_progress >= all_resources)
   {
-    g_resources_loaded = true;
-    // TODO: #3416 It seems custom_main_loop_actions must be a parameter for Loader.init()
-    PKEngine.GameEngine.MainLoop.start(1000, PKEngine.CustomMainLoopActions);
-    onResourceLoadingComplete()
+    PKEngine.Loader.resources_loaded = true;
+    PKEngine.GameEngine.MainLoop.start(1000, PKEngine.Loader.custom_main_loop_actions);
+    if (PKEngine.Loader.on_resource_loading_complete)
+    {
+      PKEngine.Loader.on_resource_loading_complete();
+    }
     return;
   }
 
-  setTimeout(checkLoadedData, 1000 / PKEngine.Const.MAXIMUM_FPS);
+  setTimeout(PKEngine.Loader.check_loaded_data, 1000 / MAXIMUM_FPS);
 }
 
-
-function ResourcesAreLoaded()
+/**
+ * Returns if resources are loaded
+ */
+PKEngine.Loader.resources_are_loaded = function ()
 {
-  return g_resources_loaded
-}
-
-//------------------------------------------------------------------------------
-
-// TODO: #3416 Seems it should be a callback provided by user code
-var onResourceLoadingComplete = function()
-{
-  PKEngine.iPadAdd2Home.show();
+  return PKEngine.Loader.resources_loaded;
 }

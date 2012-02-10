@@ -75,7 +75,7 @@ PKEngine.SocialNetAPI = new function()
     {
       if (!this.NETWORK_ID_BY_NAME[social_network_name])
       {
-        PKEngine.ERROR(I18N('Unknown social net: ${1}', social_network_name))
+        CRITICAL_ERROR(I18N('Unknown social net: ${1}', social_network_name))
       }
       else
       {
@@ -98,7 +98,7 @@ PKEngine.SocialNetAPI = new function()
         }
         else if (this.NETWORK_ID_BY_NAME[social_network_name] == this.NETWORK_TYPE.OK)
         {
-          PKEngine.ERROR(I18N("TODO: 'odnoklassniki' are not supported yet!"))
+          CRITICAL_ERROR(I18N("TODO: 'odnoklassniki' are not supported yet!"))
         }
       }
     }
@@ -124,7 +124,7 @@ PKEngine.SocialNetAPI = new function()
     }
     else
     {
-      PKEngine.ERROR(I18N("Invalid parameters for PKEngine.SocialNetAPI.init() call!"))
+      CRITICAL_ERROR(I18N("Invalid parameters for PKEngine.SocialNetAPI.init() call!"))
     }
 
     assert(social_network_type, I18N("Failed to set social net api!"))

@@ -38,7 +38,7 @@ PKEngine.Ajax.do_request = function(url, type, post_data, event_maker, on_error,
             }
             catch (ex)
             {
-              PKEngine.ERROR(I18N('Unable to parse server response for request "${1}"', url));
+              CRITICAL_ERROR(I18N('Unable to parse server response for request "${1}"', url));
               return;
             }
 
@@ -87,7 +87,7 @@ PKEngine.Ajax.default_error_handler = function(name, textStatus, jqXHR)
     case 'parsererror' : loc_text_status = I18N("Ajax error PARSERERROR"); break;
   }
 
-  PKEngine.ERROR(
+  CRITICAL_ERROR(
       I18N("Bad server answer!") + "<br>"
       + I18N("Request URL: ${1}", name) + "<br>"
       + I18N("Text error: ${1}", loc_text_status) + "<br>"
@@ -103,7 +103,7 @@ PKEngine.Ajax.on_soft_error_received = function(name, error)
 
   var error_text = error.id ? String(error.id) : JSON.stringify(error)
 
-  PKEngine.ERROR(
+  CRITICAL_ERROR(
       I18N("Bad server answer!") + "<br>"
       + I18N("Request URL: ${1}", name) + "<br>"
       + I18N("Text error: ${1}", error_text) + "<br>"

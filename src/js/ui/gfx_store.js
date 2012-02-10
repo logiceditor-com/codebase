@@ -67,7 +67,7 @@ PKEngine.GraphicsStore = new function()
     {
       if (fail_if_not_found)
       {
-        PKEngine.ERROR(I18N('No image: ${1}', (name + (key !== undefined ? ("." + key) : "" ))))
+        CRITICAL_ERROR(I18N('No image: ${1}', (name + (key !== undefined ? ("." + key) : "" ))))
       }
       return undefined
     }

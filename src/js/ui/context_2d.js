@@ -36,7 +36,7 @@ PKEngine.GUI.Context_2D = new function()
     {
       var browser_name = " "; // TODO: Fill browser name
 
-      PKEngine.ERROR(I18N('Your browser ${1} doesnt support HTML5!', browser_name));
+      CRITICAL_ERROR(I18N('Your browser ${1} doesnt support HTML5!', browser_name));
       return false;
     }
 

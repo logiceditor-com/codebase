@@ -60,7 +60,7 @@ PKEngine.Platform = new function()
   // Note: Normally you should never call this method, it's left only for quickfixes!
   this.get_type = function()
   {
-    PKEngine.ERROR(I18N("PKEngine.Platform.get_type called! Call this function only for quickfixes!"))
+    CRITICAL_ERROR(I18N("PKEngine.Platform.get_type called! Call this function only for quickfixes!"))
 
     return platform_type_;
   }

@@ -119,7 +119,7 @@ PKEngine.UserInputHandlers = new function()
     {
       var err_msg = e.toString ? e.toString() : JSON.stringify(e,null,4)
       if (e && window.console && console.log) console.log("exception stack:", e.stack)
-      PKEngine.ERROR(I18N('[PKEngine.UserInputHandlers.on_mouse_down] exception: ${1}', err_msg));
+      CRITICAL_ERROR(I18N('[PKEngine.UserInputHandlers.on_mouse_down] exception: ${1}', err_msg));
     }
 
     return false;
@@ -145,7 +145,7 @@ PKEngine.UserInputHandlers = new function()
     {
       var err_msg = e.toString ? e.toString() : JSON.stringify(e,null,4)
       if (e && window.console && console.log) console.log("exception stack:", e.stack)
-      PKEngine.ERROR(I18N('[PKEngine.UserInputHandlers.on_mouse_up] exception: ${1}', err_msg));
+      CRITICAL_ERROR(I18N('[PKEngine.UserInputHandlers.on_mouse_up] exception: ${1}', err_msg));
     }
 
     return false;
@@ -171,7 +171,7 @@ PKEngine.UserInputHandlers = new function()
     {
       var err_msg = e.toString ? e.toString() : JSON.stringify(e,null,4)
       if (e && window.console && console.log) console.log("exception stack:", e.stack)
-      PKEngine.ERROR(I18N('[PKEngine.UserInputHandlers.on_mouse_move] exception: ${1}', err_msg));
+      CRITICAL_ERROR(I18N('[PKEngine.UserInputHandlers.on_mouse_move] exception: ${1}', err_msg));
     }
 
     return false;

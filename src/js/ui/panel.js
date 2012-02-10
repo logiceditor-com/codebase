@@ -348,7 +348,7 @@ PKEngine.GUI.makeBasePanel = function(panel_class_name, whole_config)
     this.set_control_origin = function(name, x, y, container, type_name, method_name)
     {
       var control = container[name]
-      if (!control) { PKEngine.ERROR(I18N('${1} not found: ${2}', type_name, instance_child_name_(name))); return }
+      if (!control) { CRITICAL_ERROR(I18N('${1} not found: ${2}', type_name, instance_child_name_(name))); return }
       if (!method_name)
       {
         if (x !== undefined)  control.x = x
@@ -370,7 +370,7 @@ PKEngine.GUI.makeBasePanel = function(panel_class_name, whole_config)
       var image = images_[name]
       if (!image)
       {
-        PKEngine.ERROR(I18N('Image not found: ${1}', instance_child_name_(name)))
+        CRITICAL_ERROR(I18N('Image not found: ${1}', instance_child_name_(name)))
         return
       }
 
@@ -382,7 +382,7 @@ PKEngine.GUI.makeBasePanel = function(panel_class_name, whole_config)
       var label = labels_[name]
       if (!label)
       {
-        PKEngine.ERROR(I18N('Label not found: ${1}', instance_child_name_(name)))
+        CRITICAL_ERROR(I18N('Label not found: ${1}', instance_child_name_(name)))
         return
       }
 
@@ -399,7 +399,7 @@ PKEngine.GUI.makeBasePanel = function(panel_class_name, whole_config)
       var button = buttons_[name]
       if (!button)
       {
-        PKEngine.ERROR(I18N('Button not found: ${1}', instance_child_name_(name)))
+        CRITICAL_ERROR(I18N('Button not found: ${1}', instance_child_name_(name)))
         return
       }
 

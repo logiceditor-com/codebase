@@ -39,7 +39,7 @@ PKEngine.ClientAPI = new function()
       return true;
     }
 
-    PKEngine.ERROR( I18N(
+    CRITICAL_ERROR( I18N(
         'Invalid API version: expected ${1}, got ${2}',
         JSON.stringify(supported_version_, null, 4),
         JSON.stringify(received_version, null, 4)

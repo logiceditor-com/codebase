@@ -69,7 +69,7 @@ var DrawImage = function(image, x, y, width, height, anchor_x, anchor_y, transpa
 {
   if (!image)
   {
-    PKEngine.ERROR(I18N('Tried to draw non-existing image!'))
+    CRITICAL_ERROR(I18N('Tried to draw non-existing image!'))
     return
   }
 

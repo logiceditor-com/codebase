@@ -31,7 +31,7 @@ var InitLoader = function(img_path, lang, onload)
     .error(
         function ()
         {
-          PKEngine.ERROR(I18N('Cant load loader background!'));
+          CRITICAL_ERROR(I18N('Cant load loader background!'));
         }
     )
     .appendTo($('#div_loader'))[0];
@@ -45,7 +45,7 @@ var InitLoader = function(img_path, lang, onload)
     .error(
         function ()
         {
-          PKEngine.ERROR(I18N('Cant load loader progress bar!'));
+          CRITICAL_ERROR(I18N('Cant load loader progress bar!'));
         }
     )
     .appendTo($('#resources'))[0];

@@ -60,7 +60,7 @@ PKEngine.SoundSystem.return_sound_extension_by_browser_support = function()
 
   if (format == undefined)
   {
-    PKEngine.ERROR(I18N('Sound format undefined!'));
+    CRITICAL_ERROR(I18N('Sound format undefined!'));
     PKEngine.SoundSystem.Disable();
     return;
   }
@@ -103,7 +103,7 @@ PKEngine.SoundSystem.stop_and_play = function(sound, loop)
   }
   catch(e)
   {
-    PKEngine.ERROR(I18N('Error pause and play audio: ${1}', audio.src));
+    CRITICAL_ERROR(I18N('Error pause and play audio: ${1}', audio.src));
   }
 }
 
@@ -139,6 +139,6 @@ PKEngine.SoundSystem.stop = function(sound)
   }
   catch(e)
   {
-    PKEngine.ERROR(I18N('Error pause and play audio: ${1}', audio.src));
+    CRITICAL_ERROR(I18N('Error pause and play audio: ${1}', audio.src));
   }
 }

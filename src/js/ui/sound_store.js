@@ -75,7 +75,7 @@ PKEngine.SoundStore = new function()
         continue;
       }
 
-      sounds_[sound].handler.src = config.AudioPath + config.Sounds[sound] + soundFormat + ANTI_CACHE;
+      sounds_[sound].handler.src = config.AudioPath + config.Sounds[sound] + soundFormat + PKEngine.Const.ANTI_CACHE;
       sounds_[sound].handler.addEventListener("canplaythrough", (function(sound)
       {
         return function()
@@ -112,7 +112,7 @@ PKEngine.SoundStore = new function()
       if (errors.length > 0) {
         on_error_(errors);
       }
-    }, RESOURCES_LOADING_TIMEOUT);
+    }, PKEngine.Const.RESOURCES_LOADING_TIMEOUT);
   }
 
   this.get = function(sound)

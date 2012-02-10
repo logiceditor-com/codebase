@@ -151,7 +151,7 @@ function checkLoadedData()
     return;
   }
 
-  setTimeout(checkLoadedData, 1000 / MAXIMUM_FPS);
+  setTimeout(checkLoadedData, 1000 / PKEngine.Const.MAXIMUM_FPS);
 }
 
 

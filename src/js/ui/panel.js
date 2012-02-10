@@ -144,7 +144,7 @@ PKEngine.GUI.makeBasePanel = function(panel_class_name, whole_config)
                 I18N('Bad image set src: ${1}', global_class_name_(name))
               )
               image_resources_[name][key] = PKEngine.GraphicsStore.add(
-                  global_class_name_(name) + "." + key, image_set[key] + ANTI_CACHE,
+                  global_class_name_(name) + "." + key, image_set[key] + PKEngine.Const.ANTI_CACHE,
                   checkLoadedData, PK.image_loading_error
                 )
             }
@@ -157,7 +157,7 @@ PKEngine.GUI.makeBasePanel = function(panel_class_name, whole_config)
               I18N('Bad image set src: ${1}', global_class_name_(name))
             )
             image_resources_[name] = PKEngine.GraphicsStore.add(
-                global_class_name_(name), image_resource_config_[name] + ANTI_CACHE,
+                global_class_name_(name), image_resource_config_[name] + PKEngine.Const.ANTI_CACHE,
                 checkLoadedData, PK.image_loading_error
               )
           }
@@ -271,7 +271,7 @@ PKEngine.GUI.makeBasePanel = function(panel_class_name, whole_config)
           if (button_config['img_on'])
           {
             states['on'] = PKEngine.GraphicsStore.add(
-              name, button_config['img_on'] + ANTI_CACHE,
+              name, button_config['img_on'] + PKEngine.Const.ANTI_CACHE,
               checkLoadedData, PK.image_loading_error
             )
           }
@@ -279,7 +279,7 @@ PKEngine.GUI.makeBasePanel = function(panel_class_name, whole_config)
           if (button_config['img_off'])
           {
             states['off'] = PKEngine.GraphicsStore.add(
-              name, button_config['img_off'] + ANTI_CACHE,
+              name, button_config['img_off'] + PKEngine.Const.ANTI_CACHE,
               checkLoadedData, PK.image_loading_error
             );
           }
@@ -287,7 +287,7 @@ PKEngine.GUI.makeBasePanel = function(panel_class_name, whole_config)
           if (button_config['img_prsd'])
           {
             states['pressed'] = PKEngine.GraphicsStore.add(
-              name, button_config['img_prsd'] + ANTI_CACHE,
+              name, button_config['img_prsd'] + PKEngine.Const.ANTI_CACHE,
               checkLoadedData, PK.image_loading_error
             );
           }

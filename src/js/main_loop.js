@@ -75,7 +75,7 @@ PKEngine.GameEngine.MainLoop = new function()
               window.oRequestAnimationFrame      ||
               window.msRequestAnimationFrame     ||
               function(/* function */ callback, /* DOMElement */ element){
-                window.setTimeout(callback, 1000 / MAXIMUM_FPS);
+                window.setTimeout(callback, 1000 / PKEngine.Const.MAXIMUM_FPS);
               };
     })();
 

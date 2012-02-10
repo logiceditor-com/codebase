@@ -52,7 +52,7 @@ PKEngine.GUIControls = new function()
               I18N('Bad image set src: ${1}', (panel_name_ + "." + name))
             )
             PKEngine.GraphicsStore.add(
-                name + "." + key, image_set[key] + ANTI_CACHE,
+                name + "." + key, image_set[key] + PKEngine.Const.ANTI_CACHE,
                 checkLoadedData, PK.image_loading_error
               )
           }
@@ -65,7 +65,7 @@ PKEngine.GUIControls = new function()
             I18N('Bad image set src: ${1}', (panel_name_ + "." + name))
           )
           PKEngine.GraphicsStore.add(
-              name, image_config_[name] + ANTI_CACHE,
+              name, image_config_[name] + PKEngine.Const.ANTI_CACHE,
               checkLoadedData, PK.image_loading_error
             )
         }

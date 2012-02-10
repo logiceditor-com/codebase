@@ -145,7 +145,7 @@ PKEngine.GUI.makeBasePanel = function(panel_class_name, whole_config)
               )
               image_resources_[name][key] = PKEngine.GraphicsStore.add(
                   global_class_name_(name) + "." + key, image_set[key] + PKEngine.Const.ANTI_CACHE,
-                  checkLoadedData, PK.image_loading_error
+                  PKEngine.Loader.check_loaded_data, PK.image_loading_error
                 )
             }
           }
@@ -158,7 +158,7 @@ PKEngine.GUI.makeBasePanel = function(panel_class_name, whole_config)
             )
             image_resources_[name] = PKEngine.GraphicsStore.add(
                 global_class_name_(name), image_resource_config_[name] + PKEngine.Const.ANTI_CACHE,
-                checkLoadedData, PK.image_loading_error
+                PKEngine.Loader.check_loaded_data, PK.image_loading_error
               )
           }
         }
@@ -272,7 +272,7 @@ PKEngine.GUI.makeBasePanel = function(panel_class_name, whole_config)
           {
             states['on'] = PKEngine.GraphicsStore.add(
               name, button_config['img_on'] + PKEngine.Const.ANTI_CACHE,
-              checkLoadedData, PK.image_loading_error
+              PKEngine.Loader.check_loaded_data, PK.image_loading_error
             )
           }
 
@@ -280,7 +280,7 @@ PKEngine.GUI.makeBasePanel = function(panel_class_name, whole_config)
           {
             states['off'] = PKEngine.GraphicsStore.add(
               name, button_config['img_off'] + PKEngine.Const.ANTI_CACHE,
-              checkLoadedData, PK.image_loading_error
+              PKEngine.Loader.check_loaded_data, PK.image_loading_error
             );
           }
 
@@ -288,7 +288,7 @@ PKEngine.GUI.makeBasePanel = function(panel_class_name, whole_config)
           {
             states['pressed'] = PKEngine.GraphicsStore.add(
               name, button_config['img_prsd'] + PKEngine.Const.ANTI_CACHE,
-              checkLoadedData, PK.image_loading_error
+              PKEngine.Loader.check_loaded_data, PK.image_loading_error
             );
           }
 

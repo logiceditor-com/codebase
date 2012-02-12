@@ -68,15 +68,18 @@ api:export "lib/appn_queue"
         )
 
       local xml = [[<?xml version="1.0" encoding="UTF-8"?>
-    <query version="]] .. api_context:game_config().app_api_version .. [[" method="payment">
+    <query version="]] .. htmlspecialchars(api_context:game_config().app_api_version)
+        .. [[" method="payment">
       <payments>]]
       for i = 1, #transactions do
         local payment = transactions[i]
         xml = xml .. [[
-        <payment stime="]] .. payment.stime .. [[" amount="]] .. payment.amount .. [["
-             paysystem_subid="]] .. payment.paysystem_subid .. [[" paysystem_id="]] ..payment.paysystem_id .. [[">
-           <id><![CDATA[]] .. payment.id .. [=[]]></id>
-           <uid><![CDATA[]=] .. payment.uid .. [=[]]></uid>
+        <payment stime="]] .. htmlspecialchars(payment.stime)
+          .. [[" amount="]] .. htmlspecialchars(payment.amount) .. [["
+             paysystem_subid="]] .. htmlspecialchars(payment.paysystem_subid)
+          .. [[" paysystem_id="]] .. htmlspecialchars(payment.paysystem_id) .. [[">
+           <id>]] .. cdata_wrap(payment.id) .. [=[</id>
+           <uid>]=] .. cdata_wrap(payment.uid) .. [=[</uid>
         </payment>
     ]=]
       end

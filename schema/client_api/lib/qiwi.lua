@@ -39,10 +39,13 @@ api:export "lib/qiwi"
     <?xml version="1.0" encoding="utf-8"?>
     <request>
        <protocol-version>4.0</protocol-version>
-        <request-type>]] .. request_type .. [[</request-type>
-            <terminal-id>]] .. application.config["qiwi_provider_id"] .. [[</terminal-id>
-            <extra name="password">]] .. application.config["qiwi_provider_passwd"] .. [[</extra>
-            ]] .. request_body .. [[
+        <request-type>]] .. htmlspecialchars(request_type) .. [[</request-type>
+            <terminal-id>]] .. htmlspecialchars(application.config["qiwi_provider_id"])
+              .. [[</terminal-id>
+            <extra name="password">]]
+              .. htmlspecialchars(application.config["qiwi_provider_passwd"])
+              .. [[</extra>
+            ]] .. htmlspecialchars(request_body) .. [[
     </request>]]
 
       return xml
@@ -116,13 +119,13 @@ api:extend_context "qiwi.api" (function()
     -- ALARM_SMS = 0 - we dont use sms notification
     -- ACCEPT_CALL = 0 - we dont use call-notification
     local xml = [[
-          <extra name="txn-id">]] .. txn_id .. [[</extra>
-          <extra name="to-account">]] .. transaction.account_id .. [[</extra>
-          <extra name="amount">]] .. qiwi_amount .. [[</extra>
-          <extra name="create-agt">]] .. create_agt .. [[</extra>
-          <extra name="ltime">]] .. ltime .. [[</extra>
-          <extra name="ALARM_SMS">]] .. alarm_sms .. [[</extra>
-          <extra name="ACCEPT_CALL">]] .. accept_call .. [[</extra>
+          <extra name="txn-id">]] .. htmlspecialchars(txn_id) .. [[</extra>
+          <extra name="to-account">]] .. htmlspecialchars(transaction.account_id) .. [[</extra>
+          <extra name="amount">]] .. htmlspecialchars(qiwi_amount) .. [[</extra>
+          <extra name="create-agt">]] .. htmlspecialchars(create_agt) .. [[</extra>
+          <extra name="ltime">]] .. htmlspecialchars(ltime) .. [[</extra>
+          <extra name="ALARM_SMS">]] .. htmlspecialchars(alarm_sms) .. [[</extra>
+          <extra name="ACCEPT_CALL">]] .. htmlspecialchars(accept_call) .. [[</extra>
     ]]
 
     local request_body, error_text = call(qw_create_request, application, QIWI_REQUEST_TYPES.CREATE_BILL, xml)
@@ -149,7 +152,7 @@ api:extend_context "qiwi.api" (function()
     for i = 1, #transactions do
       local tid, err = call(pkb_parse_pkkey, transactions[i])
       if tid ~= nil then
-        xml = xml .. [[<bill txn-id="]] .. tid .. [[" />]]
+        xml = xml .. [[<bill txn-id="]] .. htmlspecialchars(tid) .. [[" />]]
       else
         log_error("[qiwi.api:get_bills_statuses] error: ", err)
       end

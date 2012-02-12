@@ -104,7 +104,7 @@ PKEngine.Loader.init = function (params)
     .error(
         function ()
         {
-          PKEngine.ERROR(I18N('Cant load loader background!'));
+          CRITICAL_ERROR(I18N('Cant load loader background!'));
         }
     )
     .appendTo($('#' + PKEngine.Loader.loader_id))[0];
@@ -118,7 +118,7 @@ PKEngine.Loader.init = function (params)
     .error(
         function ()
         {
-          PKEngine.ERROR(I18N('Cant load loader progress bar!'));
+          CRITICAL_ERROR(I18N('Cant load loader progress bar!'));
         }
     )
     .appendTo($('#' + PKEngine.Loader.resources_id))[0];
@@ -226,7 +226,7 @@ PKEngine.Loader.check_loaded_data = function ()
     return;
   }
 
-  setTimeout(PKEngine.Loader.check_loaded_data, 1000 / MAXIMUM_FPS);
+  setTimeout(PKEngine.Loader.check_loaded_data, 1000 / PKEngine.Const.MAXIMUM_FPS);
 }
 
 /**

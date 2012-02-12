@@ -73,14 +73,16 @@ PKEngine.GUI.Viewport = new function()
 
   //----------------------------------------------------------------------------
 
-  this.return_to_previous_screen = function()
+  this.return_to_previous_screen = function(do_additional_checks)
   {
+    if (do_additional_checks === undefined) { do_additional_checks = true }
+
     //console.log(
     //    "[PKEngine.GUIControls.Viewport.return_to_previous_screen]",
     //    do_additional_checks, this.get_current_screen_data(), this.get_previous_screen()
     //  )
 
-    if (this.previous_screen_additional_checks)
+    if (do_additional_checks && this.previous_screen_additional_checks)
     {
       var need_continue = this.previous_screen_additional_checks();
       if (!need_continue) return;

@@ -5,6 +5,7 @@
 PKEngine.UserInputHandlers = new function()
 {
   var user_input_provider_;
+  var ignore_window_orientation_;
 
   //  Core thing, should be moved into pk-core-js later
   var prepare_event_ = function(e)
@@ -55,9 +56,10 @@ PKEngine.UserInputHandlers = new function()
 
   //----------------------------------------------------------------------------
 
-  this.init = function(platform_type, game_field)
+  this.init = function(platform_type, game_field, ignore_window_orientation)
   {
     user_input_provider_ = game_field;
+    ignore_window_orientation_ = ignore_window_orientation
 
     switch (platform_type)
     {
@@ -73,8 +75,11 @@ PKEngine.UserInputHandlers = new function()
 
         additional_input_handling_preventor_ = function()
         {
-          if (window.orientation == 0 || window.orientation == 180)
+          if (!ignore_window_orientation_ && (window.orientation == 0 || window.orientation == 180))
+          {
             return false
+          }
+
           return true
         }
 

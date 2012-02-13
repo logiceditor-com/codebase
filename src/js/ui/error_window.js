@@ -13,23 +13,3 @@ PKEngine.initialize_error_window = function ()
     $('.errorWindowInner').show();
   }
 }
-
-/**
- * Initialize error handling system
- * @param callback Custom function: function (text) { ... return text }
- */
-PKEngine.initialize_error_handling = function (callback)
-{
-  PK.log_system.add_custom_error_handler(function (text)
-  {
-    var now = new Date(PK.Time.get_current_timestamp());
-    var cur_date = now.getDate() + '-' + (now.getMonth() + 1) + '-' + now.getFullYear();
-    var date = '[' + cur_date + ' ' + now.toLocaleTimeString() + ']';
-
-    return date + '<br>' + text;
-  });
-  if (callback)
-  {
-    PK.log_system.add_custom_error_handler(callback);
-  }
-}

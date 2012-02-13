@@ -23,8 +23,6 @@ PK.log_system = new function()
 
   var printer_ = default_gui_msg_printer_;
 
-  var custom_error_handlers = [];
-
   // ------------------ public --------------------------
 
   this.GUI_EOL = "<br>"
@@ -48,23 +46,6 @@ PK.log_system = new function()
   {
     return events_
   }
-
-  /**
-   * Add function to critical error handling process
-   * callback = function (text) { ... return text }
-   */
-  this.add_custom_error_handler = function (callback)
-  {
-    custom_error_handlers.push(callback);
-  }
-
-  /**
-   * Get functions to critical error handling process
-   */
-  this.get_custom_error_handlers = function ()
-  {
-    return custom_error_handlers;
-  }
 }
 
 var LOG = PK.log_system.add
@@ -86,35 +67,61 @@ var GUI_ERROR = function(text)
   }
 }
 
-var CRITICAL_ERROR = function(text)
+/**
+ * Error handler
+ */
+PK.Error = new function ()
 {
-  var text_gui, text_log
+  var custom_error_handler_ = undefined;
 
-  var custom_handlers = PK.log_system.get_custom_error_handlers();
-  for (var i = 0; i < custom_handlers.length; i++)
+  this.critical_error = function (text)
   {
-    text = custom_handlers[i](text);
+    var text_gui, text_log;
+
+    if (custom_error_handler_)
+    {
+      text = custom_error_handler_(text);
+    }
+
+    var now = new Date(PK.Time.get_current_timestamp());
+    var cur_date = now.getDate() + '-' + (now.getMonth() + 1) + '-' + now.getFullYear();
+    var date = '[' + cur_date + ' ' + now.toLocaleTimeString() + ']';
+
+    text = date + '<br>' + text;
+
+    if (window.printStackTrace)
+    {
+      var tb_lines = ["********** Stack Trace **********"];
+      tb_lines = tb_lines.concat(window.printStackTrace());
+      tb_lines.splice(1, 2); // Remove lines caused by call of printStackTrace()
+      tb_lines.push("**********************************");
+
+      text_log = text + "\n" + tb_lines.join("\n");
+      text_gui = text + PK.log_system.GUI_EOL + tb_lines.join(PK.log_system.GUI_EOL);
+    }
+    else
+    {
+      text_log = text + "\n" + "(Stack trace not available)" + "\n\n";
+      text_gui = text; // + PK.log_system.GUI_EOL + "(Stack trace not available)"
+    }
+
+    LOG("\nCRITICAL ERROR: " + text_log);
+
+    var printer = PK.log_system.get_printer();
+    if (printer)
+    {
+      printer(text_gui);
+    }
   }
 
-  if (window.printStackTrace)
+  /**
+   * Set function to critical error handling process
+   * callback = function (text) { ... return text }
+   */
+  this.set_custom_error_handler = function (callback)
   {
-    var tb_lines = ["********** Stack Trace **********"]
-    tb_lines = tb_lines.concat(window.printStackTrace())
-    tb_lines.splice(1, 2) // Remove lines caused by call of printStackTrace()
-    tb_lines.push("**********************************")
-
-    text_log = text + "\n" + tb_lines.join("\n")
-    text_gui = text + PK.log_system.GUI_EOL + tb_lines.join(PK.log_system.GUI_EOL)
+    custom_error_handler_= callback;
   }
-  else
-  {
-    text_log = text + "\n" + "(Stack trace not available)" + "\n\n"
-    text_gui = text // + PK.log_system.GUI_EOL + "(Stack trace not available)"
-  }
-
-  LOG("\nCRITICAL ERROR: " + text_log)
-
-  var printer = PK.log_system.get_printer()
-  if(printer)
-    printer(text_gui)
 }
+
+var CRITICAL_ERROR = PK.Error.critical_error;

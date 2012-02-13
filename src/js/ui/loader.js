@@ -7,232 +7,211 @@
  */
 PKEngine.Loader = new function ()
 {
-  this.loader_back_img = undefined;
-  this.loader_line_img = undefined;
-  this.preloader_resource_count = 0;
+  var loader_back_img_ = undefined;
+  var loader_line_img_ = undefined;
+  var preloader_resource_count_ = 0;
 
   /**
    * Callback
    */
-  this.custom_main_loop_actions = undefined;
+  var on_preloader_initialized_ = undefined;
 
   /**
    * Callback
    */
-  this.on_preloader_initialized = undefined;
+  var on_resource_loading_complete_ = undefined;
 
-  /**
-   * Callback
-   */
-  this.on_resource_loading_complete = undefined;
-
-  this.img_path = '';
-  this.lang = undefined;
-
-  this.last_loading_progress = 0;
-  this.resources_loaded = false;
+  var last_loading_progress_ = 0;
+  var resources_loaded_ = false;
 
   /**
   * Dom ids
   */
-  this.loader_id = 'div_loader';
-  this.resources_id = 'resources';
-}
+  var loader_id_ = 'div_loader';
+  var resources_id_ = 'resources';
 
-/**
- * Set loader params
- *
- * @param params (Object)
- */
-PKEngine.Loader.set_params = function (params)
-{
-  if (params.custom_main_loop_actions)
+  /**
+   * Returns object containing ids and paths
+   *
+   * @param img_path
+   * @param lang
+   */
+  this.make_images_config = function (img_path, lang)
   {
-    this.custom_main_loop_actions = params.custom_main_loop_actions;
+    return {
+      'preloader_background': img_path + "loader/preloader_" + lang + ".jpg",
+      'preloader_progressbar': img_path + "loader/loader_line.png",
+      'spacer_top': img_path + "spacer_top.png",
+      'spacer_bottom': img_path + "spacer_bottom.png",
+      'error_label': img_path + "error/" + lang + "/label_error.png",
+      'close_button': img_path + "buttons/" + lang + "/btn_close.png",
+      'error_window_bg': img_path + "error/bg_window.jpg"
+    };
   }
-  if (params.on_preloader_initialized)
-  {
-    this.on_preloader_initialized = params.on_preloader_initialized;
-  }
-  if (params.on_resource_loading_complete)
-  {
-    this.on_resource_loading_complete = params.on_resource_loading_complete;
-  }
-  if (params.img_path)
-  {
-    this.img_path = params.img_path;
-  }
-  if (params.lang)
-  {
-    this.lang = params.lang;
-  }
-  if (params.loader_id)
-  {
-    this.loader_id = params.loader_id;
-  }
-  if (params.resources_id)
-  {
-    this.resources_id = params.resources_id;
-  }
-}
 
-/**
- * Initialize loader with params
- *
- * @param params (Object)
- *  - custom_main_loop_actions
- *  - on_preloader_initialized
- *  - on_resource_loading_complete
- *  - img_path
- *  - lang
- *  - loader_id
- *  - resources_id
- */
-PKEngine.Loader.init = function (params)
-{
-  PKEngine.Loader.set_params(params);
-
-  $('<div id="'+PKEngine.Loader.resources_id+'" style="position: absolute; left: 10000px">')
-      .appendTo($('#' + PKEngine.Loader.loader_id));
-
-  PKEngine.Loader.loader_back_img = $('<img>',
-      {
-        id: 'preloader_background',
-        src: PKEngine.Loader.img_path + "loader/preloader_" + PKEngine.Loader.lang + ".jpg"
-      }
-    ).load(PKEngine.Loader.check_preloader_ready)
-    .error(
-        function ()
-        {
-          CRITICAL_ERROR(I18N('Cant load loader background!'));
-        }
-    )
-    .appendTo($('#' + PKEngine.Loader.loader_id))[0];
-
-  PKEngine.Loader.loader_line_img = $('<img>',
-      {
-        id: 'preloader_progressbar',
-        src: PKEngine.Loader.img_path + "loader/loader_line.png"
-      }
-    ).load(PKEngine.Loader.check_preloader_ready)
-    .error(
-        function ()
-        {
-          CRITICAL_ERROR(I18N('Cant load loader progress bar!'));
-        }
-    )
-    .appendTo($('#' + PKEngine.Loader.resources_id))[0];
-
-  $('<img/>', { src: PKEngine.Loader.img_path + "spacer_top.png", id: "spacer_top" })
-    .load(PKEngine.Loader.check_preloader_ready)
-    .appendTo($('#' + PKEngine.Loader.resources_id));
-  $('<img/>', { src: PKEngine.Loader.img_path + "spacer_bottom.png", id: "spacer_bottom" })
-    .load(PKEngine.Loader.check_preloader_ready)
-    .appendTo($('#' + PKEngine.Loader.resources_id));
-  $('<img/>', { src: PKEngine.Loader.img_path + "error/" + PKEngine.Loader.lang + "/label_error.png", id: "error_label" })
-    .load(PKEngine.Loader.check_preloader_ready)
-    .appendTo($('#' + PKEngine.Loader.resources_id));
-  $('<img/>', { src: PKEngine.Loader.img_path + "buttons/" + PKEngine.Loader.lang + "/btn_close.png", id: "close_button" })
-    .load(PKEngine.Loader.check_preloader_ready)
-    .appendTo($('#' + PKEngine.Loader.resources_id));
-  $('<img/>', { src: PKEngine.Loader.img_path + "error/bg_window.jpg", id: "error_window_bg" })
-    .load(PKEngine.Loader.check_preloader_ready)
-    .appendTo($('#' + PKEngine.Loader.resources_id));
-}
-
-/**
- * Check if preloader ready
- */
-PKEngine.Loader.check_preloader_ready = function ()
-{
-  PKEngine.Loader.preloader_resource_count += 1;
-
-  if (PKEngine.Loader.preloader_resource_count > $('#' + PKEngine.Loader.resources_id + ' img').length)
+  /**
+   * Initialize loader with params
+   *
+   * @param on_preloader_initialized callback
+   * @param on_resource_loading_complete callback
+   * @param loader_id DOM id
+   * @param resources_id DOM id
+   * @param images object containing ids and paths, returns by make_images_config
+   */
+  this.init = function (on_preloader_initialized,
+    on_resource_loading_complete,
+    loader_id,
+    resources_id,
+    images)
   {
-    if (PKEngine.Loader.on_preloader_initialized)
+    on_preloader_initialized_ = on_preloader_initialized;
+    on_resource_loading_complete_ = on_resource_loading_complete;
+    loader_id_ = loader_id;
+    resources_id_ = resources_id;
+
+    $('<div id="'+resources_id_+'" style="position: absolute; left: 10000px">')
+        .appendTo($('#' + loader_id_));
+
+    /**
+     * Shortcut
+     * @param image_name
+     */
+    var create_image = function (image_name)
     {
-      PKEngine.Loader.on_preloader_initialized();
+      return $('<img/>', { src: images[image_name], id: image_name });
+    };
+
+    loader_back_img_ = create_image('preloader_background')
+      .load(PKEngine.Loader.check_preloader_ready)
+      .error(
+          function ()
+          {
+            CRITICAL_ERROR(I18N('Cant load loader background!'));
+          }
+      )
+      .appendTo($('#' + loader_id_))[0];
+
+    loader_line_img_ = create_image('preloader_progressbar')
+      .load(PKEngine.Loader.check_preloader_ready)
+      .error(
+          function ()
+          {
+            CRITICAL_ERROR(I18N('Cant load loader progress bar!'));
+          }
+      )
+      .appendTo($('#' + resources_id_))[0];
+
+    create_image('spacer_top')
+      .load(PKEngine.Loader.check_preloader_ready)
+      .appendTo($('#' + resources_id_));
+    create_image('spacer_bottom')
+      .load(PKEngine.Loader.check_preloader_ready)
+      .appendTo($('#' + resources_id_));
+    create_image('error_label')
+      .load(PKEngine.Loader.check_preloader_ready)
+      .appendTo($('#' + resources_id_));
+    create_image('close_button')
+      .load(PKEngine.Loader.check_preloader_ready)
+      .appendTo($('#' + resources_id_));
+    create_image('error_window_bg')
+      .load(PKEngine.Loader.check_preloader_ready)
+      .appendTo($('#' + resources_id_));
+  }
+
+  /**
+   * Check if preloader ready
+   */
+  this.check_preloader_ready = function ()
+  {
+    preloader_resource_count_ += 1;
+
+    if (preloader_resource_count_ > $('#' + resources_id_ + ' img').length)
+    {
+      if (on_preloader_initialized_)
+      {
+        on_preloader_initialized_();
+      }
     }
   }
-}
 
-/**
- * Switch to canvas, show game field
- */
-PKEngine.Loader.switch_to_canvas = function ()
-{
-  // Hide temporary div to prevent influence on layout
-  $('#' + PKEngine.Loader.loader_id).hide();
-  var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();
-  game_field_2d_cntx.drawImage(PKEngine.Loader.loader_back_img, 0, 0);
-  PKEngine.Loader.loader_back_img.is_drawn = true;
-  PKEngine.GUI.Viewport.show_game_field();
-}
-
-/**
- * Check loaded data
- */
-PKEngine.Loader.check_loaded_data = function ()
-{
-  if (PKEngine.Loader.resources_loaded) return;
-
-  if (!PKEngine.Loader.loader_back_img.is_drawn)
+  /**
+   * Switch to canvas, show game field
+   */
+  this.switch_to_canvas = function ()
   {
-    PKEngine.Loader.switch_to_canvas();
-  }
-
-  // graphics
-
-  var loading_progress = PKEngine.GraphicsStore.count_loaded();
-  var all_resources = PKEngine.GraphicsStore.count_total();
-
-  // audio
-
-  if (!PKEngine.SoundSystem.IsDisabled())
-  {
-    loading_progress += PKEngine.SoundStore.count_loaded();
-    all_resources += PKEngine.SoundStore.count_total();
-  }
-
-  if(loading_progress > PKEngine.Loader.last_loading_progress)
-  {
-    PKEngine.Loader.last_loading_progress = loading_progress;
-
-    var pb_width = Math.ceil(PKEngine.Loader.loader_line_img.width * loading_progress / all_resources);
-    if (pb_width > PKEngine.Loader.loader_line_img.width)
-    {
-      pb_width = PKEngine.Loader.loader_line_img.width;
-    }
-    PKEngine.reset_shadow();
+    // Hide temporary div to prevent influence on layout
+    $('#' + loader_id_).hide();
     var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();
-    game_field_2d_cntx.drawImage(
-      PKEngine.Loader.loader_line_img,
-      0, 0,
-      pb_width, PKEngine.Loader.loader_line_img.height,
-      PKEngine.GUIControls.get_loader_parameters().line_coords.x,
-      PKEngine.GUIControls.get_loader_parameters().line_coords.y,
-      pb_width, PKEngine.Loader.loader_line_img.height
-    );
+    game_field_2d_cntx.drawImage(loader_back_img_, 0, 0);
+    loader_back_img_.is_drawn = true;
+    PKEngine.GUI.Viewport.show_game_field();
   }
 
-  if (loading_progress >= all_resources)
+  /**
+   * Check loaded data
+   */
+  this.check_loaded_data = function ()
   {
-    PKEngine.Loader.resources_loaded = true;
-    PKEngine.GameEngine.MainLoop.start(1000, PKEngine.Loader.custom_main_loop_actions);
-    if (PKEngine.Loader.on_resource_loading_complete)
+    if (resources_loaded_) return;
+
+    if (!loader_back_img_.is_drawn)
     {
-      PKEngine.Loader.on_resource_loading_complete();
+      PKEngine.Loader.switch_to_canvas();
     }
-    return;
+
+    // graphics
+
+    var loading_progress = PKEngine.GraphicsStore.count_loaded();
+    var all_resources = PKEngine.GraphicsStore.count_total();
+
+    // audio
+
+    if (!PKEngine.SoundSystem.IsDisabled())
+    {
+      loading_progress += PKEngine.SoundStore.count_loaded();
+      all_resources += PKEngine.SoundStore.count_total();
+    }
+
+    if(loading_progress > last_loading_progress_)
+    {
+      last_loading_progress_ = loading_progress;
+
+      var pb_width = Math.ceil(loader_line_img_.width * loading_progress / all_resources);
+      if (pb_width > loader_line_img_.width)
+      {
+        pb_width = loader_line_img_.width;
+      }
+      PKEngine.reset_shadow();
+      var game_field_2d_cntx = PKEngine.GUI.Context_2D.get();
+      game_field_2d_cntx.drawImage(
+        loader_line_img_,
+        0, 0,
+        pb_width, loader_line_img_.height,
+        PKEngine.GUIControls.get_loader_parameters().line_coords.x,
+        PKEngine.GUIControls.get_loader_parameters().line_coords.y,
+        pb_width, loader_line_img_.height
+      );
+    }
+
+    if (loading_progress >= all_resources)
+    {
+      resources_loaded_ = true;
+      if (on_resource_loading_complete_)
+      {
+        on_resource_loading_complete_();
+      }
+      return;
+    }
+
+    setTimeout(PKEngine.Loader.check_loaded_data, 1000 / PKEngine.Const.MAXIMUM_FPS);
   }
 
-  setTimeout(PKEngine.Loader.check_loaded_data, 1000 / PKEngine.Const.MAXIMUM_FPS);
-}
+  /**
+   * Returns if resources are loaded
+   */
+  this.resources_are_loaded = function ()
+  {
+    return resources_loaded_;
+  }
 
-/**
- * Returns if resources are loaded
- */
-PKEngine.Loader.resources_are_loaded = function ()
-{
-  return PKEngine.Loader.resources_loaded;
 }

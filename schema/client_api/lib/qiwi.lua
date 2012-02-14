@@ -43,20 +43,21 @@ api:export "lib/qiwi"
         return fail("UNSUPPORTED_REQUEST_TYPE", "[qw_create_request] Unsupported qiwi request-type: " .. tostring(request_type))
       end
 
-      local xml = [[
+      local cat, concat = make_concatter()
+      cat [[
     <?xml version="1.0" encoding="utf-8"?>
     <request>
        <protocol-version>4.0</protocol-version>
-        <request-type>]] .. htmlspecialchars(request_type) .. [[</request-type>
-            <terminal-id>]] .. htmlspecialchars(application.config["qiwi_provider_id"])
-              .. [[</terminal-id>
+        <request-type>]]
+      cat (htmlspecialchars(request_type)) [[</request-type>
+            <terminal-id>]]
+      cat (htmlspecialchars(application.config["qiwi_provider_id"])) [[</terminal-id>
             <extra name="password">]]
-              .. application.config["qiwi_provider_passwd"]
-              .. [[</extra>
-            ]] .. request_body .. [[
+      cat (application.config["qiwi_provider_passwd"]) [[</extra>
+            ]] request_body  [[
     </request>]]
 
-      return xml
+      return concat()
     end
 
     local qw_send_request = function(api_context, request_body)
@@ -126,16 +127,18 @@ api:extend_context "qiwi.api" (function()
     -- create-agt = 1 => we create agent if agent is absent
     -- ALARM_SMS = 0 - we dont use sms notification
     -- ACCEPT_CALL = 0 - we dont use call-notification
-    local xml = [[
-          <extra name="txn-id">]] .. htmlspecialchars(txn_id) .. [[</extra>
-          <extra name="to-account">]] .. htmlspecialchars(transaction.account_id) .. [[</extra>
-          <extra name="amount">]] .. htmlspecialchars(qiwi_amount) .. [[</extra>
-          <extra name="create-agt">]] .. htmlspecialchars(create_agt) .. [[</extra>
-          <extra name="ltime">]] .. htmlspecialchars(ltime) .. [[</extra>
-          <extra name="ALARM_SMS">]] .. htmlspecialchars(alarm_sms) .. [[</extra>
-          <extra name="ACCEPT_CALL">]] .. htmlspecialchars(accept_call) .. [[</extra>
+    local cat, concat = make_concatter()
+    cat [[
+          <extra name="txn-id">]] (htmlspecialchars(txn_id)) [[</extra>
+          <extra name="to-account">]] (htmlspecialchars(transaction.account_id)) [[</extra>
+          <extra name="amount">]] (htmlspecialchars(qiwi_amount)) [[</extra>
+          <extra name="create-agt">]] (htmlspecialchars(create_agt)) [[</extra>
+          <extra name="ltime">]] (htmlspecialchars(ltime)) [[</extra>
+          <extra name="ALARM_SMS">]] (htmlspecialchars(alarm_sms)) [[</extra>
+          <extra name="ACCEPT_CALL">]] (htmlspecialchars(accept_call)) [[</extra>
     ]]
 
+    local xml = concat()
     local request_body, error_text = call(qw_create_request, application, QIWI_REQUEST_TYPES.CREATE_BILL, xml)
     if request_body ~= nil then
       local res, err = call(qw_send_request, api_context, request_body)
@@ -156,17 +159,19 @@ api:extend_context "qiwi.api" (function()
         "table", application
       )
 
-    local xml = "<bills-list>"
+    local cat, concat = make_concatter()
+    cat "<bills-list>"
     for i = 1, #transactions do
       local tid, err = call(pkb_parse_pkkey, transactions[i])
       if tid ~= nil then
-        xml = xml .. [[<bill txn-id="]] .. htmlspecialchars(tid) .. [[" />]]
+        cat [[<bill txn-id="]] (htmlspecialchars(tid)) [[" />]]
       else
         log_error("[qiwi.api:get_bills_statuses] error: ", err)
       end
     end
-    xml = xml .. "</bills-list>"
+    cat "</bills-list>"
 
+    local xml = concat()
     local request_body, error_text = call(qw_create_request, application, QIWI_REQUEST_TYPES.GET_BILLS_STATUSES, xml)
     if request_body ~= nil then
       local result_code, bills = call(qw_send_request, api_context, request_body)

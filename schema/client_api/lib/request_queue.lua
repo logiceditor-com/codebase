@@ -72,17 +72,20 @@ api:export "lib/rq"
           "table", api_context,
           "table", users
         )
-    -- TODO: use table.concat here?
-      local xml = [[<?xml version="1.0" encoding="UTF-8"?>
-    <query version="]] .. api_context:game_config().app_api_version .. [[" method="payment">
+
+      local cat, concat = make_concatter()
+      cat [[<?xml version="1.0" encoding="UTF-8"?>
+    <query version="]] (api_context:game_config().app_api_version) [[" method="payment">
       <uids>]]
       for i = 1, #users do
         local user = users[i]
-        xml = xml .. "<uid>" .. cdata_wrap(user.uid) .. "</uid>\n"
+        cat "<uid>"
+        cdata_cat(cat, user.uid)
+        cat "</uid>\n"
       end
-      xml = xml .. [[  </uids>
+      cat [[  </uids>
     </query>]]
-      return xml
+      return concat()
     end
 
     -- TODO: make it work with multiuid requests ?

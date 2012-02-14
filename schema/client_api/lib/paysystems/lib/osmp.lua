@@ -106,20 +106,24 @@ api:export "lib/paysystems/lib/osmp"
     end
 
     local osmp_create_response = function(code, request)
-      local xml = [[<?xml version="1.0" encoding="UTF-8"?>
+      local cat, concat = make_concatter()
+      cat [[<?xml version="1.0" encoding="UTF-8"?>
 <response>
 <osmp_txn_id>]]
-        .. htmlspecialchars(request.txn_id and tostring(request.txn_id) or "")
-        .. [[</osmp_txn_id>
+      cat (htmlspecialchars(request.txn_id and tostring(request.txn_id) or ""))
+      cat [[</osmp_txn_id>
 <prv_txn>]]
-        .. htmlspecialchars(request.transaction_id and tostring(request.transaction_id) or "")
-        .. [[</prv_txn>
-<sum>]] .. htmlspecialchars(request.sum and tostring(request.sum) or "") .. [[</sum>
-<result>]] .. htmlspecialchars(tostring(code)) .. [[</result>
-<comment>]] .. htmlspecialchars(request.comment or "") .. [[</comment>
+      cat (htmlspecialchars(request.transaction_id and tostring(request.transaction_id) or ""))
+      cat [[</prv_txn>
+<sum>]]
+      cat (htmlspecialchars(request.sum and tostring(request.sum) or "")) [[</sum>
+<result>]]
+      cat (htmlspecialchars(tostring(code))) [[</result>
+<comment>]]
+      cat (htmlspecialchars(request.comment or "")) [[</comment>
 </response>]]
 
-      return xml
+      return concat();
     end
 
     local osmp_build_response = function(code, request)

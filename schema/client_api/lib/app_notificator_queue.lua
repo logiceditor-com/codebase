@@ -75,25 +75,30 @@ api:export "lib/appn_queue"
           "table", transactions
         )
 
-      local xml = [[<?xml version="1.0" encoding="UTF-8"?>
-    <query version="]] .. htmlspecialchars(api_context:game_config().app_api_version)
-        .. [[" method="payment">
+      local cat, concat = make_concatter()
+
+      cat [[<?xml version="1.0" encoding="UTF-8"?>
+    <query version="]] (htmlspecialchars(api_context:game_config().app_api_version)) [[" method="payment">
       <payments>]]
       for i = 1, #transactions do
         local payment = transactions[i]
-        xml = xml .. [[
-        <payment stime="]] .. htmlspecialchars(payment.stime)
-          .. [[" amount="]] .. htmlspecialchars(payment.amount) .. [["
-             paysystem_subid="]] .. htmlspecialchars(payment.paysystem_subid)
-          .. [[" paysystem_id="]] .. htmlspecialchars(payment.paysystem_id) .. [[">
-           <id>]] .. cdata_wrap(payment.id) .. [=[</id>
-           <uid>]=] .. cdata_wrap(payment.uid) .. [=[</uid>
+        cat [[
+        <payment stime="]] (htmlspecialchars(payment.stime))
+          [[" amount="]] (htmlspecialchars(payment.amount)) [["
+             paysystem_subid="]] (htmlspecialchars(payment.paysystem_subid))
+          [[" paysystem_id="]] (htmlspecialchars(payment.paysystem_id)) [[">
+           <id>]]
+        cdata_cat(cat, payment.id)
+        cat [=[</id>
+           <uid>]=]
+        cdata_cat(cat, payment.uid)
+        cat [=[</uid>
         </payment>
     ]=]
       end
-      xml = xml .. [[  </payments>
+      cat [[  </payments>
     </query>]]
-      return xml
+      return concat()
     end
 
     local REQUESTS_HANDLERS =

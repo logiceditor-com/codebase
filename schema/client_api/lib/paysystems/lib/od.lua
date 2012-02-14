@@ -71,28 +71,31 @@ api:export "lib/paysystems/lib/od"
       code = code ~= OD_RESPONSE_CODE_YES
         and OD_RESPONSE_CODE_NO
         or OD_RESPONSE_CODE_YES
-      local xml = [[<?xml version="1.0" encoding="UTF-8"?>
-<result>
-  <id>]] .. htmlspecialchars(request.transaction_id or request.userid) .. [[</id>
-  <code>]] .. htmlspecialchars(code) .. [[</code>]]
-      if comment then
-        xml = xml .. [[<comment>]] .. htmlspecialchars(comment) .. [[</comment>]]
-      end
-      xml = xml .. [[</result>]]
 
-      return xml
+      local cat, concat = make_concatter()
+      cat [[<?xml version="1.0" encoding="UTF-8"?>
+<result>
+  <id>]] (htmlspecialchars(request.transaction_id or request.userid)) [[</id>
+  <code>]] (htmlspecialchars(code)) [[</code>]]
+      if comment then
+        cat [[<comment>]] (htmlspecialchars(comment)) [[</comment>]]
+      end
+      cat [[</result>]]
+
+      return concat()
     end
 
     local od_create_check_response = function(code)
       arguments(
           "string", code
         )
-      local xml = [[<?xml version="1.0" encoding="UTF-8"?>
+      local cat, concat = make_concatter()
+      cat [[<?xml version="1.0" encoding="UTF-8"?>
 <result>
-  <code>]] .. htmlspecialchars(code:upper()) .. [[</code>
+  <code>]] (htmlspecialchars(code:upper())) [[</code>
 </result>]]
 
-      return xml
+      return concat()
     end
 
     local od_build_response = function(method, code, request)

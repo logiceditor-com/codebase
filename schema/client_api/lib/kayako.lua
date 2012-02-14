@@ -37,7 +37,7 @@ api:extend_context "kayako.helper" (function()
         if #post_data ~= 0 then
           post_data = post_data .. "&"
         end
-        post_data = ("%s%s=%s"):format(post_data, k, url_encode(v))
+        post_data = ("%s%s=%s"):format(post_data, k, url_encode(tostring(v)))
       end
       return post_data
     end

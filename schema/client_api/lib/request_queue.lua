@@ -70,7 +70,7 @@ api:export "lib/rq"
       <uids>]]
       for i = 1, #users do
         local user = users[i]
-        xml = xml .. "<uid><![CDATA[" .. user.uid .. "]]></uid>\n"
+        xml = xml .. "<uid>" .. cdata_wrap(user.uid) .. "</uid>\n"
       end
       xml = xml .. [[  </uids>
     </query>]]

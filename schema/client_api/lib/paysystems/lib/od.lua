@@ -65,10 +65,10 @@ api:export "lib/paysystems/lib/od"
         or OD_RESPONSE_CODE_YES
       local xml = [[<?xml version="1.0" encoding="UTF-8"?>
 <result>
-  <id>]] .. (request.transaction_id or request.userid) .. [[</id>
-  <code>]] .. code .. [[</code>]]
+  <id>]] .. htmlspecialchars(request.transaction_id or request.userid) .. [[</id>
+  <code>]] .. htmlspecialchars(code) .. [[</code>]]
       if comment then
-        xml = xml .. [[<comment>]] .. comment .. [[</comment>]]
+        xml = xml .. [[<comment>]] .. htmlspecialchars(comment) .. [[</comment>]]
       end
       xml = xml .. [[</result>]]
 
@@ -81,7 +81,7 @@ api:export "lib/paysystems/lib/od"
         )
       local xml = [[<?xml version="1.0" encoding="UTF-8"?>
 <result>
-  <code>]] .. code:upper() .. [[</code>
+  <code>]] .. htmlspecialchars(code:upper()) .. [[</code>
 </result>]]
 
       return xml

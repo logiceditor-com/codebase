@@ -57,6 +57,7 @@ return
   WAIT_MARKER = { "pk-engine/srv/channel/client.lua" };
   WWW_ADMIN_INFO_URL = { "pk-engine/srv/internal_config/client.lua" };
   WWW_GAME_INFO_URL = { "pk-engine/srv/internal_config/client.lua" };
+  add_task = { "pk-engine/task_processor/task_processor.lua" };
   add_values_one = { "pk-engine/db/query.lua" };
   append_no_cache_headers = { "pk-engine/webservice/wsapi.lua" };
   apply_db_changeset = { "pk-engine/db/changeset.lua" };
@@ -187,7 +188,7 @@ return
   redis_unlock = { "pk-engine/redis/lock.lua" };
   revert_db_changeset = { "pk-engine/db/changeset.lua" };
   rtry = { "pk-engine/redis/workarounds.lua" };
-  run = { "pk-engine/task/cron.lua", "pk-engine/webservice/fcgi_wsapi_runner.lua" };
+  run = { "pk-engine/task/cron.lua", "pk-engine/task/echo.lua", "pk-engine/webservice/fcgi_wsapi_runner.lua" };
   run_ev_server = { "pk-engine/net/ev-server.lua" };
   schedule_cron = { "pk-engine/cron.lua" };
   send_bytes = { "pk-engine/net/buffered_connection.lua", "pk-engine/srv/copas_conn.lua", "pk-engine/srv/raw_conn.lua" };

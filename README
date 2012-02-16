@@ -1,10 +1,7 @@
 pk-billing-lib: The PK billing libraries
 ==========================================
 
-WARNING: All code in this project is unpublished closed-source
-         unless explicitly stated otherwise.
+Copyright (c) 2011-2012, Alexander Gladysh <ag@logiceditor.com>
+Copyright (c) 2011-2012, Dmitry Potapov <dp@logiceditor.com>
 
-All rights reserved.
-
-Copyright (c) 2010-2011, Alexander Gladysh <agladysh@gmail.com>
-Copyright (c) 2010-2011, Dmitry Potapov <dmitry.v.potapov@gmail.com>
+See file 'COPYRIGHT' for the license.

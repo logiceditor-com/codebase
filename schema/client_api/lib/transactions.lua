@@ -1,3 +1,11 @@
+--------------------------------------------------------------------------------
+-- transactions.lua
+-- This file is a part of pk-billing-lib library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
+--------------------------------------------------------------------------------
+
 api:extend_context "transactions.cache" (function()
   local try_get = function(self, api_context, transaction_id, field)
     method_arguments(

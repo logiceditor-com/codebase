@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- project-config-defaults.lua: project configuration defaults
+-- This file is a part of pk-billing-lib library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 -- See format in tools-lib/project-config-schema.lua
 -- Note that PROJECT_PATH is defined in the environment

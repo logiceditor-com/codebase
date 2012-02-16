@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- create_application_config_schema.lua: contains application config schema
+-- This file is a part of pk-billing-lib library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 local assert, error = assert, error

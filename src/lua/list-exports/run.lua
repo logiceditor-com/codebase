@@ -257,7 +257,7 @@ ACTIONS.list_all = function()
         source.root_dir_only, -- May be nil
         exports.profiles_dir .. source.profile_filename,
         exports.exports_dir .. source.out_filename,
-        exports.lib_name -- May be nil
+        source.lib_name -- May be nil
       )
   end
 end

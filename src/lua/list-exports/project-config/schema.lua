@@ -34,12 +34,12 @@ do
         {
           cfg:existing_path "exports_dir";
           cfg:existing_path "profiles_dir";
-          cfg:optional_string "lib_name";
 
           cfg:non_empty_ilist "sources"
           {
             cfg:path "sources_dir";
             cfg:optional_string "root_dir_only";
+            cfg:optional_string "lib_name";
             cfg:path "profile_filename";
             cfg:path "out_filename";
           };

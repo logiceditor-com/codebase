@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- schema.lua: project-create configuration file format
+-- This file is a part of pk-project-tools library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 local load_tools_cli_data_schema

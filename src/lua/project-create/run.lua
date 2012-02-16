@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- run.lua: project-create runner
+-- This file is a part of pk-project-tools library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 local loadfile, loadstring = loadfile, loadstring

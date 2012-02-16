@@ -1,3 +1,11 @@
+--------------------------------------------------------------------------------
+-- metamanifest.lua
+-- This file is a part of pk-project-tools library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
+--------------------------------------------------------------------------------
+
 -- TODO: add syntax for escaped, underline, short
 -- keys are strings to be replaced by value strings
 

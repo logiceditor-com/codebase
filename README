@@ -1,17 +1,7 @@
 pk-admin: the PK admin engine
 =============================
 
-WARNING: All code in this project is unpublished closed-source
-         unless explicitly stated otherwise.
+Copyright (c) 2010-2012, Alexander Gladysh <ag@logiceditor.com>
+Copyright (c) 2010-2012, Dmitry Potapov <dp@logiceditor.com>
 
-All rights reserved.
-
-Copyright (c) 2009-2010, Alexander Gladysh <agladysh@gmail.com>
-Copyright (c) 2009-2010, Dmitry Potapov <dmitry.v.potapov@gmail.com>
-
-This project depends on lua-nucleo and lua-aplicado
-
-http://github.com/lua-nucleo/lua-nucleo
-http://github.com/lua-aplicado/lua-aplicado
-
-This project also depends on pk-core and pk-engine
+See file 'COPYRIGHT' for the license.

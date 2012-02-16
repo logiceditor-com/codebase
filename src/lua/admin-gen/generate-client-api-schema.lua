@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- generate-client-api-schema.lua: client api schema generator
+-- This file is a part of pk-tools library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 local make_loggers = import 'pk-core/log.lua' { 'make_loggers' }

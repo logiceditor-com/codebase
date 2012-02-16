@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- db-changes.lua: handle DB changesets
+-- This file is a part of pk-tools library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 dofile('tools-lib/init/require-serverside.lua')

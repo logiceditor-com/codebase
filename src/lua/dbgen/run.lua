@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- run.lua: database stuff generator
+-- This file is a part of pk-tools library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 -- TODO: Table name validation should take database name in account.
 --       But make autotests support different databases before fixing that.

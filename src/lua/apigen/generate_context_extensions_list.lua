@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- generate_context_extensions_list.lua: api context extensions list generator
+-- This file is a part of pk-tools library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 local arguments

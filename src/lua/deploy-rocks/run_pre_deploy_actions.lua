@@ -1,3 +1,11 @@
+--------------------------------------------------------------------------------
+-- run_pre_deploy_actions.lua
+-- This file is a part of pk-tools library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
+--------------------------------------------------------------------------------
+
 local log, dbg, spam, log_error
       = import 'pk-core/log.lua' { 'make_loggers' } (
           "deploy-rocks", "DRO"

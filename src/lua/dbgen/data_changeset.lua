@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- data_changeset.lua: data changeset generator
+-- This file is a part of pk-tools library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 local uuid = require 'uuid'

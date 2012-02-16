@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- project_manifest.lua: tools to work with project manifests
+-- This file is a part of pk-tools library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 -- TODO: Upgrade deploy-rocks to use this
 --------------------------------------------------------------------------------

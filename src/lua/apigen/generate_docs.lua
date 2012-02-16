@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- generate_docs.lua: api documentation generator
+-- This file is a part of pk-tools library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 local table_insert, table_remove = table.insert, table.remove

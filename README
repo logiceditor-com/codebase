@@ -1,16 +1,11 @@
 pk-engine: The PK engine
 ========================
 
-WARNING: All code in this project is unpublished closed-source
-         unless explicitly stated otherwise.
+Copyright (c) 2010-2012, Alexander Gladysh <ag@logiceditor.com>
+Copyright (c) 2010-2012, Dmitry Potapov <dp@logiceditor.com>
 
-All rights reserved.
-
-Copyright (c) 2009-2012, Alexander Gladysh <agladysh@gmail.com>
-Copyright (c) 2009-2012, Dmitry Potapov <dmitry.v.potapov@gmail.com>
+See file 'COPYRIGHT' for the license.
 
 Note: to run tests, create a MySQL database `pk-test`:
 
     mysql -u root -p <<<'create database `pk-test`'
-
-As usual, you need to have MySQL root user password set to 12345.

@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- http_server.lua: test-only xavante http server
+-- This file is a part of pk-test library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 local xavante = require 'xavante'

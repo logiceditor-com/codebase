@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- tmp_file_system_objects.lua: work with temp files, dirs, etc.
+-- This file is a part of pk-test library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 -- TODO: Write tests and use "/tmp/pk-test" root

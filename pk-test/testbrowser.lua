@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- pk-test/testbrowser.lua: cookie based testbrowser
+-- This file is a part of pk-test library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 local send_http_request

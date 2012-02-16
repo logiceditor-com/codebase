@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- pk-test/testbrowser/utils.lua: misc utils
+-- This file is a part of pk-test library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 require 'socket.url'

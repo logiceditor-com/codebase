@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- html_answer_render.lua: helpers for raw handlers
+-- This file is a part of pk-admin library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 local arguments,

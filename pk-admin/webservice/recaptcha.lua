@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- recaptcha.lua: wrapper for recaptcha (http://recaptcha.net)
+-- This file is a part of pk-admin library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 require("socket.http")

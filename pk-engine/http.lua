@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- http.lua - work with http/https requests
+-- This file is a part of pk-engine library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 local log, dbg, spam, log_error = import 'pk-core/log.lua' { 'make_loggers' } (

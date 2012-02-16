@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- api_redis.lua: redis wrapper for api
+-- This file is a part of pk-engine library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 --
 -- WARNING: To be used inside call().

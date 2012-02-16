@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- url_handler_wrapper.lua: api url handler wrapper
+-- This file is a part of pk-engine library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 local arguments,

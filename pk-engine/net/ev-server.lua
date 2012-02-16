@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- ev-server.lua: tools for running servers with lua-ev
+-- This file is a part of pk-engine library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 --
 -- WARNING: Event handlers MUST NOT FAIL! Always use xpcall.

@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- pk-engine.lua: pk-engine exports profile
+-- This file is a part of pk-engine library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 local tset = import 'lua-nucleo/table-utils.lua' { 'tset' }

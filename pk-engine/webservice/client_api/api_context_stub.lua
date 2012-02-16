@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- api_context_stub.lua: handler context wrapper for api (without wsapi)
+-- This file is a part of pk-engine library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 -- NOTE: When changing, remember to change api_context as well
 --------------------------------------------------------------------------------

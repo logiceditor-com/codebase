@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- persistent_db_connector.lua: persistent connector for luasql.mysql
+-- This file is a part of pk-engine library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 require 'luasql.mysql'

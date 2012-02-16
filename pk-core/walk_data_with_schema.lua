@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- walk_data_with_schema.lua: data walking based on tagged-tree schemas
+-- This file is a part of pk-core library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 -- Sandbox warning: alias all globals!
 --------------------------------------------------------------------------------

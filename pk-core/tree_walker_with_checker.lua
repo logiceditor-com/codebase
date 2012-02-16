@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- tree_walker_with_checker.lua: data walking with fancy checking facilities
+-- This file is a part of pk-core library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 -- Sandbox warning: alias all globals!
 --------------------------------------------------------------------------------

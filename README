@@ -9,3 +9,5 @@ See file 'COPYRIGHT' for the license.
 Note: to run tests, create a MySQL database `pk-test`:
 
     mysql -u root -p <<<'create database `pk-test`'
+
+As usual, you need to have MySQL root user password set to 12345.

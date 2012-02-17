@@ -1075,7 +1075,7 @@ do
     local template_path
     if template_cli_path == "/" then
       template_path = assert(luarocks_show_rock_dir("pk-project-tools.project-templates"))
-      template_path = string.sub(template_path, 1, -1) .. "/src/lua/project-templates"
+      template_path = string.sub(template_path, 1, -1) .. "/src/lua/project.template"
     else -- TODO: check dir exists!
       template_path = template_cli_path
     end

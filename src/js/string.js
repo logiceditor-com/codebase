@@ -69,47 +69,6 @@ PK.entityify_and_escape_quotes = function (s)
   return result;
 }
 
-/**
- * Split using placeholders like '${1}', '${2}' .. '${n}' or '${key}' (from keys).
- *
- * @param source
- * @param keys
- */
-PK.split_using_placeholders_old = function(source, keys)
-{
-  var result = [];
-  var pattern = '(\\$\\{[0-9]+\\})';
-  if (keys && keys.length)
-  {
-    for (var i = 0; i < keys.length; i++)
-    {
-      pattern += '|(\\$\\{'+keys[i]+'\\})';
-    }
-
-  }
-  var pieces = source.split(new RegExp(pattern));
-  for (var n = 0; n < pieces.length; n++)
-  {
-    if (pieces[n] != undefined && pieces[n] !== "")
-    {
-      var item = pieces[n];
-      if (item.substr(0, 2) == '${' && item.substr(item.length - 1) == '}')
-      {
-        var key = item.substr(2, item.length - 3);
-        var key_number = Number(key);
-        if (!isNaN(key_number))
-        {
-          if (key_number == key_number.toFixed(0))
-          {
-            item = key_number;
-          }
-        }
-      }
-      result.push(item);
-    }
-  }
-  return result;
-}
 
 /**
  * Split using placeholders like '${1}', '${2}' .. '${n}' or '${key}' (from keys).
@@ -199,68 +158,6 @@ PK.split_using_placeholders = function(source, keys)
   return pieces;
 }
 
-/**
- * Fill placeholders with values.
- *
- * @param source
- * @param ivalues Array
- * @param values Object
- */
-PK.fill_placeholders_old = function(source, ivalues, values)
-{
-  var keys = undefined;
-  var placeholders_values = undefined;
-  if (values)
-  {
-    keys = [];
-    placeholders_values = {};
-    for (var key in values)
-    {
-      keys.push(key);
-      placeholders_values["${"+key+"}"] = values[key];
-    }
-  }
-  var pieces = PK.split_using_placeholders_old(source, keys);
-  var result = [];
-  for (var n = 0; n < pieces.length; n++) {
-    var item = pieces[n];
-    if (placeholders_values)
-    {
-      if (placeholders_values[item])
-      {
-        item = placeholders_values[item];
-        result.push(item);
-        continue;
-      }
-    }
-    if (typeof(item) == 'number' && ivalues)
-    {
-      var num = item - 1;
-      if (ivalues.length > num)
-      {
-        item = ivalues[num];
-        result.push(item);
-        continue;
-      }
-      else
-      {
-        CRITICAL_ERROR(
-          "Too big value placeholder number: " + ivalues.length + '<=' + num
-        );
-        if (window.console && console.log)
-        {
-          console.log("[PK.fill_placeholders] failed on data:", source, ivalues, pieces);
-        }
-
-        LOG("source: " + source);
-        LOG("ivalues: " + JSON.stringify(ivalues, null, 4));
-        LOG("Data: " + JSON.stringify(pieces, null, 4));
-      }
-    }
-    result.push(item);
-  }
-  return result.join('');
-}
 
 /**
  * Fill placeholders with values.

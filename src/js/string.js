@@ -238,3 +238,216 @@ PK.formatString = function()
 
   return text;
 }
+
+
+//-----------------------------------------------------------------------------
+// OBSOLETE IMPLEMENTATIONS - Only for benchmarking!
+//-----------------------------------------------------------------------------
+
+PK.check_namespace('Obsolete');
+
+PK.Obsolete.split_using_placeholders_very_old = function(s, keys)
+{
+  var SEPARATOR = '{%_SEP_%}'
+
+  var num_placehoders = 0, placeholder_found = true
+
+  while (true)
+  {
+    num_placehoders++
+    var placeholder = '${' + num_placehoders + '}'
+    if( s.indexOf(placeholder) < 0 )
+      break
+    s = s.replace(placeholder, SEPARATOR + placeholder + SEPARATOR)
+  }
+  num_placehoders--
+
+  if(keys)
+   {
+     for (var i = 0; i < keys.length; i++)
+     {
+      var placeholder = '${' + keys[i] + '}'
+      if( s.indexOf(placeholder) >= 0 )
+      {
+        s = s.replace(placeholder, SEPARATOR + placeholder + SEPARATOR)
+      }
+     }
+   }
+
+  var splitted = s.split(SEPARATOR)
+
+  var result = []
+  for(var i = 0; i < splitted.length; i++)
+   {
+    if (splitted[i].match(/\$\{\d+\}/g))
+    {
+      result.push(Number(splitted[i].replace(/[\$\{\}]/g, "")))
+    }
+    else if (splitted[i] != "")
+     {
+      result.push(splitted[i])
+     }
+
+   }
+
+  return result
+}
+
+ /**
+ * Split using placeholders like '${1}', '${2}' .. '${n}' or '${key}' (from keys).
+ *
+ * @param source
+ * @param keys
+ */
+PK.Obsolete.split_using_placeholders_old = function(source, keys)
+{
+  var result = [];
+  var pattern = '(\\$\\{[0-9]+\\})';
+  if (keys && keys.length)
+  {
+    for (var i = 0; i < keys.length; i++)
+    {
+      pattern += '|(\\$\\{'+keys[i]+'\\})';
+    }
+
+  }
+  var pieces = source.split(new RegExp(pattern));
+  for (var n = 0; n < pieces.length; n++)
+  {
+    if (pieces[n] != undefined && pieces[n] !== "")
+    {
+      var item = pieces[n];
+      if (item.substr(0, 2) == '${' && item.substr(item.length - 1) == '}')
+      {
+        var key = item.substr(2, item.length - 3);
+        var key_number = Number(key);
+        if (!isNaN(key_number))
+        {
+          if (key_number == key_number.toFixed(0))
+          {
+            item = key_number;
+          }
+        }
+      }
+      result.push(item);
+    }
+  }
+  return result;
+}
+
+
+//-----------------------------------------------------------------------------
+
+PK.Obsolete.fill_placeholders_very_old = function(s, ivalues)
+{
+  var keys = undefined, values = undefined
+  var data_with_ph = PK.Obsolete.split_using_placeholders_very_old(s, keys)
+  if (!data_with_ph)
+    return s
+
+  //PKLILE.timing.start("fill_placeholders")
+
+  var result = []
+
+  for(var i = 0; i < data_with_ph.length; i++)
+   {
+    if (typeof(data_with_ph[i]) == "number")
+     {
+      var num = data_with_ph[i] - 1
+       if (ivalues.length > num)
+       {
+        result = result.concat(ivalues[num])
+       }
+       else
+       {
+         CRITICAL_ERROR(
+            "Too big value placeholder number: " + ivalues.length + '<=' + num
+          )
+         if(window.console && console.log)
+         {
+          console.log("[PK.fill_placeholders] failed on data:", s, ivalues, data_with_ph)
+         }
+
+        LOG("s: " + s)
+        LOG("ivalues: " + JSON.stringify(ivalues, null, 4))
+        LOG("Data: " + JSON.stringify(data_with_ph, null, 4))
+       }
+     }
+    else if (values && values[data_with_ph[i]] !== undefined)
+    {
+      result.push(values[data_with_ph[i]])
+    }
+    else
+    {
+      result.push(data_with_ph[i])
+    }
+   }
+
+  var out = result.join('')
+  //PKLILE.timing.stop("fill_placeholders")
+  return out
+}
+
+
+/**
+ * Fill placeholders with values.
+ *
+ * @param source
+ * @param ivalues Array
+ * @param values Object
+ */
+PK.Obsolete.fill_placeholders_old = function(source, ivalues, values)
+{
+  var keys = undefined;
+  var placeholders_values = undefined;
+  if (values)
+  {
+    keys = [];
+    placeholders_values = {};
+    for (var key in values)
+    {
+      keys.push(key);
+      placeholders_values["${"+key+"}"] = values[key];
+    }
+  }
+  var pieces = PK.Obsolete.split_using_placeholders_old(source, keys);
+  var result = [];
+  for (var n = 0; n < pieces.length; n++) {
+    var item = pieces[n];
+    if (placeholders_values)
+    {
+      if (placeholders_values[item])
+      {
+        item = placeholders_values[item];
+        result.push(item);
+        continue;
+      }
+    }
+    if (typeof(item) == 'number' && ivalues)
+    {
+      var num = item - 1;
+      if (ivalues.length > num)
+      {
+        item = ivalues[num];
+        result.push(item);
+        continue;
+      }
+      else
+      {
+        CRITICAL_ERROR(
+          "Too big value placeholder number: " + ivalues.length + '<=' + num
+        );
+        if (window.console && console.log)
+        {
+          console.log("[PK.fill_placeholders] failed on data:", source, ivalues, pieces);
+        }
+
+        LOG("source: " + source);
+        LOG("ivalues: " + JSON.stringify(ivalues, null, 4));
+        LOG("Data: " + JSON.stringify(pieces, null, 4));
+      }
+    }
+    result.push(item);
+  }
+  return result.join('');
+}

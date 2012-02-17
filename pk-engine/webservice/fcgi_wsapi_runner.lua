@@ -47,12 +47,6 @@ local arguments,
         'method_arguments'
       }
 
-local empty_table
-      = import 'lua-nucleo/table-utils.lua'
-      {
-        'empty_table'
-      }
-
 local EAGAIN
       = import 'pk-engine/errno.lua'
       {
@@ -69,20 +63,6 @@ io.stderr = lfcgi.stderr
 io.stdin = lfcgi.stdin
 
 --------------------------------------------------------------------------------
-
--- TODO: Useful. Generalize
--- TODO: Add other functions then.
-local make_fd_pseudosocket = function(fd, dirty)
-  arguments(
-      "number", fd,
-      "boolean", dirty -- TODO: not flexible enough
-    )
-  return
-  {
-    getfd = function() return fd end;
-    dirty = function() return dirty end;
-  }
-end
 
 local FCGI_STDIN_FD = 0
 
@@ -245,7 +225,6 @@ local run_unsafe = function(
     -- TODO: Double-check what will happen if control socket will die
     --       (if it can meaningfully die in the middle of the work at all).
     local control_socket = assert(zmq_context:socket(zmq.PULL))
---    assert(control_socket:setopt(zmq.SUBSCRIBE, "")) -- Subscribe to everything
     assert(control_socket:bind(zmq_control_socket_url))
 
     local poller = assert(zmq.poller(2))
@@ -267,24 +246,8 @@ local run_unsafe = function(
       local res, err = handle_control_message(system_action_handlers, msg)
       if not res then
         log_error("failed to handle control message", err)
-        --[[
-        -- TODO: ZMQ SUB does not support send()
-        local res, err = control_socket:send(assert(luabins.save(nil, err)))
-        if not res then
-          log_error("failed to send control message error reply:", err)
-        end
-        --]]
         return
       end
-
-      --[[
-      -- TODO: ZMQ SUB does not support send()
-      -- TODO: Allow multiple return values?
-      local res, err = control_socket:send(assert(luabins.save(res)))
-      if not res then
-        log_error("failed to send control message reply:", err)
-      end
-      --]]
 
       spam("/control socket message")
     end)

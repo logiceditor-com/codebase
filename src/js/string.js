@@ -186,6 +186,18 @@ PK.fill_placeholders = function(source, ivalues, values)
     return PK.clone(source);
   }
 
+  // Return clone of source if no ivalues and values
+  if ( (!ivalues || ivalues.length == 0) && (!values || values.length == 0) )
+  {
+    return PK.clone(source);
+  }
+
+  // Do simple replace if one ivalue and no values
+  if ( (ivalues && ivalues.length == 1) && (!values || values.length == 0) )
+  {
+    return source.replace('${1}', ivalues[0]);
+  }
+
   var keys = undefined;
   var placeholders_values = undefined;
   if (values)

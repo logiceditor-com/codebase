@@ -78,6 +78,18 @@ PK.entityify_and_escape_quotes = function (s)
  */
 PK.split_using_placeholders = function(source, keys)
 {
+  // Check string is empty
+  if (source.length == 0)
+  {
+    return [];
+  }
+
+  // Check string has no placeholders
+  if (source.indexOf("${") == -1)
+  {
+    return [ PK.clone(source) ];
+  }
+
   var pieces = [];
   var need_split_with_prev = false;
   var push_to_pieces = function (item)
@@ -168,6 +180,12 @@ PK.split_using_placeholders = function(source, keys)
  */
 PK.fill_placeholders = function(source, ivalues, values)
 {
+  // Check string has no placeholders
+  if (source.indexOf("${") == -1)
+  {
+    return PK.clone(source);
+  }
+
   var keys = undefined;
   var placeholders_values = undefined;
   if (values)

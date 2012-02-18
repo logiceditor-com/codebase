@@ -80,22 +80,28 @@ PK.i18n = new function()
 
   this.text = function(s)
   {
+    // Note: Error message not localized:-)
+    assert( s !== undefined, 'No parameters for PK.i18n.text()')
+
     var loc_text = instance_.raw_text(s)
 
     if(loc_text === undefined)
     {
       //console.log("not found string: `" + s + "`")
-      //LOGG("'" + s + "' : '',");
+      //LOG("'" + s + "' : '',");
       return '*' + s + '*';
     }
 
-    var fs_args = []
-    if (arguments.length > 1)
+    if (arguments.length == 1)
     {
-      fs_args = Array.prototype.slice.call(arguments, 1)
+      return loc_text
     }
 
-    fs_args.unshift(loc_text)
+    // Note: Commented code is more correct, but a bit slower
+    //var fs_args = Array.prototype.slice.call(arguments, 1)
+    //fs_args.unshift(loc_text)
+    var fs_args = arguments
+    fs_args[0] = loc_text
 
     var result = PK.formatString.apply(window, fs_args)
     //console.log(loc_text, ' -> ', result, fs_args)

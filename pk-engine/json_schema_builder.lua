@@ -72,7 +72,7 @@ local is_good_node_name = function(v)
     return nil, "node/attribute name must be a string"
   end
 
-  if v:find("[^a-zA-Z_%-:]") then -- TODO: Refine this
+  if not v:find("^[a-zA-Z_][:%-_0-9a-zA-Z]*$") then -- TODO: Refine this
     return nil, "invalid characters detected in node/attribute name"
   end
 

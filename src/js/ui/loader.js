@@ -69,7 +69,7 @@ PKEngine.Loader = new function ()
     loader_id_ = loader_id;
     resources_id_ = resources_id;
 
-    $('<div id="'+resources_id_+'" style="display: none; position: absolute;">')
+    $('<div id="'+resources_id_+'" style="display: none;">')
         .appendTo($('#' + loader_id_));
 
     /**

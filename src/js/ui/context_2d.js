@@ -1,5 +1,9 @@
 //------------------------------------------------------------------------------
-// Canvas 2D context
+// context_2d.js: Canvas 2D context
+// This file is a part of pk-engine-js library
+// Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+// Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+// See file `COPYRIGHT` for the license
 //------------------------------------------------------------------------------
 
 PKEngine.check_namespace('GUI')

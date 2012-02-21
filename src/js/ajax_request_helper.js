@@ -1,5 +1,9 @@
 //------------------------------------------------------------------------------
-//  Ajax request helper
+// ajax_request_helper.js: Ajax request helper
+// This file is a part of pk-engine-js library
+// Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+// Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+// See file `COPYRIGHT` for the license
 //------------------------------------------------------------------------------
 
 PKEngine.check_namespace("Ajax");

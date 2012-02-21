@@ -1,7 +1,10 @@
 //------------------------------------------------------------------------------
-// Universal API for work with social networks
+// social_network_api.js: Universal API for work with social networks
+// This file is a part of pk-engine-js library
+// Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+// Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+// See file `COPYRIGHT` for the license
 //------------------------------------------------------------------------------
-
 
 PKEngine.SocialNetAPI = new function()
 {

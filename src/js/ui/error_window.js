@@ -1,6 +1,10 @@
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // error_window.js: Slightly customized error window (not a member of our control hierarchy)
-//-----------------------------------------------------------------------------
+// This file is a part of pk-engine-js library
+// Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+// Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+// See file `COPYRIGHT` for the license
+//------------------------------------------------------------------------------
 
 PKEngine.initialize_error_window = function ()
 {

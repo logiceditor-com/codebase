@@ -1,5 +1,9 @@
 //------------------------------------------------------------------------------
-// Label
+// label.js: Label
+// This file is a part of pk-engine-js library
+// Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+// Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+// See file `COPYRIGHT` for the license
 //------------------------------------------------------------------------------
 
 PKEngine.Label = PKEngine.Control.extend(

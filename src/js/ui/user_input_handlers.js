@@ -1,5 +1,9 @@
 //------------------------------------------------------------------------------
-// Callbacks handling UI events: mouse, keyboard etc.
+// user_input_handlers.js: Callbacks handling UI events: mouse, keyboard etc.
+// This file is a part of pk-engine-js library
+// Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+// Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+// See file `COPYRIGHT` for the license
 //------------------------------------------------------------------------------
 
 PKEngine.UserInputHandlers = new function()

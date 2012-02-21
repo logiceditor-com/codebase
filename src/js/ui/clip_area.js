@@ -1,5 +1,9 @@
 //------------------------------------------------------------------------------
-// Clip area for canvas 2D context
+// clip_area.js: Clip area for canvas 2D context
+// This file is a part of pk-engine-js library
+// Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+// Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+// See file `COPYRIGHT` for the license
 //------------------------------------------------------------------------------
 
 PKEngine.check_namespace('GUI')

@@ -1,5 +1,9 @@
 //------------------------------------------------------------------------------
-// Server protocol description and checks
+// client_api.js: Server protocol description and checks
+// This file is a part of pk-engine-js library
+// Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+// Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+// See file `COPYRIGHT` for the license
 //------------------------------------------------------------------------------
 
 PKEngine.ClientAPI = new function()

@@ -57,7 +57,7 @@ PK.formatNumber = function(value, precision)
 }
 
 /**
- * Based on http://javascript.crockford.com/remedial.html
+ * Inspired by http://javascript.crockford.com/remedial.html
  *
  * @param s
  */

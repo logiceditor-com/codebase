@@ -1,6 +1,16 @@
+//------------------------------------------------------------------------------
+// menu.js: Menu tooltips
+// This file is a part of pk-core-js library
+// Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+// Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+// See file `COPYRIGHT` for the license
+//------------------------------------------------------------------------------
+//
 // Note: ExtJS required
+// Inspired by http://www.manfbraun.de/cont/tech/probs/ExtMenuWithTooltip2e.js
+//
+//------------------------------------------------------------------------------
 
-// Based on from http://www.manfbraun.de/cont/tech/probs/ExtMenuWithTooltip2e.js
 PK.override_menu_item_to_enable_tooltips = function()
 {
   var DISMISS_DELAY_FOR_MENU_ITEM_TOOLTIP = 0

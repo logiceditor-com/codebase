@@ -127,16 +127,14 @@ do
         )
 
       if not success then
-        local out_err = "run_task: failed:\n" .. res
-        log_error(out_err)
-        return nil, out_err
+        log_error("run_task: failed:\n", res)
+        return nil, res
       elseif res ~= true then
         if err == nil then
           err = "unknown error (missed 'return true'?)"
         end
-        local out_err = "run_task: bad call:\n" .. err
-        log_error(out_err)
-        return nil, out_err
+        log_error("run_task: bad call:\n", err)
+        return nil, err
       end
 
       return true

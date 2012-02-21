@@ -1,5 +1,9 @@
 //------------------------------------------------------------------------------
-// String functions
+// string.js: String functions
+// This file is a part of pk-core-js library
+// Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+// Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+// See file `COPYRIGHT` for the license
 //------------------------------------------------------------------------------
 
 /**

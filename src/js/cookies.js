@@ -1,8 +1,14 @@
-//----------------------------------------------------------------------------
-// Cookies
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// cookies.js: Cookies module
+// This file is a part of pk-core-js library
+// Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+// Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+// See file `COPYRIGHT` for the license
+//------------------------------------------------------------------------------
+//
 // Note: jQuery required
 //
+//------------------------------------------------------------------------------
 
 PK.check_namespace('Cookies');
 

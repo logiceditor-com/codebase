@@ -1,6 +1,10 @@
-//-----------------------------------------------------------------------------
-// Utilities working with DOM images
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// image.js: Utilities working with DOM images
+// This file is a part of pk-core-js library
+// Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+// Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+// See file `COPYRIGHT` for the license
+//------------------------------------------------------------------------------
 
 /**
  * Log image loading error.

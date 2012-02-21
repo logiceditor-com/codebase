@@ -1,11 +1,14 @@
 //------------------------------------------------------------------------------
-// Common navigation for our topic system
+// navigation.js: Common navigation for our topic system
+// This file is a part of pk-core-js library
+// Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+// Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+// See file `COPYRIGHT` for the license
 //------------------------------------------------------------------------------
 //
-// Note:
-//   1) ExtJS required
-//   2) Localization for 'Page title prefix' required
+// Note: ExtJS required. Localization for 'Page title prefix' required
 //
+//------------------------------------------------------------------------------
 
 PK.navigation = new function()
 {

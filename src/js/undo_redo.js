@@ -1,3 +1,11 @@
+//------------------------------------------------------------------------------
+// undo_redo.js: Undo/redo functionality
+// This file is a part of pk-core-js library
+// Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+// Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+// See file `COPYRIGHT` for the license
+//------------------------------------------------------------------------------
+
 PK.make_undo_redo = function(max_depth)
 {
   assert(max_depth > 0, "Max depth for undo/redo must be a positive value")

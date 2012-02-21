@@ -1,9 +1,14 @@
-//----------------------------------------------------------------------------
-// URL query parameters
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// url_query.js: URL query parameters
+// This file is a part of pk-core-js library
+// Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+// Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+// See file `COPYRIGHT` for the license
+//------------------------------------------------------------------------------
 //
 // Note: jQuery required
 //
+//------------------------------------------------------------------------------
 
 PK.Query = new function()
 {

@@ -1,3 +1,11 @@
+//------------------------------------------------------------------------------
+// clone.js: Clone object function
+// This file is a part of pk-core-js library
+// Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+// Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+// See file `COPYRIGHT` for the license
+//------------------------------------------------------------------------------
+
 // PK.clone = function(obj)
 // {
 //   // Note: Don't use Ext.encode() since it removes holes ('undefined') from arrays!

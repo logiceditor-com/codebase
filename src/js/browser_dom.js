@@ -1,3 +1,11 @@
+//------------------------------------------------------------------------------
+// browser_dom.js: Dom functions
+// This file is a part of pk-core-js library
+// Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+// Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+// See file `COPYRIGHT` for the license
+//------------------------------------------------------------------------------
+
 PK.browser_dom = new function()
 {
   var id_prefix = "pk_"

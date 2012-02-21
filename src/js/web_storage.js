@@ -1,10 +1,15 @@
 //------------------------------------------------------------------------------
-// Web Storage
+// web_storage.js: Web Storage
+// This file is a part of pk-core-js library
+// Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+// Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+// See file `COPYRIGHT` for the license
 //------------------------------------------------------------------------------
 //
-//  Note: Localization for 'ERROR: no localStorage() support!'
-//        and 'WebStorage ERROR: QUOTA_EXCEEDED_ERR' must be implemented in user code
+// Note: Localization for 'ERROR: no localStorage() support!'
+// and 'WebStorage ERROR: QUOTA_EXCEEDED_ERR' must be implemented in user code
 //
+//------------------------------------------------------------------------------
 
 PK.WebStorage = new function()
 {

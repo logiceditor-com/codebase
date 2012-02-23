@@ -162,10 +162,12 @@ PKEngine.iPadAdd2Home = new function()
     div_element.style.webkitTransform = 'translate3d(' + posX + 'px,' + posY + 'px,0)';
   }
 
-  this.init = function(platform_type)
+  this.init = function(platform_type, is_launched_in_social_net)
   {
-    if (platform_type == PKEngine.Platform.TYPE.IPAD)
+    if (platform_type == PKEngine.Platform.TYPE.IPAD && !is_launched_in_social_net)
+    {
       must_show_add2home_tip_screen_ = true;
+    }
   }
 
   this.show = function()

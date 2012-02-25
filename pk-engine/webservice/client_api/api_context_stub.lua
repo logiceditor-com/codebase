@@ -492,7 +492,54 @@ end
 
 --------------------------------------------------------------------------------
 
+local common_make_api_context_stub
+do
+
+  local default_game_config_getter = function()
+    return fail("INTERNAL_ERROR", "no www application config here")
+  end
+
+  local default_admin_config_getter = function()
+    return fail("INTERNAL_ERROR", "no www admin config here")
+  end
+
+  common_make_api_context_stub = function(
+      internal_config_manager,
+      db_tables,
+      www_game_config_getter,
+      www_admin_config_getter,
+      internal_call_handlers
+    )
+    db_tables = db_tables or { }
+
+    www_game_config_getter = www_game_config_getter or default_game_config_getter
+
+    www_admin_config_getter = www_admin_config_getter or default_admin_config_getter
+
+    internal_call_handlers = internal_call_handlers or { }
+
+    arguments(
+        "table",    internal_config_manager,
+        "table",    db_tables,
+        "function", www_admin_config_getter,
+        "function", www_game_config_getter,
+        "table",    internal_call_handlers
+      )
+
+    return make_api_context_stub(
+        internal_config_manager,
+        db_tables,
+        www_game_config_getter,
+        www_admin_config_getter,
+        internal_call_handlers
+      )
+  end
+end
+
+--------------------------------------------------------------------------------
+
 return
 {
   make_api_context_stub = make_api_context_stub;
+  common_make_api_context_stub = common_make_api_context_stub;
 }

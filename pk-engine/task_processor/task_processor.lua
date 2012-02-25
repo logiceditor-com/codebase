@@ -35,11 +35,13 @@ local assert_is_table,
       }
 
 local is_string,
-      is_table
+      is_table,
+      is_function
       = import 'lua-nucleo/type.lua'
       {
         'is_string',
-        'is_table'
+        'is_table',
+        'is_function'
       }
 
 local try_unwrap
@@ -115,6 +117,16 @@ do
       if task == nil then
         log_error("can't find task:", task_name)
         return nil, "can't find task: " .. task_name
+      end
+
+      if not is_table(task) then
+        log_error("task", task_name, "has bad exports")
+        return nil, "task: " .. task_name .. " has bad exports"
+      end
+
+      if not is_function(task.run) then
+        log_error("task", task_name, "lacks run function")
+        return nil, "task: " .. task_name .. " lacks run function"
       end
 
       log("runing task:", task_name, ", with params:", ...)

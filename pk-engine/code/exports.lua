@@ -67,6 +67,7 @@ return
   common_http_redirect = { "pk-engine/webservice/response.lua" };
   common_json_error = { "pk-engine/webservice/response.lua" };
   common_luabins_error = { "pk-engine/webservice/response.lua" };
+  common_make_api_context_stub = { "pk-engine/webservice/client_api/api_context_stub.lua" };
   common_send_http_request = { "pk-engine/http.lua" };
   common_text_error = { "pk-engine/webservice/response.lua" };
   common_xml_error = { "pk-engine/webservice/response.lua" };

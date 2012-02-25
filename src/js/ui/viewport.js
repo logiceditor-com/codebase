@@ -15,10 +15,10 @@ PKEngine.GUI.Viewport = new function()
 {
   // NOTE: first element - last viewed screen
   //       list type - [{'screen':screen_name, 'params':param_1}, ...]
-  this.screens_list_ = [];
-  this.game_field_id = "game_field";
-  this.loader_id = "div_loader";
-  this.previous_screen_additional_checks = undefined;
+  var screens_list_ = [];
+  var game_field_id_ = "game_field";
+  var loader_id_ = "div_loader";
+  var previous_screen_additional_checks_ = undefined;
 
   var MAX_SCREENS_LIST_LENGTH = 10;
 
@@ -39,9 +39,9 @@ PKEngine.GUI.Viewport = new function()
 
   this.init = function (game_field_id, loader_id, previous_screen_additional_checks)
   {
-    this.game_field_id = game_field_id;
-    this.loader_id = loader_id;
-    this.previous_screen_additional_checks = previous_screen_additional_checks;
+    game_field_id_ = game_field_id;
+    loader_id_ = loader_id;
+    previous_screen_additional_checks_ = previous_screen_additional_checks;
   }
 
   this.is_ready = function()
@@ -51,28 +51,28 @@ PKEngine.GUI.Viewport = new function()
 
   this.get_current_screen = function()
   {
-    if (this.screens_list_.length == 0)
+    if (screens_list_.length == 0)
       return false
 
-    return this.screens_list_[0].screen
+    return screens_list_[0].screen
   }
 
   this.get_current_screen_data = function()
   {
-    if (this.screens_list_.length == 0)
+    if (screens_list_.length == 0)
       return false
 
-    return this.screens_list_[0]
+    return screens_list_[0]
   }
 
   //----------------------------------------------------------------------------
 
   this.get_previous_screen = function()
   {
-    if (this.screens_list_.length < 2)
+    if (screens_list_.length < 2)
       return false
 
-    return this.screens_list_[1].screen
+    return screens_list_[1].screen
   }
 
   //----------------------------------------------------------------------------
@@ -86,15 +86,20 @@ PKEngine.GUI.Viewport = new function()
     //    do_additional_checks, this.get_current_screen_data(), this.get_previous_screen()
     //  )
 
-    if (do_additional_checks && this.previous_screen_additional_checks)
+    if (do_additional_checks && previous_screen_additional_checks_)
     {
-      var need_continue = this.previous_screen_additional_checks();
+      var need_continue = previous_screen_additional_checks_();
       if (!need_continue) return;
     }
 
-    this.screens_list_.shift()
+    screens_list_.shift()
     var screen_data = this.get_current_screen_data()
     show_screen_(screen_data.screen, screen_data.params)
+  }
+
+  this.shift_screens_list = function ()
+  {
+    return screens_list_.shift();
   }
 
   //----------------------------------------------------------------------------
@@ -103,11 +108,11 @@ PKEngine.GUI.Viewport = new function()
   {
     //console.log("[PKEngine.GUIControls.Viewport.show_screen]", screen)
 
-    this.screens_list_.unshift({'screen':screen, 'params':param_1})
+    screens_list_.unshift({'screen':screen, 'params':param_1})
 
-    if (this.screens_list_.length > MAX_SCREENS_LIST_LENGTH)
-      for (var i=0; i<(this.screens_list_.length - MAX_SCREENS_LIST_LENGTH); i++)
-        this.screens_list_.pop()
+    if (screens_list_.length > MAX_SCREENS_LIST_LENGTH)
+      for (var i=0; i<(screens_list_.length - MAX_SCREENS_LIST_LENGTH); i++)
+        screens_list_.pop()
 
     show_screen_(screen, param_1)
 
@@ -204,13 +209,13 @@ PKEngine.GUI.Viewport = new function()
 
   this.show_game_field = function()
   {
-    $('#'+this.loader_id).hide();
-    $('#'+this.game_field_id).show();
+    $('#' + loader_id_).hide();
+    $('#' + game_field_id_).show();
   }
 
   this.hide_game_field = function()
   {
-    $('#'+this.loader_id).hide();
-    $('#'+this.game_field_id).hide();
+    $('#' + loader_id_).hide();
+    $('#' + game_field_id_).hide();
   }
 }

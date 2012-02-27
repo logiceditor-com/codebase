@@ -112,10 +112,10 @@ PKEngine.UserInputHandlers = new function()
 
   this.on_mouse_down = function(e)
   {
-    try
+    if(!input_handling_is_enabled_()) return 0;
+
+    handle_err(function()
     {
-      if(!input_handling_is_enabled_())
-        return 0;
       e = prepare_event_(e)
 
       var mouse_coords = get_cursor_coords_(e);
@@ -123,13 +123,7 @@ PKEngine.UserInputHandlers = new function()
       PKEngine.GUI.Viewport.on_mouse_down(mouse_coords.x, mouse_coords.y)
 
       prevent_event_(e)
-    }
-    catch (e)
-    {
-      var err_msg = e.toString ? e.toString() : JSON.stringify(e,null,4)
-      if (e && window.console && console.log) console.log("exception stack:", e.stack)
-      CRITICAL_ERROR(I18N('[PKEngine.UserInputHandlers.on_mouse_down] exception: ${1}', err_msg));
-    }
+    }, '[PKEngine.UserInputHandlers.on_mouse_down]');
 
     return false;
   }
@@ -138,10 +132,10 @@ PKEngine.UserInputHandlers = new function()
 
   this.on_mouse_up = function(e)
   {
-    try
+    if(!input_handling_is_enabled_()) return 0;
+
+    handle_err(function()
     {
-      if(!input_handling_is_enabled_())
-        return 0;
       e = prepare_event_(e)
 
       var mouse_coords = get_cursor_coords_(e);
@@ -149,13 +143,7 @@ PKEngine.UserInputHandlers = new function()
       PKEngine.GUI.Viewport.on_click(mouse_coords.x, mouse_coords.y)
 
       prevent_event_(e)
-    }
-    catch (e)
-    {
-      var err_msg = e.toString ? e.toString() : JSON.stringify(e,null,4)
-      if (e && window.console && console.log) console.log("exception stack:", e.stack)
-      CRITICAL_ERROR(I18N('[PKEngine.UserInputHandlers.on_mouse_up] exception: ${1}', err_msg));
-    }
+    }, 'PKEngine.UserInputHandlers.on_mouse_up');
 
     return false;
   }
@@ -164,10 +152,10 @@ PKEngine.UserInputHandlers = new function()
 
   this.on_mouse_move = function(e)
   {
-    try
+    if(!input_handling_is_enabled_()) return 0;
+
+    handle_err(function()
     {
-      if(!input_handling_is_enabled_())
-        return 0;
       e = prepare_event_(e)
 
       var mouse_coords = get_cursor_coords_(e);
@@ -175,13 +163,7 @@ PKEngine.UserInputHandlers = new function()
       PKEngine.GUI.Viewport.on_mouse_move(mouse_coords.x, mouse_coords.y);
 
       prevent_event_(e)
-    }
-    catch (e)
-    {
-      var err_msg = e.toString ? e.toString() : JSON.stringify(e,null,4)
-      if (e && window.console && console.log) console.log("exception stack:", e.stack)
-      CRITICAL_ERROR(I18N('[PKEngine.UserInputHandlers.on_mouse_move] exception: ${1}', err_msg));
-    }
+    }, 'PKEngine.UserInputHandlers.on_mouse_move');
 
     return false;
   }

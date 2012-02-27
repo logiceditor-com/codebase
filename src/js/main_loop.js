@@ -23,10 +23,10 @@ PKEngine.GameEngine.MainLoop = new function()
 
   var run_frame_ = function()
   {
-    requestAnimFrame(run_frame_)
-
-    try
+    handle_err(function ()
     {
+      requestAnimFrame(run_frame_)
+
       // Handle events (from server)
       if (can_process_events_)
         PKEngine.EventQueue.run()
@@ -41,13 +41,7 @@ PKEngine.GameEngine.MainLoop = new function()
       {
         PKEngine.GUI.Renderer.render()
       }
-    }
-    catch (e)
-    {
-      var err_msg = e.toString ? e.toString() : JSON.stringify(e,null,4)
-      if (e && window.console && console.log) console.log("exception stack:", e.stack)
-      CRITICAL_ERROR(I18N('[PKEngine.GameEngine.MainLoop] exception: ${1}', err_msg));
-    }
+    }, 'PKEngine.GameEngine.MainLoop');
   }
 
 

@@ -44,6 +44,7 @@ api:export "lib/qiwi"
       end
 
       local cat, concat = make_concatter()
+      -- request_body content is already escaped
       cat [[
     <?xml version="1.0" encoding="utf-8"?>
     <request>

@@ -144,6 +144,10 @@ PK.Error = new function ()
 
 
   /**
+   * Raises critical error
+   *
+   * @param text string
+   */
   this.critical_error = function (text)
   {
     if (critical_error_raised_)

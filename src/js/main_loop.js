@@ -23,7 +23,7 @@ PKEngine.GameEngine.MainLoop = new function()
 
   var run_frame_ = function()
   {
-    handle_err(function ()
+    PK.Error.handle_error(function ()
     {
       requestAnimFrame(run_frame_)
 

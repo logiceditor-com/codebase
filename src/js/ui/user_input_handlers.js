@@ -114,7 +114,7 @@ PKEngine.UserInputHandlers = new function()
   {
     if(!input_handling_is_enabled_()) return 0;
 
-    handle_err(function()
+    PK.Error.handle_error(function()
     {
       e = prepare_event_(e)
 
@@ -134,7 +134,7 @@ PKEngine.UserInputHandlers = new function()
   {
     if(!input_handling_is_enabled_()) return 0;
 
-    handle_err(function()
+    PK.Error.handle_error(function()
     {
       e = prepare_event_(e)
 
@@ -154,7 +154,7 @@ PKEngine.UserInputHandlers = new function()
   {
     if(!input_handling_is_enabled_()) return 0;
 
-    handle_err(function()
+    PK.Error.handle_error(function()
     {
       e = prepare_event_(e)
 

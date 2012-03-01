@@ -123,7 +123,7 @@ PKEngine.UserInputHandlers = new function()
       PKEngine.GUI.Viewport.on_mouse_down(mouse_coords.x, mouse_coords.y)
 
       prevent_event_(e)
-    }, '[PKEngine.UserInputHandlers.on_mouse_down]');
+    }, 'PKEngine.UserInputHandlers.on_mouse_down');
 
     return false;
   }

@@ -94,6 +94,8 @@ PK.CriticalError.prototype = Error.prototype;
  */
 PK.Error = new function ()
 {
+  var instance_ = this;
+
   /**
    * Callback
    */
@@ -185,7 +187,7 @@ PK.Error = new function ()
 
       var error = new Error;
       error.message = format_date_time_() + "\n" + message;
-      error.stack_trace = this.get_stack_trace();
+      error.stack_trace = instance_.get_stack_trace();
 
       log_error_(error);
 

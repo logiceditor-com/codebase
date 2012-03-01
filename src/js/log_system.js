@@ -125,6 +125,30 @@ PK.Error = new function ()
     return '[' + cur_date + ' ' + now.toLocaleTimeString() + '] ';
   }
 
+
+  /**
+   * Returns stack trace if printStackTrace function available
+   *
+   * @param error Error object
+   */
+  var get_stack_trace_ = function (error)
+  {
+    if (window.printStackTrace)
+    {
+      var stack_lines = error ? window.printStackTrace({ e: error }) : window.printStackTrace();
+
+      // Remove lines caused by call of printStackTrace(), get_stack_trace_()
+      if (!error) stack_lines.splice(0, 4);
+
+      return stack_lines;
+    }
+    else
+    {
+      return undefined;
+    }
+  }
+
+
   /**
    * Prevents recursive calling of critical_error
    */
@@ -236,28 +260,6 @@ PK.Error = new function ()
   this.set_custom_error_text_wrapper = function (callback)
   {
     custom_error_text_wrapper_= callback;
-  }
-
-  /**
-   * Returns stack trace if printStackTrace function available
-   *
-   * @param error Error object
-   */
-  this.get_stack_trace = function (error)
-  {
-    if (window.printStackTrace)
-    {
-      var stack_lines = error ? window.printStackTrace({ e: error }) : window.printStackTrace();
-
-      // Remove lines caused by call of printStackTrace(), get_stack_trace()
-      stack_lines.splice(0, error ? 3 : 4);
-
-      return stack_lines;
-    }
-    else
-    {
-      return undefined;
-    }
   }
 
   /**

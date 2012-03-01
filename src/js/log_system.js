@@ -227,8 +227,11 @@ PK.Error = new function ()
   {
     if (window.printStackTrace)
     {
-      var stack_lines = error ? window.printStackTrace(error) : window.printStackTrace();
-      stack_lines.splice(0, 5); // Remove lines caused by call of printStackTrace(), get_stack_trace()
+      var stack_lines = error ? window.printStackTrace({ e: error }) : window.printStackTrace();
+
+      // Remove lines caused by call of printStackTrace(), get_stack_trace()
+      stack_lines.splice(0, error ? 3 : 4);
+
       return stack_lines;
     }
     else

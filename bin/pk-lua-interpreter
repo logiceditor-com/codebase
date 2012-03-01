@@ -2,12 +2,12 @@
 
 set -e
 
-LUA="$(which luajit2)"
+LUA="$(which luajit2)" || true
 if [ -z "${LUA}" ]; then
-  LUA="$(which luajit)"
+  LUA="$(which luajit)" || true
 
   if [ -z "${LUA}" ]; then
-    LUA="$(which lua)"
+    LUA="$(which lua)" || true
 
     if [ -z "${LUA}" ]; then
       echo "Error: luajit2, luajit and lua executables not found" >&2

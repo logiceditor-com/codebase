@@ -150,6 +150,33 @@ PK.Error = new function ()
 
 
   /**
+   * Returns changed error
+   *
+   * @param error Error object
+   * @param name string
+   */
+  var fix_error_message_and_add_stacktrace_ = function (error, name)
+  {
+    error.stack_trace = get_stack_trace_(error);
+
+    if (custom_error_text_wrapper_)
+    {
+      error.message = custom_error_text_wrapper_(error.message);
+    }
+
+    if (name)
+    {
+      // TODO: Localize
+      error.message = "[" + name + "]\n" + error.message;
+    }
+
+    error.message = format_date_time_() + error.message;
+
+    return error
+  }
+
+
+  /**
    * Prevents recursive calling of critical_error
    */
   var critical_error_raised_ = false;
@@ -192,18 +219,7 @@ PK.Error = new function ()
     }
     catch (error)
     {
-      error.stack_trace = PK.Error.get_stack_trace(error);
-
-      if (custom_error_text_wrapper_)
-      {
-        error.message = custom_error_text_wrapper_(error.message);
-      }
-      error.message = format_date_time_() + "\n" + error.message;
-
-      if (name)
-      {
-        error.message = "[" + name + "] " + error.message;
-      }
+      error = fix_error_message_and_add_stacktrace_(error, name)
 
       log_error_(error);
 
@@ -220,18 +236,12 @@ PK.Error = new function ()
 
   this.on_unhandled_error = function (message, file, line)
   {
-    message = message + " in file '" + file + "' at line " + line;
+    var full_message = message + " in file '" + file + "' at line " + line;
 
     if (custom_error_handler_)
     {
-      if (custom_error_text_wrapper_)
-      {
-        message = custom_error_text_wrapper_(message);
-      }
-
-      var error = new Error;
-      error.message = format_date_time_() + "\n" + message;
-      error.stack_trace = instance_.get_stack_trace();
+      var error = new Error(full_message);
+      error = fix_error_message_and_add_stacktrace_(error, "Unhandled error")
 
       log_error_(error);
 

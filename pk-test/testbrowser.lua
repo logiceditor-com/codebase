@@ -90,6 +90,7 @@ do
     end
   end
 
+  -- response has particular code and body
   local ensure_response = function(self, message, code, body)
     method_arguments(self,
         "string", message,
@@ -100,6 +101,7 @@ do
     ensure_strequals(message, body, self.body)
   end
 
+  -- issue GET request
   local GET = function(self, url, request_headers)
     request_headers = request_headers or { }
     method_arguments(self,
@@ -111,6 +113,7 @@ do
     return self.code
   end
 
+  -- issue POST request
   local POST = function(self, url, request_body, request_headers)
     request_body = request_body or ""
     request_headers = request_headers or { }

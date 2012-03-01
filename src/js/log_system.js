@@ -128,6 +128,20 @@ PK.Error = new function ()
    */
   var critical_error_raised_ = false;
 
+  //----------------------------------------------------------------------------
+  // PUBLIC
+  //----------------------------------------------------------------------------
+
+  /**
+   * Overrides window.onerror
+   */
+  this.override_window_onerror_callback = function()
+  {
+    window.onerror = this.on_unhandled_error;
+  }
+
+
+  /**
   this.critical_error = function (text)
   {
     if (critical_error_raised_)
@@ -263,4 +277,4 @@ PK.Error = new function ()
 var CRITICAL_ERROR = PK.Error.critical_error;
 var handle_err = PK.Error.handle_error;
 
-window.onerror = PK.Error.on_unhandled_error;
+PK.Error.override_window_onerror_callback()

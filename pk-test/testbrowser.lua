@@ -79,10 +79,15 @@ do
 
   end
 
-  local clear = function(self)
+  local clear = function(self, clear_state)
+    method_arguments(self)
+
     self.body = ""
     self.code = 0
-    self.cookies_status = { }
+    -- clear stored state
+    if clear_state then
+      self.cookie_jar:reset()
+    end
   end
 
   local ensure_response = function(self, message, code, body)

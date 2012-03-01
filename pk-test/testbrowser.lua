@@ -6,30 +6,16 @@
 -- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
+local make_cookie_jar
+      = import 'lua-aplicado/web/cookie_jar.lua'
+      {
+        'make_cookie_jar'
+      }
+
 local send_http_request
       = import 'pk-engine/http.lua'
       {
         'send_http_request'
-      }
-
-local is_table
-      = import 'lua-nucleo/type.lua'
-      {
-        'is_table'
-      }
-
-local tclone,
-      toverride_many
-      = import 'lua-nucleo/table-utils.lua'
-      {
-        'tclone',
-        'toverride_many'
-      }
-
-local make_checker
-      = import 'lua-nucleo/checker.lua'
-      {
-        'make_checker'
       }
 
 local arguments,
@@ -40,22 +26,18 @@ local arguments,
         'method_arguments'
       }
 
-local get_domain_and_path
-      = import 'pk-test/testbrowser/utils.lua'
+local is_table
+      = import 'lua-nucleo/type.lua'
       {
-        'get_domain_and_path'
+        'is_table'
       }
 
-local make_cookie_jar
-      = import 'pk-test/testbrowser/cookie_jar.lua'
-      {
-        'make_cookie_jar'
-      }
-
-local ensure_equals,
+local ensure,
+      ensure_equals,
       ensure_strequals
       = import 'lua-nucleo/ensure.lua'
       {
+        'ensure',
         'ensure_equals',
         'ensure_strequals'
       }

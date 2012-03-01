@@ -101,6 +101,85 @@ do
     ensure_strequals(message, body, self.body)
   end
 
+  -- response has particular content type
+  local ensure_content_type = function(self, message, value)
+    ensure_strequals(
+        message,
+        self.response_headers["content-type"],
+        value
+      )
+  end
+
+  -- cookie is set for the first time
+  local ensure_cookie_set = function(self, message, name, domain, path)
+    method_arguments(self,
+        "string", message,
+        "string", name
+      )
+    ensure_equals(
+        message .. ' ' .. name,
+        self.cookie_jar:is_set(name, domain, path),
+        true
+      )
+  end
+
+  -- cookie is missing
+  local ensure_cookie_not_set = function(self, message, name, domain, path)
+    method_arguments(self,
+        "string", message,
+        "string", name
+      )
+    local cookie = self.cookie_jar:get(name, domain, path)
+    ensure(message .. ' ' .. name, cookie == nil)
+    ensure_equals(
+        message .. ' ' .. name,
+        self.cookie_jar:is_set(name, domain, path),
+        false
+      )
+  end
+
+  -- cookie is updated
+  local ensure_cookie_updated = function(self, message, name, domain, path)
+    method_arguments(self,
+        "string", message,
+        "string", name
+      )
+    ensure_equals(
+        message .. ' ' .. name,
+        self.cookie_jar:is_updated(name, domain, path),
+        true
+      )
+  end
+
+  -- cookie's value has not been changed
+  local ensure_cookie_unchanged = function(self, message, name, domain, path)
+    method_arguments(self,
+        "string", message,
+        "string", name
+      )
+    ensure_equals(
+        message .. ' ' .. name,
+        self.cookie_jar:is_same(name, domain, path),
+        true
+      )
+  end
+
+  -- cookie has particular value
+  local ensure_cookie_value = function(self, message, name, value, domain, path)
+    method_arguments(self,
+        "string", message,
+        "string", name,
+        "string", value
+      )
+    local cookie = self.cookie_jar:get(name, domain, path)
+    ensure(message .. ' ' .. name, cookie)
+    ensure_equals(
+        message .. ' ' .. name,
+        cookie.value,
+        value
+      )
+  end
+
   -- issue GET request
   local GET = function(self, url, request_headers)
     request_headers = request_headers or { }
@@ -143,6 +222,12 @@ do
 
       -- assertion helpers
       ensure_response = ensure_response;
+      ensure_content_type = ensure_content_type;
+      ensure_cookie_set = ensure_cookie_set;
+      ensure_cookie_not_set = ensure_cookie_not_set;
+      ensure_cookie_updated = ensure_cookie_updated;
+      ensure_cookie_unchanged = ensure_cookie_unchanged;
+      ensure_cookie_value = ensure_cookie_value;
 
       -- Internal, but public
       clear = clear;

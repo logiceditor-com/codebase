@@ -55,9 +55,8 @@ do
         "string", request_body
       )
 
-    local domain, path = get_domain_and_path(url)
-
-    self.cookie_jar:set_headers(request_headers, domain, path)
+    -- Send relevant cookies
+    request_headers['cookie'] = self.cookie_jar:format_header_for_url(url)
 
     local request =
       {
@@ -74,14 +73,8 @@ do
     if self.body and is_table(self.response_headers) then
       -- "set-cookie" in lowercase, because socket.http :lower() it
       local set_cookie_header = self.response_headers["set-cookie"]
-      if set_cookie_header then
-        local status = self.cookie_jar:store_cookie(
-            set_cookie_header,
-            domain,
-            path
-          )
-        self.cookies_status = toverride_many(self.cookies_status, status)
-      end
+      -- N.B. always call update to refresh state of cookies
+      self.cookie_jar:update(set_cookie_header or "", url)
     end
 
   end

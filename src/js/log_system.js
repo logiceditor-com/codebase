@@ -86,6 +86,8 @@ PK.CriticalError = function (text)
 {
   this.name = 'CRITICAL ERROR';
   this.message = text;
+
+  this.stack = (new Error()).stack;
 }
 PK.CriticalError.prototype = Error.prototype;
 

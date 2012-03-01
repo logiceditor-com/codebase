@@ -203,6 +203,7 @@ do
       )
     self:clear()
     perform(self, "POST", url, request_headers, request_body)
+    return self.code
   end
 
 

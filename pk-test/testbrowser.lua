@@ -19,11 +19,13 @@ local send_http_request
       }
 
 local arguments,
-      method_arguments
+      method_arguments,
+      optional_arguments
       = import 'lua-nucleo/args.lua'
       {
         'arguments',
-        'method_arguments'
+        'method_arguments',
+        'optional_arguments'
       }
 
 local is_table
@@ -206,16 +208,22 @@ do
     return self.code
   end
 
+  make_testbrowser = function(ssl_options, time_fn)
+    ssl_options = ssl_options or { }
+    arguments(
+        "table", ssl_options
+      )
+    optional_arguments(
+        "function", time_fn
+      )
 
-  make_testbrowser = function()
     local browser =
     {
       -- public fields
       code = 0;
       body = "";
-      cookies_status = { };
-      ssl_options = { };
-      cookie_jar = make_cookie_jar();
+      ssl_options = ssl_options;
+      cookie_jar = make_cookie_jar(time_fn);
 
       -- methods
       GET = GET;

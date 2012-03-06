@@ -457,7 +457,12 @@ do
               "\n"
             )
         else
-          assert(nil, k .. " is not string or false in manifest dictionary")
+          log_error(
+              value,
+              " is not string or false in manifest dictionary for",
+              key
+            )
+          error("manifest dictionary has not string or false value")
         end
       end
 

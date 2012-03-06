@@ -408,6 +408,10 @@ do
     return self.cached_cookies_
   end
 
+  local get_request_method = function(self)
+    return get_cached_request(self).method
+  end
+
   make_api_context = function(
       context,
       db_tables,
@@ -439,6 +443,7 @@ do
       request_user_agent = request_user_agent;
       post_request = post_request;
       get_request = get_request;
+      get_request_method = get_request_method;
       --
       get_cookie = get_cookie;
       set_cookie = set_cookie;

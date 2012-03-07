@@ -527,6 +527,7 @@ ACTIONS.update_exports = function()
   local out_file_root = OUT_CONFIG.file_root
   local out_exports_dir_name = OUT_CONFIG.exports_dir_name
   local out_exports_list_name = OUT_CONFIG.exports_list_name
+  local file_header = MODE_CONFIG.file_header
 
   local known_exports, allowed_requires, allowed_globals
       = get_exports_requires_globals(freeform_table_value(MODE_CONFIG.code))
@@ -538,11 +539,12 @@ ACTIONS.update_exports = function()
       api,
       out_exports_list_name,
       out_file_root,
-      out_exports_dir_name
+      out_exports_dir_name,
+      file_header
     )
   generate_exports(
       api, out_file_root, out_exports_dir_name,
-      known_exports, allowed_requires, allowed_globals
+      known_exports, allowed_requires, allowed_globals, file_header
     )
 
   log("OK")
@@ -558,6 +560,7 @@ ACTIONS.update_context_extensions = function()
   local out_context_extensions_dir_name = OUT_CONFIG.context_extensions_dir_name
   local out_context_extensions_list_name
     = OUT_CONFIG.context_extensions_list_name
+  local file_header = MODE_CONFIG.file_header
 
   local known_exports, allowed_requires, allowed_globals
       = get_exports_requires_globals(freeform_table_value(MODE_CONFIG.code))
@@ -569,11 +572,12 @@ ACTIONS.update_context_extensions = function()
       api,
       out_context_extensions_list_name,
       out_file_root,
-      out_context_extensions_dir_name
+      out_context_extensions_dir_name,
+      file_header
     )
   generate_context_extensions(
       api, out_file_root, out_context_extensions_dir_name,
-      known_exports, allowed_requires, allowed_globals
+      known_exports, allowed_requires, allowed_globals, file_header
     )
 
   log("OK")
@@ -586,6 +590,7 @@ ACTIONS.update_handlers = function()
 
   local api_schema_dir = MODE_CONFIG.api_schema_dir
   local have_unity_client = MODE_CONFIG.have_unity_client
+  local file_header = MODE_CONFIG.file_header
 
   local out_file_root = OUT_CONFIG.file_root
   local out_api_version_filename = OUT_CONFIG.api_version_filename
@@ -614,7 +619,8 @@ ACTIONS.update_handlers = function()
       api,
       out_exports_list_name,
       out_file_root,
-      out_exports_dir_name
+      out_exports_dir_name,
+      file_header
     )
 
   local known_exports, allowed_requires, allowed_globals
@@ -628,9 +634,7 @@ ACTIONS.update_handlers = function()
   assert(
       write_file(
           out_file_root .. out_api_version_filename,
-          generate_url_handler_api_version(
-              api
-            )
+          generate_url_handler_api_version(api, file_header)
         )
     )
 
@@ -638,9 +642,7 @@ ACTIONS.update_handlers = function()
   assert(
       write_file(
           out_file_root .. out_data_formats_filename,
-          generate_url_handler_data_formats(
-              api
-            )
+          generate_url_handler_data_formats(api, file_header)
         )
     )
 
@@ -673,30 +675,32 @@ local create_session_checker
               out_data_formats_filename,
               db_tables_filename,
               webservice_request_filename,
-              out_base_url_prefix
+              out_base_url_prefix,
+              file_header
             )
         )
     )
 
   generate_exports(
       api, out_file_root, out_exports_dir_name,
-      known_exports, allowed_requires, allowed_globals
+      known_exports, allowed_requires, allowed_globals, file_header
     )
 
   generate_context_extensions_list(
       api,
       out_context_extensions_list_name,
       out_file_root,
-      out_context_extensions_dir_name
+      out_context_extensions_dir_name,
+      file_header
     )
   generate_context_extensions(
       api, out_file_root, out_context_extensions_dir_name,
-      known_exports, allowed_requires, allowed_globals
+      known_exports, allowed_requires, allowed_globals, file_header
     )
 
   generate_url_handlers(
       api, out_file_root, out_handlers_dir_name,
-      known_exports, allowed_requires, allowed_globals
+      known_exports, allowed_requires, allowed_globals, file_header
     )
 
   if have_unity_client then
@@ -724,6 +728,7 @@ ACTIONS.update_all = function()
 
   local api_schema_dir = MODE_CONFIG.api_schema_dir
   local have_unity_client = MODE_CONFIG.have_unity_client
+  local file_header = MODE_CONFIG.file_header
 
   local out_file_root = OUT_CONFIG.file_root
   local out_api_version_filename = OUT_CONFIG.api_version_filename
@@ -759,9 +764,7 @@ ACTIONS.update_all = function()
   assert(
       write_file(
           out_file_root .. out_api_version_filename,
-          generate_url_handler_api_version(
-              api
-            )
+          generate_url_handler_api_version(api, file_header)
         )
     )
 
@@ -769,9 +772,7 @@ ACTIONS.update_all = function()
   assert(
       write_file(
           out_file_root .. out_data_formats_filename,
-          generate_url_handler_data_formats(
-              api
-            )
+          generate_url_handler_data_formats(api, file_header)
         )
     )
 
@@ -798,7 +799,8 @@ local create_session_checker
               header,
               out_handlers_dir_name,
               out_data_formats_filename,
-              out_base_url_prefix
+              out_base_url_prefix,
+              file_header
             )
         )
     )
@@ -807,27 +809,29 @@ local create_session_checker
       api,
       out_exports_list_name,
       out_file_root,
-      out_exports_dir_name
+      out_exports_dir_name,
+      file_header
     )
   generate_exports(
       api, out_file_root, out_exports_dir_name,
-      known_exports, allowed_requires, allowed_globals
+      known_exports, allowed_requires, allowed_globals, file_header
     )
 
   generate_context_extensions_list(
       api,
       out_context_extensions_list_name,
       out_file_root,
-      out_context_extensions_dir_name
+      out_context_extensions_dir_name,
+      file_header
     )
   generate_context_extensions(
       api, out_file_root, out_context_extensions_dir_name,
-      known_exports, allowed_requires, allowed_globals
+      known_exports, allowed_requires, allowed_globals, file_header
     )
 
   generate_url_handlers(
       api, out_file_root, out_handlers_dir_name,
-      known_exports, allowed_requires, allowed_globals
+      known_exports, allowed_requires, allowed_globals, file_header
     )
 
   if have_unity_client then

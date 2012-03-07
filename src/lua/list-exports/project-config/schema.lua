@@ -46,6 +46,7 @@ do
             cfg:optional_string "lib_name";
             cfg:path "profile_filename";
             cfg:path "out_filename";
+            cfg:optional_string "file_header";
           };
         };
       };

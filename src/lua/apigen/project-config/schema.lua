@@ -34,6 +34,7 @@ do
             cfg:url "url";
 
             cfg:optional_path "session_checker_file_name";
+            cfg:string "file_header" { default = "" };
             cfg:path "db_tables_filename" { default = "logic/db/tables.lua" };
             cfg:path "webservice_request_filename"
             {

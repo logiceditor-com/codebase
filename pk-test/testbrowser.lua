@@ -57,6 +57,11 @@ do
         "table", request_headers
       )
 
+    -- clear transient state: body and code.
+    -- N.B. to clear persistent state (cookies)
+    -- one should issue explicit self:clear(true).
+    self:clear()
+
     -- Send relevant cookies
     request_headers['cookie'] = self.cookie_jar:format_header_for_url(url)
 
@@ -189,7 +194,6 @@ do
         "string", url,
         "table", request_headers
       )
-    self:clear()
     perform(self, "GET", url, "", request_headers)
     return self.code
   end
@@ -203,7 +207,6 @@ do
         "string", request_body,
         "table", request_headers
       )
-    self:clear()
     perform(self, "POST", url, request_body, request_headers)
     return self.code
   end

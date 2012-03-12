@@ -4,12 +4,10 @@
 .\#*\#
 
 .DS_Store
+._.DS_Store
 .project
 .settings
 .directory
-
-/lua-nucleo
-/lua-aplicado
 
 *.kdevelop.*
 *.kdevelop
@@ -20,4 +18,9 @@
 
 nohup.out
 *.log
+.idea
+*.iml
+
 *.kate_swp
+tmp/*
+*.kate_swps

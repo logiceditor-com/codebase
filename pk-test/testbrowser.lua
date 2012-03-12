@@ -49,12 +49,12 @@ local ensure,
 local make_testbrowser
 do
   --  Internal function: Let's hide all knowledge about implementation details
-  local perform = function(self, method, url, request_headers, request_body)
+  local perform = function(self, method, url, request_body, request_headers)
     method_arguments(self,
         "string", method,
         "string", url,
-        "table", request_headers,
-        "string", request_body
+        "string", request_body,
+        "table", request_headers
       )
 
     -- Send relevant cookies
@@ -190,7 +190,7 @@ do
         "table", request_headers
       )
     self:clear()
-    perform(self, "GET", url, request_headers, "")
+    perform(self, "GET", url, "", request_headers)
     return self.code
   end
 
@@ -204,7 +204,7 @@ do
         "table", request_headers
       )
     self:clear()
-    perform(self, "POST", url, request_headers, request_body)
+    perform(self, "POST", url, request_body, request_headers)
     return self.code
   end
 

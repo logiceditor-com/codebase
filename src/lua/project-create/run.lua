@@ -188,16 +188,6 @@ do
     return pattern
   end
 
-  local get_replacement_pattern = function(filename, metamanifest)
-    local pattern = { }
-    for k, _ in pairs(metamanifest.replicate_data) do
-      if filename:find(k) then
-        pattern[#pattern + 1] = k
-      end
-    end
-    return pattern
-  end
-
   local break_path = function(path)
     local file_dir_list = { }
     -- TODO: Check if more symbols needed in regexp!!!

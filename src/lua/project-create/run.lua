@@ -219,6 +219,79 @@ do
     return dir_struct
   end
 
+  -- trying to make it somewhat generic
+  local function process_dictionary_recursively(manifest, replaces, return_val, fn, ...)
+    for k, v in pairs(replaces) do
+      if manifest.subdictionary[v] then
+        return_val = process_dictionary_recursively(
+            manifest.subdictionary[v],
+            replaces,
+            return_val,
+            fn,
+            ...
+          )
+      end
+    end
+    return fn(manifest, return_val, ...)
+  end
+
+  -- get_replacement_pattern ---------------------------------------------------
+  -- search dictionary and all used replaces subdictionaries for pattern match
+
+  local get_replacement_pattern
+  do
+    local already_got = function(pattern, k)
+      for i = 1, #pattern do
+        if pattern[i] == k then
+          return true
+        end
+      end
+      return false
+    end
+
+    -- TODO: consider more clear subdictionary search,
+    --       best of all try making single subdictionary searching function
+    local function find_patterns_recursively(
+        pattern,
+        replaces_used,
+        manifest,
+        filename
+      )
+      for k, v in pairs(replaces_used) do
+        if manifest.subdictionary[v] then
+          for k, _ in pairs(manifest.subdictionary[v].replicate_data) do
+            if filename:find(k) and not already_got(pattern, k) then
+              pattern[#pattern + 1] = k
+            end
+          end
+          pattern = find_patterns_recursively(
+              pattern,
+              replaces_used,
+              manifest.subdictionary[v],
+              filename
+            )
+        end
+      end
+      return pattern
+    end
+
+    get_replacement_pattern = function(filename, metamanifest, replaces_used)
+      replaces_used = replaces_used or { }
+      local pattern = { }
+      for k, _ in pairs(metamanifest.replicate_data) do
+        if filename:find(k) then
+          pattern[#pattern + 1] = k
+        end
+      end
+      return find_patterns_recursively(
+          pattern,
+          replaces_used,
+          metamanifest,
+          filename
+        )
+    end
+  end
+
   -- replicate ignored paths ---------------------------------------------------
   -- TODO: generalize for all dictionary
   local process_ignored_paths = function(metamanifest)
@@ -312,9 +385,9 @@ do
     end
   end
 
-  --replicate_data--------------------------------------------------------------
+  --do_replicate_data-----------------------------------------------------------
 
-  local replicate_data
+  local do_replicate_data
   do
     local function make_plain_dictionary(dictionary)
       local replicate_data = { }
@@ -356,27 +429,70 @@ do
       }
     end
 
-    local process_pattern_combination = function(pattern, filenames, metamanifest)
-      local new_filenames = { }
-      for i = 1, #filenames do
-        local replacements = { }
-        if filenames[i].replaces_used[pattern] ~= nil then
-          replacements[1] = filenames[i].replaces_used[pattern]
-        else
-          replacements = metamanifest.replicate_data[pattern]
+    local process_pattern_combination
+    do
+    -- TODO: consider more clear subdictionary search,
+    --       best of all try making single subdictionary searching function
+      local function find_replacements_recursively(
+          pattern,
+          replacements,
+          replaces_used,
+          manifest
+        )
+        for k, v in ordered_pairs(replaces_used) do
+          if manifest.subdictionary[v] then
+            if
+              manifest.subdictionary[v].replicate_data
+              and manifest.subdictionary[v].replicate_data[pattern]
+            then
+              replacements = manifest.subdictionary[v].replicate_data[pattern]
+            -- TODO: this is spagetti code, consider reworking it
+            elseif manifest.subdictionary[v].dictionary[pattern] == false then
+              replacements = false
+            end
+            replacements = find_replacements_recursively(
+                pattern,
+                replacements,
+                replaces_used,
+                manifest.subdictionary[v]
+              )
+          end
         end
-
-        for j = 1, #replacements do
-          local replaces_used = tclone(filenames[i].replaces_used)
-          replaces_used[pattern] = replacements[j]
-          new_filenames[#new_filenames + 1] =
-            {
-              filename = string.gsub(filenames[i].filename, pattern, replacements[j]);
-              replaces_used = replaces_used;
-            }
-        end
+        return replacements
       end
-      return new_filenames
+
+      process_pattern_combination = function(pattern, filenames, metamanifest)
+        local new_filenames = { }
+        for i = 1, #filenames do
+          local replacements = { }
+          if filenames[i].replaces_used[pattern] ~= nil then
+            replacements[1] = filenames[i].replaces_used[pattern]
+          else
+            replacements = find_replacements_recursively(
+                pattern,
+                replacements,
+                filenames[i].replaces_used,
+                metamanifest
+              )
+            if replacements and #replacements == 0 then
+              replacements = metamanifest.replicate_data[pattern]
+            elseif replacements == false then
+              replacements = { }
+            end
+          end
+
+          for j = 1, #replacements do
+            local replaces_used = tclone(filenames[i].replaces_used)
+            replaces_used[pattern] = replacements[j]
+            new_filenames[#new_filenames + 1] =
+              {
+                filename = string.gsub(filenames[i].filename, pattern, replacements[j]);
+                replaces_used = replaces_used;
+              }
+          end
+        end
+        return new_filenames
+      end
     end
 
     local process_pattern_combinations = function(patterns, filenames, metamanifest)
@@ -405,7 +521,8 @@ do
         block_bottom_wrapper
     end
 
-    local remove_false_block = function(string_to_process, dictionary, block)
+    local remove_false_block = function(manifest, string_to_process, block)
+      local dictionary = manifest.dictionary
       for k, v in pairs(dictionary) do
         if v == false then
           --find block
@@ -578,10 +695,10 @@ do
 
       local function replicate_and_replace_in_file_recursively(
             manifest,
+            file_content,
             replaces_used,
             wrapper,
-            modificators,
-            file_content
+            modificators
           )
         -- TODO: check if pattern exists in file(string)
         local current_block_replica = ""
@@ -652,10 +769,10 @@ do
                 replaces_used_sub[k] = v[i]
                 current_block_replica = replicate_and_replace_in_file_recursively(
                     subdictionary[v[i]],
+                    current_block_replica,
                     replaces_used_sub,
                     wrapper,
-                    modificators,
-                    current_block_replica
+                    modificators
                   )
               end
 
@@ -679,8 +796,8 @@ do
 
         -- removing blocks with "false" dictionary patterns
         file_content = remove_false_block(
+            manifest,
             file_content,
-            dictionary,
             wrapper.block
           )
         file_content = replace_dictionary_in_string(
@@ -703,12 +820,13 @@ do
         local file = assert(io.open(created_path, "r"))
         local file_content = file:read("*all")
         file:close()
+
         file_content = replicate_and_replace_in_file_recursively(
             metamanifest,
+            file_content,
             replaces_used,
             metamanifest.wrapper,
-            metamanifest.modificators,
-            file_content
+            metamanifest.modificators
           )
         file = io.open(created_path, "w")
         file:write(file_content)
@@ -768,7 +886,11 @@ do
                 "\27[37mProcess: "
              .. string.sub(filepath, #metamanifest.project_path + 2)
              .. " (" .. attr.mode .. ")\27[0m")
-            local pattern_used = get_replacement_pattern(filename, metamanifest)
+            local pattern_used = get_replacement_pattern(
+                filename,
+                metamanifest,
+                path_data.replaces_used
+              )
 
             -- filename have patterns to replicate
             if #pattern_used > 0 then
@@ -787,8 +909,7 @@ do
                 local created_path =
                   path_data.created_path .. "/" .. pattern_combinations[i].filename
                 local replaces_used = tclone(pattern_combinations[i].replaces_used)
-
-                 path_data.created_structure = add_to_directory_structure(
+                path_data.created_structure = add_to_directory_structure(
                     pattern_combinations[i].filename,
                     path_data.created_structure
                   )
@@ -835,7 +956,7 @@ do
 
     end -- do
 
-    replicate_data = function(
+    do_replicate_data = function(
         metamanifest,
         file_dir_structure
       )
@@ -893,23 +1014,28 @@ do
 
   local fill_placeholders
   do
-    local replace_dictionary_patterns_in_path = function(filepath, metamanifest, replaces)
-      local new_filepath = filepath
-      for key, value in pairs(replaces) do
-        if metamanifest.subdictionary[value] then
-          for k, v in pairs(metamanifest.subdictionary[value].dictionary) do
-            if new_filepath:find(k) then
-              if v ~= false then
-                new_filepath = string.gsub(new_filepath, k, v);
-                DEBUG_print("\27[32mLocally: " .. filepath .. "\27[0m")
-              else
-                DEBUG_print("\27[33mLocally: " .. filepath .. "\27[0m")
-                return
-              end
-            end
+    local replace_pattern = function(manifest, new_filepath)
+      for k, v in pairs(manifest.dictionary) do
+        if new_filepath:find(k) then
+          if v ~= false then
+            return string.gsub(new_filepath, k, v)
+          else
+            return ""
           end
         end
       end
+      return new_filepath
+    end
+
+    local replace_dictionary_patterns_in_path = function(filepath, metamanifest, replaces)
+      local new_filepath = filepath
+      new_filepath = process_dictionary_recursively(
+          metamanifest,
+          replaces,
+          new_filepath,
+          replace_pattern
+        )
+
       for k, v in pairs(metamanifest.dictionary) do
         if new_filepath:find(k) then
           if v ~= false then
@@ -920,6 +1046,7 @@ do
           end
         end
       end
+
       local short_path = string.sub(filepath, #metamanifest.project_path + 2)
       local short_path_new = string.sub(new_filepath, #metamanifest.project_path + 2)
       -- TODO: vaible way?
@@ -931,10 +1058,13 @@ do
           DEBUG_print("\27[33mIgnored: " .. short_path_new .. "\27[0m")
           remove_recursively(filepath)
           DEBUG_print("\27[31mRemoved: " .. short_path .. "\27[0m")
-        else
+        elseif new_filepath ~= "" then
           create_path_to_file(new_filepath)
           assert(os.rename(filepath, new_filepath), filepath .. " -> " .. new_filepath)
           DEBUG_print("\27[33mRenamed:\27[0m " .. short_path_new)
+        else
+          remove_recursively(filepath)
+          DEBUG_print("\27[31mCleaned: " .. short_path .. "\27[0m")
         end
       end
     end
@@ -1104,8 +1234,8 @@ do
     DEBUG_print("file_dir_structure :" .. tpretty(file_dir_structure))
     local clean_up_data = tclone(file_dir_structure)
 
-    local replicated_structure = replicate_data(metamanifest, file_dir_structure)
     log("Replicating data")
+    local replicated_structure = do_replicate_data(metamanifest, file_dir_structure)
 
     -- TODO: make some more nice dir structure output?
     -- TODO: debug, replicated_structure seems _wrong_ (it is not used yet)

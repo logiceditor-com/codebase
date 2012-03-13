@@ -1,0 +1,4 @@
+#{PROJECT_NAME}:{UNDERLINE} =
+{
+  #{ADMIN_CONFIG}
+}

@@ -1,0 +1,18 @@
+server {
+--[[BLOCK_START:EMPTY_LISTEN]]
+  listen 80;
+--[[BLOCK_END:EMPTY_LISTEN]]
+--[[BLOCK_START:NORMAL_LISTEN]]
+  listen #{STATIC_NAME}:{URLIFY}-static#{SERVICE_INDEX}:{URLIFY}#{DEPLOY_SERVER_DOMAIN}:{URLIFY}:80;
+--[[BLOCK_END:NORMAL_LISTEN]]
+  server_name #{STATIC_NAME}:{URLIFY}-static#{SERVICE_INDEX}:{URLIFY}#{DEPLOY_SERVER_DOMAIN}:{URLIFY};
+
+  error_log  /var/log/nginx/#{PROJECT_NAME}:{URLIFY}-#{STATIC_NAME}:{URLIFY}-static.error.log;
+  access_log  /var/log/nginx/#{PROJECT_NAME}:{URLIFY}-#{STATIC_NAME}:{URLIFY}-static.access.log;
+  set_real_ip_from 0.0.0.0/0;
+  real_ip_header X-Real-IP;
+
+  location / {
+    alias /usr/local/lib/luarocks/rocks/#{PROJECT_NAME}.www.static.#{STATIC_NAME}/scm-1/www/static/#{STATIC_NAME}/site/;
+  }
+}

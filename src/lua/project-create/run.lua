@@ -126,7 +126,17 @@ local load_project_manifest
         'load_project_manifest'
       }
 
-local tpretty = import 'lua-nucleo/tpretty.lua' { 'tpretty' }
+local tpretty
+      = import 'lua-nucleo/tpretty.lua'
+      {
+        'tpretty'
+      }
+
+local tstr
+      = import 'lua-nucleo/tstr.lua'
+      {
+        'tstr'
+      }
 
 --------------------------------------------------------------------------------
 
@@ -241,7 +251,7 @@ do
       end
     end
     metamanifest.ignore_paths = ignored
-    --DEBUG_print("\27[32mmetamanifest.ignored\27[0m: \n " .. tpretty(metamanifest.ignore_paths, "  ", 80))
+    DEBUG_print("\27[32mmetamanifest.ignored\27[0m: \n " .. tpretty(metamanifest.ignore_paths))
     return metamanifest
   end
 
@@ -320,12 +330,6 @@ do
       for i = 1, #replicate_data do
         local data = replicate_data[i]
         local replicate = dictionary[data]
-        --DEBUG_print("\27[32mdata\27[0m:\n" .. data)
-        --DEBUG_print("\27[32mdictionary[data]\27[0m:\n"
-        --.. tpretty(dictionary[data], "  ", 80))
-        -- TODO: good way to clean up numbered part?
-        --for j = 1, #replicate_data[data] do
-        --end
         replicate_data[data] = { }
         for j = 1, #replicate do
           local name = string.sub(data, 1, -2) .. "_" .. string.format("%03d", j)
@@ -436,7 +440,7 @@ do
           data_wrapper
         )
         if is_string(value) then
-          --DEBUG_print("Dictionary ",  tostring(key), tostring(value))
+          DEBUG_print("Dictionary ",  tostring(key), tostring(value))
           local to_insert = string.gsub(value, "%%", "%%%1")
           return string.gsub(
               string_to_process,
@@ -585,7 +589,9 @@ do
 
         -- replace patterns already fixed for this file
         for k, v in pairs(replaces_used) do
+          DEBUG_print(" k, v:",  k, v)
           if manifest.subdictionary[v] then
+            DEBUG_print("file_content:",  file_content)
             file_content = replace_dictionary_in_string(
                 file_content,
                 manifest.subdictionary[v].dictionary,
@@ -593,13 +599,14 @@ do
                 wrapper.modificator,
                 modificators
               )
+            DEBUG_print("replace_dictionary_in_string file_content:",  file_content)
             -- append data of replacement subdictionaries
             for l, w in pairs(manifest.subdictionary[v].replicate_data) do
               replicate_data[l] = w
             end
             for l, w in pairs(manifest.subdictionary[v].dictionary) do
               dictionary[l] = w
-              -- DEBUG_print(tostring(w) .. " \27[33madded to dictionary as:\27[0m " .. tostring(l))
+              DEBUG_print(tostring(w) .. " \27[33madded to dictionary as:\27[0m " .. tostring(l))
             end
             for l, w in pairs(manifest.subdictionary[v].subdictionary) do
               subdictionary[l] = w
@@ -680,7 +687,6 @@ do
             wrapper.modificator,
             modificators
           )
-        -- DEBUG_print(file_content)
         file_content = check_trailspaces_newlines(file_content)
         return file_content
       end
@@ -731,7 +737,10 @@ do
            )
         else
           if filepath ~= created_path then
-            DEBUG_print("\27[32mCopy to:\27[0m " .. string.sub(created_path, #metamanifest.project_path + 2))
+            DEBUG_print(
+                "\27[32mCopy to:\27[0m "
+             .. string.sub(created_path, #metamanifest.project_path + 2)
+              )
             copy_file_force(filepath, created_path)
           end
           local manifest_copy = tclone(metamanifest)
@@ -760,8 +769,6 @@ do
 
             -- filename have patterns to replicate
             if #pattern_used > 0 then
-              --DEBUG_print("FILENAME: ", filename)
-              --DEBUG_print("  pattern used: ", tpretty(pattern_used, "  ", 80))
               local pattern_combinations = process_pattern_combinations(
                   pattern_used,
                   {
@@ -772,7 +779,6 @@ do
                   },
                   metamanifest
                 )
-              --DEBUG_print("  pattern combinations: ", tpretty(pattern_combinations, "  ", 80))
               for i = 1, #pattern_combinations do
                 -- create paths
                 local created_path =
@@ -837,9 +843,6 @@ do
       metamanifest.processed = metamanifest_plain.processed
       metamanifest.subdictionary = metamanifest_plain.subdictionary
 
-      DEBUG_print("\27[32mPlain dictionary:\27[0m \n" .. tpretty(metamanifest.dictionary, "  ", 80))
-      DEBUG_print("\27[32mSubdictionaries :\27[0m \n" .. tpretty(metamanifest.subdictionary, "  ", 80))
-
       -- no dictionary replacements
       return process_replication_recursively(
           {
@@ -857,13 +860,8 @@ do
   --clean_up_replicate_data-----------------------------------------------------
 
   local function clean_up_replicate_data_recursively(metamanifest, path, file_dir_structure)
-    --for filename in lfs.dir(path) do
---    DEBUG_print("\27[31mpath\27[0m".. path)
---    DEBUG_print("file_dir_structure :" .. tpretty(file_dir_structure, "  ", 80))
     for filename, structure in pairs(file_dir_structure) do
       if filename ~= "FLAGS" then
---        DEBUG_print("\27[31mfilename\27[0m" .. filename)
---        DEBUG_print("structure :" .. tpretty(structure, "  ", 80))
         local filepath = path .. "/" .. filename
 
         -- TODO: BAD handle through dir structure
@@ -936,7 +934,6 @@ do
           DEBUG_print("\27[33mRenamed:\27[0m " .. short_path_new)
         end
       end
---      return new_filepath
     end
 
     fill_placeholders = function(
@@ -947,12 +944,11 @@ do
         if filename ~= "FLAGS" then
           local filepath = path .. "/" .. filename
           DEBUG_print("\27[32mProcess:\27[0m " .. string.sub(filepath, #metamanifest.project_path + 2))
-          --filepath = replace_dictionary_patterns_in_path(filepath, metamanifest)
           local attr = lfs.attributes(filepath)
           if attr.mode == "directory" then
             fill_placeholders(metamanifest, filepath, structure)
           else
-            -- DEBUG_print("structure: ", tpretty(structure, "  ", 80))
+            DEBUG_print("structure: ", tpretty(structure))
             replace_dictionary_patterns_in_path(filepath, metamanifest, structure.FLAGS.replaces_used)
           end
         end
@@ -1046,13 +1042,14 @@ do
         "string", template_cli_path
       )
 
-    log("\27[1mLoading metamanifest\27[0m")
+    log("Loading metamanifest")
 
     -- TODO: HACK? how to get path to this?
     local defaults_path =
       assert(luarocks_show_rock_dir("pk-project-tools.pk-project-create"))
     defaults_path =
       string.sub(defaults_path, 1, -1) .. "/src/lua/project-create/metamanifest"
+
     -- template_path
     local metamanifest_defaults = load_project_manifest(defaults_path, "", "")
     local metamanifest_project = load_project_manifest(
@@ -1063,64 +1060,65 @@ do
     metamanifest_defaults.dictionary = unify_manifest_dictionary(
         metamanifest_defaults.dictionary
       )
+
     metamanifest_project.dictionary = unify_manifest_dictionary(
         metamanifest_project.dictionary
       )
 
     local metamanifest = twithdefaults(metamanifest_project, metamanifest_defaults)
     metamanifest.project_path = project_path
-
-    DEBUG_print("\27[32mDefault metamanifest:\27[0m\n" .. tpretty(metamanifest_defaults, "  ", 80))
-    DEBUG_print("\27[32mProject metamanifest:\27[0m\n" .. tpretty(metamanifest_project, "  ", 80))
-    DEBUG_print("\27[32mFinal metamanifest:\27[0m\n" .. tpretty(metamanifest, "  ", 80))
+    DEBUG_print("\27[32mDefault metamanifest:\27[0m\n" .. tpretty(metamanifest_defaults))
+    DEBUG_print("\27[32mProject metamanifest:\27[0m\n" .. tpretty(metamanifest_project))
+    DEBUG_print("\27[32mFinal metamanifest:\27[0m\n" .. tpretty(metamanifest))
 
     metamanifest = process_ignored_paths(metamanifest)
 
-    log("\27[1mCopy template files\27[0m")
+    log("Copy template files")
     local template_path
+    --local template_rock
     if template_cli_path == "/" then
       template_path = assert(luarocks_show_rock_dir("pk-project-tools.project-templates"))
       template_path = string.sub(template_path, 1, -1) .. "/src/lua/project.template"
     else -- TODO: check dir exists!
       template_path = template_cli_path
     end
-    DEBUG_print("\27[37mTemplate_path:\27[0m " .. template_path)
 
     local new_files = copy_files(metamanifest, template_path)
-    --DEBUG_print("new files :" .. tpretty(new_files, "  ", 80))
     local file_dir_structure = create_directory_structure(new_files)
-    --DEBUG_print("file_dir_structure :" .. tpretty(file_dir_structure, "  ", 80))
+    DEBUG_print("file_dir_structure :" .. tpretty(file_dir_structure))
     local clean_up_data = tclone(file_dir_structure)
 
-    log("\27[1mReplicating data\27[0m")
     local replicated_structure = replicate_data(metamanifest, file_dir_structure)
+    log("Replicating data")
     -- TODO: make some more nice dir structure output?
-    -- DEBUG_print("replicated_structure :" .. tpretty(replicated_structure, "  ", 80))
+    -- TODO: debug, replicated_structure seems _wrong_ (it is not used yet)
+    DEBUG_print("file_dir_structure :" .. tpretty(file_dir_structure))
+    DEBUG_print("replicated_structure :" .. tpretty(replicated_structure))
 
-    log("\27[1mCleanup replication data\27[0m")
-    -- TODO: file_dir_structure =
+    log("Cleanup replication data")
+    -- TODO: return changed file_dir_structure
     clean_up_replicate_data_recursively(
         metamanifest,
         metamanifest.project_path,
         clean_up_data
       )
 
-    log("\27[1mFilling placeholders\27[0m")
-    -- TODO: file_dir_structure =
+    log("Filling placeholders")
+    -- TODO: return changed file_dir_structure
     fill_placeholders(
         metamanifest,
         metamanifest.project_path,
         replicated_structure
       )
 
-    log("\27[1mCleanup generated data\27[0m")
+    log("Cleanup generated data")
     clean_up_generated_data_recursively(
         metamanifest,
         metamanifest.project_path,
         replicated_structure
       )
 
-    log("\27[1mProject " .. metamanifest.dictionary.PROJECT_NAME .. " created\27[0m")
+    log("Project " .. metamanifest.dictionary.PROJECT_NAME .. " created")
     return true
   end
 end

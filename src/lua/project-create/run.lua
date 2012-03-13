@@ -49,15 +49,21 @@ local is_table,
 local tgetpath,
       tclone,
       twithdefaults,
-      tset
+      tset,
+      tiflip
       = import 'lua-nucleo/table-utils.lua'
       {
         'tgetpath',
         'tclone',
         'twithdefaults',
-        'tset'
+        'tset',
+        'tiflip'
       }
-
+local ordered_pairs
+      = import 'lua-nucleo/tdeepequals.lua'
+      {
+        'ordered_pairs'
+      }
 local load_all_files,
       write_file,
       read_file,

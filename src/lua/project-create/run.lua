@@ -1071,6 +1071,14 @@ do
     metamanifest_project.dictionary = unify_manifest_dictionary(
         metamanifest_project.dictionary
       )
+    if metamanifest_defaults.version ~= metamanifest_project.version then
+      DEBUG_print(
+          "\27[31mWrong metamanifest version:\27[0m",
+          "\nexpected:", metamanifest_defaults.version,
+          "\ngot:", metamanifest_project.version
+        )
+      return
+    end
 
     local metamanifest = twithdefaults(metamanifest_project, metamanifest_defaults)
     metamanifest.project_path = project_path

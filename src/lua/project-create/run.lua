@@ -1136,7 +1136,6 @@ Usage:
 Options:
 
     --debug                    Verbose output
-    --force                    Force overwrite all generated files over old copies
 ]]
 
 local CONFIG_SCHEMA = create_config_schema()
@@ -1150,14 +1149,13 @@ local run = function(...)
       function(args) -- Parse actions
         local param = { }
 
-        param.metamanifest_path = args[1]
-        param.root_project_path = args[2]
-        param.root_template_path = args[3]
-        param.debug             = args["--debug"]
-        param.force             = true --args["--force"]
+        param.metamanifest_path  = args[1] or args["--metamanifest_path"]
+        param.root_project_path  = args[2] or args["--root_project_path"]
+        param.root_template_path = args[3] or args["--root_template_path"]
+        param.debug              = args["--debug"]
         return
         {
-          PROJECT_PATH = ""; -- TODO: Remove
+          PROJECT_PATH = args["--root"] or "";
           [TOOL_NAME] = param;
         }
       end,

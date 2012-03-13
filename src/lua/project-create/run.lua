@@ -257,20 +257,27 @@ do
 
   --copy_files------------------------------------------------------------------
 
-  local copy_files = function(metamanifest, template_path)
+  local copy_files = function(metamanifest, template_path, new_files)
     local all_template_files = find_all_files(template_path, ".*")
-    local new_files = { }
 
     -- string length of common part of all file paths
     local shift = 2 + string.len(template_path)
+
     DEBUG_print("\27[33mDo not overwrite in\27[0m:")
     for k, v in pairs(metamanifest.ignore_paths) do
       DEBUG_print("  " .. k)
     end
+    DEBUG_print("\27[33mDo not copy in\27[0m:")
+    for k, v in pairs(metamanifest.remove_paths) do
+      DEBUG_print("  " .. v)
+    end
+
     for i = 1, #all_template_files do
       local short_path = string.sub(all_template_files[i], shift)
       local project_filepath = metamanifest.project_path .. "/" .. short_path
-      if
+      if check_path_ignored(short_path, tset(metamanifest.remove_paths)) then
+        DEBUG_print("\27[33mRemoved:\27[0m " .. short_path)
+      elseif
         check_path_ignored(short_path, metamanifest.ignore_paths)
         and does_file_exist(project_filepath)
       then
@@ -1076,20 +1083,26 @@ do
     log("Copy template files")
     local template_path
     --local template_rock
-    if template_cli_path == "/" then
-      template_path = assert(luarocks_show_rock_dir("pk-project-tools.project-templates"))
-      template_path = string.sub(template_path, 1, -1) .. "/src/lua/project.template"
-    else -- TODO: check dir exists!
-      template_path = template_cli_path
+    local new_files = { }
+    for i = 1, #metamanifest.templates do
+      if metamanifest.templates[i].relative_path then
+        template_path = metamanifest_path .. metamanifest.templates[i].path
+      else
+        template_path = metamanifest.templates[i].path
+      end
+      log("Template path:", template_path)
+      DEBUG_print("\27[37mTemplates_path:\27[0m " .. template_path)
+      copy_files(metamanifest, template_path, new_files)
+      DEBUG_print("new files :" .. tpretty(new_files))
     end
 
-    local new_files = copy_files(metamanifest, template_path)
     local file_dir_structure = create_directory_structure(new_files)
     DEBUG_print("file_dir_structure :" .. tpretty(file_dir_structure))
     local clean_up_data = tclone(file_dir_structure)
 
     local replicated_structure = replicate_data(metamanifest, file_dir_structure)
     log("Replicating data")
+
     -- TODO: make some more nice dir structure output?
     -- TODO: debug, replicated_structure seems _wrong_ (it is not used yet)
     DEBUG_print("file_dir_structure :" .. tpretty(file_dir_structure))

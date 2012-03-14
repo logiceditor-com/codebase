@@ -45,18 +45,16 @@ api:export "lib/qiwi"
 
       local cat, concat = make_concatter()
       -- request_body content is already escaped
-      cat [[
-    <?xml version="1.0" encoding="utf-8"?>
-    <request>
-       <protocol-version>4.0</protocol-version>
-        <request-type>]]
-      cat (htmlspecialchars(request_type)) [[</request-type>
-            <terminal-id>]]
-      cat (htmlspecialchars(application.config["qiwi_provider_id"])) [[</terminal-id>
-            <extra name="password">]]
-      cat (application.config["qiwi_provider_passwd"]) [[</extra>
-            ]] request_body  [[
-    </request>]]
+      cat [[<?xml version="1.0" encoding="utf-8"?>
+<request>
+  <protocol-version>4.0</protocol-version>
+  <request-type>]] (htmlspecialchars(request_type)) [[</request-type>
+  <terminal-id>]] (htmlspecialchars(application.config["qiwi_provider_id"]))
+    [[</terminal-id>
+  <extra name="password">]] (application.config["qiwi_provider_passwd"])
+    [[</extra>
+]] (request_body)  [[
+</request>]]
 
       return concat()
     end

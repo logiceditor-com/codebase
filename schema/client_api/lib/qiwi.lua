@@ -51,7 +51,9 @@ api:export "lib/qiwi"
   <request-type>]] (htmlspecialchars(request_type)) [[</request-type>
   <terminal-id>]] (htmlspecialchars(application.config["qiwi_provider_id"]))
     [[</terminal-id>
-  <extra name="password">]] (application.config["qiwi_provider_passwd"])
+  <extra name="password">]] (htmlspecialchars(
+      application.config["qiwi_provider_passwd"]
+    ))
     [[</extra>
 ]] (request_body)  [[
 </request>]]

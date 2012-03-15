@@ -130,14 +130,14 @@ api:extend_context "qiwi.api" (function()
     -- ACCEPT_CALL = 0 - we dont use call-notification
     local cat, concat = make_concatter()
     cat [[
-          <extra name="txn-id">]] (htmlspecialchars(txn_id)) [[</extra>
-          <extra name="to-account">]] (htmlspecialchars(transaction.account_id)) [[</extra>
-          <extra name="amount">]] (htmlspecialchars(qiwi_amount)) [[</extra>
-          <extra name="create-agt">]] (htmlspecialchars(create_agt)) [[</extra>
-          <extra name="ltime">]] (htmlspecialchars(ltime)) [[</extra>
-          <extra name="ALARM_SMS">]] (htmlspecialchars(alarm_sms)) [[</extra>
-          <extra name="ACCEPT_CALL">]] (htmlspecialchars(accept_call)) [[</extra>
-    ]]
+    <extra name="txn-id">]] (htmlspecialchars(txn_id)) [[</extra>
+    <extra name="to-account">]] (htmlspecialchars(transaction.account_id)) [[</extra>
+    <extra name="amount">]] (htmlspecialchars(qiwi_amount)) [[</extra>
+    <extra name="create-agt">]] (htmlspecialchars(create_agt)) [[</extra>
+    <extra name="ltime">]] (htmlspecialchars(ltime)) [[</extra>
+    <extra name="ALARM_SMS">]] (htmlspecialchars(alarm_sms)) [[</extra>
+    <extra name="ACCEPT_CALL">]] (htmlspecialchars(accept_call)) [[</extra>
+]]
 
     local xml = concat()
     local request_body, error_text = call(qw_create_request, application, QIWI_REQUEST_TYPES.CREATE_BILL, xml)
@@ -161,16 +161,22 @@ api:extend_context "qiwi.api" (function()
       )
 
     local cat, concat = make_concatter()
-    cat "<bills-list>"
+    cat [[
+    <bills-list>
+]]
     for i = 1, #transactions do
       local tid, err = call(pkb_parse_pkkey, transactions[i])
       if tid ~= nil then
-        cat [[<bill txn-id="]] (htmlspecialchars(tid)) [[" />]]
+        cat [[
+      <bill txn-id="]] (htmlspecialchars(tid)) [[" />
+]]
       else
         log_error("[qiwi.api:get_bills_statuses] error: ", err)
       end
     end
-    cat "</bills-list>"
+    cat [[
+    </bills-list>
+]]
 
     local xml = concat()
     local request_body, error_text = call(qw_create_request, application, QIWI_REQUEST_TYPES.GET_BILLS_STATUSES, xml)

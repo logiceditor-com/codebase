@@ -1164,15 +1164,37 @@ do
 
   ------------------------------------------------------------------------------
 
+  local function copy_files_from_templates(path, metamanifest, new_files)
+    local config_path = path .. "/template_config"
+    if does_file_exist(config_path) then
+      local template_metamanifest = load_project_manifest(
+          config_path, "", ""
+        )
+      for i = 1, #template_metamanifest.parent_templates do
+        copy_files_from_templates(
+            template_metamanifest.parent_templates[i].path,
+            metamanifest,
+            new_files
+          )
+      end
+    end
+    log("Template path:", path)
+    DEBUG_print("\27[37mTemplates_path:\27[0m " .. path)
+    copy_files(metamanifest, path, new_files)
+    DEBUG_print("new files :" .. tpretty(new_files))
+  end
+
+  ------------------------------------------------------------------------------
+
   create_project = function(
       metamanifest_path,
       project_path,
-      template_cli_path
+      root_template_path
     )
     arguments(
         "string", metamanifest_path,
         "string", project_path,
-        "string", template_cli_path
+        "string", root_template_path
       )
 
     log("Loading metamanifest")
@@ -1214,49 +1236,42 @@ do
 
     metamanifest = process_ignored_paths(metamanifest)
 
+    ----------------------------------------------------------------------------
+
     log("Copy template files")
-    local template_path
-    --local template_rock
     local new_files = { }
-    for i = 1, #metamanifest.templates do
-      if metamanifest.templates[i].relative_path then
-        template_path = metamanifest_path .. metamanifest.templates[i].path
-      else
-        template_path = metamanifest.templates[i].path
-      end
-      log("Template path:", template_path)
-      DEBUG_print("\27[37mTemplates_path:\27[0m " .. template_path)
-      copy_files(metamanifest, template_path, new_files)
-      DEBUG_print("new files :" .. tpretty(new_files))
-    end
+    copy_files_from_templates(root_template_path, metamanifest, new_files)
 
     local file_dir_structure = create_directory_structure(new_files)
     DEBUG_print("file_dir_structure :" .. tpretty(file_dir_structure))
     local clean_up_data = tclone(file_dir_structure)
 
+    ----------------------------------------------------------------------------
+
     log("Replicating data")
     local replicated_structure = do_replicate_data(metamanifest, file_dir_structure)
-
-    -- TODO: make some more nice dir structure output?
-    -- TODO: debug, replicated_structure seems _wrong_ (it is not used yet)
     DEBUG_print("file_dir_structure :" .. tpretty(file_dir_structure))
     DEBUG_print("replicated_structure :" .. tpretty(replicated_structure))
 
+    ----------------------------------------------------------------------------
+
     log("Cleanup replication data")
-    -- TODO: return changed file_dir_structure
     clean_up_replicate_data_recursively(
         metamanifest,
         metamanifest.project_path,
         clean_up_data
       )
 
+    ----------------------------------------------------------------------------
+
     log("Filling placeholders")
-    -- TODO: return changed file_dir_structure
     fill_placeholders(
         metamanifest,
         metamanifest.project_path,
         replicated_structure
       )
+
+    ----------------------------------------------------------------------------
 
     log("Cleanup generated data")
     clean_up_generated_data_recursively(

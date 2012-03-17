@@ -12,6 +12,12 @@ local load_tools_cli_data_schema
         'load_tools_cli_data_schema'
       }
 
+local luarocks_show_rock_dir
+      = import 'lua-aplicado/shell/luarocks.lua'
+      {
+        'luarocks_show_rock_dir'
+      }
+
 local create_config_schema
 do
   local schema_chunk = function()
@@ -25,7 +31,13 @@ do
         cfg:existing_path "PROJECT_PATH" { default = "." };
         cfg:existing_path "metamanifest_path";
         cfg:path "root_project_path";
-        cfg:existing_path "root_template_path" { default = "." };
+        cfg:existing_path "root_template_path"
+        {
+          default = luarocks_show_rock_dir(
+              "pk-project-tools.project-templates"
+            )
+            .. "/src/lua/generic.template";
+        };
         cfg:boolean "debug" { default = false };
       };
 

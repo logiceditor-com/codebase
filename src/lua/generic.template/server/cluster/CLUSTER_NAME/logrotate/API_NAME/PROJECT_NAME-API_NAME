@@ -1,10 +1,12 @@
 # LogRotate script for the first node of #{PROJECT_NAME}
 #
 /var/log/#{PROJECT_NAME}-#{API_NAME}-wsapi.log {
+--[[BLOCK_START:KEEP_LOGS_DAYS]]
   #
   # Keep logs for .. days
   #
   rotate #{KEEP_LOGS_DAYS}
+--[[BLOCK_END:KEEP_LOGS_DAYS]]
   #
   # Rotate daily
   #

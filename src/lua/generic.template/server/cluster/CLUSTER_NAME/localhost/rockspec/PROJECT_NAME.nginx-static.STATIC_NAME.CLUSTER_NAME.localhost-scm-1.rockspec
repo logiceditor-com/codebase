@@ -1,4 +1,4 @@
-package = "#{PROJECT_NAME}.nginx-static.#{STATIC_NAME}.#{CLUSTER_NAME}"
+package = "#{PROJECT_NAME}.nginx-static.#{STATIC_NAME}.#{CLUSTER_NAME}.localhost"
 version = "scm-1"
 source = {
    url = "" -- Installable with `luarocks make` only
@@ -17,6 +17,6 @@ dependencies = {
 build = {
    type = "none",
    copy_directories = {
-      "cluster/#{CLUSTER_NAME}/nginx/#{STATIC_NAME}-static";
+      "cluster/#{CLUSTER_NAME}/localhost/nginx/#{STATIC_NAME}-static";
    }
 }

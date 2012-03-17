@@ -27,7 +27,10 @@ build = {
    },
    install = {
       lua = {
-         ["#{PROJECT_NAME}-#{SERVICE_NAME}.run"] = "services/#{SERVICE_NAME}/src/#{PROJECT_NAME}/#{SERVICE_NAME}/run.lua"
+         ["#{PROJECT_NAME}-#{SERVICE_NAME}.run"] = "services/#{SERVICE_NAME}/src/#{PROJECT_NAME}/#{SERVICE_NAME}/run.lua";
+--[[BLOCK_START:HAS_TASK_PROCESSOR]]
+         ["#{PROJECT_NAME}-#{SERVICE_NAME}.tasks"] = "services/#{SERVICE_NAME}/src/#{PROJECT_NAME}/#{SERVICE_NAME}/tasks.lua";
+--[[BLOCK_END:HAS_TASK_PROCESSOR]]
       },
       bin = {
          "services/#{SERVICE_NAME}/bin/#{PROJECT_NAME}-#{SERVICE_NAME}.service"

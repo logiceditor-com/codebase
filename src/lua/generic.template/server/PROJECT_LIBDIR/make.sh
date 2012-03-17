@@ -1,9 +1,21 @@
 #!/bin/bash
-source $(dirname $(readlink -f $0))"/config.bash"
+set -e
+set -o errexit
+set -o nounset
+
+ROOT="${BASH_SOURCE[0]}";
+
+if([ -h "${ROOT}" ]) then
+  while([ -h "${ROOT}" ]) do ROOT=`readlink "${ROOT}"`; done
+fi
+ROOT=$(cd `dirname "${ROOT}"` && cd .. && pwd) # Up one level
+
+PK_PROJECT_NAME=#{PROJECT_NAME}-lib
+PK_PROJECT_PATH=${ROOT}/${PK_PROJECT_NAME}
 
 echo "----> Generating all"
 
-pushd "$PK_ROOT_PATH" > /dev/null
+pushd "$ROOT" > /dev/null
 rm -r ${PK_PROJECT_PATH}/generated/* || true
 
 ./bin/apigen #{PROJECT_LIBDIR} update_handlers

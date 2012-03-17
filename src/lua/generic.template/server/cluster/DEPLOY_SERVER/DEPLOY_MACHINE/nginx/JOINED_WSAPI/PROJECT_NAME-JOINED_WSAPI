@@ -3,17 +3,21 @@ server {
   listen 80;
 --[[BLOCK_END:EMPTY_LISTEN]]
 --[[BLOCK_START:NORMAL_LISTEN]]
-  listen #{API_NAME}:{URLIFY}#{DEPLOY_SERVER_DOMAIN}:{URLIFY}:80;
+  listen #{JOINED_WSAPI}:{URLIFY}#{SERVICE_INDEX}:{URLIFY}#{DEPLOY_SERVER_DOMAIN}:{URLIFY}:80;
 --[[BLOCK_END:NORMAL_LISTEN]]
-  server_name #{API_NAME}:{URLIFY}#{DEPLOY_SERVER_DOMAIN}:{URLIFY};
+  server_name #{JOINED_WSAPI}:{URLIFY}#{SERVICE_INDEX}:{URLIFY}#{DEPLOY_SERVER_DOMAIN}:{URLIFY};
 
-  error_log  /var/log/nginx/#{PROJECT_NAME}:{URLIFY}-#{API_NAME}:{URLIFY}.error.log;
-  access_log  /var/log/nginx/#{PROJECT_NAME}:{URLIFY}-#{API_NAME}:{URLIFY}.access.log;
+  error_log  /var/log/nginx/#{PROJECT_NAME}:{URLIFY}-#{JOINED_WSAPI}:{URLIFY}.error.log;
+  access_log  /var/log/nginx/#{PROJECT_NAME}:{URLIFY}-#{JOINED_WSAPI}:{URLIFY}.access.log;
   set_real_ip_from 0.0.0.0/0;
   real_ip_header X-Real-IP;
 
+  location /static/ {
+    alias /usr/local/lib/luarocks/rocks/#{PROJECT_NAME}.#{JOINED_WSAPI}/scm-1/www/#{JOINED_WSAPI}/static/;
+  }
+
   location / {
-    fastcgi_pass unix:/tmp/#{PROJECT_NAME}-#{API_NAME}.socket;
+    fastcgi_pass unix:/tmp/#{PROJECT_NAME}-#{JOINED_WSAPI}.socket;
 
     fastcgi_param  SCRIPT_FILENAME  run.lua;
     fastcgi_param  PATH_INFO        $document_uri;

@@ -25,7 +25,7 @@ clusters[#clusters + 1] =
   {
 --[[BLOCK_START:DEPLOY_SINGLE_MACHINE]]
     {
-      name = "#{DEPLOY_SERVER}";
+      name = "#{DEPLOY_MACHINE}";
       external_url = "#{DEPLOY_SERVER}";
       internal_url = "localhost";
 

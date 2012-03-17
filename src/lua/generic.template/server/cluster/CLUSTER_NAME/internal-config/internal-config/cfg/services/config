@@ -50,5 +50,12 @@
       url = false;
     };
   };
+--[[BLOCK_START:HAS_TASK_PROCESSOR]]
+  task_processor =
+  {
+    db_name = "#{TASK_DB_NAME}";
+    key = "#{PROJECT_NAME}:#{SERVICE_NAME}:tasks";
+  };
+--[[BLOCK_END:HAS_TASK_PROCESSOR]]
 }
 --[[BLOCK_END:SERVICE_NAME]]

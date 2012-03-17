@@ -375,12 +375,12 @@ roles =
   static_nginx_role
   {
     name = "#{PROJECT_NAME}-static-#{STATIC_NAME}";
-    rock_name = "#{PROJECT_NAME}.nginx-static.#{STATIC_NAME}.${CLUSTER_NAME}";
+    rock_name = "#{PROJECT_NAME}.nginx-static.#{STATIC_NAME}.${CLUSTER_NAME}.${MACHINE_NAME}";
     deploy_rocks =
     {
       "#{PROJECT_NAME}.www.static.#{STATIC_NAME}"
     };
-    nginx_config_name = "cluster/${CLUSTER_NAME}/nginx/#{STATIC_NAME}-static/#{PROJECT_NAME}-static-#{STATIC_NAME}";
+    nginx_config_name = "cluster/${CLUSTER_NAME}/${MACHINE_NAME}/nginx/#{STATIC_NAME}-static/#{PROJECT_NAME}-static-#{STATIC_NAME}";
   };
   --
 --[[BLOCK_END:STATIC_NAME]]
@@ -395,12 +395,12 @@ roles =
     };
     nginx =
     {
-      rock_name = "#{PROJECT_NAME}.nginx.#{API_NAME}.${CLUSTER_NAME}";
-      config_path = "cluster/${CLUSTER_NAME}/nginx/#{API_NAME}/#{PROJECT_NAME}-#{API_NAME}";
+      rock_name = "#{PROJECT_NAME}.nginx.#{API_NAME}.${CLUSTER_NAME}.${MACHINE_NAME}";
+      config_path = "cluster/${CLUSTER_NAME}/${MACHINE_NAME}/nginx/#{API_NAME}/#{PROJECT_NAME}-#{API_NAME}";
     };
     logrotate =
     {
-      rock_name = "#{PROJECT_NAME}.nginx.#{API_NAME}.${CLUSTER_NAME}";
+      rock_name = "#{PROJECT_NAME}.nginx.#{API_NAME}.${CLUSTER_NAME}.${MACHINE_NAME}";
       config_path = "cluster/${CLUSTER_NAME}/logrotate/#{API_NAME}/#{PROJECT_NAME}-#{API_NAME}";
     };
     shellenv =
@@ -438,12 +438,12 @@ roles =
     };
     nginx =
     {
-      rock_name = "#{PROJECT_NAME}.nginx.#{JOINED_WSAPI}.${CLUSTER_NAME}";
-      config_path = "cluster/${CLUSTER_NAME}/nginx/#{JOINED_WSAPI}/#{PROJECT_NAME}-#{JOINED_WSAPI}";
+      rock_name = "#{PROJECT_NAME}.nginx.#{JOINED_WSAPI}.${CLUSTER_NAME}.${MACHINE_NAME}";
+      config_path = "cluster/${CLUSTER_NAME}/${MACHINE_NAME}/nginx/#{JOINED_WSAPI}/#{PROJECT_NAME}-#{JOINED_WSAPI}";
     };
     logrotate =
     {
-      rock_name = "#{PROJECT_NAME}.nginx.#{JOINED_WSAPI}.${CLUSTER_NAME}";
+      rock_name = "#{PROJECT_NAME}.nginx.#{JOINED_WSAPI}.${CLUSTER_NAME}.${MACHINE_NAME}";
       config_path = "cluster/${CLUSTER_NAME}/logrotate/#{JOINED_WSAPI}/#{PROJECT_NAME}-#{JOINED_WSAPI}";
     };
     shellenv =

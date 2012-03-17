@@ -74,7 +74,7 @@ for cluster in ${CLUSTERS[@]} ; do
         ./bin/apigen ${api} update_handlers
 #        ./bin/apigen ${api} generate_documents
         sudo luarocks make www/${api}/rockspec/#{PROJECT_NAME}.${api}-scm-1.rockspec
-        sudo luarocks make cluster/${CLUSTER}/rockspec/#{PROJECT_NAME}.nginx.${api}.${CLUSTER}-scm-1.rockspec
+        sudo luarocks make cluster/${CLUSTER}/localhost/rockspec/#{PROJECT_NAME}.nginx.${api}.${CLUSTER}.localhost-scm-1.rockspec
         sudo luarocks make cluster/${CLUSTER}/rockspec/#{PROJECT_NAME}.shellenv.${api}.${CLUSTER}-scm-1.rockspec
         echo "------> GENERATE AND INSTALL ${api} END."
       fi
@@ -95,7 +95,7 @@ for service in ${SERVICES[@]} ; do
   if [ -z "${API}" -o "${service}" == "${API}" ]
   then
     echo "------> INSTALL ${service} BEGIN..."
-    sudo luarocks make services/${service}/rockspec/pk-billing-${service}-scm-1.rockspec
+    sudo luarocks make services/${service}/rockspec/#{PROJECT_NAME}-${service}-scm-1.rockspec
     echo "------> INSTALL ${service} END."
   fi
 done

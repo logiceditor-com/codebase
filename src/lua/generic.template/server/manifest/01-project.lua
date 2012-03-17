@@ -83,4 +83,22 @@ subtrees =
   };
 --[[BLOCK_END:PK_TEST]]
 #{SUBTREE}
+--[[BLOCK_START:PK_CORE_JS_LIB]]
+  {
+    name = "pk-core-js";
+    git = PROJECT_PATH;
+    path = "lib/pk-core-js";
+    url = "gitolite@git.iphonestudio.ru:pk-core-js.git";
+    branch = "master";
+  };
+--[[BLOCK_END:PK_CORE_JS_LIB]]
+--[[BLOCK_START:PK_LOGICEDITOR_LIB]]
+  {
+    name = "pk-logiceditor";
+    git = PROJECT_PATH;
+    path = "lib/pk-logiceditor";
+    url = "gitolite@git.iphonestudio.ru:pk-logiceditor.git";
+    branch = "master";
+  };
+--[[BLOCK_END:PK_LOGICEDITOR_LIB]]
 }

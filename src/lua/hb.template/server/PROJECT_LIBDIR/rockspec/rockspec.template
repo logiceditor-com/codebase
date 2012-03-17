@@ -1,4 +1,4 @@
-package = "#{PROJECT_NAME}.lib"
+package = "#{PROJECT_LIB_ROCK}"
 version = "${VERSION}"
 source = {
    url = ""
@@ -6,7 +6,7 @@ source = {
 description = {
    summary = "#{PROJECT_NAME} Common Server Code",
    homepage = "http://#{PROJECT_DOMAIN}",
-   license = "Unpublished closed-source!",
+   license = "#{LICENSE}",
    maintainer = "#{MAINTAINER}"
 }
 supported_platforms = {

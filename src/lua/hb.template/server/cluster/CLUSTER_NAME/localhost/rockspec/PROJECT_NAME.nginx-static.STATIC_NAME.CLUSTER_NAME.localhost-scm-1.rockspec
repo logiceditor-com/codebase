@@ -6,7 +6,7 @@ source = {
 description = {
    summary = "#{PROJECT_NAME} #{STATIC_NAME} static nginx Configuration for #{CLUSTER_NAME}",
    homepage = "http://#{PROJECT_DOMAIN}",
-   license = "Unpublished closed-source!",
+   license = "#{LICENSE}",
    maintainer = "#{MAINTAINER}"
 }
 supported_platforms = {

@@ -104,7 +104,7 @@ libwww-perl allows using GET, POST in shell
 
 Expected output:
 
-    luarocks 2.0.6
+    luarocks 2.0.7.1
     LuaRocks main command-line interface
 
 1.2.2 Ensure that luarocks is installed in /usr/bin/luarocks
@@ -149,25 +149,29 @@ Additional recommended settings:
 
     sudo visudo
 
-Change group admin to NOPASSWD: ALL
+Add this string, using your user name
+    user_name ALL=(ALL) NOPASSWD: ALL
 
---[[BLOCK_START:MYSQL_BASES_CFG]]
+or change group admin to NOPASSWD: ALL, if you are in that group
+    %admin ALL=(ALL) NOPASSWD: ALL
+--[[BLOCK_START:MYSQL_BASES]]
+
 6. Install MySQL (developer machine only).
 
     sudo apt-get install mysql-server
 
 Set the root password to 12345
---[[BLOCK_END:MYSQL_BASES_CFG]]
+--[[BLOCK_END:MYSQL_BASES]]
 
 Minimal software versions
 -------------------------
 
 Ensure that you have at least:
 
-* libev-dev 3.9
-* redis-server 2.2.11
-* multiwatch 1.0.0
-* luajit 2 beta 8
+* libev-dev 3.9+
+* redis-server 2.2.14+
+* multiwatch 1.0.0+
+* luajit 2 beta 8+
 
 Hosts
 -----
@@ -194,7 +198,7 @@ Also add aliases to localhost (developer machine only!):
     127.0.0.1 #{REDIS_BASE_HOST}
 --[[BLOCK_END:REDIS_BASE_HOST]]
 
---[[BLOCK_START:MYSQL_BASES_CFG]]
+--[[BLOCK_START:MYSQL_BASES]]
 
 DB initialization
 -----------------
@@ -218,7 +222,7 @@ DB initialization
 
     cd ~/projects/#{PROJECT_NAME}/server/backoffice/database/bin
     ./#{PROJECT_NAME}-backoffice-initialize-db
---[[BLOCK_END:MYSQL_BASES_CFG]]
+--[[BLOCK_END:MYSQL_BASES]]
 
 Install project
 ---------------

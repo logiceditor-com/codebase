@@ -6,8 +6,8 @@ local ROCKS =
  .. "#{PROJECT_NAME}-execute-system-action-scm-1.rockspec";
   };
   {
-    generator = { "#{PROJECT_NAME}-lib/rockspec/gen-rockspecs" };
-    "#{PROJECT_NAME}-lib/rockspec/#{PROJECT_NAME}.lib-scm-1.rockspec";
+    generator = { "#{PROJECT_LIBDIR}/rockspec/gen-rockspecs" };
+    "#{PROJECT_LIBDIR}/rockspec/#{PROJECT_LIB_ROCK}-scm-1.rockspec";
   };
 --[[BLOCK_START:STATIC_NAME]]
   {

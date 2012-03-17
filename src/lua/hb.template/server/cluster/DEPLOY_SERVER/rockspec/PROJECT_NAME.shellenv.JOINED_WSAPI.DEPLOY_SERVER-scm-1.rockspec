@@ -6,7 +6,7 @@ source = {
 description = {
    summary = "#{PROJECT_NAME} #{JOINED_WSAPI} shellenv Configuration for #{DEPLOY_SERVER}",
    homepage = "http://#{PROJECT_DOMAIN}",
-   license = "Unpublished closed-source!",
+   license = "#{LICENSE}",
    maintainer = "#{MAINTAINER}"
 }
 supported_platforms = {

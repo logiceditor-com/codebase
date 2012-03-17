@@ -1,5 +1,6 @@
 --------------------------------------------------------------------------------
 -- manifest/roles.lua: machine roles description
+#{FILE_HEADER}
 --------------------------------------------------------------------------------
 
 local static_nginx_role = function(param)
@@ -421,7 +422,7 @@ roles =
     deploy_rocks =
     {
       "#{PROJECT_NAME}.#{API_NAME}";
-      "#{PROJECT_NAME}.lib"; -- TODO: This is a dependency, do not list it explicitly
+      "#{PROJECT_LIB_ROCK}"; -- TODO: This is a dependency, do not list it explicitly
     };
   };
   --
@@ -464,7 +465,7 @@ roles =
     deploy_rocks =
     {
       "#{PROJECT_NAME}.#{JOINED_WSAPI}";
-      "#{PROJECT_NAME}.lib"; -- TODO: This is a dependency, do not list it explicitly
+      "#{PROJECT_LIB_ROCK}"; -- TODO: This is a dependency, do not list it explicitly
     };
   };
   --
@@ -498,16 +499,18 @@ roles =
     deploy_rocks =
     {
       "#{PROJECT_NAME}-#{SERVICE_NAME}";
-      "#{PROJECT_NAME}.lib"; -- TODO: Do not list dependencies here, move them to the rockspec
+      "#{PROJECT_LIB_ROCK}"; -- TODO: Do not list dependencies here, move them to the rockspec
     };
   };
   --
 --[[BLOCK_END:SERVICE_NAME]]
+--[[BLOCK_START:MYSQL_BASES]]
   {
-    name = "mysql-db"; -- TODO: stub mysql rock
+    name = "#{MYSQL_BASES}";
     deployment_actions = { };
   };
   --
+--[[BLOCK_END:MYSQL_BASES]]
 --[[BLOCK_START:REDIS_BASE_HOST]]
   {
     name = "#{REDIS_BASE_HOST}"; -- TODO: stub redis rock

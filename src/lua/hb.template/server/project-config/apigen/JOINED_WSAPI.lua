@@ -1,5 +1,6 @@
 --------------------------------------------------------------------------------
 -- api.lua: apigen configuration
+#{FILE_HEADER}
 --------------------------------------------------------------------------------
 -- Note that PROJECT_PATH is defined in the environment
 --------------------------------------------------------------------------------
@@ -9,10 +10,12 @@ local file = function(name) return { filename = name } end
 local NAME = "#{JOINED_WSAPI}"
 
 local EXPORTS_LIST_NAME = PROJECT_PATH
-    .. "tmp/" .. NAME .. "/code/exports/client_api.lua";
+    .. "tmp/" .. NAME .. "/code/exports/client_api.lua"
 
 common.PROJECT_PATH = PROJECT_PATH
-
+common.www.application.file_header = [[
+#{FILE_HEADER}
+]]
 common.www.application.url = "http://#{PROJECT_NAME}-#{JOINED_WSAPI}/"
 common.www.application.api_schema_dir = PROJECT_PATH .. "schema/" .. NAME .. "/client_api"
 common.www.application.have_unity_client = false

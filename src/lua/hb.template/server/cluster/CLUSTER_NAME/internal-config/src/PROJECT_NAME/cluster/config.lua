@@ -1,5 +1,6 @@
 --------------------------------------------------------------------------------
 -- config.lua: basic cluster configuration
+#{FILE_HEADER}
 --------------------------------------------------------------------------------
 -- WARNING: Avoid putting information here at all costs.
 --          Use internal-config whenever possible!

@@ -6,7 +6,7 @@ source = {
 description = {
    summary = "#{PROJECT_NAME} website #{API_NAME} api",
    homepage = "http://#{PROJECT_DOMAIN}",
-   license = "Unpublished closed-source!",
+   license = "#{LICENSE}",
    maintainer = "#{MAINTAINER}"
 }
 dependencies = {

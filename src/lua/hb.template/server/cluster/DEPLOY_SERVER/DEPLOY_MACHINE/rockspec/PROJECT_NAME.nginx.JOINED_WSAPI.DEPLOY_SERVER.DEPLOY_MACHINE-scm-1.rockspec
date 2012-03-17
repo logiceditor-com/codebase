@@ -6,7 +6,7 @@ source = {
 description = {
    summary = "#{PROJECT_NAME} #{JOINED_WSAPI} nginx Configuration for #{DEPLOY_SERVER}.#{DEPLOY_MACHINE}",
    homepage = "http://#{PROJECT_DOMAIN}",
-   license = "Unpublished closed-source!",
+   license = "#{LICENSE}",
    maintainer = "#{MAINTAINER}"
 }
 supported_platforms = {

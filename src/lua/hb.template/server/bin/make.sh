@@ -30,16 +30,12 @@ ROOT="${BASH_SOURCE[0]}";
 if([ -h "${ROOT}" ]) then
   while([ -h "${ROOT}" ]) do ROOT=`readlink "${ROOT}"`; done
 fi
-ROOT=$(cd `dirname "${ROOT}"` && cd ../.. && pwd)
+ROOT=$(cd `dirname "${ROOT}"` && cd .. && pwd) # Up one level
 
-if [ -e ${ROOT}/server/.git ]; then
-  rm -r ${ROOT}/server/.git/hooks
-  ln -s ../etc/git/hooks ${ROOT}/server/.git/hooks
-fi
-if [ -e ${ROOT}/deployment/.git ]; then
-  rm -r ${ROOT}/deployment/.git/hooks
-  ln -s ../etc/git/hooks ${ROOT}/deployment/.git/hooks
-fi
+rm -r ${HOME}/projects/#{PROJECT_NAME}/server/.git/hooks
+ln -s ../etc/git/hooks ${HOME}/projects/#{PROJECT_NAME}/server/.git/hooks
+rm -r ${HOME}/projects/#{PROJECT_NAME}/deployment/.git/hooks
+ln -s ../etc/git/hooks ${HOME}/projects/#{PROJECT_NAME}/deployment/.git/hooks
 
 if [ "${CLUSTER}" = "--help" ]; then
   echo "Usage: ${0} <cluster> [<api>]" >&2
@@ -57,10 +53,10 @@ else
   echo "------> MAKE ALL FOR ${CLUSTER} BEGIN..."
 fi
 
-echo "------> REBUILD #{PROJECT_NAME}-lib BEGIN..."
-cd #{PROJECT_NAME}-lib && ./make.sh
+echo "------> REBUILD #{PROJECT_LIBDIR} BEGIN..."
+cd #{PROJECT_LIBDIR} && ./make.sh
 cd ..
-echo "------> REBUILD #{PROJECT_NAME}-lib END"
+echo "------> REBUILD #{PROJECT_LIBDIR} END"
 
 for cluster in ${CLUSTERS[@]} ; do
   if [ "${cluster}" = "${CLUSTERS}" ]

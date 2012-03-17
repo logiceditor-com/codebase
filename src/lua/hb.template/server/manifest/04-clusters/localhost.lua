@@ -1,5 +1,6 @@
 --------------------------------------------------------------------------------
 -- manifest/clusters/localhost.lua: developer machine pseudo-cluster description
+#{FILE_HEADER}
 --------------------------------------------------------------------------------
 
 local localhost_config = function(name)
@@ -46,7 +47,9 @@ local localhost_config = function(name)
 --[[BLOCK_START:REDIS_BASE_HOST]]
           { name = "#{REDIS_BASE_HOST}" };
 --[[BLOCK_END:REDIS_BASE_HOST]]
-          { name = "mysql-db" };
+--[[BLOCK_START:MYSQL_BASES]]
+          { name = "#{MYSQL_BASES}" };
+--[[BLOCK_END:MYSQL_BASES]]
 --[[BLOCK_START:PK_TEST]]
           { name = "pk-test" };
 --[[BLOCK_END:PK_TEST]]

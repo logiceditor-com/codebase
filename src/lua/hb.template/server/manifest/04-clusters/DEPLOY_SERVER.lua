@@ -1,5 +1,6 @@
 --------------------------------------------------------------------------------
 -- manifest/clusters/#{DEPLOY_SERVER}.lua: #{DEPLOY_SERVER} cluster description
+#{FILE_HEADER}
 --------------------------------------------------------------------------------
 
 clusters = clusters or { }
@@ -54,7 +55,9 @@ clusters[#clusters + 1] =
 --[[BLOCK_START:REDIS_BASE_HOST_DEPLOY]]
         { name = "#{REDIS_BASE_HOST_DEPLOY}" };
 --[[BLOCK_END:REDIS_BASE_HOST_DEPLOY]]
-        { name = "mysql-db" };
+--[[BLOCK_START:MYSQL_BASES]]
+        { name = "#{MYSQL_BASES}" };
+--[[BLOCK_END:MYSQL_BASES]]
       };
     };
 --[[BLOCK_END:DEPLOY_SINGLE_MACHINE]]

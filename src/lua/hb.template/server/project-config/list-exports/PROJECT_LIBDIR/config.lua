@@ -1,29 +1,35 @@
 --------------------------------------------------------------------------------
 -- project-config-defaults.lua: project configuration defaults
+#{FILE_HEADER}
 --------------------------------------------------------------------------------
 -- See format in tools-lib/project-config-schema.lua
 -- Note that PROJECT_PATH is defined in the environment
 --------------------------------------------------------------------------------
 
 common.PROJECT_PATH = PROJECT_PATH
+common.file_header = [[
+#{FILE_HEADER}
+]]
 common.exports =
 {
-    exports_dir = PROJECT_PATH .. "/#{PROJECT_NAME}-lib/";
-    profiles_dir = PROJECT_PATH .. "/project-config/list-exports/#{PROJECT_NAME}-lib/";
+    exports_dir = PROJECT_PATH .. "/#{PROJECT_LIBDIR}/";
+    profiles_dir = PROJECT_PATH .. "/project-config/list-exports/#{PROJECT_LIBDIR}/";
 
     sources =
     {
       {
-        sources_dir = PROJECT_PATH .. "#{PROJECT_NAME}-lib/generated/";
-        root_dir_only = "#{PROJECT_NAME}-lib/lib/";
+        sources_dir = PROJECT_PATH .. "#{PROJECT_LIBDIR}/generated/";
+        root_dir_only = "#{PROJECT_LIBDIR}/lib/";
         profile_filename = "profiles.lua";
         out_filename = "code/exports.lua";
+        file_header = common.file_header;
       };
       {
-        sources_dir = PROJECT_PATH .. "#{PROJECT_NAME}-lib/generated/";
-        root_dir_only = "#{PROJECT_NAME}-lib/ext/";
+        sources_dir = PROJECT_PATH .. "#{PROJECT_LIBDIR}/generated/";
+        root_dir_only = "#{PROJECT_LIBDIR}/ext/";
         profile_filename = "profiles.lua";
         out_filename = "code/extensions.lua";
+        file_header = common.file_header;
       };
     };
 }
@@ -54,7 +60,7 @@ common.www.game.generated =
   handlers_index_filename = "handlers.lua";
   data_formats_filename = "formats.lua";
   handlers_dir_name = "handlers";
-  exports_dir_name = "#{PROJECT_NAME}-lib/lib";
+  exports_dir_name = "#{PROJECT_LIBDIR}/lib";
   exports_list_name = PROJECT_PATH .. "/tools/schema/code/exports/client_api.lua";
   base_url_prefix = "/";
   unity_api_filename = "/dev/null"; -- No Unity API
@@ -63,7 +69,7 @@ common.www.game.generated =
     = PROJECT_PATH .. "/tools/schema/client_api/doc/latex.template";
   doc_md_filename = PROJECT_PATH .. "/doc/client_api.md";
   doc_pdf_filename = PROJECT_PATH .. "/doc/client_api.pdf";
-};
+}
 
 common.www.admin.generated =
 {
@@ -80,7 +86,7 @@ common.www.admin.generated =
   doc_latex_template_filename = "/dev/null";
   doc_md_filename = "/dev/null";
   doc_pdf_filename = "/dev/null";
-};
+}
 
 list_exports =
 {

@@ -1,5 +1,6 @@
 --------------------------------------------------------------------------------
 -- manifest/project.lua: project description
+#{FILE_HEADER}
 --------------------------------------------------------------------------------
 
 -- TODO: DSL-ize!
@@ -81,6 +82,7 @@ subtrees =
     branch = "master";
   };
 --[[BLOCK_END:PK_TEST]]
+#{SUBTREE}
 --[[BLOCK_START:PK_CORE_JS_LIB]]
   {
     name = "pk-core-js";

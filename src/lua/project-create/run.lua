@@ -332,22 +332,32 @@ do
     -- string length of common part of all file paths
     local shift = 2 + string.len(template_path)
 
-    DEBUG_print("\27[33mDo not overwrite in\27[0m:")
-    for k, v in pairs(metamanifest.ignore_paths) do
-      DEBUG_print("  " .. k)
-    end
-    DEBUG_print("\27[33mDo not copy in\27[0m:")
-    for k, v in pairs(metamanifest.remove_paths) do
-      DEBUG_print("  " .. v)
+    if CONFIG[TOOL_NAME].debug then
+      DEBUG_print("\27[33mDo not overwrite in\27[0m:")
+      if metamanifest.ignore_paths then
+        for k, v in pairs(metamanifest.ignore_paths) do
+          DEBUG_print("  " .. k)
+        end
+      end
+      DEBUG_print("\27[33mDo not copy in\27[0m:")
+      if metamanifest.remove_paths then
+        for k, v in pairs(metamanifest.remove_paths) do
+          DEBUG_print("  " .. v)
+        end
+      end
     end
 
     for i = 1, #all_template_files do
       local short_path = string.sub(all_template_files[i], shift)
       local project_filepath = metamanifest.project_path .. "/" .. short_path
-      if check_path_ignored(short_path, tset(metamanifest.remove_paths)) then
+      if
+        metamanifest.remove_paths
+        and check_path_ignored(short_path, tset(metamanifest.remove_paths))
+      then
         DEBUG_print("\27[33mRemoved:\27[0m " .. short_path)
       elseif
-        check_path_ignored(short_path, metamanifest.ignore_paths)
+        metamanifest.ignore_paths
+        and check_path_ignored(short_path, metamanifest.ignore_paths)
         and does_file_exist(project_filepath)
       then
         DEBUG_print("\27[33mIgnored:\27[0m " .. short_path)

@@ -1164,21 +1164,38 @@ do
 
   ------------------------------------------------------------------------------
 
-  local function copy_files_from_templates(path, metamanifest, new_files)
+  local get_template_path = function(name, paths)
+    for i = 1, #paths do
+      local path = paths[i].path .. "/" .. name .. ".template"
+      DEBUG_print("Checking path " .. path)
+      if does_file_exist(path) then
+        DEBUG_print("Exists!")
+        return path
+      end
+    end
+    error("Template " .. name .. " not found in paths: " .. tstr(paths))
+  end
+
+  local function copy_files_from_templates(name, paths, metamanifest, new_files)
+    local path = get_template_path(name, paths)
+    log("Template path:", path)
     local config_path = path .. "/template_config"
     if does_file_exist(config_path) then
+      log("Template config:", config_path)
       local template_metamanifest = load_project_manifest(
           config_path, "", ""
         )
       for i = 1, #template_metamanifest.parent_templates do
         copy_files_from_templates(
-            template_metamanifest.parent_templates[i].path,
+            template_metamanifest.parent_templates[i].name,
+            paths,
             metamanifest,
             new_files
           )
       end
+    else
+      DEBUG_print("No template config found for " .. name)
     end
-    log("Template path:", path)
     DEBUG_print("\27[37mTemplates_path:\27[0m " .. path)
     copy_files(metamanifest, path, new_files)
     DEBUG_print("new files :" .. tpretty(new_files))
@@ -1189,12 +1206,14 @@ do
   create_project = function(
       metamanifest_path,
       project_path,
-      root_template_path
+      root_template_name,
+      root_template_paths
     )
     arguments(
         "string", metamanifest_path,
         "string", project_path,
-        "string", root_template_path
+        "string", root_template_name,
+        "table", root_template_paths
       )
 
     log("Loading metamanifest")
@@ -1240,7 +1259,12 @@ do
 
     log("Copy template files")
     local new_files = { }
-    copy_files_from_templates(root_template_path, metamanifest, new_files)
+    copy_files_from_templates(
+        root_template_name,
+        root_template_paths,
+        metamanifest,
+        new_files
+      )
 
     local file_dir_structure = create_directory_structure(new_files)
     DEBUG_print("file_dir_structure :" .. tpretty(file_dir_structure))
@@ -1313,7 +1337,8 @@ local run = function(...)
 
         param.metamanifest_path  = args[1] or args["--metamanifest_path"]
         param.root_project_path  = args[2] or args["--root_project_path"]
-        param.root_template_path = args[3] or args["--root_template_path"]
+        param.root_template_name = args[3] or args["--root_template_name"]
+        param.root_template_paths = args["--root_template_paths"]
         param.debug              = args["--debug"]
         return
         {
@@ -1323,7 +1348,8 @@ local run = function(...)
       end,
       EXTRA_HELP,
       CONFIG_SCHEMA,
-      nil, -- Specify primary config file with --base-config cli option
+      luarocks_show_rock_dir("pk-project-tools.pk-project-create")
+        .. "/src/lua/project-create/project-config/config.lua",
       nil, -- No secondary config file
       ...
     )
@@ -1344,7 +1370,8 @@ local run = function(...)
   create_project(
       CONFIG[TOOL_NAME].metamanifest_path,
       CONFIG[TOOL_NAME].root_project_path,
-      CONFIG[TOOL_NAME].root_template_path
+      CONFIG[TOOL_NAME].root_template_name,
+      freeform_table_value(CONFIG[TOOL_NAME].root_template_paths)
     )
 end
 

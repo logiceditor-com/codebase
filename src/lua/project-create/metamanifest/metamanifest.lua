@@ -161,8 +161,8 @@ Disallow: /]];
 dictionary.PROJECT_LIBDIR = dictionary.PROJECT_NAME .. "-lib"
 dictionary.PROJECT_LIB_ROCK = dictionary.PROJECT_NAME .. ".lib"
 dictionary.MYSQL_BASES = false
-dictionary.MYSQL_BASES_DEPLOY_CFG = [[--No bases]]
-dictionary.MYSQL_BASES_CFG = [[--No bases]]
+dictionary.MYSQL_BASES_DEPLOY_CFG = false
+dictionary.MYSQL_BASES_CFG = false
 dictionary.REDIS_BASES_CFG =
     [[system = { address = { host = "]] .. dictionary.PROJECT_NAME
  .. [[-redis-system", port = 6379 }, database = 5 }]]

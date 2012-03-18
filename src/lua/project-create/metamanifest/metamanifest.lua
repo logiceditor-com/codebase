@@ -6,13 +6,20 @@
 -- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
--- TODO: add syntax for escaped, underline, short
--- keys are strings to be replaced by value strings
+local escape_lua_pattern =
+      import 'lua-nucleo/string.lua' { 'escape_lua_pattern' }
+
+local luarocks_show_rock_dir
+      = import 'lua-aplicado/shell/luarocks.lua'
+      {
+        'luarocks_show_rock_dir'
+      }
 
 --    false value - remove key from template
 --     true value - force ignore key (same as = nil, but overwrite defaults) TODO: true?
 --  {table} value - replicate and replace key (process blocks)
 -- "string" value - plain replace key with value (ignore blocks)
+
 dictionary =
 {
   PROJECT_NAME = "project-name";
@@ -37,15 +44,69 @@ dictionary =
   PROJECT_MAIL = "info@logiceditor.com";
   PROJECT_DOMAIN = "logiceditor.com";
 
-  COPYRIGHTS = "Copyright (c) 2009-2011 Alexander Gladysh, Dmitry Potapov";
+  README_TEXT = [[
+project
+=======
+
+Copyright (c) 2011-2012, Alexander Gladysh <ag@logiceditor.com>
+Copyright (c) 2011-2012, Dmitry Potapov <dp@logiceditor.com>
+
+See file `COPYRIGHT` for the license.
+
+Each third-party rock contents is copyrighted according to its own license.
+]];
+
+  COPYRIGHT_TEXT = [[
+project License
+---------------
+
+project is licensed under the terms of the MIT license reproduced below.
+This means that project is free software and can be used for both academic
+and commercial purposes at absolutely no cost.
+
+===============================================================================
+
+Copyright (c) 2011-2012 Alexander Gladysh <ag@logiceditor.com>
+Copyright (c) 2011-2012 Dmitry Potapov <dp@logiceditor.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the 'Software'), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+===============================================================================
+
+(end of COPYRIGHT)]];
+
   MAINTAINER = "Alexander Gladysh <agladysh@gmail.com>";
+  LICENSE = "Unpublished closed-source!";
+
+  FILE_HEADER = [[
+-- See file `COPYRIGHT` for the license and copyright information]];
 
   IP_ADDRESS = "TODO:Change! 127.0.255.";
 
   API_TEST_HANDLERS = false;
+  MACHINE_NAME = "localhost";
+  SERVICE_INDEX = "";
 
   -- default libs
   PK_TEST = { "true" }; -- intended table with string
+  PK_CORE_JS_LIB = false;
+  PK_LOGICEDITOR_LIB = false;
   PK_ADMIN = false;
 
   API_NAME = "api";
@@ -77,16 +138,17 @@ dictionary =
 
   CLUSTER_NAME =
   {
-    "localhost-vf";
     "localhost-ag";
     "localhost-dp";
-    "localhost-mn";
   };
 
   -- TODO: obsolete, rocks/ related, remove later
   SUBPROJ_NAME = { "pk", "project" };
 
-  KEEP_LOGS_DAYS = "30";
+  KEEP_LOGS_DAYS = false; --{ "30" };
+
+  TASK_DB_NAME = false;
+  HAS_TASK_PROCESSOR = false;
 
   ROBOTS_TXT = [[
 User-agent: *
@@ -94,19 +156,25 @@ Disallow: /]];
 
   EMPTY_LISTEN = false;
   NORMAL_LISTEN = { "true" };
+  SUBTREE = "";
 }
-dictionary.MYSQL_BASES_DEPLOY_CFG = [[--No bases]];
-dictionary.MYSQL_BASES_CFG = [[--No bases]];
+dictionary.PROJECT_LIBDIR = dictionary.PROJECT_NAME .. "-lib"
+dictionary.PROJECT_LIB_ROCK = dictionary.PROJECT_NAME .. ".lib"
+dictionary.MYSQL_BASES = false
+dictionary.MYSQL_BASES_DEPLOY_CFG = [[--No bases]]
+dictionary.MYSQL_BASES_CFG = [[--No bases]]
 dictionary.REDIS_BASES_CFG =
     [[system = { address = { host = "]] .. dictionary.PROJECT_NAME
- .. [[-redis-system", port = 6379 }, database = 5 }]];
+ .. [[-redis-system", port = 6379 }, database = 5 }]]
 
 dictionary.ADMIN_CONFIG =
   [[--No admin settings]]
 
 dictionary.APPLICATION_CONFIG =
-  [[client_api_version = "2010XXX";]]
+  [[--No application settings]]
 
+-- this version and project metamanifest's version must be same
+version = 1
 
 -- files and directories that will be ignored on project generation
 ignore_paths =
@@ -130,8 +198,16 @@ wrapper =
   };
 }
 
-local escape_lua_pattern =
-      import 'lua-nucleo/string.lua' { 'escape_lua_pattern' }
+templates =
+{
+  {
+    template_path =
+      assert(luarocks_show_rock_dir(
+          "pk-project-tools.project-templates"
+        ))
+   .. "/src/lua/generic.template";
+  };
+}
 
 modificators =
 {

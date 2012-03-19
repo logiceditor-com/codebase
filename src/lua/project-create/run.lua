@@ -1345,11 +1345,11 @@ local run = function(...)
       function(args) -- Parse actions
         local param = { }
 
-        param.metamanifest_path  = args[1] or args["--metamanifest_path"]
-        param.root_project_path  = args[2] or args["--root_project_path"]
+        param.metamanifest_path = args[1] or args["--metamanifest_path"]
+        param.root_project_path = args[2] or args["--root_project_path"]
         param.root_template_name = args[3] or args["--root_template_name"]
         param.root_template_paths = args["--root_template_paths"]
-        param.debug              = args["--debug"]
+        param.debug = args["--debug"]
         return
         {
           PROJECT_PATH = args["--root"] or "";

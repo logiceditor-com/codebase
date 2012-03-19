@@ -31,7 +31,7 @@ do
         cfg:existing_path "PROJECT_PATH" { default = "." };
         cfg:existing_path "metamanifest_path";
         cfg:path "root_project_path";
-        cfg:string "root_template_name" { default = "generic"; };
+        cfg:string "root_template_name" { default = "generic" };
         cfg:non_empty_ilist "root_template_paths"
         {
           cfg:existing_path "path";

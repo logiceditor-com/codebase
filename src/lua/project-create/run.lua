@@ -1254,7 +1254,7 @@ do
           "\nexpected:", metamanifest_defaults.version,
           "\ngot:", metamanifest_project.version
         )
-      return
+      error("Wrong metamanifest version")
     end
 
     local metamanifest = twithdefaults(metamanifest_project, metamanifest_defaults)

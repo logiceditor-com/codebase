@@ -24,7 +24,7 @@ mkdir -p ${PK_PROJECT_PATH}/generated/#{PROJECT_NAME}-lib/verbatim/
 cp -RP ${PK_PROJECT_PATH}/schema/verbatim/* ${PK_PROJECT_PATH}/generated/#{PROJECT_NAME}-lib/verbatim/
 
 ${PK_PROJECT_PATH}/rockspec/gen-rockspecs
-cd ${PK_ROOT_PATH} && sudo luarocks make ${PK_PROJECT_PATH}/rockspec/#{PROJECT_LIB_ROCK}-scm-1.rockspec
+cd ${ROOT} && sudo luarocks make ${PK_PROJECT_PATH}/rockspec/#{PROJECT_LIB_ROCK}-scm-1.rockspec
 ./bin/list-exports --config=./project-config/list-exports/#{PROJECT_LIBDIR}/config.lua --no-base-config --root="./" list_all
 popd > /dev/null
 

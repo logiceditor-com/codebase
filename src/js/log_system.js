@@ -293,6 +293,5 @@ PK.Error = new function ()
 }
 
 var CRITICAL_ERROR = PK.Error.critical_error;
-var handle_err = PK.Error.handle_error;
 
 PK.Error.override_window_onerror_callback()

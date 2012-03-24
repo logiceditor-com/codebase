@@ -168,6 +168,7 @@ do
     end
   end
 
+  ------------------------------------------------------------------------------
   local copy_file_force  = function(path_from, path_to)
     create_path_to_file(path_to)
     copy_file_with_flag(path_from, path_to, "-f")
@@ -292,28 +293,27 @@ do
     end
   end
 
-  -- replicate ignored paths ---------------------------------------------------
   -- TODO: generalize for all dictionary
   local process_ignored_paths = function(metamanifest)
     local ignored = tset(metamanifest.ignore_paths)
-    for ignore, _ in pairs(ignored) do
-      for k, v in pairs(metamanifest.dictionary) do
+    for ignore, _ in ordered_pairs(ignored) do
+      for k, v in ordered_pairs(metamanifest.dictionary) do
         if is_table(v) then
           for j = 1, #v do
-            if not ignored[string.gsub(ignore, string.gsub(k, "%p", "%%%1"), v[j])] then
-              ignored[string.gsub(ignore, string.gsub(k, "%p", "%%%1"), v[j])] = true
+            if not ignored[ignore:gsub(k:gsub("%p", "%%%1"), v[j])] then
+              ignored[ignore:gsub(k:gsub("%p", "%%%1"), v[j])] = true
               ignored[ignore] = nil
             end
           end
         elseif v == false then
-          if not ignored[string.gsub(ignore, string.gsub(k, "%p", "%%%1"), "")] then
+          if not ignored[ignore:gsub(k:gsub("%p", "%%%1"), "")] then
             ignored[ignore] = nil
           end
         elseif v == true then -- TODO: HACK!
           -- ignore
         else
-          if not ignored[string.gsub(ignore, string.gsub(k, "%p", "%%%1"), v)] then
-            ignored[string.gsub(ignore, string.gsub(k, "%p", "%%%1"), v)] = true
+          if not ignored[ignore:gsub(k:gsub("%p", "%%%1"), v)] then
+            ignored[ignore:gsub(k:gsub("%p", "%%%1"), v)] = true
             ignored[ignore] = nil
           end
         end
@@ -1232,7 +1232,7 @@ do
     local defaults_path =
       assert(luarocks_show_rock_dir("pk-project-tools.pk-project-create"))
     defaults_path =
-      string.sub(defaults_path, 1, -1) .. "/src/lua/project-create/metamanifest"
+      defaults_path:sub(1, -1) .. "/src/lua/project-create/metamanifest"
 
     -- template_path
     local metamanifest_defaults = load_project_manifest(defaults_path, "", "")
@@ -1275,9 +1275,10 @@ do
         metamanifest,
         new_files
       )
-
+    DEBUG_print("new_files :" .. tpretty(new_files))
     local file_dir_structure = create_directory_structure(new_files)
     DEBUG_print("file_dir_structure :" .. tpretty(file_dir_structure))
+
     local clean_up_data = tclone(file_dir_structure)
 
     ----------------------------------------------------------------------------

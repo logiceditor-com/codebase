@@ -392,7 +392,7 @@ do
     end
   end
 
-  fill_placeholders = function(
+  fill_placeholders_in_template = function(
       metamanifest, path, file_dir_structure
     )
     metamanifest.cleanup = { }
@@ -419,5 +419,5 @@ return
   copy_files_from_templates = copy_files_from_templates;
   clean_up_replicate_data_recursively = clean_up_replicate_data_recursively;
   clean_up_generated_data_recursively = clean_up_generated_data_recursively;
-  fill_placeholders = fill_placeholders;
+  fill_placeholders_in_template = fill_placeholders_in_template;
 }

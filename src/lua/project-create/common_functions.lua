@@ -125,7 +125,7 @@ local check_path_ignored = function(short_path, ignore_paths)
       "string", short_path,
       "table", ignore_paths
     )
-  for k, v in pairs(ignore_paths) do
+  for k, v in ordered_pairs(ignore_paths) do
     -- if beginning of the path matches ignore path - it is ignored
     if ignore_paths[short_path:sub(0, #k)] then
       return true
@@ -142,7 +142,7 @@ local get_dictionary_pattern = function(filename, metamanifest)
       "table", metamanifest
     )
   local pattern = { }
-  for k, _ in pairs(metamanifest.dictionary) do
+  for k, _ in ordered_pairs(metamanifest.dictionary) do
     if filename:find(k, nil, true) then
       pattern[#pattern + 1] = k
     end
@@ -189,7 +189,7 @@ end
 --------------------------------------------------------------------------------
 
 local function process_dictionary_recursively(manifest, replaces, return_val, fn, ...)
-  for k, v in pairs(replaces) do
+  for k, v in ordered_pairs(replaces) do
     if manifest.subdictionary[v] then
       return_val = process_dictionary_recursively(
           manifest.subdictionary[v],
@@ -225,7 +225,7 @@ do
       manifest,
       filename
     )
-    for k, v in pairs(replaces_used) do
+    for k, v in ordered_pairs(replaces_used) do
       if manifest.subdictionary[v] then
         for k, _ in ordered_pairs(manifest.subdictionary[v].replicate_data) do
           if filename:find(k, nil, true) and not tifindvalue_nonrecursive(pattern, k) then
@@ -246,7 +246,7 @@ do
   get_replacement_pattern = function(filename, metamanifest, replaces_used)
     replaces_used = replaces_used or { }
     local pattern = { }
-    for k, _ in pairs(metamanifest.replicate_data) do
+    for k, _ in ordered_pairs(metamanifest.replicate_data) do
       if filename:find(k, nil, true) then
         pattern[#pattern + 1] = k
       end

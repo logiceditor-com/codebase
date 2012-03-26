@@ -293,8 +293,33 @@ do
       end
     end --for
     return dictionary
+  end --for
+end
+
+--------------------------------------------------------------------------------
+
+local find_data_using_parents = function(manifest, table_name, key)
+  local check_level = manifest
+
+  while check_level[table_name][key] == nil do
+    if check_level.parent then
+      check_level = check_level.parent
+    else
+      break
+    end
+  end
+
+  if check_level[table_name][key] == nil then
+    return nil, key .. " not found in table up to root"
   end
 end -- do
+
+  return check_level[table_name][key]
+end
+
+local find_replicate_data = function(manifest, name)
+  return find_data_using_parents(manifest, "replicate_data", name)
+end
 
 --------------------------------------------------------------------------------
 

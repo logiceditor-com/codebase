@@ -190,13 +190,13 @@ local copy_files = function(metamanifest, template_path, new_files)
   if CONFIG[TOOL_NAME].debug then
     DEBUG_print("\27[33mDo not overwrite in\27[0m:")
     if metamanifest.ignore_paths then
-      for k, v in pairs(metamanifest.ignore_paths) do
+      for k, v in ordered_pairs(metamanifest.ignore_paths) do
         DEBUG_print("  " .. k)
       end
     end
     DEBUG_print("\27[33mDo not copy in\27[0m:")
     if metamanifest.remove_paths then
-      for k, v in pairs(metamanifest.remove_paths) do
+      for k, v in ordered_pairs(metamanifest.remove_paths) do
         DEBUG_print("  " .. v)
       end
     end
@@ -299,7 +299,7 @@ local function clean_up_generated_data_recursively(
     path,
     file_dir_structure
   )
-  for filename, structure in pairs(file_dir_structure) do
+  for filename, structure in ordered_pairs(file_dir_structure) do
     if filename ~= "FLAGS" then
       local filepath = path .. "/" .. filename
 
@@ -338,7 +338,7 @@ end
 local fill_placeholders
 do
   local replace_pattern = function(manifest, new_filepath)
-    for k, v in pairs(manifest.dictionary) do
+    for k, v in ordered_pairs(manifest.dictionary) do
       if new_filepath:find(k, nil, true) then
         if v ~= false then
           return new_filepath:gsub(k, v)
@@ -359,7 +359,7 @@ do
         replace_pattern
       )
 
-    for k, v in pairs(metamanifest.dictionary) do
+    for k, v in ordered_pairs(metamanifest.dictionary) do
       if new_filepath:find(k, nil, true) then
         if v ~= false then
           new_filepath = new_filepath:gsub(k, v)
@@ -397,13 +397,13 @@ do
       metamanifest, path, file_dir_structure
     )
     metamanifest.cleanup = { }
-    for filename, structure in pairs(file_dir_structure) do
+    for filename, structure in ordered_pairs(file_dir_structure) do
       if filename ~= "FLAGS" then
         local filepath = path .. "/" .. filename
         DEBUG_print("\27[32mProcess:\27[0m " .. filepath:sub(#metamanifest.project_path + 2))
         local attr = lfs.attributes(filepath)
         if attr.mode == "directory" then
-          fill_placeholders(metamanifest, filepath, structure)
+          fill_placeholders_in_template(metamanifest, filepath, structure)
         else
           DEBUG_print("structure: ", tpretty(structure))
           replace_dictionary_patterns_in_path(filepath, metamanifest, structure.FLAGS.replaces_used)

@@ -8,10 +8,11 @@
 
 local loadfile, loadstring = loadfile, loadstring
 
--- Create module loggers
+--------------------------------------------------------------------------------
+
 local log, dbg, spam, log_error
       = import 'pk-core/log.lua' { 'make_loggers' } (
-          "project-create", "PRC"
+          "project-create/run", "PCR"
         )
 
 --------------------------------------------------------------------------------
@@ -152,8 +153,7 @@ local copy_file_force,
       process_dictionary_recursively,
       get_replacement_pattern,
       unify_manifest_dictionary,
-      create_directory_structure,
-      fill_placeholders
+      create_directory_structure
       = import 'pk-project-create/common_functions.lua'
       {
         'copy_file_force',
@@ -176,13 +176,13 @@ local do_replicate_data
 local copy_files_from_templates,
       clean_up_replicate_data_recursively,
       clean_up_generated_data_recursively,
-      fill_placeholders
+      fill_placeholders_in_template
       = import 'pk-project-create/copy_files.lua'
       {
         'copy_files_from_templates',
         'clean_up_replicate_data_recursively',
         'clean_up_generated_data_recursively',
-        'fill_placeholders'
+        'fill_placeholders_in_template'
       }
 
 --------------------------------------------------------------------------------
@@ -334,7 +334,7 @@ do
     ----------------------------------------------------------------------------
 
     log("Filling placeholders")
-    fill_placeholders(
+    fill_placeholders_in_template(
         metamanifest,
         metamanifest.project_path,
         replicated_structure

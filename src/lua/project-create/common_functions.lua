@@ -204,18 +204,22 @@ local function process_dictionary_recursively(manifest, replaces, return_val, fn
 end
 
 --------------------------------------------------------------------------------
+
+-- TODO: move to lua-nucleo #3736
+local tifindvalue_nonrecursive = function(pattern, k)
+  for i = 1, #pattern do
+    if pattern[i] == k then
+      return true
+    end
+  end
+  return false
+end
+
+--------------------------------------------------------------------------------
 -- search dictionary and all used replaces subdictionaries for pattern match
 
 local get_replacement_pattern
 do
-  local already_got = function(pattern, k)
-    for i = 1, #pattern do
-      if pattern[i] == k then
-        return true
-      end
-    end
-    return false
-  end
 
   -- TODO: consider more clear subdictionary search,
   --       best of all try making single subdictionary searching function

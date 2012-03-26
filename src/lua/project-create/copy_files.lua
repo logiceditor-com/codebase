@@ -267,37 +267,11 @@ end
 
 --------------------------------------------------------------------------------
 
-local function clean_up_replicate_data_recursively(metamanifest, path, file_dir_structure)
-  for filename, structure in pairs(file_dir_structure) do
-    if filename ~= "FLAGS" then
-      local filepath = path .. "/" .. filename
-
-      -- TODO: BAD handle through dir structure
-      if does_file_exist(filepath) then
-        local attr = assert(lfs.attributes(filepath))
-
-        -- TODO: replace on reading file_dir_structure FLAGS?
-        local pattern_used = get_replacement_pattern(filename, metamanifest)
-
-        if #pattern_used > 0 then
-          DEBUG_print("\27[33mRemoved:\27[0m " .. string.sub(filepath, #metamanifest.project_path + 2))
-          remove_recursively(filepath)
-        else
-          local attr = assert(lfs.attributes(filepath))
-          if attr.mode == "directory" then
-            clean_up_replicate_data_recursively(metamanifest, filepath, structure)
-          end
-        end
-      end
-    end
-
-  end
-end
-
-local function clean_up_generated_data_recursively(
+local function clean_up_fs_recursively(
     metamanifest,
     path,
-    file_dir_structure
+    file_dir_structure,
+    get_pattern
   )
   for filename, structure in ordered_pairs(file_dir_structure) do
     if filename ~= "FLAGS" then
@@ -308,13 +282,12 @@ local function clean_up_generated_data_recursively(
         local attr = assert(lfs.attributes(filepath))
 
         -- TODO: replace on reading file_dir_structure FLAGS?
-        local pattern_used = get_dictionary_pattern(filename, metamanifest)
+        local pattern_used = get_pattern(filename, metamanifest)
 
         if #pattern_used > 0 then
           DEBUG_print(
-              "\27[33mRemoved: "
-           .. string.sub(filepath, #metamanifest.project_path + 2)
-           .. "\27[0m"
+              "\27[33mRemoved:\27[0m "
+           .. filepath:sub(#metamanifest.project_path + 2)
             )
           remove_recursively(filepath)
         else
@@ -322,20 +295,45 @@ local function clean_up_generated_data_recursively(
           if attr.mode == "directory" then
             DEBUG_print(
                 "\27[32mChecked:\27[0m "
-             .. string.sub(filepath, #metamanifest.project_path + 2)
+             .. filepath:sub(#metamanifest.project_path + 2)
               )
-            clean_up_generated_data_recursively(metamanifest, filepath, structure)
+            clean_up_fs_recursively(metamanifest, filepath, structure, get_pattern)
           end
         end
       end
     end
-
   end
+end
+
+local clean_up_replicate_data_recursively = function(
+    metamanifest,
+    path,
+    file_dir_structure
+  )
+  return clean_up_fs_recursively(
+      metamanifest,
+      path,
+      file_dir_structure,
+      get_replacement_pattern
+    )
+end
+
+local clean_up_generated_data_recursively = function(
+    metamanifest,
+    path,
+    file_dir_structure
+  )
+  return clean_up_fs_recursively(
+      metamanifest,
+      path,
+      file_dir_structure,
+      get_dictionary_pattern
+    )
 end
 
 --------------------------------------------------------------------------------
 
-local fill_placeholders
+local fill_placeholders_in_template
 do
   local replace_pattern = function(manifest, new_filepath)
     for k, v in ordered_pairs(manifest.dictionary) do

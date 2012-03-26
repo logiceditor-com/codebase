@@ -185,7 +185,7 @@ local copy_files = function(metamanifest, template_path, new_files)
   local all_template_files = find_all_files(template_path, ".*")
 
   -- string length of common part of all file paths
-  local shift = 2 + string.len(template_path)
+  local shift = 2 + #template_path
 
   if CONFIG[TOOL_NAME].debug then
     DEBUG_print("\27[33mDo not overwrite in\27[0m:")
@@ -203,7 +203,7 @@ local copy_files = function(metamanifest, template_path, new_files)
   end
 
   for i = 1, #all_template_files do
-    local short_path = string.sub(all_template_files[i], shift)
+    local short_path = all_template_files[i]:sub(shift)
     local project_filepath = metamanifest.project_path .. "/" .. short_path
     if
       metamanifest.remove_paths
@@ -339,9 +339,9 @@ local fill_placeholders
 do
   local replace_pattern = function(manifest, new_filepath)
     for k, v in pairs(manifest.dictionary) do
-      if new_filepath:find(k) then
+      if new_filepath:find(k, nil, true) then
         if v ~= false then
-          return string.gsub(new_filepath, k, v)
+          return new_filepath:gsub(k, v)
         else
           return ""
         end
@@ -360,9 +360,9 @@ do
       )
 
     for k, v in pairs(metamanifest.dictionary) do
-      if new_filepath:find(k) then
+      if new_filepath:find(k, nil, true) then
         if v ~= false then
-          new_filepath = string.gsub(new_filepath, k, v);
+          new_filepath = new_filepath:gsub(k, v)
         else
           DEBUG_print("\27[33mFalse  : " .. filepath .. "\27[0m")
           return
@@ -370,8 +370,9 @@ do
       end
     end
 
-    local short_path = string.sub(filepath, #metamanifest.project_path + 2)
-    local short_path_new = string.sub(new_filepath, #metamanifest.project_path + 2)
+    local short_path = filepath:sub(#metamanifest.project_path + 2)
+    local short_path_new = new_filepath:sub(#metamanifest.project_path + 2)
+
     -- TODO: vaible way?
     if filepath ~= new_filepath then
       if
@@ -399,7 +400,7 @@ do
     for filename, structure in pairs(file_dir_structure) do
       if filename ~= "FLAGS" then
         local filepath = path .. "/" .. filename
-        DEBUG_print("\27[32mProcess:\27[0m " .. string.sub(filepath, #metamanifest.project_path + 2))
+        DEBUG_print("\27[32mProcess:\27[0m " .. filepath:sub(#metamanifest.project_path + 2))
         local attr = lfs.attributes(filepath)
         if attr.mode == "directory" then
           fill_placeholders(metamanifest, filepath, structure)

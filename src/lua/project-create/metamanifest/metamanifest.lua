@@ -9,14 +9,7 @@
 local escape_lua_pattern =
       import 'lua-nucleo/string.lua' { 'escape_lua_pattern' }
 
-local luarocks_show_rock_dir
-      = import 'lua-aplicado/shell/luarocks.lua'
-      {
-        'luarocks_show_rock_dir'
-      }
-
---    false value - remove key from template
---     true value - force ignore key (same as = nil, but overwrite defaults) TODO: true?
+--    false value - remove key from template (remove blocks also)
 --  {table} value - replicate and replace key (process blocks)
 -- "string" value - plain replace key with value (ignore blocks)
 
@@ -195,17 +188,6 @@ wrapper =
   {
     top    = { left = "--[[BLOCK_START:"; right = "]]"; };
     bottom = { left = "--[[BLOCK_END:";   right = "]]"; };
-  };
-}
-
-templates =
-{
-  {
-    template_path =
-      assert(luarocks_show_rock_dir(
-          "pk-project-tools.project-templates"
-        ))
-   .. "/src/lua/generic.template";
   };
 }
 

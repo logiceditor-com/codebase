@@ -248,7 +248,7 @@ do
   end
 
   get_replacement_pattern = function(filename, metamanifest, replaces_used)
-    replaces_used = replaces_used or { }
+    replaces_used = replaces_used or empty_table
     local pattern = { }
     for k, _ in ordered_pairs(metamanifest.replicate_data) do
       if filename:find(k, nil, true) then
@@ -266,34 +266,31 @@ end
 
 --------------------------------------------------------------------------------
 
-local unify_manifest_dictionary
-do
-  unify_manifest_dictionary = function(dictionary)
-    for k, v in pairs(dictionary) do
-      if is_table(v) then
-        --check all values where key is number
-        local i = 1
-        while v[i] ~= nil do
-          if is_table(v[i]) then
-            if v[i].name ~= nil then
-              local name = v[i].name
-              v[name] = { }
-              for k_local, v_local in pairs(v[i]) do
-                if k_local ~= "name" then
-                  v[name][k_local] = v[i][k_local]
-                  v[i][k_local] = nil
-                end
+local function unify_manifest_dictionary(dictionary)
+  for k, v in ordered_pairs(dictionary) do
+    if is_table(v) then
+      --check all values where key is number
+      local i = 1
+      while v[i] ~= nil do
+        if is_table(v[i]) then
+          if v[i].name ~= nil then
+            local name = v[i].name
+            v[name] = { }
+            for k_local, v_local in ordered_pairs(v[i]) do
+              if k_local ~= "name" then
+                v[name][k_local] = v[i][k_local]
+                v[i][k_local] = nil
               end
-              v[i] = name
             end
+            v[i] = name
           end
-          i = i + 1
         end
-        v = unify_manifest_dictionary(v)
+        i = i + 1
       end
-    end --for
-    return dictionary
+      v = unify_manifest_dictionary(v)
+    end
   end --for
+  return dictionary
 end
 
 --------------------------------------------------------------------------------

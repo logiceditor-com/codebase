@@ -244,14 +244,13 @@ local remove_false_block = function(manifest, string_to_process, block)
       --find block
       local string_to_find = get_wrapped_string(k, block)
       local blocks = {}
-      for w in string.gmatch(string_to_process, string_to_find) do
+      for w in string_to_process:gmatch(string_to_find) do
         blocks[#blocks + 1] = w
       end
       for j = 1, #blocks do
-      --remove found block
-        string_to_process = string.gsub(
-            string_to_process,
-            string.gsub(blocks[j], "[%p%%]", "%%%1"),
+        --remove found block
+        string_to_process = string_to_process:gsub(
+            blocks[j]:gsub("[%p%%]", "%%%1"),
             "\n"
           )
       end
@@ -260,11 +259,9 @@ local remove_false_block = function(manifest, string_to_process, block)
   return string_to_process
 end
 
+-- TODO: move to lua-nucleo #3736
 local check_trailspaces_newlines = function(file_content)
-  file_content = string.gsub(file_content, "[ \t]*\n", "\n")
-  file_content = string.gsub(file_content, "\n\n[\n]+", "\n")
-  file_content = string.gsub(file_content, "\n\n$", "\n")
-  return file_content
+  return file_content:gsub("[ \t]*\n", "\n"):gsub("\n\n[\n]+", "\n"):gsub("\n\n$", "\n")
 end
 
 local replace_pattern_in_string = function(
@@ -274,23 +271,19 @@ local replace_pattern_in_string = function(
     data_wrapper
   )
   if is_string(value) then
-    DEBUG_print("Dictionary ",  tostring(key), tostring(value))
-    local to_insert = string.gsub(value, "%%", "%%%1")
-    return string.gsub(
-        string_to_process,
-        string.gsub(data_wrapper.left, "%p", "%%%1")
-     .. string.gsub(key, "%p", "%%%1")
-     .. string.gsub(data_wrapper.right, "%p", "%%%1"),
-        to_insert
+    return string_to_process:gsub(
+        data_wrapper.left:gsub("%p", "%%%1")
+     .. key:gsub("%p", "%%%1")
+     .. data_wrapper.right:gsub("%p", "%%%1"),
+        (value:gsub("%%", "%%%1"))
       )
   elseif value == false then
     -- Remove all strings with pattern that == false
-    return string.gsub(
-        string_to_process,
+    return string_to_process:gsub(
         "\n[.]*"
-     .. string.gsub(data_wrapper.left, "%p", "%%%1")
-     .. string.gsub(key, "%p", "%%%1")
-     .. string.gsub(data_wrapper.right, "%p", "%%%1")
+     .. data_wrapper.left:gsub("%p", "%%%1")
+     .. key:gsub("%p", "%%%1")
+     .. data_wrapper.right:gsub("%p", "%%%1")
      .. "[.]*\n",
         "\n"
       )
@@ -347,10 +340,10 @@ end
 
 local check_string_has_patterns = function(string_to_process, data_wrapper)
   local pattern =
-      string.gsub(data_wrapper.left, "%p", "%%%1")
+      data_wrapper.left:gsub("%p", "%%%1")
    .. '[^{}]-'
-   .. string.gsub(data_wrapper.right, "%p", "%%%1")
-  if string.find(string_to_process, pattern) == nil then
+   .. data_wrapper.right:gsub("%p", "%%%1")
+  if string_to_process:find(pattern) == nil then
     return false
   end
   return true
@@ -362,13 +355,13 @@ local check_string_has_modificators = function(
     modificator_wrapper
   )
   local pattern =
-      string.gsub(data_wrapper.left, "%p", "%%%1")
+      data_wrapper.left:gsub("%p", "%%%1")
    .. '[^{}]-'
-   .. string.gsub(data_wrapper.right, "%p", "%%%1")
-   .. string.gsub(modificator_wrapper.left, "%p", "%%%1")
+   .. data_wrapper.right:gsub("%p", "%%%1")
+   .. modificator_wrapper.left:gsub("%p", "%%%1")
    .. '[^{}]-'
-   .. string.gsub(modificator_wrapper.right, "%p", "%%%1")
-  if string.find(string_to_process, pattern) == nil then
+   .. modificator_wrapper.right:gsub("%p", "%%%1")
+  if string_to_process:find(pattern) == nil then
     return false
   end
   return true
@@ -610,7 +603,7 @@ do
           replaces_used[pattern] = replacements[j]
           new_filenames[#new_filenames + 1] =
             {
-              filename = string.gsub(filenames[i].filename, pattern, replacements[j]);
+              filename = filenames[i].filename:gsub(pattern, replacements[j]);
               replaces_used = replaces_used;
             }
         end
@@ -662,7 +655,7 @@ do
         if filepath ~= created_path then
           DEBUG_print(
               "\27[32mCopy to:\27[0m "
-           .. string.sub(created_path, #metamanifest.project_path + 2)
+           .. created_path:sub(#metamanifest.project_path + 2)
             )
           copy_file_force(filepath, created_path)
         end
@@ -686,7 +679,7 @@ do
           local attr = lfs.attributes(filepath)
           DEBUG_print(
               "\27[37mProcess: "
-           .. string.sub(filepath, #metamanifest.project_path + 2)
+           .. filepath:sub(#metamanifest.project_path + 2)
            .. " (" .. attr.mode .. ")\27[0m")
           local pattern_used = get_replacement_pattern(
               filename,

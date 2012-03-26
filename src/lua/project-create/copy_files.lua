@@ -348,7 +348,11 @@ do
     return new_filepath
   end
 
-  local replace_dictionary_patterns_in_path = function(filepath, metamanifest, replaces)
+  local replace_dictionary_patterns_in_path = function(
+      filepath,
+      metamanifest,
+      replaces
+    )
     local new_filepath = filepath
     new_filepath = process_dictionary_recursively(
         metamanifest,
@@ -404,7 +408,11 @@ do
           fill_placeholders_in_template(metamanifest, filepath, structure)
         else
           DEBUG_print("structure: ", tpretty(structure))
-          replace_dictionary_patterns_in_path(filepath, metamanifest, structure.FLAGS.replaces_used)
+          replace_dictionary_patterns_in_path(
+              filepath,
+              metamanifest,
+              structure.FLAGS.replaces_used
+            )
         end
       end
     end

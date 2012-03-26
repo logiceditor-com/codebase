@@ -239,7 +239,7 @@ end
 
 local remove_false_block = function(manifest, string_to_process, block)
   local dictionary = manifest.dictionary
-  for k, v in pairs(dictionary) do
+  for k, v in ordered_pairs(dictionary) do
     if v == false then
       --find block
       local string_to_find = get_wrapped_string(k, block)
@@ -302,7 +302,7 @@ local replace_simple_dictionary_in_string = function(
     dictionary,
     data_wrapper
   )
-  for k, v in pairs(dictionary) do
+  for k, v in ordered_pairs(dictionary) do
     string_to_process =
       replace_pattern_in_string(string_to_process, k, v, data_wrapper)
   end
@@ -428,19 +428,18 @@ local function replicate_and_replace_in_file_recursively(
         )
       DEBUG_print("replace_dictionary_in_string file_content:",  file_content)
       -- append data of replacement subdictionaries
-      for l, w in pairs(manifest.subdictionary[v].replicate_data) do
+      for l, w in ordered_pairs(subdictionary[v].replicate_data) do
         replicate_data[l] = w
       end
-      for l, w in pairs(manifest.subdictionary[v].dictionary) do
+      for l, w in ordered_pairs(subdictionary[v].dictionary) do
         dictionary[l] = w
         DEBUG_print(tostring(w) .. " \27[33madded to dictionary as:\27[0m " .. tostring(l))
       end
-      for l, w in pairs(manifest.subdictionary[v].subdictionary) do
+      for l, w in ordered_pairs(subdictionary[v].subdictionary) do
         subdictionary[l] = w
       end
     end
-    file_content = string.gsub(
-        file_content,
+    file_content = file_content:gsub(
         wrapper.data.left .. k .. wrapper.data.right,
         wrapper.data.left .. v .. wrapper.data.right
       )
@@ -526,10 +525,7 @@ local replicate_and_replace_in_file = function(
     replaces_used,
     created_path
   )
-  local file = assert(io.open(created_path, "r"))
-  local file_content = file:read("*all")
-  file:close()
-
+  local file_content = read_file(created_path)
   file_content = replicate_and_replace_in_file_recursively(
       metamanifest,
       file_content,
@@ -537,9 +533,8 @@ local replicate_and_replace_in_file = function(
       metamanifest.wrapper,
       metamanifest.modificators
     )
-  file = io.open(created_path, "w")
-  file:write(file_content)
-  file:close()
+  file_content = check_trailspaces_newlines(file_content)
+  write_file(created_path, file_content)
 end
 
 --------------------------------------------------------------------------------

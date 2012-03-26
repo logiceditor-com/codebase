@@ -289,6 +289,20 @@ end
 
 --------------------------------------------------------------------------------
 
+local cut_wrappers = function(text, wrapper, value)
+  local string_to_find, block_top_wrapper, block_bottom_wrapper =
+    get_wrapped_string(value, wrapper)
+  return text:gsub(block_top_wrapper .. "\n", ""):gsub("\n" .. block_bottom_wrapper, "")
+end
+
+local remove_wrappers = function(text, wrapper)
+  local string_to_find, block_top_wrapper, block_bottom_wrapper =
+    get_wrapped_string('[^{}]-', wrapper)
+  return text:gsub(block_top_wrapper .. "\n", ""):gsub("\n" .. block_bottom_wrapper, "")
+end
+
+--------------------------------------------------------------------------------
+
 local create_directory_structure
 do
   create_directory_structure = function(new_files)
@@ -321,6 +335,8 @@ return
   process_dictionary_recursively = process_dictionary_recursively;
   get_replacement_pattern = get_replacement_pattern;
   unify_manifest_dictionary = unify_manifest_dictionary;
+  cut_wrappers = cut_wrappers;
+  remove_wrappers = remove_wrappers;
   find_replicate_data = find_replicate_data;
   get_wrapped_string = get_wrapped_string;
   create_directory_structure = create_directory_structure;

@@ -211,6 +211,15 @@ local function make_plain_dictionary(dictionary)
     processed = processed;
     subdictionary = subdictionary;
   }
+--------------------------------------------------------------------------------
+
+local prepare_manifest = function(metamanifest)
+  local metamanifest_plain = make_plain_dictionary(metamanifest.dictionary)
+  metamanifest.dictionary = metamanifest_plain.dictionary
+  metamanifest.replicate_data = metamanifest_plain.replicate_data
+  metamanifest.processed = metamanifest_plain.processed
+  metamanifest.subdictionary = metamanifest_plain.subdictionary
+  return metamanifest
 end
 
 --------------------------------------------------------------------------------
@@ -737,14 +746,10 @@ do
 
   do_replicate_data = function(
       metamanifest,
-      file_dir_structure
+      file_dir_structure,
+      debug
     )
-    -- TODO: this is bad, make it smarter
-    local metamanifest_plain = make_plain_dictionary(metamanifest.dictionary)
-    metamanifest.dictionary = metamanifest_plain.dictionary
-    metamanifest.replicate_data = metamanifest_plain.replicate_data
-    metamanifest.processed = metamanifest_plain.processed
-    metamanifest.subdictionary = metamanifest_plain.subdictionary
+    debug_value = debug or false
 
     -- no dictionary replacements
     return process_replication_recursively(
@@ -755,7 +760,7 @@ do
           created_structure = { ["FLAGS"] = { } },
           replaces_used = { }
         },
-        metamanifest
+        prepare_manifest(metamanifest)
       )
   end
 end

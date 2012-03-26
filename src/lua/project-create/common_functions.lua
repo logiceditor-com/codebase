@@ -327,24 +327,53 @@ end
 
 --------------------------------------------------------------------------------
 
-local create_directory_structure
-do
-  create_directory_structure = function(new_files)
-    local dir_struct = { ["FLAGS"] = { } }
-    local file_dir_list = { }
-    for i = 1, #new_files do
-      file_dir_list = break_path(new_files[i])
-      local dir_struct_curr = dir_struct
-      for j = 1, #file_dir_list do
-        if not dir_struct_curr[file_dir_list[j]] then
-          dir_struct_curr[file_dir_list[j]] = { ["FLAGS"] = { } }
-        end
-        dir_struct_curr = dir_struct_curr[file_dir_list[j]]
-      end
-      dir_struct_curr.FLAGS["FILE"] = true
+local function find_top_level_blocks(text, wrapper, replaces_used, blocks)
+  if replaces_used then
+    for k, v in ordered_pairs(replaces_used) do
+      text = cut_wrappers(text, wrapper, k)
     end
-    return dir_struct
   end
+
+  blocks = blocks or { }
+  local top_wrapper_start, top_left_wrapper_end = text:find(wrapper.top.left, nil, true)
+  local top_right_wrapper_start = text:find(wrapper.top.right, nil, true)
+
+  if top_left_wrapper_end and top_right_wrapper_start then
+    local val = text:sub(top_left_wrapper_end + 1, top_right_wrapper_start - 1)
+    local _, bottom_wrapper_end =
+      text:find(wrapper.bottom.left .. val .. wrapper.bottom.right, nil, true)
+    blocks[#blocks + 1] =
+    {
+      value = val;
+      text = text:sub(top_wrapper_start, bottom_wrapper_end + 1);
+    }
+    find_top_level_blocks(
+        text:sub(bottom_wrapper_end + 1),
+        wrapper,
+        replaces_used,
+        blocks
+      )
+  end
+  return blocks
+end
+
+--------------------------------------------------------------------------------
+
+local create_directory_structure = function(new_files)
+  local dir_struct = { ["FLAGS"] = { } }
+  local file_dir_list = { }
+  for i = 1, #new_files do
+    file_dir_list = break_path(new_files[i])
+    local dir_struct_curr = dir_struct
+    for j = 1, #file_dir_list do
+      if not dir_struct_curr[file_dir_list[j]] then
+        dir_struct_curr[file_dir_list[j]] = { ["FLAGS"] = { } }
+      end
+      dir_struct_curr = dir_struct_curr[file_dir_list[j]]
+    end
+    dir_struct_curr.FLAGS["FILE"] = true
+  end
+  return dir_struct
 end
 
 --------------------------------------------------------------------------------
@@ -359,6 +388,7 @@ return
   process_dictionary_recursively = process_dictionary_recursively;
   get_replacement_pattern = get_replacement_pattern;
   unify_manifest_dictionary = unify_manifest_dictionary;
+  find_top_level_blocks = find_top_level_blocks;
   cut_wrappers = cut_wrappers;
   remove_wrappers = remove_wrappers;
   find_replicate_data = find_replicate_data;

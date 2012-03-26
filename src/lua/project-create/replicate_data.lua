@@ -173,44 +173,57 @@ end
 
 --------------------------------------------------------------------------------
 
-local function make_plain_dictionary(dictionary)
+local function make_plain_dictionary(dictionary, parent)
+  local parent = parent or nil
   local replicate_data = { }
   local processed = { }
   local subdictionary = { }
 
-  for k, v in pairs(dictionary) do
+  for k, v in ordered_pairs(dictionary) do
     if is_table(v) then
       replicate_data[#replicate_data + 1] = k
-    elseif v == true then -- TODO: subject to revise
-      dictionary[k] = nil
-      DEBUG_print(k .. "\27[32mremoved as it was\27[0m:\n" .. tostring(v))
+    elseif v == false then
+      DEBUG_print(k .. " - \27[32mfalse\27[0m : going to make empty")
+      replicate_data[#replicate_data + 1] = k
     end
   end
 
   for i = 1, #replicate_data do
+    DEBUG_print("Going through replicate data:", replicate_data[i])
     local data = replicate_data[i]
     local replicate = dictionary[data]
+    DEBUG_print("replicate", replicate_data[i])
     replicate_data[data] = { }
-    for j = 1, #replicate do
-      local name = string.sub(data, 1, -2) .. "_" .. string.format("%03d", j)
-      dictionary[name] = replicate[j]
-      replicate_data[data][j] = name
-      subdictionary[name] = replicate[replicate[j]]
-      if is_table(subdictionary[name]) then
-        subdictionary[name] = make_plain_dictionary(subdictionary[name])
+    if is_table(replicate) then
+      for j = 1, #replicate do
+        local name = data:sub(1, -2) .. "_" .. string.format("%03d", j)
+        dictionary[name] = replicate[j]
+        replicate_data[data][j] = name
+        subdictionary[name] = replicate[replicate[j]]
+        if is_table(subdictionary[name]) then
+          subdictionary[name] = make_plain_dictionary(subdictionary[name], dictionary)
+        end
       end
+      processed[data] = tclone(dictionary[data])
     end
-    processed[data] = tclone(dictionary[data])
     dictionary[data] = nil
     replicate_data[i] = nil
   end
-
-  return {
+  local result =
+  {
     dictionary = dictionary;
     replicate_data = replicate_data;
     processed = processed;
     subdictionary = subdictionary;
   }
+  -- so we can always reach parent table from subtable,
+  -- though this makes our dictionary data structure heavily recursive
+  for k, v in ordered_pairs(subdictionary) do
+    subdictionary[k].parent = result
+  end
+  return result
+end
+
 --------------------------------------------------------------------------------
 
 local prepare_manifest = function(metamanifest)

@@ -108,6 +108,10 @@ local shell_read,
 --------------------------------------------------------------------------------
 
 local copy_file_force  = function(path_from, path_to)
+  arguments(
+      "string", path_from,
+      "string", path_to
+    )
   create_path_to_file(path_to)
   copy_file_with_flag(path_from, path_to, "-f")
   return true
@@ -116,6 +120,11 @@ end
 --------------------------------------------------------------------------------
 
 local check_path_ignored = function(short_path, ignore_paths)
+  ignore_paths = ignore_paths or empty_table
+  arguments(
+      "string", short_path,
+      "table", ignore_paths
+    )
   for k, v in pairs(ignore_paths) do
     -- if beginning of the path matches ignore path - it is ignored
     if ignore_paths[short_path:sub(0, #k)] then
@@ -128,6 +137,10 @@ end
 --------------------------------------------------------------------------------
 
 local get_dictionary_pattern = function(filename, metamanifest)
+  arguments(
+      "string", filename,
+      "table", metamanifest
+    )
   local pattern = { }
   for k, _ in pairs(metamanifest.dictionary) do
     if filename:find(k, nil, true) then
@@ -140,6 +153,9 @@ end
 --------------------------------------------------------------------------------
 
 local break_path = function(path)
+  arguments(
+      "string", path
+    )
   local file_dir_list = { }
   -- TODO: Check if more symbols needed in regexp!!!
   for w in path:gmatch("/[%w%._%-]+") do
@@ -151,6 +167,10 @@ end
 --------------------------------------------------------------------------------
 
 local add_to_directory_structure = function(new_file, dir_struct)
+  arguments(
+      "string", new_file,
+      "table", dir_struct
+    )
   local file_dir_list = { }
   file_dir_list = break_path(new_file)
   local dir_struct_curr = dir_struct or { }

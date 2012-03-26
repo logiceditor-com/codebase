@@ -118,7 +118,7 @@ end
 local check_path_ignored = function(short_path, ignore_paths)
   for k, v in pairs(ignore_paths) do
     -- if beginning of the path matches ignore path - it is ignored
-    if ignore_paths[string.sub(short_path, 0, #k)] then
+    if ignore_paths[short_path:sub(0, #k)] then
       return true
     end
   end
@@ -130,7 +130,7 @@ end
 local get_dictionary_pattern = function(filename, metamanifest)
   local pattern = { }
   for k, _ in pairs(metamanifest.dictionary) do
-    if filename:find(k) then
+    if filename:find(k, nil, true) then
       pattern[#pattern + 1] = k
     end
   end
@@ -142,8 +142,8 @@ end
 local break_path = function(path)
   local file_dir_list = { }
   -- TODO: Check if more symbols needed in regexp!!!
-  for w in string.gmatch("/" .. path, "/[%w%._%-]+") do
-    file_dir_list[#file_dir_list + 1] = string.sub(w, 2)
+  for w in path:gmatch("/[%w%._%-]+") do
+    file_dir_list[#file_dir_list + 1] = w:sub(2)
   end
   return file_dir_list
 end
@@ -207,8 +207,8 @@ do
     )
     for k, v in pairs(replaces_used) do
       if manifest.subdictionary[v] then
-        for k, _ in pairs(manifest.subdictionary[v].replicate_data) do
-          if filename:find(k) and not already_got(pattern, k) then
+        for k, _ in ordered_pairs(manifest.subdictionary[v].replicate_data) do
+          if filename:find(k, nil, true) and not tifindvalue_nonrecursive(pattern, k) then
             pattern[#pattern + 1] = k
           end
         end
@@ -227,7 +227,7 @@ do
     replaces_used = replaces_used or { }
     local pattern = { }
     for k, _ in pairs(metamanifest.replicate_data) do
-      if filename:find(k) then
+      if filename:find(k, nil, true) then
         pattern[#pattern + 1] = k
       end
     end
@@ -276,11 +276,11 @@ end -- do
 
 local get_wrapped_string = function(string_to_process, wrapper)
   local block_top_wrapper =
-    string.gsub(wrapper.top.left, "%p", "%%%1") .. string_to_process ..
-    string.gsub(wrapper.top.right, "%p", "%%%1")
+    wrapper.top.left:gsub("%p", "%%%1") .. string_to_process ..
+    wrapper.top.right:gsub("%p", "%%%1")
   local block_bottom_wrapper =
-    string.gsub(wrapper.bottom.left, "%p", "%%%1") .. string_to_process ..
-    string.gsub(wrapper.bottom.right, "%p", "%%%1")
+    wrapper.bottom.left:gsub("%p", "%%%1") .. string_to_process ..
+    wrapper.bottom.right:gsub("%p", "%%%1")
   return
     block_top_wrapper .. ".-" .. block_bottom_wrapper,
     block_top_wrapper,

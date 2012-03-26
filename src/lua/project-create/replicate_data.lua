@@ -309,6 +309,32 @@ local replace_simple_dictionary_in_string = function(
   return string_to_process
 end
 
+local replace_value_with_modificators_in_string = function(
+    string_to_process,
+    value,
+    replacement,
+    data_wrapper,
+    modificator_wrapper,
+    modificators
+  )
+  if is_table(modificators) then
+    for mod, fn in ordered_pairs(modificators) do
+      if is_string(replacement) and is_function(fn) then
+        string_to_process = string_to_process:gsub(
+            data_wrapper.left:gsub("%p", "%%%1")
+         .. value:gsub("%p", "%%%1")
+         .. data_wrapper.right:gsub("%p", "%%%1")
+         .. modificator_wrapper.left:gsub("%p", "%%%1")
+         .. mod:gsub("%p", "%%%1")
+         .. modificator_wrapper.right:gsub("%p", "%%%1"),
+            (fn(replacement):gsub("%%", "%%%1"))
+          )
+      end
+    end
+  end
+  return replace_pattern_in_string(string_to_process, value, replacement, data_wrapper)
+end
+
 local replace_dictionary_with_modificators_in_string = function(
     string_to_process,
     dictionary,
@@ -316,24 +342,15 @@ local replace_dictionary_with_modificators_in_string = function(
     modificator_wrapper,
     modificators
   )
-  for k, v in pairs(dictionary) do
-    for mod, fn in pairs(modificators) do
-      if is_string(v) and is_function(fn) then
-        local to_insert = string.gsub(fn(v), "%%", "%%%1")
-        string_to_process = string.gsub(
-            string_to_process,
-            string.gsub(data_wrapper.left, "%p", "%%%1")
-         .. string.gsub(k, "%p", "%%%1")
-         .. string.gsub(data_wrapper.right, "%p", "%%%1")
-         .. string.gsub(modificator_wrapper.left, "%p", "%%%1")
-         .. string.gsub(mod, "%p", "%%%1")
-         .. string.gsub(modificator_wrapper.right, "%p", "%%%1"),
-            to_insert
-          )
-      end
-    end
-    string_to_process =
-      replace_pattern_in_string(string_to_process, k, v, data_wrapper)
+  for k, v in ordered_pairs(dictionary) do
+    string_to_process = replace_value_with_modificators_in_string(
+        string_to_process,
+        k,
+        v,
+        data_wrapper,
+        modificator_wrapper,
+        modificators
+      )
   end
   return string_to_process
 end
@@ -365,6 +382,38 @@ local check_string_has_modificators = function(
     return false
   end
   return true
+end
+
+local replace_value_in_string_using_parent = function(
+    string_to_process,
+    value,
+    manifest,
+    data_wrapper,
+    modificator_wrapper,
+    modificators
+  )
+  local manifest_current = manifest
+  local dictionary_current = manifest_current.dictionary
+  while is_table(dictionary_current) do
+    -- DEBUG_print("\27[33mdictionary_current\27[0m ", tstr(dictionary_current))
+    if dictionary_current[value] then
+      return replace_value_with_modificators_in_string(
+          string_to_process,
+          value,
+          dictionary_current[value],
+          data_wrapper,
+          modificator_wrapper,
+          modificators
+        )
+    end
+    if manifest_current.parent then
+      manifest_current = manifest_current.parent
+      dictionary_current = manifest_current.dictionary
+    else
+      dictionary_current = nil
+    end
+  end
+  return string_to_process
 end
 
 local replace_dictionary_in_string = function(
@@ -400,40 +449,76 @@ local replace_dictionary_in_string = function(
     )
 end
 
+local replace_dictionary_in_string_using_parent = function(
+    string_to_process,
+    dictionary,
+    manifest,
+    data_wrapper,
+    modificator_wrapper,
+    modificators
+  )
+  local manifest_current = manifest
+  local dictionary_current = dictionary
+  while is_table(dictionary_current) do
+    string_to_process = replace_dictionary_in_string(
+        string_to_process,
+        dictionary_current,
+        data_wrapper,
+        modificator_wrapper,
+        modificators
+      )
+    if manifest_current.parent then
+      manifest_current = manifest_current.parent
+      dictionary_current = manifest_current.dictionary
+    else
+      dictionary_current = nil
+    end
+  end
+  return string_to_process
+end
+
 local function replicate_and_replace_in_file_recursively(
       manifest,
       file_content,
       replaces_used,
       wrapper,
-      modificators
+      modificators,
+      nested
     )
-  -- TODO: check if pattern exists in file(string)
-  local current_block_replica = ""
-  local blocks = { }
-  local replicate_data = manifest.replicate_data
-  local dictionary = manifest.dictionary
-  local subdictionary = manifest.subdictionary
 
-  -- replace patterns already fixed for this file
-  for k, v in pairs(replaces_used) do
-    DEBUG_print(" k, v:",  k, v)
-    if manifest.subdictionary[v] then
-      DEBUG_print("file_content:",  file_content)
+  local nested = nested or 0
+  local replicate_data = tclone(manifest.replicate_data)
+  local dictionary = tclone(manifest.dictionary)
+  local subdictionary = manifest.subdictionary
+  DEBUG_print("[" .. nested .. "] ","\27[33mRaRiFR\27[0m ")
+  -- replace patterns already fixed for this part of text (or file)
+  for k, v in ordered_pairs(replaces_used) do
+    DEBUG_print("[" .. nested .. "] ","replaces_used k, v:",  k, v)
+    if subdictionary[v] then
+
       file_content = replace_dictionary_in_string(
           file_content,
-          manifest.subdictionary[v].dictionary,
+          subdictionary[v].dictionary,
           wrapper.data,
           wrapper.modificator,
           modificators
         )
-      DEBUG_print("replace_dictionary_in_string file_content:",  file_content)
+
+      DEBUG_print(
+          "[" .. nested .. "] ",
+          "replace_dictionary_in_string file_content:\n",
+          file_content, "\n"
+        )
       -- append data of replacement subdictionaries
       for l, w in ordered_pairs(subdictionary[v].replicate_data) do
         replicate_data[l] = w
       end
       for l, w in ordered_pairs(subdictionary[v].dictionary) do
         dictionary[l] = w
-        DEBUG_print(tostring(w) .. " \27[33madded to dictionary as:\27[0m " .. tostring(l))
+        DEBUG_print(
+            "[" .. nested .. "] ",
+            tostring(w) .. " \27[33madded to dictionary as:\27[0m " .. tostring(l)
+          )
       end
       for l, w in ordered_pairs(subdictionary[v].subdictionary) do
         subdictionary[l] = w
@@ -445,60 +530,68 @@ local function replicate_and_replace_in_file_recursively(
       )
   end
 
-  -- replicate blocks
-  for k, v in pairs(replicate_data) do
-    --find block
-    local string_to_find, block_top_wrapper, block_bottom_wrapper =
-      get_wrapped_string(k, wrapper.block)
-    blocks = { }
-    for w in string.gmatch(file_content, string_to_find) do
-      blocks[#blocks + 1] = w
+  local top_level_blocks = find_top_level_blocks(file_content, wrapper.block, replaces_used)
+
+  for i = 1, #top_level_blocks do
+    local block = top_level_blocks[i]
+    local value = block.value
+    local text = block.text
+    local value_replicates = find_replicate_data(manifest, value)
+    block.replicas = { }
+
+    -- "false" value processed here
+    if tisempty(value_replicates) then
+      block.replicas[#block.replicas + 1] = ""
     end
-    --form new block
-    local blocks_set_to_write = { }
-    for j = 1, #blocks do
-      blocks_set_to_write[j] = { }
-      for i = 1, #v do
-        current_block_replica = blocks[j]
-        -- insert replica instead of general marker
-        current_block_replica = string.gsub(
-            current_block_replica,
-            string.gsub(wrapper.data.left, "%p", "%%%1")
-         .. k
-         .. string.gsub(wrapper.data.right, "%p", "%%%1"),
-            wrapper.data.left .. v[i] .. wrapper.data.right
-          )
-        -- sub dictionary replaces
-        if subdictionary[v[i]] then
-          -- recursion here
-          local replaces_used_sub = replaces_used
-          replaces_used_sub[k] = v[i]
-          current_block_replica = replicate_and_replace_in_file_recursively(
-              subdictionary[v[i]],
-              current_block_replica,
-              replaces_used_sub,
-              wrapper,
-              modificators
-            )
-        end
 
-        -- cut block wrappers
-        current_block_replica =
-          string.gsub(current_block_replica, block_top_wrapper .. "\n", "")
-        current_block_replica =
-          string.gsub(current_block_replica, "\n" .. block_bottom_wrapper, "")
-
-        blocks_set_to_write[j][i] = current_block_replica
-      end
-
-      --replace found block
-      file_content = string.gsub(
-          file_content,
-          string.gsub(blocks[j], "[%p%%]", "%%%1"),
-          table.concat(blocks_set_to_write[j], "\n")
+    -- replicated values processed here
+    for j = 1, #value_replicates do
+      local current_block_replica = text:gsub(
+          wrapper.data.left:gsub("%p", "%%%1")
+       .. value
+       .. wrapper.data.right:gsub("%p", "%%%1"),
+          wrapper.data.left
+       .. value_replicates[j]
+       .. wrapper.data.right
         )
-    end -- for j = 1, #blocks do
-  end -- for k, v in pairs(replicate_data) do
+      current_block_replica = replace_value_in_string_using_parent(
+          current_block_replica,
+          value_replicates[j],
+          manifest,
+          wrapper.data,
+          wrapper.modificator,
+          modificators
+        )
+
+      local submanifest = manifest
+      if subdictionary[value_replicates[j]] then
+        submanifest = subdictionary[value_replicates[j]]
+      end
+      local replaces_used_sub = tclone(replaces_used)
+      replaces_used_sub[value] = value_replicates[j]
+
+      current_block_replica = replicate_and_replace_in_file_recursively(
+          submanifest,
+          current_block_replica,
+          replaces_used_sub,
+          wrapper,
+          modificators,
+          nested + 1
+        )
+
+      current_block_replica = cut_wrappers(
+          current_block_replica,
+          wrapper.block,
+          value
+        )
+      block.replicas[#block.replicas + 1] = current_block_replica
+    end -- for j = 1, #value_replicates do
+
+    file_content = file_content:gsub(
+        block.text:gsub("[%p%%]", "%%%1"),
+        table.concat(block.replicas, "")
+      )
+  end -- for i = 1, #top_level_blocks do
 
   -- removing blocks with "false" dictionary patterns
   file_content = remove_false_block(
@@ -506,14 +599,16 @@ local function replicate_and_replace_in_file_recursively(
       file_content,
       wrapper.block
     )
-  file_content = replace_dictionary_in_string(
+
+  file_content = remove_wrappers(file_content, wrapper.block)
+  file_content = replace_dictionary_in_string_using_parent(
       file_content,
       dictionary,
+      manifest,
       wrapper.data,
       wrapper.modificator,
       modificators
     )
-  file_content = check_trailspaces_newlines(file_content)
   return file_content
 end
 
@@ -654,9 +749,8 @@ do
             )
           copy_file_force(filepath, created_path)
         end
-        local manifest_copy = tclone(metamanifest)
         replicate_and_replace_in_file(
-            manifest_copy,
+            metamanifest,
             created_dir_structure,
             replaces_used,
             created_path

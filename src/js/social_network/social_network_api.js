@@ -187,7 +187,13 @@ PKEngine.SocialNetAPIImpl.Authless = new function()
   this.get_app_id = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
   this.get_billing_app_id = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
   this.get_uid = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+
   this.get_friends = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
+  //this.get_friends = function(with_app, without_app, callback)
+  //{
+  //  callback([{ uid: "223", photo: "ph223", first_name: "a", last_name: "b" }])
+  //}
+
   this.get_profiles = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
   this.get_balance = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
   this.payment = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD

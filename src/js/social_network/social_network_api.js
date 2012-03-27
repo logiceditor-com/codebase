@@ -305,6 +305,14 @@ PKEngine.SocialNetAPIImpl.VK_Internal = new function()
         if (with_app && without_app)
         {
           //console.log("[friends.get callback] cb for all", data.response)
+
+          // Note: Must convert uids to strings by function's contract
+          if (data && data.response)
+          {
+            for(var i = 0; i < data.response.length; i++)
+              data.response[i].uid = String(data.response[i].uid);
+          }
+
           callback(data.response)
           return
         }
@@ -334,6 +342,14 @@ PKEngine.SocialNetAPIImpl.VK_Internal = new function()
             }
 
             //console.log("[friends.get callback] cb for only without app", PK.clone(users_with_app), PK.clone(result))
+
+            // Note: Must convert uids to strings by function's contract
+            if (result)
+            {
+              for(var i = 0; i < result.length; i++)
+                result[i].uid = String(result[i].uid);
+            }
+
             callback(result)
           })
       })
@@ -524,6 +540,14 @@ PKEngine.SocialNetAPIImpl.VK_External = new function()
 
         // Return all if requested
         //console.log("[friends.get callback] cb for all", data.response)
+
+        // Note: Must convert uids to strings by function's contract
+        if (data && data.response)
+        {
+          for(var i = 0; i < data.response.length; i++)
+            data.response[i].uid = String(data.response[i].uid);
+        }
+
         callback(data.response)
         return
       })

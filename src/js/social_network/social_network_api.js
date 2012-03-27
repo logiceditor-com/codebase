@@ -54,7 +54,7 @@ PKEngine.SocialNetAPI = new function()
 
       // social:getters
       get_uid ()
-      get_friends (with_app, without_app)
+      get_friends (with_app, without_app) returns false or [ {uid, photo, first_name, last_name} ]
       get_profiles (uids, callback)
 
       // billing

@@ -113,10 +113,15 @@ PK.Error = new function ()
   var log_error_ = function (error)
   {
     LOG(error.message);
+    if (error.stack_trace)
+    {
+      LOG(error.stack_trace);
+    }
+
     var printer = PK.log_system.get_printer();
     if (printer)
     {
-      printer(error.message, error.stack_trace.slice());
+      printer(error.message, PK.clone(error.stack_trace));
     }
   }
 
@@ -294,7 +299,7 @@ PK.Error = new function ()
   {
     if (stack_trace)
     {
-      var trace = stack_trace.slice();
+      var trace = PK.clone(stack_trace);
       trace.unshift("********** Stack Trace **********");
       trace.push("**********************************");
       return trace.join("\n");

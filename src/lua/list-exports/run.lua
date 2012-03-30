@@ -103,6 +103,7 @@ local list = function(
   root_dir_only = root_dir_only and root_dir_only:gsub("/+$", "")
   file_header = file_header
     or [[
+-- This file is a part of ]], (lib_name or root_dir_only or sources_dir), [[ library
 -- See file `COPYRIGHT` for the license and copyright information
 ]]
   log(
@@ -199,7 +200,6 @@ local list = function(
 --------------------------------------------------------------------------------
 -- generated exports map for ]], (root_dir_only or sources_dir), "/", [[
 
--- This file is a part of ]], (lib_name or root_dir_only or sources_dir), [[ library
 ]] .. file_header .. [[
 --------------------------------------------------------------------------------
 -- WARNING! Do not change manually!

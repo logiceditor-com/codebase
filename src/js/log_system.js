@@ -98,6 +98,8 @@ PK.Error = new function ()
 {
   var instance_ = this;
 
+  var handle_error_calls_ = 0;
+
   /**
    * Callback
    */
@@ -208,11 +210,22 @@ PK.Error = new function ()
     }
     critical_error_raised_ = true;
 
-    throw new PK.CriticalError(text);
+    if (handle_error_calls_ > 0)
+    {
+      throw new PK.CriticalError(text);
+    }
+    else
+    {
+      instance_.handle_error (
+          function() { throw new PK.CriticalError(text); },
+          "Dangling error"
+        );
+    }
   }
 
   this.handle_error = function (callback, name)
   {
+    handle_error_calls_++;
     try
     {
       callback();
@@ -232,6 +245,7 @@ PK.Error = new function ()
         throw error;
       }
     }
+    handle_error_calls_--;
   }
 
   this.on_unhandled_error = function (message, file, line)

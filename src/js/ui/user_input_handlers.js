@@ -121,6 +121,15 @@ PKEngine.UserInputHandlers = new function()
           };
         }
 
+        check_integrity_ = function()
+        {
+          return (
+              user_input_provider_.onmousedown
+              && user_input_provider_.onmouseup
+              && user_input_provider_.onmousemove
+            )
+        }
+
         user_input_provider_.onmousedown = PKEngine.UserInputHandlers.on_mouse_down;
         user_input_provider_.onmouseup = PKEngine.UserInputHandlers.on_mouse_up;
         user_input_provider_.onmousemove = PKEngine.UserInputHandlers.on_mouse_move;

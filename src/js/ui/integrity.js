@@ -8,62 +8,46 @@
 
 PKEngine.Integrity = new function()
 {
-  var callback_;
+  var INTEGRITY_CHECK_TIMEOUT_ = 500; // in ms.
 
-  var check_integrity_ = true;
+  var custom_checker_;
+
+  var must_check_integrity_ = true;
+
   var check_integrity_timer_;
-  var platform_type_;
-  var user_input_provider_;
 
   //----------------------------------------------------------------------------
 
-  this.init = function(platform_type, user_input_provider, callback)
+  this.init = function(custom_checker_)
   {
-    platform_type_ = platform_type;
-    user_input_provider_ = user_input_provider;
+    custom_checker_ = custom_checker;
 
-    if (typeof callback == "function")
-    {
-      callback_ = callback;
-    }
+    check_integrity_timer_ = PK.Timer.make();
+
+    check_integrity_timer_.start(INTEGRITY_CHECK_TIMEOUT_);
   }
 
   //----------------------------------------------------------------------------
 
   this.check = function()
   {
-    if (!check_integrity_)
+    if (!must_check_integrity_ || !check_integrity_timer_.is_complete())
       return false;
 
-    if (!check_integrity_timer_)
+    must_check_integrity_ = false;
+
+    if (!PKEngine.UserInputHandlers.check_integrity())
     {
-      check_integrity_timer_ = PK.Timer.make();
-      check_integrity_timer_.start(500);
-    }
-
-    if (!check_integrity_timer_.is_complete())
-      return false;
-
-    if
-      (
-        platform_type_ == PKEngine.Platform.TYPE.IPAD
-        && (
-                !user_input_provider_.ontouchstart
-             || !user_input_provider_.ontouchend
-             || !user_input_provider_.ontouchmove
-           )
-      )
-    {
-       check_integrity_ = false;
-
-       if (typeof callback_ == "function")
-         callback_();
-
        // TODO: localize
-       CRITICAL_ERROR(I18N("Game has wrong state! Click on close button for reloading game!"));
-
-       // NOTE: reinitialize input handlers
-       //PKEngine.UserInputHandlers.init();
+       CRITICAL_ERROR(I18N("Integrity check failed! Click 'close' to reload the game!"));
     }
+
+    if (custom_checker_)
+    {
+      custom_checker_();
+    }
+
+    must_check_integrity_ = true;
+    check_integrity_timer_.start(INTEGRITY_CHECK_TIMEOUT_);
   }
 }

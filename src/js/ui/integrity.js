@@ -18,7 +18,7 @@ PKEngine.Integrity = new function()
 
   //----------------------------------------------------------------------------
 
-  this.init = function(custom_checker_)
+  this.init = function(custom_checker)
   {
     custom_checker_ = custom_checker;
 

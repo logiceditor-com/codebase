@@ -101,8 +101,8 @@ PKEngine.UserInputHandlers = new function()
         {
           return (
               user_input_provider_.ontouchstart
-              || user_input_provider_.ontouchend
-              || user_input_provider_.ontouchmove
+              && user_input_provider_.ontouchend
+              && user_input_provider_.ontouchmove
             )
         }
 

@@ -11,6 +11,8 @@ PKEngine.UserInputHandlers = new function()
   var user_input_provider_;
   var ignore_window_orientation_;
 
+  //----------------------------------------------------------------------------
+
   //  Core thing, should be moved into pk-core-js later
   var prepare_event_ = function(e)
   {
@@ -32,9 +34,6 @@ PKEngine.UserInputHandlers = new function()
 
   //----------------------------------------------------------------------------
 
-  // Must return 'true' if we can process user input now
-  var additional_input_handling_preventor_;
-
   var input_handling_is_enabled_ = function()
   {
     if (!PKEngine.GUI.Viewport.is_ready())
@@ -48,8 +47,6 @@ PKEngine.UserInputHandlers = new function()
 
   //----------------------------------------------------------------------------
 
-  var get_cursor_coords_;
-
   var get_coords_shift_ = function()
   {
     return {
@@ -58,6 +55,19 @@ PKEngine.UserInputHandlers = new function()
     }
   }
 
+  //----------------------------------------------------------------------------
+
+  // Private methods dependent on platform
+
+  var check_integrity_;
+
+  // Must return 'true' if we can process user input now
+  var additional_input_handling_preventor_;
+
+  var get_cursor_coords_;
+
+  //----------------------------------------------------------------------------
+  // PUBLIC
   //----------------------------------------------------------------------------
 
   this.init = function(platform_type, game_field, ignore_window_orientation)
@@ -87,6 +97,15 @@ PKEngine.UserInputHandlers = new function()
           return true
         }
 
+        check_integrity_ = function()
+        {
+          return (
+              user_input_provider_.ontouchstart
+              || user_input_provider_.ontouchend
+              || user_input_provider_.ontouchmove
+            )
+        }
+
         user_input_provider_.ontouchstart = PKEngine.UserInputHandlers.on_mouse_down;
         user_input_provider_.ontouchend = PKEngine.UserInputHandlers.on_mouse_up;
         user_input_provider_.ontouchmove = PKEngine.UserInputHandlers.on_mouse_move;
@@ -106,6 +125,13 @@ PKEngine.UserInputHandlers = new function()
         user_input_provider_.onmouseup = PKEngine.UserInputHandlers.on_mouse_up;
         user_input_provider_.onmousemove = PKEngine.UserInputHandlers.on_mouse_move;
     }
+  }
+
+  //----------------------------------------------------------------------------
+
+  this.check_integrity = function()
+  {
+    return !check_integrity_ || check_integrity_()
   }
 
   //----------------------------------------------------------------------------

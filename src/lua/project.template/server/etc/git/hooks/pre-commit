@@ -1,5 +1,12 @@
 #!/bin/bash
 
+#-------------------------------------------------------------------------------
+# pk-pre-commit: script to check data before committing to git
+# Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+# Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+# pk-pre-commit is distributed under the terms of the MIT/X11 license.
+#-------------------------------------------------------------------------------
+
 # this function is based on the example from
 # http://stackoverflow.com/questions/6119956/how-to-determine-if-git-handles-a-file-as-binary-or-as-text
 # --numstat option of 'git diff' shows number of added and deleted lines in decimal

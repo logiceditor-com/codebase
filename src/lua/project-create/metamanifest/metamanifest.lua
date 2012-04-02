@@ -13,6 +13,9 @@ local escape_lua_pattern =
 --  {table} value - replicate and replace key (process blocks)
 -- "string" value - plain replace key with value (ignore blocks)
 
+-- this version and project metamanifest's version must be same
+version = 2
+
 dictionary =
 {
   PROJECT_NAME = "project-name";
@@ -165,9 +168,6 @@ dictionary.ADMIN_CONFIG =
 
 dictionary.APPLICATION_CONFIG =
   [[--No application settings]]
-
--- this version and project metamanifest's version must be same
-version = 1
 
 -- files and directories that will be ignored on project generation
 ignore_paths =

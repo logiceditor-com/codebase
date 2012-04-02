@@ -307,171 +307,119 @@ local replace_simple_dictionary_in_string = function(
   end
   return string_to_process
 end
-
-local replace_value_with_modificators_in_string = function(
-    string_to_process,
-    value,
-    replacement,
-    data_wrapper,
-    modificator_wrapper,
-    modificators
-  )
-  if is_table(modificators) then
-    for mod, fn in ordered_pairs(modificators) do
-      if is_string(replacement) and is_function(fn) then
-        string_to_process = string_to_process:gsub(
-            data_wrapper.left:gsub("%p", "%%%1")
-         .. value:gsub("%p", "%%%1")
-         .. data_wrapper.right:gsub("%p", "%%%1")
-         .. modificator_wrapper.left:gsub("%p", "%%%1")
-         .. mod:gsub("%p", "%%%1")
-         .. modificator_wrapper.right:gsub("%p", "%%%1"),
-            (fn(replacement):gsub("%%", "%%%1"))
-          )
-      end
-    end
-  end
-  return replace_pattern_in_string(string_to_process, value, replacement, data_wrapper)
-end
-
-local replace_dictionary_with_modificators_in_string = function(
-    string_to_process,
-    dictionary,
-    data_wrapper,
-    modificator_wrapper,
-    modificators
-  )
-  for k, v in ordered_pairs(dictionary) do
-    string_to_process = replace_value_with_modificators_in_string(
-        string_to_process,
-        k,
-        v,
-        data_wrapper,
-        modificator_wrapper,
-        modificators
-      )
-  end
-  return string_to_process
-end
-
-local check_string_has_patterns = function(string_to_process, data_wrapper)
-  local pattern =
-      data_wrapper.left:gsub("%p", "%%%1")
-   .. '[^{}]-'
-   .. data_wrapper.right:gsub("%p", "%%%1")
-  if string_to_process:find(pattern) == nil then
-    return false
-  end
-  return true
-end
-
-local check_string_has_modificators = function(
-    string_to_process,
-    data_wrapper,
-    modificator_wrapper
-  )
-  local pattern =
-      data_wrapper.left:gsub("%p", "%%%1")
-   .. '[^{}]-'
-   .. data_wrapper.right:gsub("%p", "%%%1")
-   .. modificator_wrapper.left:gsub("%p", "%%%1")
-   .. '[^{}]-'
-   .. modificator_wrapper.right:gsub("%p", "%%%1")
-  if string_to_process:find(pattern) == nil then
-    return false
-  end
-  return true
-end
+--------------------------------------------------------------------------------
 
 local replace_value_in_string_using_parent = function(
     string_to_process,
     value,
     manifest,
+    replaces_used,
     data_wrapper,
-    modificator_wrapper,
-    modificators
+    modificators_used
   )
-  local manifest_current = manifest
-  local dictionary_current = manifest_current.dictionary
-  while is_table(dictionary_current) do
-    -- DEBUG_print("\27[33mdictionary_current\27[0m ", tstr(dictionary_current))
-    if dictionary_current[value] then
-      return replace_value_with_modificators_in_string(
-          string_to_process,
-          value,
-          dictionary_current[value],
-          data_wrapper,
-          modificator_wrapper,
-          modificators
-        )
-    end
-    if manifest_current.parent then
-      manifest_current = manifest_current.parent
-      dictionary_current = manifest_current.dictionary
-    else
-      dictionary_current = nil
+  modificators_used = modificators_used or { }
+  replaces_used = replaces_used or { }
+  arguments(
+      "string", string_to_process,
+      "string", value,
+      "table", manifest,
+      "table", replaces_used,
+      "table", data_wrapper,
+      "table", modificators_used
+    )
+  local value_to_use = find_dictionary_data(manifest, value, replaces_used)
+
+  if modificators_used and value_to_use then
+    for i = 1, #modificators_used do
+      value_to_use = modificators_used[i](value_to_use)
     end
   end
+
+  if value_to_use then
+    return replace_pattern_in_string(
+        string_to_process,
+        modificators_used.value or value,
+        value_to_use,
+        data_wrapper
+      )
+   end
   return string_to_process
 end
 
-local replace_dictionary_in_string = function(
-    string_to_process,
-    dictionary,
-    data_wrapper,
-    modificator_wrapper,
-    modificators
-  )
-  if not check_string_has_patterns(string_to_process, data_wrapper) then
-    return string_to_process
-  end
-  if
-    not check_string_has_modificators(
-        string_to_process,
-        data_wrapper,
-        modificator_wrapper
-      )
-  then
-    return replace_simple_dictionary_in_string(
-        string_to_process,
-        dictionary,
-        data_wrapper
-      )
-  end
+--------------------------------------------------------------------------------
 
-  return replace_dictionary_with_modificators_in_string(
-      string_to_process,
-      dictionary,
-      data_wrapper,
-      modificator_wrapper,
-      modificators
+local function parse_modificators(value, wrapper, modificators, modificators_used)
+  modificators_used = modificators_used or { value = value }
+  modificators = modificators or { }
+  arguments(
+      "string", value,
+      "table", wrapper,
+      "table", modificators,
+      "table", modificators_used
     )
+
+  dbg("modificators", modificators)
+  dbg("parsing", value, modificators_used)
+  local wrapper_left_start, wrapper_left_end = value:find(wrapper.left, nil, true)
+  if wrapper_left_end then
+    local val = value:sub(1, wrapper_left_start - 1)
+    if modificators[val] then
+      modificators_used[#modificators_used + 1] = modificators[val]
+    else
+      error("Wrong modificator found: " .. val)
+    end
+    parse_modificators(
+        value:sub(wrapper_left_start + 1),
+        wrapper,
+        modificators,
+        modificators_used
+      )
+  else
+    local wrapper_right_start = value:find(wrapper.right, nil, true)
+    if wrapper_right_start then
+      modificators_used.param = value:sub(1, wrapper_right_start - 1)
+    end
+  end
+  return modificators_used
 end
 
-local replace_dictionary_in_string_using_parent = function(
-    string_to_process,
-    dictionary,
+--------------------------------------------------------------------------------
+
+local replace_dictionary_in_string = function(
     manifest,
+    string_to_process,
     data_wrapper,
     modificator_wrapper,
-    modificators
+    modificators,
+    replaces_used
   )
-  local manifest_current = manifest
-  local dictionary_current = dictionary
-  while is_table(dictionary_current) do
-    string_to_process = replace_dictionary_in_string(
+  replaces_used = replaces_used or { }
+  arguments(
+      "table", manifest,
+      "string", string_to_process,
+      "table", data_wrapper,
+      "table", modificator_wrapper,
+      "table", modificators,
+      "table", replaces_used
+    )
+
+  local values = find_wrapped_values(string_to_process, data_wrapper)
+  if not values then
+    return string_to_process
+  end
+  dbg("found wrapped values:", values)
+  for i = 1, #values do
+    local value = values[i]
+    local modificators_used = parse_modificators(value, modificator_wrapper, modificators)
+    dbg("modificators_used.param", modificators_used.param)
+    string_to_process = replace_value_in_string_using_parent(
         string_to_process,
-        dictionary_current,
+        modificators_used.param or value,
+        manifest,
+        replaces_used,
         data_wrapper,
-        modificator_wrapper,
-        modificators
+        modificators_used
       )
-    if manifest_current.parent then
-      manifest_current = manifest_current.parent
-      dictionary_current = manifest_current.dictionary
-    else
-      dictionary_current = nil
-    end
   end
   return string_to_process
 end
@@ -498,57 +446,51 @@ local function replicate_and_replace_in_file_recursively(
       "number", nested
     )
 
-  local nested = nested or 0
   local replicate_data = tclone(manifest.replicate_data)
   local dictionary = tclone(manifest.dictionary)
   local subdictionary = manifest.subdictionary
+
+  dbg("[" .. nested .. "] ","[replicate_and_replace_in_file_recursively]")
+  dbg("[" .. nested .. "] ","replaces_used:", tstr(replaces_used))
+
   -- replace patterns already fixed for this part of text (or file)
   for k, v in ordered_pairs(replaces_used) do
-    DEBUG_print("[" .. nested .. "] ","replaces_used k, v:",  k, v)
-    if subdictionary[v] then
-
-      file_content = replace_dictionary_in_string(
-          file_content,
-          subdictionary[v].dictionary,
-          wrapper.data,
-          wrapper.modificator,
-          modificators
-        )
-
-      DEBUG_print(
-          "[" .. nested .. "] ",
-          "replace_dictionary_in_string file_content:\n",
-          file_content, "\n"
-        )
-      -- append data of replacement subdictionaries
-      for l, w in ordered_pairs(subdictionary[v].replicate_data) do
-        replicate_data[l] = w
-      end
-      for l, w in ordered_pairs(subdictionary[v].dictionary) do
-        dictionary[l] = w
-        DEBUG_print(
-            "[" .. nested .. "] ",
-            tostring(w) .. " \27[33madded to dictionary as:\27[0m " .. tostring(l)
-          )
-      end
-      for l, w in ordered_pairs(subdictionary[v].subdictionary) do
-        subdictionary[l] = w
-      end
-    end
-    file_content = file_content:gsub(
-        wrapper.data.left .. k .. wrapper.data.right,
-        wrapper.data.left .. v .. wrapper.data.right
+    dbg("[" .. nested .. "] ","replaces_used k, v:",  k, v)
+    file_content = replace_dictionary_in_string(
+        {
+          dictionary =
+          {
+            [k] = find_dictionary_data(
+                manifest.subdictionary[v] or manifest,
+                v,
+                replaces_used
+              );
+          };
+        },
+        file_content,
+        wrapper.data,
+        wrapper.modificator,
+        modificators
       )
   end
 
   local top_level_blocks = find_top_level_blocks(file_content, wrapper.block, replaces_used)
+  dbg("[" .. nested .. "] ","[top_level_blocks]", tpretty(top_level_blocks))
 
   for i = 1, #top_level_blocks do
     local block = top_level_blocks[i]
     local value = block.value
     local text = block.text
-    local value_replicates = find_replicate_data(manifest, value)
+
+    local value_replicates = find_replicate_data(manifest, value, replaces_used)
+
+    -- no replicates found, use dictionary value
+    if value_replicates == nil then
+      value_replicates = { value }
+    end
+
     block.replicas = { }
+    dbg("[" .. nested .. "] ","[value_replicates]", tstr(value_replicates), block.value)
 
     -- "false" value processed here
     if tisempty(value_replicates) then
@@ -557,21 +499,33 @@ local function replicate_and_replace_in_file_recursively(
 
     -- replicated values processed here
     for j = 1, #value_replicates do
-      local current_block_replica = text:gsub(
-          wrapper.data.left:gsub("%p", "%%%1")
-       .. value
-       .. wrapper.data.right:gsub("%p", "%%%1"),
-          wrapper.data.left
-       .. value_replicates[j]
-       .. wrapper.data.right
+      dbg("[" .. nested .. "] ","value_replicates[" .. j .. "]", value_replicates[j])
+      spam("[" .. nested .. "] ","[replication] before", text)
+
+      local current_block_replica =  replace_dictionary_in_string(
+          {
+            dictionary =
+            {
+              [value] = find_dictionary_data(
+                  manifest,
+                  value_replicates[j],
+                  replaces_used
+                );
+            };
+          },
+          text,
+          wrapper.data,
+          wrapper.modificator,
+          modificators
         )
+
+      spam("[" .. nested .. "] ","[replication] after", current_block_replica)
       current_block_replica = replace_value_in_string_using_parent(
           current_block_replica,
           value_replicates[j],
           manifest,
-          wrapper.data,
-          wrapper.modificator,
-          modificators
+          replaces_used,
+          wrapper.data
         )
 
       local submanifest = manifest
@@ -590,11 +544,14 @@ local function replicate_and_replace_in_file_recursively(
           nested + 1
         )
 
+      spam("[" .. nested .. "] ","[cut_wrappers] before", current_block_replica)
       current_block_replica = cut_wrappers(
           current_block_replica,
           wrapper.block,
           value
         )
+      spam("[" .. nested .. "] ","[cut_wrappers] after", current_block_replica)
+
       block.replicas[#block.replicas + 1] = current_block_replica
     end -- for j = 1, #value_replicates do
 
@@ -612,258 +569,310 @@ local function replicate_and_replace_in_file_recursively(
     )
 
   file_content = remove_wrappers(file_content, wrapper.block)
-  file_content = replace_dictionary_in_string_using_parent(
-      file_content,
-      dictionary,
+
+  spam("[" .. nested .. "] ","dictionary", tstr(dictionary))
+  spam("[" .. nested .. "] ","file_content before replace (end)", file_content)
+  file_content = replace_dictionary_in_string(
       manifest,
+      file_content,
       wrapper.data,
       wrapper.modificator,
-      modificators
+      modificators,
+      replaces_used
     )
+  spam("[" .. nested .. "] ","file_content after replace (end)", file_content)
   return file_content
 end
 
 --------------------------------------------------------------------------------
 
-local replicate_and_replace_in_file = function(
-    metamanifest,
-    created_dir_structure,
-    replaces_used,
-    created_path
+local function get_already_used_replaces(
+    fs_structure,
+    replaces
   )
-  local file_content = read_file(created_path)
-  file_content = replicate_and_replace_in_file_recursively(
-      metamanifest,
-      file_content,
-      replaces_used,
-      metamanifest.wrapper,
-      metamanifest.modificators
+  replaces = replaces or { }
+  arguments(
+      "table", fs_structure,
+      "table", replaces
     )
-  file_content = check_trailspaces_newlines(file_content)
-  write_file(created_path, file_content)
+
+  if fs_structure.replaces_used then
+    for k, v in ordered_pairs(fs_structure.replaces_used) do
+      if replaces[k] == nil then
+        replaces[k] = v
+      else
+        dbg("Double replacement found:", fs_structure.replaces_used, "replaces", replaces)
+      end
+    end
+  end
+
+  if fs_structure.parent then
+    return get_already_used_replaces(fs_structure.parent, replaces)
+  else
+    return replaces
+  end
 end
 
 --------------------------------------------------------------------------------
 
-local do_replicate_data
-do
-  local process_pattern_combination
-  do
-  -- TODO: consider more clear subdictionary search,
-  --       best of all try making single subdictionary searching function
-    local function find_replacements_recursively(
-        pattern,
-        replacements,
-        replaces_used,
-        manifest
+local replicate_and_replace_in_file = function(
+    filename,
+    fileinfo,
+    wrapper,
+    modificators
+  )
+  modificators = modificators or empty_table
+  arguments(
+      "string", filename,
+      "table", fileinfo,
+      "table", wrapper,
+      "table", modificators
+    )
+  local file_content = read_file(fileinfo.original_file.path)
+
+  if not (does_file_exist(fileinfo.path) and fileinfo.do_not_replace) then
+    file_content = replicate_and_replace_in_file_recursively(
+        fileinfo.manifest_local,
+        file_content,
+        get_already_used_replaces(fileinfo, fileinfo.replaces_used),
+        wrapper,
+        modificators
       )
-      for k, v in ordered_pairs(replaces_used) do
-        if manifest.subdictionary[v] then
-          if
-            manifest.subdictionary[v].replicate_data
-            and manifest.subdictionary[v].replicate_data[pattern]
-          then
-            replacements = manifest.subdictionary[v].replicate_data[pattern]
-          -- TODO: this is spagetti code, consider reworking it
-          elseif manifest.subdictionary[v].dictionary[pattern] == false then
-            replacements = false
-          end
-          replacements = find_replacements_recursively(
-              pattern,
-              replacements,
-              replaces_used,
-              manifest.subdictionary[v]
-            )
-        end
+    create_path_to_file(fileinfo.path)
+    write_file(fileinfo.path, check_trailspaces_newlines(file_content))
+  else
+    dbg(fileinfo.path, "marked as ignored")
+  end
+end
+
+--------------------------------------------------------------------------------
+
+local create_replicated_entries = function(
+    filename,
+    fileinfo,
+    manifest,
+    fs_structure,
+    wrapper
+  )
+  arguments(
+      "string", filename,
+      "table", fileinfo,
+      "table", manifest,
+      "table", fs_structure,
+      "table", wrapper
+    )
+
+  local values = find_wrapped_values(filename, wrapper) or empty_table
+
+  local replaces = { }
+  local used_replaces = get_already_used_replaces(fs_structure)
+
+  local local_used_replaces = { }
+  for i = 1, #values do
+    local value = values[i]
+    dbg("[c_r_e] value:",  value)
+    if used_replaces[value] then
+       dbg("[c_r_e] used_replaces:",  value, used_replaces[value])
+      local_used_replaces[value] = used_replaces[value]
+    else
+      replaces[value] = find_replicate_data(manifest, value)
+      dbg("[c_r_e] replaces[value]:",  value, replaces[value])
+      -- processing false in dictionary
+      if is_table(replaces[value]) and tisempty(replaces[value]) then
+        return { }
       end
-      return replacements
     end
-
-    process_pattern_combination = function(pattern, filenames, metamanifest)
-      local new_filenames = { }
-      for i = 1, #filenames do
-        local replacements = { }
-        if filenames[i].replaces_used[pattern] ~= nil then
-          replacements[1] = filenames[i].replaces_used[pattern]
-        else
-          replacements = find_replacements_recursively(
-              pattern,
-              replacements,
-              filenames[i].replaces_used,
-              metamanifest
-            )
-          if replacements and #replacements == 0 then
-            replacements = metamanifest.replicate_data[pattern]
-          elseif replacements == false then
-            replacements = { }
-          end
-        end
-
-        for j = 1, #replacements do
-          local replaces_used = tclone(filenames[i].replaces_used)
-          replaces_used[pattern] = replacements[j]
-          new_filenames[#new_filenames + 1] =
-            {
-              filename = filenames[i].filename:gsub(pattern, replacements[j]);
-              replaces_used = replaces_used;
-            }
-        end
-      end
-      return new_filenames
+    if not replaces[value] and not used_replaces[value] then
+      filename = filename:gsub(
+          escape_lua_pattern(wrapper.left .. value .. wrapper.right),
+          assert(find_dictionary_data(manifest, value))
+        );
     end
   end
+  dbg("[c_r_e] filename:", filename)
 
-
-  local process_pattern_combinations = function(patterns, filenames, metamanifest)
-    local new_filenames = filenames
-    while #patterns > 0 do
-      local pattern = table.remove(patterns)
-      new_filenames = process_pattern_combination(
-          pattern,
-          new_filenames,
-          metamanifest
-        )
+  -- replace patterns already fixed for this part of text (or file)
+  local replicas = { }
+  for k, v in ordered_pairs(local_used_replaces) do
+    dbg("[c_r_e] replaces_used k, v:",  k, v)
+    if tisempty(replicas) then
+      replicas[#replicas + 1] =
+      {
+        filename = filename:gsub(
+            escape_lua_pattern(wrapper.left .. k .. wrapper.right),
+            find_dictionary_data(manifest, v)
+          );
+        replaces_used = { }; --[k] = v };
+        original_file = fileinfo;
+        manifest = manifest;
+      }
+    else
+      for j = 1, #replicas do
+        replicas[j].filename = replicas[j].filename:gsub(
+            escape_lua_pattern(wrapper.left .. k .. wrapper.right),
+            find_dictionary_data(manifest, v)
+          );
+      end
     end
-    return new_filenames
   end
+  dbg("[c_r_e] filename (2):", filename)
 
-  local process_replication_recursively
-  do
-    local process_curr_path = function(
-        attr,
-        created_path,
-        filepath,
-        replaces_used,
-        metamanifest,
-        file_dir_structure,
-        created_dir_structure
-      )
-      if attr.mode == "directory" then
-        create_path_to_file(created_path .. "/.")
-        -- TODO: sanity check must work
-        -- assert(file_dir_structure.FLAGS.FILE == nil, "dir structure sanity check")
-        process_replication_recursively(
-           {
-             existed_path = filepath,
-             created_path = created_path,
-             existed_structure = file_dir_structure,
-             created_structure = created_dir_structure,
-             replaces_used = replaces_used
-           },
-           metamanifest
-         )
+  for i = 1, #values do
+    local value = values[i]
+    if replaces[value] then
+      if tisempty(replicas) then
+        for j = 1, #replaces[value] do
+          replicas[#replicas + 1] =
+          {
+            filename = filename:gsub(
+                escape_lua_pattern(wrapper.left .. value .. wrapper.right),
+                find_dictionary_data(
+                    manifest.subdictionary[replaces[value][j]] or manifest,
+                    replaces[value][j]
+                  )
+              );
+            replaces_used = { [value] = replaces[value][j] };
+            original_file = fileinfo;
+            manifest = manifest.subdictionary[replaces[value][j]] or manifest;
+          }
+        end
       else
-        if filepath ~= created_path then
-          copy_file_force(filepath, created_path)
+        local new_replicas = { }
+        for j = 1, #replaces[value] do
+          for k = 1, #replicas do
+            local replaces_used = tclone(replicas[k].replaces_used)
+            replaces_used[value] = replaces[value][j]
+            local val = find_dictionary_data(manifest, replaces[value][j])
+            new_replicas[#new_replicas + 1] =
+            {
+              filename = replicas[k].filename:gsub(
+                  escape_lua_pattern(wrapper.left .. value .. wrapper.right),
+                  find_dictionary_data(
+                      replicas[k].manifest or
+                      (manifest.subdictionary[replaces[value][j]] or manifest),
+                      replaces[value][j]
+                    )
+                );
+              replaces_used = replaces_used;
+              original_file = fileinfo;
+              manifest =
+                (replicas[k].manifest or
+                (manifest.subdictionary[replaces[value][j]] or manifest));
+            }
+          end
         end
-        replicate_and_replace_in_file(
-            metamanifest,
-            created_dir_structure,
-            replaces_used,
-            created_path
+        replicas = new_replicas
+      end
+    end
+  end
+  dbg("[c_r_e] filename end:", filename)
+
+  if
+    tisempty(values) or
+    (values and tisempty(replicas))
+  then
+    return
+    {
+      {
+        filename = filename;
+        replaces_used = { };
+        original_file = fileinfo;
+        manifest = manifest;
+      }
+    }
+  end
+
+  if
+    values and tisempty(replaces) and tisempty(local_used_replaces)
+  then
+    return { }
+  end
+
+  return replicas
+end
+
+--------------------------------------------------------------------------------
+
+local function create_replicated_structure(
+    curr_fs_struct,
+    curr_manifest,
+    curr_fs_struct_replicated,
+    curr_path,
+    wrapper
+  )
+  curr_fs_struct_replicated = curr_fs_struct_replicated or
+  {
+    path = "";
+    type = "directory";
+    contained = { };
+    do_not_replace = false;
+  }
+  curr_path = curr_path or curr_manifest.project_path
+  wrapper = wrapper or curr_manifest.wrapper.fs
+  arguments(
+      "table", curr_fs_struct,
+      "table", curr_manifest,
+      "table", curr_fs_struct_replicated,
+      "table", wrapper
+    )
+
+  for k, v in ordered_pairs(curr_fs_struct.contained) do
+    dbg("----------------------------------------------")
+    dbg("starting to process file: ", k)
+    local new_entries = create_replicated_entries(
+        k,
+        v,
+        curr_manifest,
+        curr_fs_struct_replicated,
+        wrapper
+      )
+
+    for i = 1, #new_entries do
+      local entry = new_entries[i]
+      dbg("going for entry", entry.filename)
+      local path = curr_path .. "/" .. entry.filename
+      curr_fs_struct_replicated.contained[entry.filename] =
+      {
+        path = path;
+        parent = curr_fs_struct_replicated;
+        type = v.type;
+        contained = { };
+        do_not_replace = v.do_not_replace;
+        replaces_used = entry.replaces_used;
+        original_file = entry.original_file;
+        manifest_local = entry.manifest;
+      }
+      if v.type == "directory" then
+        create_replicated_structure(
+            v,
+            entry.manifest,
+            curr_fs_struct_replicated.contained[entry.filename],
+            path,
+            wrapper
           )
       end
     end
+  end
 
-    process_replication_recursively = function(
-        path_data,
-        metamanifest
-      )
-      for filename, structure in pairs(path_data.existed_structure) do
-        if filename ~= "FLAGS" then
-          local filepath = path_data.existed_path .. "/" .. filename
-          local attr = lfs.attributes(filepath)
-          DEBUG_print(
-              "\27[37mProcess: "
-           .. filepath:sub(#metamanifest.project_path + 2)
-           .. " (" .. attr.mode .. ")\27[0m")
-          local pattern_used = get_replacement_pattern(
-              filename,
-              metamanifest,
-              path_data.replaces_used
-            )
- 
-          -- filename have patterns to replicate
-          if #pattern_used > 0 then
-            local pattern_combinations = process_pattern_combinations(
-                pattern_used,
-                {
-                  {
-                    filename = filename;
-                    replaces_used = path_data.replaces_used;
-                  };
-                },
-                metamanifest
-              )
-            for i = 1, #pattern_combinations do
-              -- create paths
-              local created_path =
-                path_data.created_path .. "/" .. pattern_combinations[i].filename
-              local replaces_used = tclone(pattern_combinations[i].replaces_used)
-              path_data.created_structure = add_to_directory_structure(
-                  pattern_combinations[i].filename,
-                  path_data.created_structure
-                )
-              local structure_new = path_data.created_structure[pattern_combinations[i].filename]
-              structure_new.FLAGS["replaces_used"] = replaces_used
-              -- recursion hided here
-              process_curr_path(
-                  attr,
-                  created_path,
-                  filepath,
-                  replaces_used,
-                  metamanifest,
-                  structure,
-                  structure_new
-                )
-            end
- 
-          -- filename has no patterns to replicate
-          else
-            local created_path = path_data.created_path .. "/" .. filename
-            local replaces_used = tclone(path_data.replaces_used)
- 
-            path_data.created_structure = add_to_directory_structure(
-                filename,
-                path_data.created_structure
-              )
-            local structure_new = path_data.created_structure[filename]
-            structure_new.FLAGS["replaces_used"] = replaces_used
-            -- recursion hided here
-            process_curr_path(
-                  attr,
-                  created_path,
-                  filepath,
-                  replaces_used,
-                  metamanifest,
-                  structure,
-                  structure_new
-              )
-          end
-        end -- if filename ~= "FLAGS"
-      end -- filename, structure in pairs(file_dir_structure) do
-      return path_data.created_structure
-    end -- process_replication_recursively
-  end -- do
+  return curr_fs_struct_replicated
+end
 
-  do_replicate_data = function(
-      metamanifest,
-      file_dir_structure,
-      debug
+--------------------------------------------------------------------------------
+
+local function process_replicated_structure(fs_struct, metamanifest)
+  arguments(
+      "table", fs_struct,
+      "table", metamanifest
     )
-    debug_value = debug or false
+  local wrapper = metamanifest.wrapper or { }
+  local modificators = metamanifest.modificators or { }
 
-    -- no dictionary replacements
-    return process_replication_recursively(
-        {
-          existed_path = metamanifest.project_path,
-          created_path = metamanifest.project_path,
-          existed_structure = file_dir_structure,
-          created_structure = { ["FLAGS"] = { } },
-          replaces_used = { }
-        },
-        prepare_manifest(metamanifest)
-      )
+  for k, v in ordered_pairs(fs_struct.contained) do
+    if v.type == "directory" then
+      process_replicated_structure(v, metamanifest)
+    else
+      replicate_and_replace_in_file(k, v, wrapper, modificators)
+    end
   end
 end
 
@@ -871,8 +880,7 @@ end
 
 return
 {
-  do_replicate_data = do_replicate_data;
-  make_plain_dictionary = make_plain_dictionary;
-  prepare_manifest = prepare_manifest;
+  create_replicated_structure = create_replicated_structure;
+  process_replicated_structure = process_replicated_structure;
   replicate_and_replace_in_file_recursively = replicate_and_replace_in_file_recursively;
 }

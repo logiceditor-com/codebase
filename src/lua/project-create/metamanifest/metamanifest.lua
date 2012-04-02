@@ -182,7 +182,7 @@ wrapper =
   -- default eg. #{PROJECT_NAME}
   data  =    { left = "#{"; right = "}"; };
   -- data with procedure eg. #{PROJECT_NAME}:{ESCAPE}
-  modificator = { left = ":{"; right = "}"; };
+  modificator = { left = "("; right = ")"; };
   -- how blocks to be replicated must be wrapped in text
   block =
   {

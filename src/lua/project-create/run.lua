@@ -60,15 +60,16 @@ local tgetpath,
         'tset',
         'tiflip'
       }
+
 local ordered_pairs
       = import 'lua-nucleo/tdeepequals.lua'
       {
         'ordered_pairs'
       }
+
 local load_all_files,
       write_file,
       read_file,
-      create_path_to_file,
       find_all_files,
       is_directory,
       does_file_exist,
@@ -80,7 +81,6 @@ local load_all_files,
         'load_all_files',
         'write_file',
         'read_file',
-        'create_path_to_file',
         'find_all_files',
         'is_directory',
         'does_file_exist',
@@ -145,26 +145,14 @@ local tstr
         'tstr'
       }
 
-local copy_file_force,
-      check_path_ignored,
-      get_dictionary_pattern,
-      break_path,
-      add_to_directory_structure,
-      process_dictionary_recursively,
-      get_replacement_pattern,
-      unify_manifest_dictionary,
-      create_directory_structure
+local unify_manifest_dictionary,
+      get_template_paths,
+      prepare_manifest
       = import 'pk-project-create/common_functions.lua'
       {
-        'copy_file_force',
-        'check_path_ignored',
-        'get_dictionary_pattern',
-        'break_path',
-        'add_to_directory_structure',
-        'process_dictionary_recursively',
-        'get_replacement_pattern',
         'unify_manifest_dictionary',
-        'create_directory_structure',
+        'get_template_paths',
+        'prepare_manifest'
       }
 
 local create_replicated_structure,
@@ -175,16 +163,10 @@ local create_replicated_structure,
         'process_replicated_structure'
       }
 
-local copy_files_from_templates,
-      clean_up_replicate_data_recursively,
-      clean_up_generated_data_recursively,
-      fill_placeholders_in_template
+local create_template_fs_structure
       = import 'pk-project-create/copy_files.lua'
       {
-        'copy_files_from_templates',
-        'clean_up_replicate_data_recursively',
-        'clean_up_generated_data_recursively',
-        'fill_placeholders_in_template'
+        'create_template_fs_structure'
       }
 
 --------------------------------------------------------------------------------
@@ -204,39 +186,6 @@ local CONFIG, ARGS
 
 local create_project
 do
-
-  local process_ignored_paths = function(metamanifest)
-    local ignored = tset(metamanifest.ignore_paths)
-    for ignore, _ in ordered_pairs(ignored) do
-      for k, v in ordered_pairs(metamanifest.dictionary) do
-        if is_table(v) then
-          for j = 1, #v do
-            if not ignored[ignore:gsub(k:gsub("%p", "%%%1"), v[j])] then
-              ignored[ignore:gsub(k:gsub("%p", "%%%1"), v[j])] = true
-              ignored[ignore] = nil
-            end
-          end
-        elseif v == false then
-          if not ignored[ignore:gsub(k:gsub("%p", "%%%1"), "")] then
-            ignored[ignore] = nil
-          end
-        elseif v == true then -- TODO: HACK!
-          -- ignore
-        else
-          if not ignored[ignore:gsub(k:gsub("%p", "%%%1"), v)] then
-            ignored[ignore:gsub(k:gsub("%p", "%%%1"), v)] = true
-            ignored[ignore] = nil
-          end
-        end
-      end
-    end
-    metamanifest.ignore_paths = ignored
-    DEBUG_print("\27[32mmetamanifest.ignored\27[0m: \n " .. tpretty(metamanifest.ignore_paths))
-    return metamanifest
-  end
-
-  ------------------------------------------------------------------------------
-
   create_project = function(
       metamanifest_path,
       project_path,

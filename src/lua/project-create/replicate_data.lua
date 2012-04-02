@@ -48,7 +48,8 @@ local tgetpath,
       twithdefaults,
       tset,
       tiflip,
-      tisempty
+      tisempty,
+      empty_table
       = import 'lua-nucleo/table-utils.lua'
       {
         'tgetpath',
@@ -56,7 +57,8 @@ local tgetpath,
         'twithdefaults',
         'tset',
         'tiflip',
-        'tisempty'
+        'tisempty',
+        'empty_table'
       }
 
 local ordered_pairs
@@ -115,10 +117,12 @@ local shell_read,
         'shell_exec'
       }
 
-local split_by_char
+local split_by_char,
+      escape_lua_pattern
       = import 'lua-nucleo/string.lua'
       {
-        'split_by_char'
+        'split_by_char',
+        'escape_lua_pattern'
       }
 
 local tpretty
@@ -163,16 +167,15 @@ local copy_file_force,
 
 --------------------------------------------------------------------------------
 
-local debug_value
-
-local DEBUG_print = function(...)
-  if debug_value ~= false then -- ~= false then
-    print(...)
-  end
-end
 
 --------------------------------------------------------------------------------
 
+local remove_false_block = function(manifest, string_to_process, wrapper)
+  arguments(
+      "table", manifest,
+      "string", string_to_process,
+      "table", wrapper
+    )
 local function make_plain_dictionary(dictionary, parent)
   local parent = parent or nil
   local replicate_data = { }
@@ -237,12 +240,11 @@ end
 
 --------------------------------------------------------------------------------
 
-local remove_false_block = function(manifest, string_to_process, block)
   local dictionary = manifest.dictionary
   for k, v in ordered_pairs(dictionary) do
     if v == false then
       --find block
-      local string_to_find = get_wrapped_string(k, block)
+      local string_to_find = get_wrapped_string(k, wrapper)
       local blocks = {}
       for w in string_to_process:gmatch(string_to_find) do
         blocks[#blocks + 1] = w
@@ -259,10 +261,14 @@ local remove_false_block = function(manifest, string_to_process, block)
   return string_to_process
 end
 
+--------------------------------------------------------------------------------
+
 -- TODO: move to lua-nucleo #3736
 local check_trailspaces_newlines = function(file_content)
   return file_content:gsub("[ \t]*\n", "\n"):gsub("\n\n[\n]+", "\n"):gsub("\n\n$", "\n")
 end
+
+--------------------------------------------------------------------------------
 
 local replace_pattern_in_string = function(
     string_to_process,
@@ -270,29 +276,22 @@ local replace_pattern_in_string = function(
     value,
     data_wrapper
   )
+
   if is_string(value) then
     return string_to_process:gsub(
-        data_wrapper.left:gsub("%p", "%%%1")
-     .. key:gsub("%p", "%%%1")
-     .. data_wrapper.right:gsub("%p", "%%%1"),
+        escape_lua_pattern(data_wrapper.left .. key .. data_wrapper.right),
         (value:gsub("%%", "%%%1"))
       )
   elseif value == false then
     -- Remove all strings with pattern that == false
     return string_to_process:gsub(
         "\n[.]*"
-     .. data_wrapper.left:gsub("%p", "%%%1")
-     .. key:gsub("%p", "%%%1")
-     .. data_wrapper.right:gsub("%p", "%%%1")
+     .. escape_lua_pattern(data_wrapper.left .. key .. data_wrapper.right)
      .. "[.]*\n",
         "\n"
       )
   else
-    log_error(
-        value,
-        " is not string or false in manifest dictionary for",
-        key
-      )
+    log_error(value, "is not string or false in manifest dictionary for", key)
     error("manifest dictionary has not string or false value")
   end
 end
@@ -477,6 +476,8 @@ local replace_dictionary_in_string_using_parent = function(
   return string_to_process
 end
 
+--------------------------------------------------------------------------------
+
 local function replicate_and_replace_in_file_recursively(
       manifest,
       file_content,
@@ -485,12 +486,22 @@ local function replicate_and_replace_in_file_recursively(
       modificators,
       nested
     )
+  replaces_used = replaces_used or { }
+  modificators = modificators or { }
+  nested = nested or 0
+  arguments(
+      "table", manifest,
+      "string", file_content,
+      "table", replaces_used,
+      "table", wrapper,
+      "table", modificators,
+      "number", nested
+    )
 
   local nested = nested or 0
   local replicate_data = tclone(manifest.replicate_data)
   local dictionary = tclone(manifest.dictionary)
   local subdictionary = manifest.subdictionary
-  DEBUG_print("[" .. nested .. "] ","\27[33mRaRiFR\27[0m ")
   -- replace patterns already fixed for this part of text (or file)
   for k, v in ordered_pairs(replaces_used) do
     DEBUG_print("[" .. nested .. "] ","replaces_used k, v:",  k, v)
@@ -743,10 +754,6 @@ do
          )
       else
         if filepath ~= created_path then
-          DEBUG_print(
-              "\27[32mCopy to:\27[0m "
-           .. created_path:sub(#metamanifest.project_path + 2)
-            )
           copy_file_force(filepath, created_path)
         end
         replicate_and_replace_in_file(
@@ -859,6 +866,8 @@ do
       )
   end
 end
+
+--------------------------------------------------------------------------------
 
 return
 {

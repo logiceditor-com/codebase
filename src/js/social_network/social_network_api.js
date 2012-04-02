@@ -497,12 +497,12 @@ PKEngine.SocialNetAPIImpl.VK_External = new function()
 
     // NOTE: read hash params from vk.com
     var vk_hash_ = window.location.hash.substring(1)
-    console.log('[PKEngine.SocialNetAPIImpl.VK_External.init] hash params from vk.com', vk_hash_)
+    //console.log('[PKEngine.SocialNetAPIImpl.VK_External.init] hash params from vk.com', vk_hash_)
 
     if (vk_hash_)
     {
       var params_array_ = vk_hash_.split('&')
-      console.log('[PKEngine.SocialNetAPIImpl.VK_External.init] hash params array from vk.com', params_array_)
+      //console.log('[PKEngine.SocialNetAPIImpl.VK_External.init] hash params array from vk.com', params_array_)
 
       if (params_array_.length > 0)
       {
@@ -515,11 +515,11 @@ PKEngine.SocialNetAPIImpl.VK_External = new function()
             {
               case 'access_token':
                 access_token_ = param[1]
-                console.log('[PKEngine.SocialNetAPIImpl.VK_External.init] access_token', access_token_)
+                //console.log('[PKEngine.SocialNetAPIImpl.VK_External.init] access_token', access_token_)
                 break;
               case 'user_id':
                 uid_ = param[1]
-                console.log('[PKEngine.SocialNetAPIImpl.VK_External.init] user_id', uid_)
+                //console.log('[PKEngine.SocialNetAPIImpl.VK_External.init] user_id', uid_)
                 break;
             }
           }

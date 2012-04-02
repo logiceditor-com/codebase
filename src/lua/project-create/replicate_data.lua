@@ -70,7 +70,6 @@ local ordered_pairs
 local load_all_files,
       write_file,
       read_file,
-      create_path_to_file,
       find_all_files,
       is_directory,
       does_file_exist,
@@ -82,7 +81,6 @@ local load_all_files,
         'load_all_files',
         'write_file',
         'read_file',
-        'create_path_to_file',
         'find_all_files',
         'is_directory',
         'does_file_exist',
@@ -137,36 +135,29 @@ local tstr
         'tstr'
       }
 
-local copy_file_force,
-      check_path_ignored,
-      get_dictionary_pattern,
-      break_path,
-      add_to_directory_structure,
-      process_dictionary_recursively,
-      get_replacement_pattern,
-      find_top_level_blocks,
+local find_top_level_blocks,
       find_replicate_data,
+      find_dictionary_data,
       get_wrapped_string,
       cut_wrappers,
-      remove_wrappers
+      remove_wrappers,
+      find_wrapped_values
       = import 'pk-project-create/common_functions.lua'
       {
-        'copy_file_force',
-        'check_path_ignored',
-        'get_dictionary_pattern',
-        'break_path',
-        'add_to_directory_structure',
-        'process_dictionary_recursively',
-        'get_replacement_pattern',
         'find_top_level_blocks',
         'find_replicate_data',
+        'find_dictionary_data',
         'get_wrapped_string',
         'cut_wrappers',
-        'remove_wrappers'
+        'remove_wrappers',
+        'find_wrapped_values'
       }
 
 --------------------------------------------------------------------------------
 
+-- TODO: until manual log level will be available #3775
+dbg = function() end
+spam = function() end
 
 --------------------------------------------------------------------------------
 
@@ -176,70 +167,6 @@ local remove_false_block = function(manifest, string_to_process, wrapper)
       "string", string_to_process,
       "table", wrapper
     )
-local function make_plain_dictionary(dictionary, parent)
-  local parent = parent or nil
-  local replicate_data = { }
-  local processed = { }
-  local subdictionary = { }
-
-  for k, v in ordered_pairs(dictionary) do
-    if is_table(v) then
-      replicate_data[#replicate_data + 1] = k
-    elseif v == false then
-      DEBUG_print(k .. " - \27[32mfalse\27[0m : going to make empty")
-      replicate_data[#replicate_data + 1] = k
-    end
-  end
-
-  for i = 1, #replicate_data do
-    DEBUG_print("Going through replicate data:", replicate_data[i])
-    local data = replicate_data[i]
-    local replicate = dictionary[data]
-    DEBUG_print("replicate", replicate_data[i])
-    replicate_data[data] = { }
-    if is_table(replicate) then
-      for j = 1, #replicate do
-        local name = data:sub(1, -2) .. "_" .. string.format("%03d", j)
-        dictionary[name] = replicate[j]
-        replicate_data[data][j] = name
-        subdictionary[name] = replicate[replicate[j]]
-        if is_table(subdictionary[name]) then
-          subdictionary[name] = make_plain_dictionary(subdictionary[name], dictionary)
-        end
-      end
-      processed[data] = tclone(dictionary[data])
-    end
-    dictionary[data] = nil
-    replicate_data[i] = nil
-  end
-  local result =
-  {
-    dictionary = dictionary;
-    replicate_data = replicate_data;
-    processed = processed;
-    subdictionary = subdictionary;
-  }
-  -- so we can always reach parent table from subtable,
-  -- though this makes our dictionary data structure heavily recursive
-  for k, v in ordered_pairs(subdictionary) do
-    subdictionary[k].parent = result
-  end
-  return result
-end
-
---------------------------------------------------------------------------------
-
-local prepare_manifest = function(metamanifest)
-  local metamanifest_plain = make_plain_dictionary(metamanifest.dictionary)
-  metamanifest.dictionary = metamanifest_plain.dictionary
-  metamanifest.replicate_data = metamanifest_plain.replicate_data
-  metamanifest.processed = metamanifest_plain.processed
-  metamanifest.subdictionary = metamanifest_plain.subdictionary
-  return metamanifest
-end
-
---------------------------------------------------------------------------------
-
   local dictionary = manifest.dictionary
   for k, v in ordered_pairs(dictionary) do
     if v == false then
@@ -296,17 +223,6 @@ local replace_pattern_in_string = function(
   end
 end
 
-local replace_simple_dictionary_in_string = function(
-    string_to_process,
-    dictionary,
-    data_wrapper
-  )
-  for k, v in ordered_pairs(dictionary) do
-    string_to_process =
-      replace_pattern_in_string(string_to_process, k, v, data_wrapper)
-  end
-  return string_to_process
-end
 --------------------------------------------------------------------------------
 
 local replace_value_in_string_using_parent = function(

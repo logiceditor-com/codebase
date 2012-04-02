@@ -61,6 +61,12 @@ local ordered_pairs
         'ordered_pairs'
       }
 
+local load_project_manifest
+      = import 'pk-tools/project_manifest.lua'
+      {
+        'load_project_manifest'
+      }
+
 local split_by_char,
       escape_lua_pattern
       = import 'lua-nucleo/string.lua'
@@ -72,7 +78,6 @@ local split_by_char,
 local load_all_files,
       write_file,
       read_file,
-      create_path_to_file,
       find_all_files,
       is_directory,
       does_file_exist,
@@ -84,7 +89,6 @@ local load_all_files,
         'load_all_files',
         'write_file',
         'read_file',
-        'create_path_to_file',
         'find_all_files',
         'is_directory',
         'does_file_exist',
@@ -93,188 +97,18 @@ local load_all_files,
         'create_path_to_file'
       }
 
-local copy_file_with_flag,
-      copy_file,
-      remove_file,
-      remove_recursively
-      = import 'lua-aplicado/shell/filesystem.lua'
-      {
-        'copy_file_with_flag',
-        'copy_file',
-        'remove_file',
-        'remove_recursively'
-      }
-
-local shell_read,
-      shell_exec
-      = import 'lua-aplicado/shell.lua'
-      {
-        'shell_read',
-        'shell_exec'
-      }
-
 --------------------------------------------------------------------------------
 
-local copy_file_force  = function(path_from, path_to)
-  arguments(
-      "string", path_from,
-      "string", path_to
-    )
-  create_path_to_file(path_to)
-  copy_file_with_flag(path_from, path_to, "-f")
-  return true
-end
-
---------------------------------------------------------------------------------
-
-local check_path_ignored = function(short_path, ignore_paths)
-  ignore_paths = ignore_paths or empty_table
-  arguments(
-      "string", short_path,
-      "table", ignore_paths
-    )
-  for k, v in ordered_pairs(ignore_paths) do
-    -- if beginning of the path matches ignore path - it is ignored
-    if ignore_paths[short_path:sub(0, #k)] then
-      return true
-    end
-  end
-  return false
-end
-
---------------------------------------------------------------------------------
-
-local get_dictionary_pattern = function(filename, metamanifest)
-  arguments(
-      "string", filename,
-      "table", metamanifest
-    )
-  local pattern = { }
-  for k, _ in ordered_pairs(metamanifest.dictionary) do
-    if filename:find(k, nil, true) then
-      pattern[#pattern + 1] = k
-    end
-  end
-  return pattern
-end
-
---------------------------------------------------------------------------------
-
-local break_path = function(path)
-  arguments(
-      "string", path
-    )
-  local file_dir_list = { }
-  -- TODO: Check if more symbols needed in regexp!!!
-  for w in path:gmatch("/[%w%._%-]+") do
-    file_dir_list[#file_dir_list + 1] = w:sub(2)
-  end
-  return file_dir_list
-end
-
---------------------------------------------------------------------------------
-
-local add_to_directory_structure = function(new_file, dir_struct)
-  arguments(
-      "string", new_file,
-      "table", dir_struct
-    )
-  local file_dir_list = { }
-  file_dir_list = break_path(new_file)
-  local dir_struct_curr = dir_struct or { }
-  for j = 1, #file_dir_list do
-    if not dir_struct_curr[file_dir_list[j]] then
-      dir_struct_curr[file_dir_list[j]] = { ["FLAGS"] = { } }
-    end
-    dir_struct_curr.FLAGS = dir_struct_curr.FLAGS or { }
-    dir_struct_curr.FLAGS["FILE"] = nil
-    dir_struct_curr = dir_struct_curr[file_dir_list[j]]
-  end
-  dir_struct_curr.FLAGS["FILE"] = true
-  return dir_struct
-end
-
---------------------------------------------------------------------------------
-
-local function process_dictionary_recursively(manifest, replaces, return_val, fn, ...)
-  for k, v in ordered_pairs(replaces) do
-    if manifest.subdictionary[v] then
-      return_val = process_dictionary_recursively(
-          manifest.subdictionary[v],
-          replaces,
-          return_val,
-          fn,
-          ...
-        )
-    end
-  end
-  return fn(manifest, return_val, ...)
-end
-
---------------------------------------------------------------------------------
-
--- TODO: move to lua-nucleo #3736
-local tifindvalue_nonrecursive = function(pattern, k)
-  for i = 1, #pattern do
-    if pattern[i] == k then
-      return true
-    end
-  end
-  return false
-end
-
---------------------------------------------------------------------------------
--- search dictionary and all used replaces subdictionaries for pattern match
-
-local get_replacement_pattern
-do
-
-  -- TODO: consider more clear subdictionary search,
-  --       best of all try making single subdictionary searching function
-  local function find_patterns_recursively(
-      pattern,
-      replaces_used,
-      manifest,
-      filename
-    )
-    for k, v in ordered_pairs(replaces_used) do
-      if manifest.subdictionary[v] then
-        for k, _ in ordered_pairs(manifest.subdictionary[v].replicate_data) do
-          if filename:find(k, nil, true) and not tifindvalue_nonrecursive(pattern, k) then
-            pattern[#pattern + 1] = k
-          end
-        end
-        pattern = find_patterns_recursively(
-            pattern,
-            replaces_used,
-            manifest.subdictionary[v],
-            filename
-          )
-      end
-    end
-    return pattern
-  end
-
-  get_replacement_pattern = function(filename, metamanifest, replaces_used)
-    replaces_used = replaces_used or empty_table
-    local pattern = { }
-    for k, _ in ordered_pairs(metamanifest.replicate_data) do
-      if filename:find(k, nil, true) then
-        pattern[#pattern + 1] = k
-      end
-    end
-    return find_patterns_recursively(
-        pattern,
-        replaces_used,
-        metamanifest,
-        filename
-      )
-  end
-end
+-- TODO: until manual log level will be available #3775
+dbg = function() end
+spam = function() end
 
 --------------------------------------------------------------------------------
 
 local function unify_manifest_dictionary(dictionary)
+  arguments(
+      "table", dictionary
+    )
   for k, v in ordered_pairs(dictionary) do
     if is_table(v) then
       --check all values where key is number
@@ -297,33 +131,74 @@ local function unify_manifest_dictionary(dictionary)
       end
       v = unify_manifest_dictionary(v)
     end
-  end --for
+  end
   return dictionary
 end
 
 --------------------------------------------------------------------------------
 
-local find_data_using_parents = function(manifest, table_name, key)
+local find_data_using_parents = function(manifest, table_name, key, replaces_used)
+  arguments(
+      "table", manifest,
+      "string", table_name,
+      "string", key
+    )
+  optional_arguments(
+      "table", replaces_used
+    )
   local check_level = manifest
 
-  while check_level[table_name][key] == nil do
-    if check_level.parent then
+  local found = false
+  while not found do
+    if replaces_used then
+      for k, v in ordered_pairs(replaces_used) do
+        local value = tgetpath(check_level, "subdictionary", v, table_name, key)
+        if value then
+          return value
+        end
+      end
+    end
+
+    if tgetpath(check_level, table_name, key) then
+      found = true
+    elseif check_level.parent then
       check_level = check_level.parent
     else
       break
     end
   end
 
-  if check_level[table_name][key] == nil then
+  local value = tgetpath(check_level, table_name, key)
+  if not value then
+    dbg("WARNING!", key, "not found in table up to root")
     return nil, key .. " not found in table up to root"
   end
-end -- do
 
-  return check_level[table_name][key]
+  return value
 end
 
-local find_replicate_data = function(manifest, name)
-  return find_data_using_parents(manifest, "replicate_data", name)
+local find_replicate_data = function(manifest, name, fs_data)
+  arguments(
+      "table", manifest,
+      "string", name
+    )
+  optional_arguments(
+      "table", fs_data
+    )
+  dbg("Searching replicate data:", name)
+  return find_data_using_parents(manifest, "replicate_data", name, fs_data)
+end
+
+local find_dictionary_data = function(manifest, name, fs_data)
+  arguments(
+      "table", manifest,
+      "string", name
+    )
+  optional_arguments(
+      "table", fs_data
+    )
+  dbg("Searching dictionary data:", name)
+  return find_data_using_parents(manifest, "dictionary", name, fs_data)
 end
 
 --------------------------------------------------------------------------------
@@ -369,6 +244,31 @@ end
 
 --------------------------------------------------------------------------------
 
+local function find_wrapped_values(text, wrapper, values)
+  values = values or { }
+  arguments(
+      "string", text,
+      "table", wrapper,
+      "table", values
+    )
+  local wrapper_left_start, wrapper_left_end = text:find(wrapper.left, nil, true)
+  local wrapper_right_start, wrapper_right_end = text:find(wrapper.right, nil, true)
+  if wrapper_left_end and wrapper_right_start then
+    local val = text:sub(wrapper_left_end + 1, wrapper_right_start - 1)
+    if #val > 0 then
+      values[#values + 1] = val;
+    end
+    find_wrapped_values(
+        text:sub(wrapper_right_end + 1),
+        wrapper,
+        values
+      )
+  end
+  return values
+end
+
+--------------------------------------------------------------------------------
+
 local function find_top_level_blocks(text, wrapper, replaces_used, blocks)
   blocks = blocks or { }
   arguments(
@@ -409,39 +309,134 @@ end
 
 --------------------------------------------------------------------------------
 
-local create_directory_structure = function(new_files)
-  local dir_struct = { ["FLAGS"] = { } }
-  local file_dir_list = { }
-  for i = 1, #new_files do
-    file_dir_list = break_path(new_files[i])
-    local dir_struct_curr = dir_struct
-    for j = 1, #file_dir_list do
-      if not dir_struct_curr[file_dir_list[j]] then
-        dir_struct_curr[file_dir_list[j]] = { ["FLAGS"] = { } }
-      end
-      dir_struct_curr = dir_struct_curr[file_dir_list[j]]
+local get_template_path = function(name, paths)
+  arguments(
+      "string", name,
+      "table", paths
+    )
+  for i = 1, #paths do
+    local path = paths[i].path .. "/" .. name .. ".template"
+    if does_file_exist(path) then
+      return path
     end
-    dir_struct_curr.FLAGS["FILE"] = true
   end
-  return dir_struct
+  error("Template " .. name .. " not found in paths: " .. tstr(paths))
+end
+
+local function get_template_paths(template_name, template_paths, templates)
+  templates = templates or { }
+  arguments(
+      "string", template_name,
+      "table", template_paths,
+      "table", templates
+    )
+  local path = get_template_path(template_name, template_paths)
+  templates[#templates + 1] = path
+
+  dbg("Template path:", path)
+  local config_path = path .. "/template_config"
+  if does_file_exist(config_path) then
+    dbg("Template config:", config_path)
+    local template_metamanifest = load_project_manifest(config_path, "", "")
+    for i = 1, #template_metamanifest.parent_templates do
+      get_template_paths(
+          template_metamanifest.parent_templates[i].name,
+          template_paths,
+          templates
+        )
+    end
+  else
+    dbg("No template config found for", template_name, "template")
+  end
+  return templates
+end
+
+--------------------------------------------------------------------------------
+
+local function make_plain_dictionary(dictionary, parent)
+  arguments(
+      "table", dictionary
+    )
+  optional_arguments(
+      "table", parent
+    )
+  local replicate_data = { }
+  local processed = { }
+  local subdictionary = { }
+
+  for k, v in ordered_pairs(dictionary) do
+    if is_table(v) then
+      replicate_data[#replicate_data + 1] = k
+    elseif v == false then
+      replicate_data[#replicate_data + 1] = k
+    end
+  end
+
+  for i = 1, #replicate_data do
+    local data = replicate_data[i]
+    log("replicate_data[", i, "]", data) -- to prevent seg faults, remove it to reproduce TODO: #3786
+    local replicate = dictionary[data]
+    replicate_data[data] = { }
+    if is_table(replicate) then
+      for j = 1, #replicate do
+        local name = data:sub(1, -2) .. "_" .. string.format("%03d", j)
+        dictionary[name] = replicate[j]
+        replicate_data[data][j] = name
+        subdictionary[name] = replicate[replicate[j]]
+        if is_table(subdictionary[name]) then
+          subdictionary[name] = make_plain_dictionary(
+              subdictionary[name],
+              dictionary
+            )
+        end
+      end
+      processed[data] = tclone(dictionary[data])
+    end
+    dictionary[data] = nil
+    replicate_data[i] = nil
+  end
+
+  local result =
+  {
+    dictionary = dictionary;
+    replicate_data = replicate_data;
+    processed = processed;
+    subdictionary = subdictionary;
+  }
+  -- so we can always reach parent table from subtable,
+  -- though this makes our dictionary data structure heavily recursive
+  for k, v in ordered_pairs(subdictionary) do
+    dbg("making parent for", k)
+    subdictionary[k].parent = result
+  end
+  return result
+end
+
+
+local prepare_manifest = function(metamanifest)
+  arguments(
+      "table", metamanifest
+    )
+  local metamanifest_plain = make_plain_dictionary(metamanifest.dictionary)
+  metamanifest.dictionary = metamanifest_plain.dictionary
+  metamanifest.replicate_data = metamanifest_plain.replicate_data
+  metamanifest.processed = metamanifest_plain.processed
+  metamanifest.subdictionary = metamanifest_plain.subdictionary
+  return metamanifest
 end
 
 --------------------------------------------------------------------------------
 
 return
 {
-  copy_file_force = copy_file_force;
-  check_path_ignored = check_path_ignored;
-  get_dictionary_pattern = get_dictionary_pattern;
-  break_path = break_path;
-  add_to_directory_structure = add_to_directory_structure;
-  process_dictionary_recursively = process_dictionary_recursively;
-  get_replacement_pattern = get_replacement_pattern;
   unify_manifest_dictionary = unify_manifest_dictionary;
   find_top_level_blocks = find_top_level_blocks;
   cut_wrappers = cut_wrappers;
   remove_wrappers = remove_wrappers;
+  find_wrapped_values = find_wrapped_values;
   find_replicate_data = find_replicate_data;
+  find_dictionary_data = find_dictionary_data;
   get_wrapped_string = get_wrapped_string;
-  create_directory_structure = create_directory_structure;
+  get_template_paths = get_template_paths;
+  prepare_manifest = prepare_manifest;
 }

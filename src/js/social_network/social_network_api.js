@@ -446,10 +446,12 @@ PKEngine.SocialNetAPIImpl.VK_Internal = new function()
 PKEngine.SocialNetAPIImpl.VK_External = new function()
 {
   var test_mode_;
-  var app_id;
-  var uid_;
   var app_id_;
+  var uid_;
+  var open_id_app_id_;
+  var access_token_;
   var images_;
+  var redirect_url_;
   var billing_app_id_;
 
 
@@ -481,15 +483,49 @@ PKEngine.SocialNetAPIImpl.VK_External = new function()
 
   this.init = function(social_network_config, query_params, callback)
   {
+    //console.log("VK_External.init")
+
     // This code cannot be called for internal authorization purpose
     assert(social_network_config.apiId, I18N('Cant authorize user: No apiId!'))
 
     test_mode_ = social_network_config.test_mode
     app_id_ = social_network_config.apiId
+    open_id_app_id_ = social_network_config.openIdAppId
     images_ = social_network_config.images
     billing_app_id_ = social_network_config.billing_app_id
+    redirect_url_ = social_network_config.redirectUrl
 
-    VK.init({ apiId: social_network_config.apiId })
+    // NOTE: read hash params from vk.com
+    var vk_hash_ = window.location.hash.substring(1)
+    console.log('[PKEngine.SocialNetAPIImpl.VK_External.init] hash params from vk.com', vk_hash_)
+
+    if (vk_hash_)
+    {
+      var params_array_ = vk_hash_.split('&')
+      console.log('[PKEngine.SocialNetAPIImpl.VK_External.init] hash params array from vk.com', params_array_)
+
+      if (params_array_.length > 0)
+      {
+        for (var i = 0; i < params_array_.length; i++)
+        {
+          var param = params_array_[i].split('=')
+          if (param.length > 0)
+          {
+            switch(param[0])
+            {
+              case 'access_token':
+                access_token_ = param[1]
+                console.log('[PKEngine.SocialNetAPIImpl.VK_External.init] access_token', access_token_)
+                break;
+              case 'user_id':
+                uid_ = param[1]
+                console.log('[PKEngine.SocialNetAPIImpl.VK_External.init] user_id', uid_)
+                break;
+            }
+          }
+        }
+      }
+    }
 
     callback()
     return true
@@ -502,22 +538,28 @@ PKEngine.SocialNetAPIImpl.VK_External = new function()
 
   this.login = function(callback)
   {
-    VK.Auth.login(function(response)
+    //console.log('[PKEngine.SocialNetAPIImpl.VK_External.login] OAuth login');
+
+    if (uid_ && access_token_)
     {
-      if (response.session)
-      {
-        uid_ = response.session.mid
-        callback({
-            id: response.session.mid,
-            session: 0, // Note: Could be 'response.session.sid', but we don't need session here
-            networkID:  PKEngine.SocialNetAPI.NETWORK_TYPE.VK_EXTERNAL
-          })
-      }
-      else
-      {
-        callback(null)
-      }
-    })
+      callback({
+          id: uid_,
+          session: access_token_,
+          networkID:  PKEngine.SocialNetAPI.NETWORK_TYPE.VK_EXTERNAL
+        })
+    }
+    else
+    {
+      //console.log('[PKEngine.SocialNetAPIImpl.VK_External.login] redirect to http://oauth.vkontakte.ru/authorize');
+
+      window.location =
+        'http://oauth.vkontakte.ru/authorize?client_id=' + open_id_app_id_
+        + '&scope=notify,friends,photos,wall,offline'
+        + '&display=page'
+        + '&redirect_uri=' + redirect_url_
+        + '&response_type=token';
+    }
+
     return true
   }
 

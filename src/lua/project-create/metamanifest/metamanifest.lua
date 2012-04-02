@@ -21,9 +21,9 @@ dictionary =
   DEPLOY_SERVER_DOMAIN = ".2rl";
 
   -- use this two EXCLUSIVELY for each deploy server
-  DEPLOY_SINGLE_MACHINE = { "true" }; -- intended table with string
+  DEPLOY_SINGLE_MACHINE = { "SAVE_BLOCK" }; -- intended table with string
   DEPLOY_SEVERAL_MACHINES = false;
-  -- if DEPLOY_SEVERAL_MACHINES "true"
+  -- if "SAVE_BLOCK" DEPLOY_SEVERAL_MACHINES
   -- DEPLOY_MACHINE - list of name name
   -- use this EXCLUSIVELY for each deploy machine
   -- DEPLOY_MACHINE_EXTERNAL_URL
@@ -97,7 +97,7 @@ THE SOFTWARE.
   SERVICE_INDEX = "";
 
   -- default libs
-  PK_TEST = { "true" }; -- intended table with string
+  PK_TEST = { "SAVE_BLOCK" };
   PK_CORE_JS_LIB = false;
   PK_LOGICEDITOR_LIB = false;
   PK_ADMIN = false;
@@ -148,7 +148,7 @@ User-agent: *
 Disallow: /]];
 
   EMPTY_LISTEN = false;
-  NORMAL_LISTEN = { "true" };
+  NORMAL_LISTEN = { "SAVE_BLOCK" };
   SUBTREE = "";
 }
 dictionary.PROJECT_LIBDIR = dictionary.PROJECT_NAME .. "-lib"

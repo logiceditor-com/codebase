@@ -61,6 +61,14 @@ local ordered_pairs
         'ordered_pairs'
       }
 
+local split_by_char,
+      escape_lua_pattern
+      = import 'lua-nucleo/string.lua'
+      {
+        'split_by_char',
+        'escape_lua_pattern'
+      }
+
 local load_all_files,
       write_file,
       read_file,
@@ -321,12 +329,17 @@ end
 --------------------------------------------------------------------------------
 
 local get_wrapped_string = function(string_to_process, wrapper)
+  arguments(
+      "string", string_to_process,
+      "table", wrapper
+    )
+
   local block_top_wrapper =
-    wrapper.top.left:gsub("%p", "%%%1") .. string_to_process ..
-    wrapper.top.right:gsub("%p", "%%%1")
+    escape_lua_pattern(wrapper.top.left) .. string_to_process ..
+    escape_lua_pattern(wrapper.top.right)
   local block_bottom_wrapper =
-    wrapper.bottom.left:gsub("%p", "%%%1") .. string_to_process ..
-    wrapper.bottom.right:gsub("%p", "%%%1")
+    escape_lua_pattern(wrapper.bottom.left) .. string_to_process ..
+    escape_lua_pattern(wrapper.bottom.right)
   return
     block_top_wrapper .. ".-" .. block_bottom_wrapper,
     block_top_wrapper,
@@ -336,27 +349,42 @@ end
 --------------------------------------------------------------------------------
 
 local cut_wrappers = function(text, wrapper, value)
+  arguments(
+      "string", text,
+      "table", wrapper,
+      "string", value
+    )
   local string_to_find, block_top_wrapper, block_bottom_wrapper =
     get_wrapped_string(value, wrapper)
   return text:gsub(block_top_wrapper .. "\n", ""):gsub("\n" .. block_bottom_wrapper, "")
 end
 
 local remove_wrappers = function(text, wrapper)
-  local string_to_find, block_top_wrapper, block_bottom_wrapper =
-    get_wrapped_string('[^{}]-', wrapper)
-  return text:gsub(block_top_wrapper .. "\n", ""):gsub("\n" .. block_bottom_wrapper, "")
+  arguments(
+      "string", text,
+      "table", wrapper
+    )
+  return cut_wrappers(text, wrapper, '[^{}]-')
 end
 
 --------------------------------------------------------------------------------
 
 local function find_top_level_blocks(text, wrapper, replaces_used, blocks)
+  blocks = blocks or { }
+  arguments(
+      "string", text,
+      "table", wrapper,
+      "table", blocks
+    )
+  optional_arguments(
+      "table", replaces_used
+    )
   if replaces_used then
     for k, v in ordered_pairs(replaces_used) do
       text = cut_wrappers(text, wrapper, k)
     end
   end
 
-  blocks = blocks or { }
   local top_wrapper_start, top_left_wrapper_end = text:find(wrapper.top.left, nil, true)
   local top_right_wrapper_start = text:find(wrapper.top.right, nil, true)
 

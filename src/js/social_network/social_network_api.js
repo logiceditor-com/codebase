@@ -455,31 +455,30 @@ PKEngine.SocialNetAPIImpl.VK_External = new function()
   var billing_app_id_;
 
 
-  // TODO: Share with VK_Internal
-  var ensure_vk_api_answer_is_ok_ = function(name, data)
-  {
-    if (data.error)
-    {
-      LOG(I18N('${1} returned error:', name) + JSON.stringify(data.error,null,4))
-      if(window.console && console.log)
-      {
-        console.log(I18N('${1} returned error:', name), data.error)
-      }
-      return false
-    }
-
-    if (!data.response)
-    {
-      LOG(I18N('${1} returned bad answer:', name) + JSON.stringify(data,null,4))
-      if(window.console && console.log)
-      {
-        console.log(I18N('${1} returned bad answer:', name), data)
-      }
-      return false
-    }
-
-    return true
-  }
+//   var ensure_vk_api_answer_is_ok_ = function(name, data)
+//   {
+//     if (data.error)
+//     {
+//       LOG(I18N('${1} returned error:', name) + JSON.stringify(data.error,null,4))
+//       if(window.console && console.log)
+//       {
+//         console.log(I18N('${1} returned error:', name), data.error)
+//       }
+//       return false
+//     }
+//
+//     if (!data.response)
+//     {
+//       LOG(I18N('${1} returned bad answer:', name) + JSON.stringify(data,null,4))
+//       if(window.console && console.log)
+//       {
+//         console.log(I18N('${1} returned bad answer:', name), data)
+//       }
+//       return false
+//     }
+//
+//     return true
+//   }
 
   this.init = function(social_network_config, query_params, callback)
   {
@@ -572,44 +571,51 @@ PKEngine.SocialNetAPIImpl.VK_External = new function()
 
   this.get_friends = function(with_app, without_app, callback)
   {
-    //console.log("[VK_External.get_friends]", with_app, without_app)
+    // TODO: Ticket #3362: Implement using VK Open API
+    callback(false);
+    return;
 
-    if (with_app === undefined) with_app = true
-    if (without_app === undefined) without_app = true
-
-    if(!with_app && !without_app)
-      return false
-
-    //console.log("[VK_External.get_friends] all or only without app")
-    VK.api("friends.get", { fields:'photo', test_mode: test_mode_ }, function(data)
-      {
-        //console.log("[friends.get callback]", data)
-        if (!ensure_vk_api_answer_is_ok_("friends.get", data)) { callback(false); return }
-
-        // Return all if requested
-        //console.log("[friends.get callback] cb for all", data.response)
-
-        // Note: Must convert uids to strings by function's contract
-        if (data && data.response)
-        {
-          for(var i = 0; i < data.response.length; i++)
-            data.response[i].uid = String(data.response[i].uid);
-        }
-
-        callback(data.response)
-        return
-      })
-    return true
+//     //console.log("[VK_External.get_friends]", with_app, without_app)
+//
+//     if (with_app === undefined) with_app = true
+//     if (without_app === undefined) without_app = true
+//
+//     if(!with_app && !without_app)
+//       return false
+//
+//     console.log("[VK_External.get_friends] all or only without app")
+//     VK.api("friends.get", { fields:'photo', test_mode: test_mode_ }, function(data)
+//       {
+//         console.log("[friends.get callback]", data)
+//         if (!ensure_vk_api_answer_is_ok_("friends.get", data)) { callback(false); return }
+//
+//         // Return all if requested
+//         console.log("[friends.get callback] cb for all", data.response)
+//
+//         // Note: Must convert uids to strings by function's contract
+//         if (data && data.response)
+//         {
+//           for(var i = 0; i < data.response.length; i++)
+//             data.response[i].uid = String(data.response[i].uid);
+//         }
+//
+//         callback(data.response)
+//         return
+//       })
+//     return true
   }
 
-  // TODO: Share with VK_Internal
   this.get_profiles = function(uids, callback)
   {
-    VK.api("getProfiles", { uids: uids.join(","), fields:'photo', test_mode: test_mode_ }, function(data)
-      {
-        if (!ensure_vk_api_answer_is_ok_("getProfiles", data)) { callback(false); return }
-        callback(data.response)
-      })
+    // TODO: Ticket #3362: Implement using VK Open API
+    callback(false);
+    return;
+
+//     VK.api("getProfiles", { uids: uids.join(","), fields:'photo', test_mode: test_mode_ }, function(data)
+//       {
+//         if (!ensure_vk_api_answer_is_ok_("getProfiles", data)) { callback(false); return }
+//         callback(data.response)
+//       })
   }
 
   // Not supported
@@ -617,51 +623,53 @@ PKEngine.SocialNetAPIImpl.VK_External = new function()
   this.payment = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
   this.invite = PKEngine.SocialNetAPI.UNSUPPORTED_API_METHOD
 
-  // TODO: Share with VK_Internal
   this.wallPost = function(uid, msg, image_name, post_id, link)
   {
-    var photo_id
-    if (image_name)
-    {
-      photo_id = assert(images_[image_name], I18N("Invalid picture name: ${1}", String(image_name)))
-    }
+    // TODO: Ticket #3362: Implement using VK Open API
+    return;
 
-    if (photo_id)
-    {
-      VK.api(
-          'wall.savePost',
-          { wall_id: uid, message: msg, photo_id: photo_id, post_id: post_id, test_mode: test_mode_ },
-          function(data)
-          {
-            if (!ensure_vk_api_answer_is_ok_("wall.savePost", data)) { return }
-
-            VK.callMethod('saveWallPost', data.response.post_hash)
-          }
-        )
-      return true
-    }
-
-    var attachment = ""
-
-    if  (photo_id)
-      attachment += (attachment == "") ? "photo" + photo_id : ",photo" + photo_id
-
-    if (link)
-      attachment += (attachment == "") ? link : "," + link
-
-    if (attachment == "")
-      attachment = undefined
-
-    VK.api(
-        "wall.post",
-        { owner_id: uid, message: msg,  attachment: attachment, test_mode: test_mode_ },
-        function(data)
-        {
-          if (!ensure_vk_api_answer_is_ok_("wall.post", data)) { return }
-        }
-      )
-
-    return true
+//     var photo_id
+//     if (image_name)
+//     {
+//       photo_id = assert(images_[image_name], I18N("Invalid picture name: ${1}", String(image_name)))
+//     }
+//
+//     if (photo_id)
+//     {
+//       VK.api(
+//           'wall.savePost',
+//           { wall_id: uid, message: msg, photo_id: photo_id, post_id: post_id, test_mode: test_mode_ },
+//           function(data)
+//           {
+//             if (!ensure_vk_api_answer_is_ok_("wall.savePost", data)) { return }
+//
+//             VK.callMethod('saveWallPost', data.response.post_hash)
+//           }
+//         )
+//       return true
+//     }
+//
+//     var attachment = ""
+//
+//     if  (photo_id)
+//       attachment += (attachment == "") ? "photo" + photo_id : ",photo" + photo_id
+//
+//     if (link)
+//       attachment += (attachment == "") ? link : "," + link
+//
+//     if (attachment == "")
+//       attachment = undefined
+//
+//     VK.api(
+//         "wall.post",
+//         { owner_id: uid, message: msg,  attachment: attachment, test_mode: test_mode_ },
+//         function(data)
+//         {
+//           if (!ensure_vk_api_answer_is_ok_("wall.post", data)) { return }
+//         }
+//       )
+//
+//     return true
   }
 }
 

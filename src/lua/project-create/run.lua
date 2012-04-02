@@ -167,10 +167,12 @@ local copy_file_force,
         'create_directory_structure',
       }
 
-local do_replicate_data
+local create_replicated_structure,
+      process_replicated_structure
       = import 'pk-project-create/replicate_data.lua'
       {
-        'do_replicate_data'
+        'create_replicated_structure',
+        'process_replicated_structure'
       }
 
 local copy_files_from_templates,
@@ -202,14 +204,6 @@ local CONFIG, ARGS
 
 local create_project
 do
-  ------------------------------------------------------------------------------
-  local DEBUG_print = function(...)
-    if CONFIG[TOOL_NAME].debug then
-      print(...)
-    end
-  end
-
-  ------------------------------------------------------------------------------
 
   local process_ignored_paths = function(metamanifest)
     local ignored = tset(metamanifest.ignore_paths)
@@ -255,101 +249,47 @@ do
         "string", root_template_name,
         "table", root_template_paths
       )
+    log("Project generation started, please wait")
 
-    log("Loading metamanifest")
-
-    -- TODO: HACK? how to get path to this?
     local defaults_path =
       assert(luarocks_show_rock_dir("pk-project-tools.pk-project-create"))
     defaults_path =
       defaults_path:sub(1, -1) .. "/src/lua/project-create/metamanifest"
 
-    -- template_path
-    local metamanifest_defaults = load_project_manifest(defaults_path, "", "")
-    local metamanifest_project = load_project_manifest(
-        metamanifest_path,
-        project_path,
-        ""
-      )
-    metamanifest_defaults.dictionary = unify_manifest_dictionary(
-        metamanifest_defaults.dictionary
+    local metamanifest_defaults = unify_manifest_dictionary(
+        load_project_manifest(defaults_path, "", "")
       )
 
-    metamanifest_project.dictionary = unify_manifest_dictionary(
-        metamanifest_project.dictionary
+    local metamanifest_project = unify_manifest_dictionary(
+        load_project_manifest(metamanifest_path, project_path, "")
       )
+
     if metamanifest_defaults.version ~= metamanifest_project.version then
-      DEBUG_print(
-          "\27[31mWrong metamanifest version:\27[0m",
-          "\nexpected:", metamanifest_defaults.version,
-          "\ngot:", metamanifest_project.version
+      log("Wrong metamanifest version:",
+          "expected:", metamanifest_defaults.version,
+          "got:", metamanifest_project.version
         )
       error("Wrong metamanifest version")
     end
 
-    local metamanifest = twithdefaults(metamanifest_project, metamanifest_defaults)
+    local metamanifest = prepare_manifest(
+        twithdefaults(metamanifest_project, metamanifest_defaults)
+      )
+
     metamanifest.project_path = project_path
-    DEBUG_print("\27[32mDefault metamanifest:\27[0m\n" .. tpretty(metamanifest_defaults))
-    DEBUG_print("\27[32mProject metamanifest:\27[0m\n" .. tpretty(metamanifest_project))
-    DEBUG_print("\27[32mFinal metamanifest:\27[0m\n" .. tpretty(metamanifest))
 
-    metamanifest = process_ignored_paths(metamanifest)
-
-    ----------------------------------------------------------------------------
-
-    log("Copy template files")
-    local new_files = { }
-    copy_files_from_templates(
-        root_template_name,
-        root_template_paths,
-        metamanifest,
-        new_files
-      )
-    DEBUG_print("new_files :" .. tpretty(new_files))
-    local file_dir_structure = create_directory_structure(new_files)
-    DEBUG_print("file_dir_structure :" .. tpretty(file_dir_structure))
-
-    local clean_up_data = tclone(file_dir_structure)
-
-    ----------------------------------------------------------------------------
-
-    log("Replicating data")
-    local replicated_structure = do_replicate_data(
-        metamanifest,
-        file_dir_structure,
-        CONFIG[TOOL_NAME].debug
-      )
-    DEBUG_print("file_dir_structure :" .. tpretty(file_dir_structure))
-    DEBUG_print("replicated_structure :" .. tpretty(replicated_structure))
-
-    ----------------------------------------------------------------------------
-
-    log("Cleanup replication data")
-    clean_up_replicate_data_recursively(
-        metamanifest,
-        metamanifest.project_path,
-        clean_up_data
+    process_replicated_structure(
+        create_replicated_structure(
+            create_template_fs_structure(
+                get_template_paths(root_template_name, root_template_paths),
+                metamanifest
+              ),
+            metamanifest
+          ),
+        metamanifest
       )
 
-    ----------------------------------------------------------------------------
-
-    log("Filling placeholders")
-    fill_placeholders_in_template(
-        metamanifest,
-        metamanifest.project_path,
-        replicated_structure
-      )
-
-    ----------------------------------------------------------------------------
-
-    log("Cleanup generated data")
-    clean_up_generated_data_recursively(
-        metamanifest,
-        metamanifest.project_path,
-        replicated_structure
-      )
-
-    log("Project " .. metamanifest.dictionary.PROJECT_NAME .. " created")
+    log("Project " .. metamanifest.dictionary.PROJECT_NAME .. " generated successfully")
     return true
   end
 end
@@ -366,7 +306,7 @@ Usage:
 
 Options:
 
-    --debug                    Verbose output
+    --debug                    Verbose output (NYI)
 ]]
 
 local CONFIG_SCHEMA = create_config_schema()

@@ -496,19 +496,19 @@ PKEngine.SocialNetAPIImpl.VK_External = new function()
     redirect_url_ = social_network_config.redirectUrl
 
     // NOTE: read hash params from vk.com
-    var vk_hash_ = window.location.hash.substring(1)
-    //console.log('[PKEngine.SocialNetAPIImpl.VK_External.init] hash params from vk.com', vk_hash_)
+    var vk_hash = window.location.hash.substring(1)
+    //console.log('[PKEngine.SocialNetAPIImpl.VK_External.init] hash params from vk.com', vk_hash)
 
-    if (vk_hash_)
+    if (vk_hash)
     {
-      var params_array_ = vk_hash_.split('&')
-      //console.log('[PKEngine.SocialNetAPIImpl.VK_External.init] hash params array from vk.com', params_array_)
+      var params_array = vk_hash.split('&')
+      //console.log('[PKEngine.SocialNetAPIImpl.VK_External.init] hash params array from vk.com', params_array)
 
-      if (params_array_.length > 0)
+      if (params_array.length > 0)
       {
-        for (var i = 0; i < params_array_.length; i++)
+        for (var i = 0; i < params_array.length; i++)
         {
-          var param = params_array_[i].split('=')
+          var param = params_array[i].split('=')
           if (param.length > 0)
           {
             switch(param[0])

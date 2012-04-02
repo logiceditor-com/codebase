@@ -189,6 +189,7 @@ wrapper =
     top    = { left = "--[[BLOCK_START:"; right = "]]"; };
     bottom = { left = "--[[BLOCK_END:";   right = "]]"; };
   };
+  fs = { left = "_("; right = ")_"; };
 }
 
 modificators =

@@ -194,7 +194,7 @@ wrapper =
   };
 
   -- how values must be wrapped in file names, eg. lib-%+PROJECT_NAME+.lua
-  fs = { left = escape_lua_pattern("%+"); right = escape_lua_pattern("+"); };
+  fs = { left = "%+"; right = "+"; };
 }
 
 modificators =

@@ -26,14 +26,16 @@ dictionary =
   -- use this two EXCLUSIVELY for each deploy server
   DEPLOY_SINGLE_MACHINE = { "SAVE_BLOCK" }; -- intended table with string
   DEPLOY_SEVERAL_MACHINES = false;
-  -- if "SAVE_BLOCK" DEPLOY_SEVERAL_MACHINES
-  -- DEPLOY_MACHINE - list of name name
-  -- use this EXCLUSIVELY for each deploy machine
-  -- DEPLOY_MACHINE_EXTERNAL_URL
-  -- DEPLOY_MACHINE_INTERNAL_URL
-  -- REMOTE_ROCKS_REPO_URL
-  -- DEPLOY_SERVER_HOST (see manifest 03-roles)
-  -- ROOT_DEPLOYMENT_MACHINE
+  -- if "SAVE_BLOCK" used for DEPLOY_SEVERAL_MACHINES then
+  --   define DEPLOY_MACHINE - list of name name
+  --   use this EXCLUSIVELY for each deploy machine
+  --   define DEPLOY_MACHINE_EXTERNAL_URL
+  --   define DEPLOY_MACHINE_INTERNAL_URL
+  --   define REMOTE_ROCKS_REPO_URL
+  --   define DEPLOY_SERVER_HOST (see manifest 03-roles)
+  --   define  ROOT_DEPLOYMENT_MACHINE
+  -- use examples in generated projects metamanifests as reference
+
   REMOTE_ROOT_DIR = "-deployment";
 
   PROJECT_TEAM = "project-name team";
@@ -178,11 +180,12 @@ ignore_paths =
 
 wrapper =
 {
-  -- how values must be wrapped in text to be replaces,
-  -- default eg. #{PROJECT_NAME}
+  -- how values must be wrapped in text to be replaces, eg. #{PROJECT_NAME}
   data  =    { left = "#{"; right = "}"; };
-  -- data with procedure eg. #{PROJECT_NAME}:{ESCAPE}
+
+  -- data with procedure eg. #{ESCAPE(PROJECT_NAME)}
   modificator = { left = "("; right = ")"; };
+
   -- how blocks to be replicated must be wrapped in text
   block =
   {

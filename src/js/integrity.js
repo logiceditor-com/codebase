@@ -47,7 +47,7 @@ PKEngine.Integrity = new function()
       else
       {
         // TODO: localize
-        CRITICAL_ERROR(I18N("Integrity check failed! Click 'close' to reload the game!"));
+        CRITICAL_ERROR(I18N("Integrity check failed!"));
       }
     }
 

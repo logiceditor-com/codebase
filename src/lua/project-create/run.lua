@@ -155,12 +155,12 @@ local unify_manifest_dictionary,
         'prepare_manifest'
       }
 
-local create_replicated_structure,
-      process_replicated_structure
+local make_project_using_fs_structure,
+      create_project_fs_structure
       = import 'pk-project-create/replicate_data.lua'
       {
-        'create_replicated_structure',
-        'process_replicated_structure'
+        'make_project_using_fs_structure',
+        'create_project_fs_structure'
       }
 
 local create_template_fs_structure
@@ -227,8 +227,8 @@ do
 
     metamanifest.project_path = project_path
 
-    process_replicated_structure(
-        create_replicated_structure(
+    make_project_using_fs_structure(
+        create_project_fs_structure(
             create_template_fs_structure(
                 get_template_paths(root_template_name, root_template_paths),
                 metamanifest

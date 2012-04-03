@@ -709,7 +709,7 @@ end
 
 --------------------------------------------------------------------------------
 
-local function create_replicated_structure(
+local function create_project_fs_structure(
     curr_fs_struct,
     curr_manifest,
     curr_fs_struct_replicated,
@@ -720,7 +720,7 @@ local function create_replicated_structure(
   {
     path = "";
     type = "directory";
-    contained = { };
+    children = { };
     do_not_replace = false;
   }
   curr_path = curr_path or curr_manifest.project_path
@@ -732,7 +732,7 @@ local function create_replicated_structure(
       "table", wrapper
     )
 
-  for k, v in ordered_pairs(curr_fs_struct.contained) do
+  for k, v in ordered_pairs(curr_fs_struct.children) do
     dbg("----------------------------------------------")
     dbg("starting to process file: ", k)
     local new_entries = create_replicated_entries(
@@ -747,22 +747,22 @@ local function create_replicated_structure(
       local entry = new_entries[i]
       dbg("going for entry", entry.filename)
       local path = curr_path .. "/" .. entry.filename
-      curr_fs_struct_replicated.contained[entry.filename] =
+      curr_fs_struct_replicated.children[entry.filename] =
       {
         path = path;
         parent = curr_fs_struct_replicated;
         type = v.type;
-        contained = { };
+        children = { };
         do_not_replace = v.do_not_replace;
         replaces_used = entry.replaces_used;
         original_file = entry.original_file;
         manifest_local = entry.manifest;
       }
       if v.type == "directory" then
-        create_replicated_structure(
+        create_project_fs_structure(
             v,
             entry.manifest,
-            curr_fs_struct_replicated.contained[entry.filename],
+            curr_fs_struct_replicated.children[entry.filename],
             path,
             wrapper
           )
@@ -775,7 +775,7 @@ end
 
 --------------------------------------------------------------------------------
 
-local function process_replicated_structure(fs_struct, metamanifest)
+local function make_project_using_fs_structure(fs_struct, metamanifest)
   arguments(
       "table", fs_struct,
       "table", metamanifest
@@ -783,9 +783,9 @@ local function process_replicated_structure(fs_struct, metamanifest)
   local wrapper = metamanifest.wrapper or { }
   local modificators = metamanifest.modificators or { }
 
-  for k, v in ordered_pairs(fs_struct.contained) do
+  for k, v in ordered_pairs(fs_struct.children) do
     if v.type == "directory" then
-      process_replicated_structure(v, metamanifest)
+      make_project_using_fs_structure(v, metamanifest)
     else
       replicate_and_replace_in_file(k, v, wrapper, modificators)
     end
@@ -796,7 +796,7 @@ end
 
 return
 {
-  create_replicated_structure = create_replicated_structure;
-  process_replicated_structure = process_replicated_structure;
+  create_project_fs_structure = create_project_fs_structure;
+  make_project_using_fs_structure = make_project_using_fs_structure;
   replicate_and_replace_in_file_recursively = replicate_and_replace_in_file_recursively;
 }

@@ -158,15 +158,15 @@ spam = function() end
 --------------------------------------------------------------------------------
 
 -- TODO: move to lua-nucleo #3736
-local match_prefix_list = function(string, prefixes)
+local match_prefix_list = function(str, prefixes)
   prefixes = prefixes or empty_table
   arguments(
-      "string", string,
+      "string", str,
       "table", prefixes
     )
   for i = 1, #prefixes do
     local prefix = prefixes[i]
-    if prefix == string:sub(0, #prefix) then
+    if prefix == str:sub(0, #prefix) then
       return true
     end
   end
@@ -185,7 +185,7 @@ local function create_fs_structure_recursively(
   {
     path = "";
     type = "directory";
-    contained = { };
+    children = { };
     do_not_replace = false;
   }
   path = path or root_path
@@ -206,22 +206,22 @@ local function create_fs_structure_recursively(
       end
       dbg("file: " .. short_path)
       if
-        not fs_structure.contained[filename] and
+        not fs_structure.children[filename] and
         not match_prefix_list(short_path, metamanifest.remove_paths)
       then
-        fs_structure.contained[filename] =
+        fs_structure.children[filename] =
         {
           path = filepath;
           parent = fs_structure;
           type = attr.mode;
-          contained = { };
+          children = { };
           do_not_replace = match_prefix_list(short_path, metamanifest.ignore_paths);
         }
         if attr.mode == "directory" then
           create_fs_structure_recursively(
               root_path,
               metamanifest,
-              fs_structure.contained[filename],
+              fs_structure.children[filename],
               filepath
             )
         end
@@ -244,7 +244,7 @@ local create_template_fs_structure = function(templates, metamanifest)
   {
     path = "";
     type = "directory";
-    contained = { };
+    children = { };
     do_not_replace = false;
   }
   for i = 1, #templates do

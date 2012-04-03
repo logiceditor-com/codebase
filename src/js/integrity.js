@@ -10,16 +10,18 @@ PKEngine.Integrity = new function()
 {
   var INTEGRITY_CHECK_TIMEOUT_ = 500; // in ms.
 
-  var custom_checker_;
-
   var must_check_integrity_ = true;
+
+  var custom_error_handler_;
+  var custom_checker_;
 
   var check_integrity_timer_;
 
   //----------------------------------------------------------------------------
 
-  this.init = function(custom_checker)
+  this.init = function(custom_error_handler, custom_checker)
   {
+    custom_error_handler_ = custom_error_handler;
     custom_checker_ = custom_checker;
 
     check_integrity_timer_ = PK.Timer.make();
@@ -38,8 +40,15 @@ PKEngine.Integrity = new function()
 
     if (!PKEngine.UserInputHandlers.check_integrity())
     {
-       // TODO: localize
-       CRITICAL_ERROR(I18N("Integrity check failed! Click 'close' to reload the game!"));
+      if (custom_error_handler_)
+      {
+        custom_error_handler_();
+      }
+      else
+      {
+        // TODO: localize
+        CRITICAL_ERROR(I18N("Integrity check failed! Click 'close' to reload the game!"));
+      }
     }
 
     if (custom_checker_)

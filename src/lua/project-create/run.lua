@@ -186,27 +186,25 @@ local CONFIG, ARGS
 
 local create_project
 do
-  create_project = function(
+  local load_metamanifest_with_defaults = function(
       metamanifest_path,
-      project_path,
-      root_template_name,
-      root_template_paths
+      project_path
     )
     arguments(
         "string", metamanifest_path,
-        "string", project_path,
-        "string", root_template_name,
-        "table", root_template_paths
+        "string", project_path
       )
-    log("Project generation started, please wait")
-
-    local defaults_path =
-      assert(luarocks_show_rock_dir("pk-project-tools.pk-project-create"))
-    defaults_path =
-      defaults_path:sub(1, -1) .. "/src/lua/project-create/metamanifest"
 
     local metamanifest_defaults = unify_manifest_dictionary(
-        load_project_manifest(defaults_path, "", "")
+        load_project_manifest(
+            assert(
+                luarocks_show_rock_dir("pk-project-tools.pk-project-create"),
+                "pk-project-tools.pk-project-create: rock directory not found"
+              ):sub(1, -1)
+         .. "/src/lua/project-create/metamanifest",
+            "",
+            ""
+          )
       )
 
     local metamanifest_project = unify_manifest_dictionary(
@@ -214,7 +212,8 @@ do
       )
 
     if metamanifest_defaults.version ~= metamanifest_project.version then
-      log("Wrong metamanifest version:",
+      log_error(
+          "Wrong metamanifest version:",
           "expected:", metamanifest_defaults.version,
           "got:", metamanifest_project.version
         )
@@ -227,6 +226,28 @@ do
 
     metamanifest.project_path = project_path
 
+    return metamanifest
+  end
+
+  create_project = function(
+      metamanifest_path,
+      project_path,
+      root_template_name,
+      root_template_paths
+    )
+    arguments(
+        "string", metamanifest_path,
+        "string", project_path,
+        "string", root_template_name,
+        "table", root_template_paths
+      )
+    log("Project generation started", project_path)
+
+    local metamanifest = load_metamanifest_with_tool_defaults(
+        metamanifest_path,
+        project_path
+      )
+
     make_project_using_fs_structure(
         create_project_fs_structure(
             create_template_fs_structure(
@@ -238,13 +259,13 @@ do
         metamanifest
       )
 
-    log("Project " .. metamanifest.dictionary.PROJECT_NAME .. " generated successfully")
-    return true
+    log("Project", metamanifest.dictionary.PROJECT_NAME, "generated successfully")
   end
 end
 
 --------------------------------------------------------------------------------
 
+-- TODO: remove (NYI) in --debug after #3775
 local EXTRA_HELP = [[
 
 pk-project-create: fast project creation tool

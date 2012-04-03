@@ -252,18 +252,26 @@ local function find_wrapped_values(text, wrapper, values)
       "table", values
     )
   local wrapper_left_start, wrapper_left_end = text:find(wrapper.left, nil, true)
-  local wrapper_right_start, wrapper_right_end = text:find(wrapper.right, nil, true)
-  if wrapper_left_end and wrapper_right_start then
-    local val = text:sub(wrapper_left_end + 1, wrapper_right_start - 1)
-    if #val > 0 then
-      values[#values + 1] = val;
+
+  if wrapper_left_end then
+    local wrapper_right_start, wrapper_right_end =
+      text:sub(wrapper_left_end + 1):find(wrapper.right, nil, true)
+
+    if wrapper_right_start then
+      local val = text:sub(wrapper_left_end + 1, wrapper_left_end + wrapper_right_start - 1)
+      if #val > 0 then
+        values[#values + 1] = val;
+      end
+      find_wrapped_values(
+          text:sub(wrapper_left_end + wrapper_right_end + 1),
+          wrapper,
+          values
+        )
+    else
+      dbg("found string with single left wrapper:", text, "wrapper:", wrapper)
     end
-    find_wrapped_values(
-        text:sub(wrapper_right_end + 1),
-        wrapper,
-        values
-      )
   end
+  spam("for", text, "values found:", values, "wrapper used:", wrapper)
   return values
 end
 

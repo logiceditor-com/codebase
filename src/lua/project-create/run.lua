@@ -186,7 +186,7 @@ local CONFIG, ARGS
 
 local create_project
 do
-  local load_metamanifest_with_defaults = function(
+  local load_metamanifest_with_tool_defaults = function(
       metamanifest_path,
       project_path
     )

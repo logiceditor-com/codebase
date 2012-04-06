@@ -451,6 +451,8 @@ do
       config_manager_maker,
       service_name
     )
+
+    config_manager_maker = config_manager_maker or make_default_config_manager
     service_name = service_name or "(unknown)"
 
     arguments(
@@ -458,8 +460,6 @@ do
         "function", config_manager_maker,
         "string", service_name
       )
-
-    config_manager_maker = config_manager_maker or make_default_config_manager
 
     return
     {

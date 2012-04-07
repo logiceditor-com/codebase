@@ -118,11 +118,12 @@ PK.Error = new function ()
       LOG(error.stack_trace);
     }
 
-    var printer = PK.log_system.get_printer();
-    if (printer)
-    {
-      printer(error.message, PK.clone(error.stack_trace));
-    }
+    // Note: Don't use log_system's printer here - it's just for GUI_ERROR
+    //var printer = PK.log_system.get_printer();
+    //if (printer)
+    //{
+    //  printer(error.message, PK.clone(error.stack_trace));
+    //}
   }
 
   var format_date_time_ = function ()

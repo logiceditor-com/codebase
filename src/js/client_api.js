@@ -34,9 +34,9 @@ PKEngine.ClientAPI = new function()
         received_version &&
         received_version.name == supported_version_.name &&
         (
-          Number(received_version['1']) == supported_version_['1'] &&
-          Number(received_version['2']) == supported_version_['2'] &&
-          Number(received_version['3']) >= supported_version_['3']
+          Number(received_version['major']) == supported_version_['major'] &&
+          Number(received_version['minor']) == supported_version_['minor'] &&
+          Number(received_version['build']) >= supported_version_['build']
         )
       )
     {

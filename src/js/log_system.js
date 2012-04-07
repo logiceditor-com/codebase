@@ -210,7 +210,7 @@ PK.Error = new function ()
   {
     if (critical_error_raised_)
     {
-      LOG("\nCRITICAL ERROR: " + text);
+      LOG("\nRECURSIVE CRITICAL ERROR: " + text);
       return;
     }
     critical_error_raised_ = true;
@@ -237,6 +237,9 @@ PK.Error = new function ()
     }
     catch (error)
     {
+      // We've catched the error
+      critical_error_raised_ = false;
+
       error = fix_error_message_and_add_stacktrace_(error, name)
 
       log_error_(error);

@@ -382,7 +382,7 @@ local function make_plain_dictionary(dictionary, parent)
 
   for i = 1, #replicate_data do
     local data = replicate_data[i]
-    log("replicate_data[", i, "]", data) -- to prevent seg faults, remove it to reproduce TODO: #3786
+    -- log("replicate_data[", i, "]", data) -- to prevent seg faults, remove it to reproduce TODO: #3786
     local replicate = dictionary[data]
     replicate_data[data] = { }
     if is_table(replicate) then

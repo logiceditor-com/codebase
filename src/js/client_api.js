@@ -43,11 +43,15 @@ PKEngine.ClientAPI = new function()
       return true;
     }
 
-    CRITICAL_ERROR( I18N(
+    LOG( I18N(
         'Invalid API version: expected ${1}, got ${2}',
         JSON.stringify(supported_version_, null, 4),
         JSON.stringify(received_version, null, 4)
       ));
+
+    CRITICAL_ERROR(
+        I18N('The current client is out of date. Click "close" to reload the page.')
+      );
 
     return false;
   }

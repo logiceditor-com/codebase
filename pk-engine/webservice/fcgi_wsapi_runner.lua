@@ -98,7 +98,12 @@ local handle_wsapi_request = function(app_run)
   -- are getting -EAGAIN.
   --
 
-  local status = posix.setfl(0, bit.bor(posix.getfl(0), posix.O_NONBLOCK))
+  local stdin_fd = 0
+  local status = posix.fcntl(
+      stdin_fd,
+      posix.F_SETFL,
+      bit.bor(posix.fcntl(stdin_fd, posix.F_GETFL), posix.O_NONBLOCK)
+    )
 
   if status < 0 then
     log_error("FCGI WSAPI Runner: unable to place stdin into non-blocking mode:", status)

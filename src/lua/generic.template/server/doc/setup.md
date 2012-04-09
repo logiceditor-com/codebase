@@ -2,7 +2,7 @@ Generic setup instructions for developer machine
 ================================================
 
 Prerequisites: Ubuntu / Debian
-Preferred flavor: Ubuntu Lucid 10.10 Server x86_64
+Preferred flavor: Ubuntu Lucid 11.04 Server x86_64
 
 Notes on server machine installation
 ------------------------------------

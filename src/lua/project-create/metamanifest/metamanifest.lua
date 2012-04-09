@@ -155,6 +155,7 @@ Disallow: /]];
   EMPTY_LISTEN = false;
   NORMAL_LISTEN = { "SAVE_BLOCK" };
   SUBTREE = "";
+  SHELLENV_LOGFLUSH = "ALWAYS";
 }
 dictionary.PROJECT_LIBDIR = dictionary.PROJECT_NAME .. "-lib"
 dictionary.PROJECT_LIB_ROCK = dictionary.PROJECT_NAME .. ".lib"

@@ -29,7 +29,12 @@ common.www.application.code.exports =
   file (PROJECT_PATH .. "lib/lua-aplicado/lua-aplicado/code/exports.lua");
   file (PROJECT_PATH .. "lib/pk-core/pk-core/code/exports.lua");
   file (PROJECT_PATH .. "lib/pk-engine/pk-engine/code/exports.lua");
---  file (PROJECT_PATH .. "lib/pk-admin/pk-admin/code/exports.lua");
+--[[BLOCK_START:PK_ADMIN]]
+  file (PROJECT_PATH .. "lib/pk-admin/pk-admin/code/exports.lua");
+--[[BLOCK_END:PK_ADMIN]]
+--[[BLOCK_START:PK_WEBSERVICE]]
+  file (PROJECT_PATH .. "lib/pk-webservice/generated/pk-webservice/code/exports.lua");
+--[[BLOCK_END:PK_WEBSERVICE]]
   --
   file (EXPORTS_LIST_NAME);
 }

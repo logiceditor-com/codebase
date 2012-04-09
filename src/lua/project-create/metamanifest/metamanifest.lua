@@ -103,6 +103,7 @@ THE SOFTWARE.
 
   -- default libs
   PK_TEST = { "SAVE_BLOCK" };
+  PK_WEBSERVICE = false;
   PK_CORE_JS_LIB = false;
   PK_LOGICEDITOR_LIB = false;
   PK_ADMIN = false;

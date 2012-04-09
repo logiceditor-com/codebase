@@ -52,6 +52,15 @@ subtrees =
     branch = "master";
   };
 --[[BLOCK_END:PK_ADMIN]]
+--[[BLOCK_START:PK_WEBSERVICE]]
+  {
+    name = "pk-webservice";
+    git = PROJECT_PATH;
+    path = "lib/pk-webservice";
+    url = "gitolite@git.iphonestudio.ru:pk-webservice.git";
+    branch = "master";
+  };
+--[[BLOCK_END:PK_WEBSERVICE]]
   {
     name = "pk-engine";
     git = PROJECT_PATH;

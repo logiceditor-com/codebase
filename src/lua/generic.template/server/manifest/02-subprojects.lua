@@ -56,6 +56,15 @@ subprojects =
             manifest = PROJECT_PATH .. "/lib/pk-admin/rockspec/pk-rocks-manifest.lua"
           };
 --[[BLOCK_END:PK_ADMIN]]
+--[[BLOCK_START:PK_WEBSERVICE]]
+          --
+          {
+            tool = "add_rocks_from_pk_rocks_manifest";
+            source_repo_name = "pk-banner-mrx";
+            local_path = PROJECT_PATH .. "/lib/pk-webservice/";
+            manifest = PROJECT_PATH .. "/lib/pk-webservice/rockspec/pk-rocks-manifest.lua";
+          };
+--[[BLOCK_END:PK_WEBSERVICE]]
           --
           {
             tool = "add_rocks_from_pk_rocks_manifest";

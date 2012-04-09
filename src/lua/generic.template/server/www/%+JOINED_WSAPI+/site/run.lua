@@ -131,11 +131,13 @@ local EXTENSIONS
         'EXTENSIONS'
       }
 
-local LIB_EXTENSIONS
-      = import '#{PROJECT_NAME}/extensions/extensions.lua'
-      {
-        'EXTENSIONS'
-      }
+local ADD_EXTENSIONS =
+{
+  import '#{PROJECT_NAME}/extensions/extensions.lua' { 'EXTENSIONS' };
+--[[BLOCK_START:PK_WEBSERVICE]]
+  import 'pk-webservice/extensions.lua' { 'EXTENSIONS' };
+--[[BLOCK_END:PK_WEBSERVICE]]
+}
 
 local tclone,
       tijoin_many
@@ -503,7 +505,9 @@ do
     local to_precache = { }
 
     local extensions = tclone(EXTENSIONS)
-    extensions = tijoin_many(extensions, LIB_EXTENSIONS)
+    for i = 1, #ADD_EXTENSIONS do
+      extensions = tijoin_many(extensions, ADD_EXTENSIONS[i])
+    end
 
     for i = 1, #extensions do
       local ext_info = extensions[i]

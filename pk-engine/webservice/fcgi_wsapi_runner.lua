@@ -83,7 +83,7 @@ end
 local handle_wsapi_request = function(app_run)
   --dbg("before lfcgi.accept()")
 
-  -- 
+  --
   -- This WSAPI handler executes in slightly unusual configuration: FastCGI file
   -- descriptor (which is stdin) is shared by several processes all spawned by
   -- multiwatch. Therefore it is not guaranteed that handle_wsapi_request() is

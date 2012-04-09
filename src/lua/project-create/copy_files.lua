@@ -205,18 +205,19 @@ local function create_fs_structure_recursively(
         return error("bad file attributes: " .. filepath)
       end
       dbg("file: " .. short_path)
-      if
-        not fs_structure.children[filename] and
-        not match_prefix_list(short_path, metamanifest.remove_paths)
-      then
-        fs_structure.children[filename] =
-        {
-          path = filepath;
-          parent = fs_structure;
-          type = attr.mode;
-          children = { };
-          do_not_replace = match_prefix_list(short_path, metamanifest.ignore_paths);
-        }
+      if not match_prefix_list(short_path, metamanifest.remove_paths) then
+        if not fs_structure.children[filename] then
+          fs_structure.children[filename] =
+          {
+            path = filepath;
+            parent = fs_structure;
+            type = attr.mode;
+            children = { };
+            do_not_replace = match_prefix_list(short_path, metamanifest.ignore_paths);
+          }
+        else
+          dbg("Path already found in child template: " .. filepath)
+        end
         if attr.mode == "directory" then
           create_fs_structure_recursively(
               root_path,

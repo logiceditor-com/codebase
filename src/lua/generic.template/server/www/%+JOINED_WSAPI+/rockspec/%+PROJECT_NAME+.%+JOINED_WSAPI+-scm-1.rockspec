@@ -22,6 +22,9 @@ dependencies = {
    "pk-core >= 0.0.1",
    "pk-engine >= 0.0.1",
    "lbase64 >= 20070628-1",
+--[[BLOCK_START:ROCKSPEC_DEPENDENCIES]]
+   "#{ROCKSPEC_DEPENDENCIES}",
+--[[BLOCK_END:ROCKSPEC_DEPENDENCIES]]
    "luajson >= 1.2.1"
    -- TODO: add engine dependencies!
 }

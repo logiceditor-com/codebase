@@ -156,6 +156,7 @@ Disallow: /]];
   EMPTY_LISTEN = false;
   NORMAL_LISTEN = { "SAVE_BLOCK" };
   SUBTREE = "";
+  ROCKSPEC_DEPENDENCIES = false;
   SHELLENV_LOGFLUSH = "ALWAYS";
 }
 dictionary.PROJECT_LIBDIR = dictionary.PROJECT_NAME .. "-lib"

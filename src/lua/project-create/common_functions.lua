@@ -294,12 +294,32 @@ local function find_top_level_blocks(text, wrapper, replaces_used, blocks)
   end
 
   local top_wrapper_start, top_left_wrapper_end = text:find(wrapper.top.left, nil, true)
-  local top_right_wrapper_start = text:find(wrapper.top.right, nil, true)
+  if top_left_wrapper_end then
+    local top_right_wrapper_start =
+      text:sub(top_left_wrapper_end + 1):find(wrapper.top.right, nil, true) +
+      top_left_wrapper_end
+    if not top_right_wrapper_start then
+      log_error(
+          "text:", text,
+          "text part:", text:sub(top_left_wrapper_end + 1),
+          "warppers found:", top_wrapper_start, top_left_wrapper_end
+        )
+      return error("matching block not found")
+    end
 
-  if top_left_wrapper_end and top_right_wrapper_start then
     local val = text:sub(top_left_wrapper_end + 1, top_right_wrapper_start - 1)
     local _, bottom_wrapper_end =
       text:find(wrapper.bottom.left .. val .. wrapper.bottom.right, nil, true)
+    if not bottom_wrapper_end then
+      log_error(
+          "text:", text,
+          "val:", val,
+          "matching block start:",
+          text:sub(top_left_wrapper_end + 1, top_right_wrapper_start - 1),
+          "warppers found:", top_left_wrapper_end, top_right_wrapper_start
+        )
+      return error("matching block not found")
+    end
     blocks[#blocks + 1] =
     {
       value = val;

@@ -37,6 +37,7 @@
   # The extension may be configured using the dateformat option.
   #
   dateext
+  dateformat -%Y%m%d-%s
   #
   # Tell service to let go of the old log file (works only with delaycompress on)
   #

@@ -158,6 +158,7 @@ Disallow: /]];
   SUBTREE = "";
   ROCKSPEC_DEPENDENCIES = false;
   SHELLENV_LOGFLUSH = "EVERY_N_SECONDS"; -- another value: "ALWAYS"
+  DOES_IT_WORK = "";
 }
 dictionary.PROJECT_LIBDIR = dictionary.PROJECT_NAME .. "-lib"
 dictionary.PROJECT_LIB_ROCK = dictionary.PROJECT_NAME .. ".lib"

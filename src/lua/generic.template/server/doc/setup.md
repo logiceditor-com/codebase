@@ -381,21 +381,6 @@ YOU DONE.
 
 Does it work?
 -------------
-
-    GET http://#{PROJECT_NAME}-internal-config/cfg/db/bases
-
-    GET http://#{PROJECT_NAME}-internal-config-deploy/cfg/db/bases
---[[BLOCK_START:API_NAME]]
-
-    GET http://#{PROJECT_NAME}-#{API_NAME}
---[[BLOCK_END:API_NAME]]
---[[BLOCK_START:JOINED_WSAPI]]
-
-    GET http://#{PROJECT_NAME}-#{JOINED_WSAPI}
---[[BLOCK_END:JOINED_WSAPI]]
---[[BLOCK_START:STATIC_NAME]]
-    GET http://#{PROJECT_NAME}-#{STATIC_NAME}-static
---[[BLOCK_END:STATIC_NAME]]
 --[[BLOCK_START:API_NAME]]
 
 sudo su - www-data -c '/usr/bin/env \
@@ -410,6 +395,18 @@ sudo su - www-data -c '/usr/bin/env \
     "PK_CONFIG_HOST=#{PROJECT_NAME}-internal-config" "PK_CONFIG_PORT=80" \
     #{PROJECT_NAME}-#{JOINED_WSAPI}.fcgi'
 --[[BLOCK_END:JOINED_WSAPI]]
+--[[BLOCK_START:API_NAME]]
+
+    GET http://#{PROJECT_NAME}-#{API_NAME}
+--[[BLOCK_END:API_NAME]]
+--[[BLOCK_START:JOINED_WSAPI]]
+
+    GET http://#{PROJECT_NAME}-#{JOINED_WSAPI}
+--[[BLOCK_END:JOINED_WSAPI]]
+--[[BLOCK_START:STATIC_NAME]]
+    GET http://#{PROJECT_NAME}-#{STATIC_NAME}-static
+--[[BLOCK_END:STATIC_NAME]]
+#{DOES_IT_WORK}
 
 Other useful commands
 ---------------------

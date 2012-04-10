@@ -323,7 +323,7 @@ If nothing found:
 
 If nothing found:
 
-  $ (cd ${HOME}/projects/pk-hb/server/lib/pk-tools && lua -e 'for _, R in
+  $ (cd ${HOME}/projects/#{PROJECT_NAME}/server/lib/pk-tools && lua -e 'for _, R in
     ipairs(loadfile("rockspec/pk-rocks-manifest.lua")().ROCKS) do
     print(R[1]) end' | xargs -l1 -I% sudo luarocks make %
     --only-from=../pk-foreign-rocks/rocks)

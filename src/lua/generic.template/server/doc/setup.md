@@ -130,7 +130,7 @@ Expected output:
 
     sudo dpkg-reconfigure tzdata
 
-3. Install modern Git and Nginx (unless provided by distribution)
+3. Install modern git (unless provided by distribution)
 
 Git:
 

@@ -12,6 +12,17 @@ Manual server installs should be pretty much the same.
 Do not install on server anything marked as "tests only"
 or "developer machine only" unless you know what you're doing.
 
+Algorythm below must be processed once, after that one must use
+
+    bin/make.sh <your-cluster-name>
+
+or
+
+    bin/deploy-rocks deploy_from_code <your-cluster-name>  2>&1 \
+      | tee ~/deploy.<your-cluster-name>."$(date '+%y.%m.%d_%T')".log
+
+commands.
+
 APT-packages
 ------------
 
@@ -363,7 +374,8 @@ If it does not print anything, you're missing deploy-rocks rock.
 
 4. Deploy:
 
-    bin/deploy-rocks deploy_from_code <your-cluster-name>
+    bin/deploy-rocks deploy_from_code <your-cluster-name>  2>&1 \
+      | tee ~/deploy.<your-cluster-name>."$(date '+%y.%m.%d_%T')".log
 
 YOU DONE.
 

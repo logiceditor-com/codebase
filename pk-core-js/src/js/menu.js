@@ -1,6 +1,20 @@
-//Taken from http://www.manfbraun.de/cont/tech/probs/ExtMenuWithTooltip2e.js
+//------------------------------------------------------------------------------
+// menu.js: Menu tooltips
+// This file is a part of pk-core-js library
+// Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+// Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+// See file `COPYRIGHT` for the license
+//------------------------------------------------------------------------------
+//
+// Note: ExtJS required
+// Inspired by http://www.manfbraun.de/cont/tech/probs/ExtMenuWithTooltip2e.js
+//
+//------------------------------------------------------------------------------
+
 PK.override_menu_item_to_enable_tooltips = function()
 {
+  var DISMISS_DELAY_FOR_MENU_ITEM_TOOLTIP = 0
+
   Ext.override(Ext.menu.Item, {
     onRender: function(container, position)
       {
@@ -24,8 +38,11 @@ PK.override_menu_item_to_enable_tooltips = function()
         this.textEl = this.el.child('.x-menu-item-text');
         if (this.tooltip)
         {
+          // Note: constrainPosition is not documented
           this.tooltip = new Ext.ToolTip(Ext.apply({
-                target: this.el
+                target: this.el,
+                constrainPosition: true,
+                dismissDelay: DISMISS_DELAY_FOR_MENU_ITEM_TOOLTIP
                 }, Ext.isObject(this.tooltip) ? this.tooltip : { html: this.tooltip } ));
         }
         Ext.menu.Item.superclass.onRender.call(this, container, position);

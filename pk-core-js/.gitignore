@@ -4,8 +4,10 @@
 .\#*\#
 
 .DS_Store
+._.DS_Store
 .project
 .settings
+.directory
 
 *.kdevelop.*
 *.kdevelop
@@ -14,5 +16,11 @@
 /Doxyfile
 /tags
 
+nohup.out
+*.log
 .idea
 *.iml
+
+*.kate_swp
+tmp/*
+*.kate_swps

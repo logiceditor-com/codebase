@@ -1,11 +1,16 @@
 --------------------------------------------------------------------------------
 -- api_context.lua: handler context wrapper for api
+-- This file is a part of pk-engine library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 -- NOTE: When changing, remember to change api_context_stub.lua as well
 --------------------------------------------------------------------------------
 
 require 'wsapi.request'
 require 'socket.url'
+require 'wsapi.util'
 
 --------------------------------------------------------------------------------
 
@@ -55,9 +60,19 @@ local make_api_redis,
         'destroy_api_redis'
       }
 
+local make_api_hiredis,
+      destroy_api_hiredis
+      = import 'pk-engine/webservice/client_api/api_hiredis.lua'
+      {
+        'make_api_hiredis',
+        'destroy_api_hiredis'
+      }
+
 --------------------------------------------------------------------------------
 
-local log, dbg, spam, log_error = make_loggers("webservice/client_api/api_context", "APC")
+local log, dbg, spam, log_error = make_loggers(
+    "webservice/client_api/api_context", "APC"
+  )
 
 --------------------------------------------------------------------------------
 
@@ -69,8 +84,9 @@ do
   local get_cached_request = function(self)
     method_arguments(self)
     if not self.cached_request_ then
+      self.new_wsapi_env = wsapi.util.make_rewindable(self.context_.wsapi_env)
       self.cached_request_ = wsapi.request.new(
-          self.context_.wsapi_env,
+          self.new_wsapi_env,
           { overwrite = true }
         )
     end
@@ -93,6 +109,15 @@ do
       self.cached_redis_ = make_api_redis(self.context_.redis_manager)
     end
     return self.cached_redis_
+  end
+
+  -- Private method
+  local get_cached_hiredis = function(self)
+    method_arguments(self)
+    if not self.cached_hiredis_ then
+      self.cached_hiredis_ = make_api_hiredis(self.context_.hiredis_manager)
+    end
+    return self.cached_hiredis_
   end
 
   local post_request = function(self)
@@ -155,7 +180,33 @@ do
     --       or starts with '127', '10.' or '192',
     --       try to look into X-Forwarded-For header.
 
-    return self.context_.wsapi_env.REMOTE_ADDR or ""
+    local wsapi_env = self.context_.wsapi_env
+    local ip = wsapi_env["X-REAL-IP"]
+
+    if not ip or ip == "" then
+      ip = wsapi_env["X-FORWARDED-FOR"]
+      if ip then
+        ip = ip:match("^(.-),.*$")
+      end
+    end
+
+    if not ip or ip == "" then
+      ip = wsapi_env["REMOTE_ADDR"]
+    end
+
+    if not ip then
+      ip = ""
+    end
+
+    return ip
+  end
+
+  local request_user_agent = function(self)
+    method_arguments(self)
+
+    -- WARNING: This function should not fail even if UA is unknown!
+
+    return self.context_.wsapi_env["HTTP_USER_AGENT"] or ""
   end
 
   -- Note that we do not have anything destroyable (yet)
@@ -178,6 +229,13 @@ do
       self.cached_redis_ = nil
     end
 
+    -- Not using get_cached_hiredis() since we don't want to create hiredis
+    -- if it was not used
+    if self.cached_hiredis_ then
+      destroy_api_hiredis(self.cached_hiredis_)
+      self.cached_hiredis_ = nil
+    end
+
     assert(#self.param_stack_ == 0, "unbalanced param stack on destroy")
   end
 
@@ -189,6 +247,11 @@ do
   local redis = function(self)
     method_arguments(self)
     return get_cached_redis(self)
+  end
+
+  local hiredis = function(self)
+    method_arguments(self)
+    return get_cached_hiredis(self)
   end
 
   local handle_url = function(self, url, param)
@@ -241,6 +304,114 @@ do
     return table.remove(self.param_stack_)
   end
 
+  local extend = function(self, key, factory)
+    return self.context_:ext(key, factory)
+  end
+
+  local ext = function(self, key)
+    return self.context_:ext(key)
+  end
+
+  local get_cookie = function(self, name)
+    method_arguments(
+        self,
+        "string", name
+      )
+    -- TODO: How should this interact with param_stack?
+    return get_cached_request(self).cookies[name]
+  end
+
+  local set_cookie = function(self, name, value)
+    method_arguments(
+        self,
+        "string", name
+        -- value may be string or table
+      )
+    -- TODO: How should this interact with param_stack?
+    self.context_.wsapi_response:set_cookie(name, value)
+  end
+
+  local delete_cookie = function(self, name, path)
+    method_arguments(
+        self,
+        "string", name
+      )
+    optional_arguments(
+        "string", path
+      )
+    -- TODO: How should this interact with param_stack?
+    self.context_.wsapi_response:delete_cookie(name, path)
+  end
+
+  local get_cookies = function(self)
+    method_arguments(self)
+
+    if self.cached_cookies_ == nil then
+      local cookies = { }
+      local cookies_ = string.gsub(";" .. (get_cached_request(self).env.HTTP_COOKIE or "") .. ";", "%s*;%s*", ";")
+      local pattern = ";([%a%d-_]+)=(.-);"
+      local name, cookie, init = '', '', 1
+
+      while (true) do
+        name, cookie = string.match(cookies_, pattern, init)
+        if name == nil or cookie == nil then
+          break;
+        end
+        rawset(cookies, wsapi.util.url_decode(name), wsapi.util.url_decode(cookie))
+        init = init + #name + #cookie
+      end
+
+      self.cached_cookies_ = cookies
+    end
+
+    return self.cached_cookies_
+  end
+
+  local execute_system_action_on_current_node = function(self, action, ...)
+    method_arguments(
+        self,
+        "string", action
+      )
+    -- TODO: Lazy hack.
+
+    local res, err = self:ext(
+        "current_node_system_action_executor"
+      ):execute(action, ...)
+    if res == nil then
+      return
+          nil,
+          "failed to execute current node system action: " .. tostring(err)
+    end
+
+    local res, err = self:ext(
+        "current_process_system_action_executor"
+      ):execute(action, ...)
+    if res == nil then
+      return
+          nil,
+          "failed to execute current process system action: " .. tostring(err)
+    end
+
+    return res -- TODO: Support multiple return values?
+  end
+
+  -- TODO: Hack. Should not be available to public.
+  local raw_redis_manager = function(self)
+    return self.context_.redis_manager
+  end
+
+  local get_raw_postdata = function(self)
+    if self.cached_postdata_ == nil then
+      self.new_wsapi_env.input:rewind()
+      self.cached_cookies_ = self.new_wsapi_env.input:read(self.context_.wsapi_env.input.length)
+    end
+    return self.cached_cookies_
+  end
+
+  local get_request_method = function(self)
+    return get_cached_request(self).method
+  end
+
   make_api_context = function(
       context,
       db_tables,
@@ -253,22 +424,39 @@ do
         "table",    db_tables,
         "function", www_admin_config_getter,
         "function", www_game_config_getter,
-        "table", internal_call_handlers
+        "table",    internal_call_handlers
       )
 
     return
     {
       raw_internal_config_manager = raw_internal_config_manager;
+      raw_redis_manager = raw_redis_manager;
       handle_url = handle_url;
       --
       game_config = game_config;
       admin_config = admin_config;
       db = db;
       redis = redis;
+      hiredis = hiredis;
       --
       request_ip = request_ip;
+      request_user_agent = request_user_agent;
       post_request = post_request;
       get_request = get_request;
+      get_request_method = get_request_method;
+      --
+      get_cookie = get_cookie;
+      set_cookie = set_cookie;
+      delete_cookie = delete_cookie;
+      get_cookies = get_cookies;
+      --
+      get_raw_postdata = get_raw_postdata;
+      --
+      extend = extend;
+      ext = ext;
+      --
+      execute_system_action_on_current_node
+        = execute_system_action_on_current_node;
       --
       push_param = push_param; -- Private
       pop_param = pop_param; -- Private
@@ -277,17 +465,24 @@ do
       --
       -- WARNING: Do not expose this variable (see push/pop_param).
       context_ = context;
+      new_wsapi_env = nil;
       --
       cached_request_ = nil;
       cached_game_config_ = nil;
       cached_admin_config_ = nil;
       cached_db_ = nil;
       cached_redis_ = nil;
+      cached_hiredis_ = nil;
+      cached_cookies_ = nil;
+      cached_postdata_ = nil;
       --
       tables_ = db_tables;
       www_game_config_getter_ = www_game_config_getter;
       www_admin_config_getter_ = www_admin_config_getter;
       internal_call_handlers_ = internal_call_handlers;
+      --
+      extensions_ = { };
+      ext_factories_ = { };
       --
       param_stack_ = { };
     }

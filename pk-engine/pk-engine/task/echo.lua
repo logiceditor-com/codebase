@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
--- persistent_connector.lua
+-- echo.lua: simplest test task
 -- This file is a part of pk-engine library
 -- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
 -- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
@@ -22,39 +22,48 @@ local make_loggers
         'make_loggers'
       }
 
-local make_persistent_connection
-      = import 'pk-engine/persistent_connection.lua'
+local try_unwrap
+      = import 'pk-engine/hiredis/util.lua'
       {
-        'make_persistent_connection'
+        'try_unwrap'
       }
 
 --------------------------------------------------------------------------------
 
-local log, dbg, spam, log_error = make_loggers("net/persistent_connector", "NPC")
+local log, dbg, spam, log_error
+    = import 'pk-core/log.lua' { 'make_loggers' } (
+        "task/echo", "TEC"
+      )
 
 --------------------------------------------------------------------------------
 
-local make_persistent_connector
-do
-  local connect = function(self)
-    return make_persistent_connection(self.net_connector_)
-  end
+local run = function(api_context, db_name, input_string)
+  arguments(
+      "table", api_context,
+      "string", db_name,
+      "string", input_string
+    )
 
-  make_persistent_connector = function(net_connector)
-    arguments(
-        "table", net_connector
-      )
+  log("echo task got input string:", input_string)
 
-    return
-    {
-      connect = connect;
-      --
-      net_connector_ = net_connector;
-    }
-  end
+  local redis = api_context:hiredis()
+  local db = redis[db_name](redis)
+
+  try_unwrap(
+      "INTERNAL_ERROR",
+      db:command("PING")
+    )
+
+  try_unwrap(
+      "INTERNAL_ERROR",
+      db:command("RPUSH", "test_task_key", input_string)
+    )
+  return true
 end
+
+--------------------------------------------------------------------------------
 
 return
 {
-  make_persistent_connector = make_persistent_connector;
+  run = run;
 }

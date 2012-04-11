@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- check.lua: webservice-specific argument checkers for generated handlers
+-- This file is a part of pk-engine library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 --
 -- NOTE: These checkers do type conversions.
@@ -19,10 +23,12 @@ local arguments,
         'method_arguments'
       }
 
-local is_string
+local is_string,
+      is_table
       = import 'lua-nucleo/type.lua'
       {
-        'is_string'
+        'is_string',
+        'is_table'
       }
 
 local make_loggers
@@ -177,6 +183,32 @@ local check_uuid = function(t, is_optional, tag, field)
     )
 end
 
+-- TODO: this is new file check, subject to test
+local check_file = function(t, is_optional, tag, field)
+
+  local value = t["file"]
+
+  if (value == nil or value == "") and is_optional then
+    return nil
+  end
+
+  if is_table(value) then
+    return value
+  end
+
+  if value == nil then
+    fail(
+        "BAD_INPUT",
+        "missing " .. tag .. " " .. field
+      )
+  end
+
+  fail(
+      "BAD_INPUT",
+      "unexpected " .. tag .. " " .. field .. " type: `" .. type(value) .. "'"
+    )
+end
+
 --------------------------------------------------------------------------------
 
 local check_db_id = check_positive_integer
@@ -249,6 +281,7 @@ do
       uuid = check_uuid;
       --
       db_id = check_db_id;
+      file = check_file;
       --
       int_enum = check_int_enum;
       string_enum = check_string_enum;
@@ -328,6 +361,7 @@ return -- Note renames
   uuid = check_uuid;
   --
   db_id = check_db_id;
+  file = check_file;
   --
   int_enum = check_int_enum;
   string_enum = check_string_enum;

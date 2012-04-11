@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- cron.lua: schedule cron
+-- This file is a part of pk-engine library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 local make_loggers = import 'pk-core/log.lua' { 'make_loggers' }

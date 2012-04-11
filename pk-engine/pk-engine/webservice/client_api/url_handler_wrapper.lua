@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- url_handler_wrapper.lua: api url handler wrapper
+-- This file is a part of pk-engine library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 local arguments,
@@ -46,6 +50,34 @@ local log, dbg, spam, log_error = make_loggers("webservice/client_api/url_handle
 
 local make_url_handler_wrapper
 do
+
+  -- Common functions ----------------------------------------------------------
+
+  local respond_and_clean_context = function(
+      api_context,
+      err_info,
+      response_fn,
+      error_formatter_fn
+    )
+    local err, msg = call(
+        error_formatter_fn,
+        tostring(err_info) or "(error message is not a string)",
+        api_context
+      )
+    api_context:destroy()
+    api_context = nil
+    if not err then
+      local message =
+        "Error in error handler: "
+     .. (tostring(msg) or "(error message is not a string)")
+      log_error(message)
+      error(message)
+    end
+    return call(response_fn, err, msg)
+  end
+
+  -- static --------------------------------------------------------------------
+
   local static = function(self, handler_filename)
     method_arguments(
         self,
@@ -61,6 +93,8 @@ do
       return 200, BODY, CONTENT_TYPE
     end
   end
+
+  -- api -----------------------------------------------------------------------
 
   local api = function(
       self,
@@ -95,21 +129,14 @@ do
 
       local input, err = call(input_loader, api_context)
       if not input then
-        api_context:destroy()
-        api_context = nil
-
-        return response_fn(error_formatter_fn(tostring(err)))
+        return respond_and_clean_context(api_context, err, response_fn, error_formatter_fn)
       end
 
       -- TODO: HACK! Remove that "extra".
       local output, extra = call(handler_fn, api_context, input)
       if not output then
-        api_context:destroy()
-        api_context = nil
-
         local err = extra
-
-        return response_fn(error_formatter_fn(tostring(err)))
+        return respond_and_clean_context(api_context, err, response_fn, error_formatter_fn)
       end
 
       local rendered_output, err = call(
@@ -119,10 +146,7 @@ do
           extra
         )
       if not rendered_output then
-        api_context:destroy()
-        api_context = nil
-
-        return response_fn(error_formatter_fn(tostring(err)))
+        return respond_and_clean_context(api_context, err, response_fn, error_formatter_fn)
       end
 
       api_context:destroy()
@@ -132,6 +156,7 @@ do
     end
   end
 
+  -- api with dynamic output format --------------------------------------------
   -- TODO: Generalize with above.
   local api_with_dynamic_output_format = function(
       self,
@@ -167,10 +192,7 @@ do
 
       local input, err = call(input_loader, api_context)
       if not input then
-        api_context:destroy()
-        api_context = nil
-
-        return response_fn(error_formatter_fn(tostring(err)))
+        return respond_and_clean_context(api_context, err, response_fn, error_formatter_fn)
       end
 
       local rendered_output, err = call(
@@ -181,10 +203,7 @@ do
           input
         )
       if not rendered_output then
-        api_context:destroy()
-        api_context = nil
-
-        return response_fn(error_formatter_fn(tostring(err)))
+        return respond_and_clean_context(api_context, err, response_fn, error_formatter_fn)
       end
 
       api_context:destroy()
@@ -194,11 +213,51 @@ do
     end
   end
 
+  -- do with api context -------------------------------------------------------
+
+  local do_with_api_context
+  do
+    local destroy_context = function(api_context, ...)
+      api_context:destroy()
+      return ...
+    end
+
+    do_with_api_context = function(
+        self, context, handler_fn, ...
+      )
+      method_arguments(
+          self,
+          "table", context,
+          "function", handler_fn
+        )
+
+      local api_context = make_api_context(
+          context,
+          self.db_tables_,
+          self.www_game_config_getter_,
+          self.www_admin_config_getter_,
+          self.internal_call_handlers_
+        )
+
+      return destroy_context(
+          api_context,
+          call(
+              handler_fn,
+              api_context,
+              ...
+            )
+        )
+    end
+  end
+
+  -- raw -----------------------------------------------------------------------
   -- TODO: Generalize with above.
   local raw = function(
       self,
       handler_fn,
-      input_loader
+      input_loader,
+      response_handler,
+      error_handler
     )
     method_arguments(
         self,
@@ -211,6 +270,9 @@ do
     local www_admin_config_getter = self.www_admin_config_getter_
     local internal_call_handlers = self.internal_call_handlers_
 
+    local raw_response_handler = response_handler or html_response
+    local raw_error_handler = error_handler or common_html_error
+
     return function(context)
       local api_context = make_api_context(
           context,
@@ -222,11 +284,11 @@ do
 
       local input, err = call(input_loader, api_context)
       if not input then
-        api_context:destroy()
-        api_context = nil
-
-        -- TODO: This should be configurable!
-        return html_response(common_html_error(tostring(err)))
+        return respond_and_clean_context(
+            api_context,
+            err,
+            raw_response_handler,
+            raw_error_handler)
       end
 
       local status, body, headers = call(
@@ -235,13 +297,12 @@ do
           input
         )
       if not status then
-        api_context:destroy()
-        api_context = nil
-
         local err = body
-
-        -- TODO: This should be configurable!
-        return html_response(common_html_error(tostring(err)))
+        return respond_and_clean_context(
+            api_context,
+            err,
+            raw_response_handler,
+            raw_error_handler)
       end
 
       api_context:destroy()
@@ -251,6 +312,7 @@ do
     end
   end
 
+  -- internal call -------------------------------------------------------------
   -- TODO: Generalize with above.
   -- WARNING: This works only with uhw:api() due to return value protocol!
   local internal_call = function(
@@ -290,6 +352,8 @@ do
     end
   end
 
+  --make_url_handler_wrapper----------------------------------------------------
+
   make_url_handler_wrapper = function(
       db_tables,
       www_game_config_getter,
@@ -313,6 +377,8 @@ do
       raw = raw;
       --
       internal_call = internal_call;
+      --
+      do_with_api_context = do_with_api_context;
       --
       db_tables_ = db_tables;
       www_game_config_getter_ = www_game_config_getter;

@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- persistent_db_connector.lua: persistent connector for luasql.mysql
+-- This file is a part of pk-engine library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 require 'luasql.mysql'
@@ -28,15 +32,11 @@ local make_loggers
         'make_loggers'
       }
 
-local make_persistent_connection
-      = import 'pk-engine/persistent_connection.lua'
-      {
-        'make_persistent_connection'
-      }
-
 --------------------------------------------------------------------------------
 
-local log, dbg, spam, log_error = make_loggers("db/persistent_db_connector", "PDC")
+local log, dbg, spam, log_error = make_loggers(
+    "db/persistent_db_connector", "PDC"
+  )
 
 --------------------------------------------------------------------------------
 
@@ -92,8 +92,10 @@ local make_persistent_db_connection
 do
   local connection_was_broken = function(err)
     -- TODO: ?! Too much implementation detail?
-    --       Look for API to check this (or ask luasql developers to provide one if possible).
-    return err == "LuaSQL: error executing query. MySQL: MySQL server has gone away"
+    --       Look for API to check this
+    --       (or ask luasql developers to provide one if possible).
+    return
+      err == "LuaSQL: error executing query. MySQL: MySQL server has gone away"
   end
 
   -- Private method

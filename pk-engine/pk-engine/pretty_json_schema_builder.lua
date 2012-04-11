@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- pretty_json_schema_builder.lua - build xml schema
+-- This file is a part of pk-engine library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 local log, dbg, spam, log_error = import 'pk-core/log.lua' { 'make_loggers' }(
@@ -50,6 +54,12 @@ local tijoin_many,
         'tclone'
       }
 
+local escape_for_json
+      = import 'lua-nucleo/string.lua'
+      {
+        'escape_for_json'
+      }
+
 local make_call_tracer = import 'pk-engine/call_tracer.lua' { 'make_call_tracer' }
 
 -- TODO: NOT for public consumption! Port to lua-nucleo.
@@ -75,24 +85,22 @@ local is_good_node_name = function(v)
     return nil, "node/attribute name must be a string"
   end
 
-  if v:find("[^a-zA-Z_%-:]") then -- TODO: Refine this
+  if not v:find("^[a-zA-Z_][:%-_0-9a-zA-Z]*$") then -- TODO: Refine this
     return nil, "invalid characters detected in node/attribute name"
   end
 
   return true
 end
 
-local js_escape = function(value)
-  -- TODO: Use proper escape!
-  return ("%q"):format(value)
-end
-
 local js_escape_num = function(value)
   if is_number(value) then
     return tostring(value)
   end
-  return js_escape(value)
+  return escape_for_json(value)
 end
+
+-- TODO: Why numbers are acceptable here?
+local js_escape = js_escape_num
 
 -- TODO: Move more branching into building time.
 --       Return different closures for each static branch.

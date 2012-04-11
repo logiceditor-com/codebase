@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- db_connection_manager.lua: luasql.mysql persistent connection manager
+-- This file is a part of pk-engine library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 local arguments,
@@ -48,7 +52,9 @@ local make_persistent_db_connector,
 
 --------------------------------------------------------------------------------
 
-local log, dbg, spam, log_error = make_loggers("db/db_connection_manager", "DCM")
+local log, dbg, spam, log_error = make_loggers(
+    "db/db_connection_manager", "DCM"
+  )
 
 --------------------------------------------------------------------------------
 

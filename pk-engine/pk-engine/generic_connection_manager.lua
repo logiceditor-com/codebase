@@ -1,3 +1,11 @@
+--------------------------------------------------------------------------------
+-- generic_connection_manager.lua
+-- This file is a part of pk-engine library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
+--------------------------------------------------------------------------------
+
 local arguments,
       optional_arguments,
       method_arguments

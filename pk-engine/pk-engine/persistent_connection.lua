@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- persistent_connection.lua: persistent connection
+-- This file is a part of pk-engine library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 
 local tstr = import 'lua-nucleo/table.lua' { 'tstr' }
@@ -28,17 +32,20 @@ local log, dbg, spam, log_error = make_loggers("persistent_connection", "PCO")
 
 -- Creates persistent connection object, with interface as follows:
 --
---   send() - Proxies 'send' call to socket, detecting whether socket was closed.
+--   send() - Proxies 'send' call to socket,
+--            detecting whether socket was closed.
 --            If socket was closed next time we use the object,
 --            new connection will be created.
 --            Error is returned to user as is in any way.
 --
---   receive() - Proxies 'send' call to socket, detecting whether socket was closed
+--   receive() - Proxies 'send' call to socket,
+--            detecting whether socket was closed
 --            If socket was closed next time we use the object,
 --            new connection will be created.
 --            Error is returned to user as is in any way.
 --
---   close() - Explicitly closes current connection so next time we use the object,
+--   close() - Explicitly closes current connection,
+--             so next time we use the object,
 --             new connection will be created.
 --
 -- All other functions are proxied directly to socket.
@@ -113,7 +120,7 @@ do
 
     local conn, err = get_connection(self)
     if not conn then
-      log_error("receive failed:", err)
+      log_error("get_connection failed:", err)
       return nil, err
     end
 
@@ -144,7 +151,7 @@ do
 
     local conn, err = get_connection(self)
     if not conn then
-      log_error("receive failed:", err)
+      log_error("get_connection failed:", err)
       return nil, err
     end
 
@@ -153,7 +160,9 @@ do
 
   local delegated_method = function(name)
     return function(self, ...)
-      return assert(self.conn_proxy_, "not connected")[name](self.conn_proxy_, ...)
+      return assert(
+          self.conn_proxy_, "not connected"
+        )[name](self.conn_proxy_, ...)
     end
   end
 
@@ -171,8 +180,11 @@ do
       -- Undocumented methods for select()
       getfd = delegated_method("getfd");
       dirty = delegated_method("dirty");
+
       -- Extra API
-      refresh = refresh; -- Note: can't name connect(), socket already has this function.
+
+      -- Note: can't name connect(), socket already has such function.
+      refresh = refresh;
       --
       connector_ = connector;
       conn_proxy_ = nil;

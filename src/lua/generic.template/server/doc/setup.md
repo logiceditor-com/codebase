@@ -89,7 +89,8 @@ commands above.
         libcurl4-gnutls-dev \
         nginx               \
         libmysqlclient16    \
-        libssl-dev
+        libssl-dev          \
+        openssh-server
 
 Development machine only (documentation generation):
 

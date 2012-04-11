@@ -4,6 +4,7 @@
 .\#*\#
 
 .DS_Store
+._.DS_Store
 .project
 .settings
 .directory
@@ -17,8 +18,9 @@
 
 nohup.out
 *.log
+.idea
+*.iml
 
-/lua-nucleo
-/lua-aplicado
-/pk-core
-/pk-engine
+*.kate_swp
+tmp/*
+*.kate_swps

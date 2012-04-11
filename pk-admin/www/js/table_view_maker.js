@@ -1,20 +1,190 @@
+//------------------------------------------------------------------------------
+//                           FILTER PANEL
+//------------------------------------------------------------------------------
+
+PKAdmin.make_filter_panel = function(filters)
+{
+  var filter_panel = undefined,
+      current_filters = {},
+      num_current_filters = 0
+
+  var addFilter = function(el, item)
+  {
+    if (current_filters[item.data.field_name])
+    {
+      Ext.Msg.alert(I18N('Warning'), I18N('This field is already used in another filter'));
+      return
+    }
+
+    current_filters[item.data.field_name] = true
+    ++num_current_filters
+
+    var filter_control = item.data.filter.render()
+
+    if(num_current_filters % 2 == 1)
+      filter_panel.get('left').add(filter_control)
+    else
+      filter_panel.get('right').add(filter_control)
+
+    filter_panel.doLayout()
+  }
+
+  var applyFilters = function()
+  {
+    Ext.Msg.alert(I18N('TODO'), I18N('Not implemented yet'));
+  }
+
+  var clearFilters = function()
+  {
+    filter_panel.get('left').removeAll()
+    filter_panel.get('right').removeAll()
+
+    filter_panel.doLayout()
+
+    current_filters = {}
+    num_current_filters = 0
+  }
+
+  var loadFilters = function()
+  {
+    Ext.Msg.alert(I18N('TODO'), I18N('Not implemented yet'));
+  }
+
+  var saveFilters = function()
+  {
+    Ext.Msg.alert(I18N('TODO'), I18N('Not implemented yet'));
+  }
+
+  var exportData = function()
+  {
+    Ext.Msg.alert(I18N('TODO'), I18N('Not implemented yet'));
+  }
+
+  var drawChart = function()
+  {
+    Ext.Msg.alert(I18N('TODO'), I18N('Not implemented yet'));
+  }
+
+  var disabled = !filters || filters.length < 1
+
+  filter_panel = new Ext.Panel({
+    collapsible: true,
+    title: I18N('Filters'),
+    autoHeight: true,
+    //height: 200,
+    xtype: 'panel',
+    autoScroll: true,
+    layout:'column',
+    bodyStyle:'padding:2px 2px 2px 2px',
+
+    tbar: new Ext.Toolbar({
+      disabled: disabled,
+      items:
+      [
+        {
+          xtype: 'combo',
+          emptyText: I18N('Add new filter'),
+          store: new Ext.data.ArrayStore({
+            fields: ['field_name', 'field_title', 'filter'],
+            data: filters
+          }),
+          valueField: 'field_name',
+          displayField: 'field_title',
+          editable: false,
+          typeAhead: true,
+          mode: 'local',
+          triggerAction: 'all',
+          selectOnFocus: true,
+          width: 150,
+          listeners: { select : addFilter }
+        },
+        {
+          text: I18N('Apply'),
+          tooltip: I18N('Apply filters'),
+          iconCls: 'icon-apply',
+          handler: applyFilters
+        },
+        {
+          text: I18N('Clear'),
+          tooltip: I18N('Clear filters'),
+          iconCls: 'icon-delete',
+          handler: clearFilters
+        },
+        {
+          text: I18N('Load'),
+          tooltip: I18N('Load filters'),
+          iconCls: 'icon-load',
+          handler: loadFilters
+        },
+        {
+          text: I18N('Save'),
+          tooltip: I18N('Save filters'),
+          iconCls: 'icon-save',
+          handler: saveFilters
+        },
+        "-",
+        {
+          text: I18N('Export data'),
+          tooltip: I18N('Export data'),
+          iconCls: 'icon-export-data',
+          handler: exportData
+        },
+        "-",
+        {
+          text: I18N('Draw chart'),
+          tooltip: I18N('Draw chart'),
+          iconCls: 'icon-draw-chart',
+          handler: drawChart
+        }
+      ]
+    }),
+
+    items:
+    [
+      {
+        layout: 'form',
+        id: 'left',
+        baseCls: 'x-plain',
+        columnWidth: 0.5
+      },
+      {
+        layout: 'form',
+        id: 'right',
+        baseCls: 'x-plain',
+        columnWidth: 0.5
+      }
+    ]
+  })
+
+  return filter_panel
+}
+
+
+//------------------------------------------------------------------------------
+//                           GRID PANEL
+//------------------------------------------------------------------------------
+
 // Parameters:
 //   title
 //   tbar
+//   bbar
 //   height
 //   width
 //   per_page
 //   displayMsg
 //   emptyMsg
 //   render_to
-//   columns
+//   columns,
+//   colModel_listeners, gridPanel_listeners
 //   filters
 //   store
-PK.make_grid_panel = function(params)
+PKAdmin.make_grid_panel = function(params)
 {
   var plugins
   if(params.filters)
+  {
     plugins = [params.filters];
+  }
 
   var panel = new Ext.grid.GridPanel({
     renderTo: params.render_to,
@@ -22,9 +192,10 @@ PK.make_grid_panel = function(params)
     //hidden: true,
     store: params.store,
     colModel: new Ext.grid.ColumnModel({
-      defaults: {sortable: true},
-      columns: params.columns
+      columns: params.columns,
+      listeners: params.colModel_listeners
     }),
+    listeners: params.gridPanel_listeners,
     loadMask: true,
     plugins: plugins,
     stripeRows: true,
@@ -47,7 +218,8 @@ PK.make_grid_panel = function(params)
       displayMsg: params.displayMsg,
       emptyMsg: params.emptyMsg
     }),
-    tbar: params.tbar
+    tbar: params.tbar,
+    bbar: params.bbar
   });
 
   if (params.store !== undefined)
@@ -60,8 +232,13 @@ PK.make_grid_panel = function(params)
 }
 
 
+//------------------------------------------------------------------------------
+//                           TABLE VIEW PANEL
+//------------------------------------------------------------------------------
+
 // Parameters:
 //   title
+//   name
 //   primaryKey
 //   displayMsg
 //   emptyMsg
@@ -79,43 +256,66 @@ PK.make_grid_panel = function(params)
 //   add_request_params
 //   per_page
 //   custom_tbar
-PK.make_table_view_panel = function(
-    panel_getter, title, columns, params, show_params
+PKAdmin.make_table_view_panel = function(
+    grid_panel_getter, title, columns, params, show_params
   )
 {
   var per_page = 20
   if (params.per_page !== undefined)
     per_page = params.per_page
 
-  var reader_fields = new Array;
+  var reader_fields = [], filters = []
 
-  for(f in columns)
+  for(var i = 0; i < columns.length; i++)
   {
-    reader_fields[reader_fields.length] =
-    {
-      name: columns[f].dataIndex,
-      convert: columns[f].convert
-    }
+    if (columns[i].hidden === undefined)
+      columns[i].hidden =
+        PKAdmin.client_settings.table_column(
+            params.name,
+            columns[i].dataIndex,
+            columns[i].value_type
+          ).hidden
+
+    if (columns[i].width === undefined)
+      columns[i].width =
+        PKAdmin.client_settings.table_column(
+            params.name,
+            columns[i].dataIndex,
+            columns[i].value_type
+          ).width
+
+    reader_fields.push({
+      name: columns[i].dataIndex,
+      convert: columns[i].convert
+    })
+
+    if (columns[i].filter)
+      filters.push([
+        columns[i].dataIndex,
+        columns[i].header,
+        columns[i].filter
+      ])
   }
 
-  var filters = new Ext.ux.grid.GridFilters({
-    local: true, // false
 
-    filters:[
-      {dataIndex: params.primaryKey,   type: 'numeric'},
-      {dataIndex: 'name',    type: 'string'}
-//           {
-//             dataIndex: 'risk',
-//             type: 'list',
-//             active:false,//whether filter value is activated
-//             value:'low',//default filter value
-//             options: ['low','medium','high'],
-//             //if local = false or unspecified, phpMode has an effect
-//             phpMode: false
-//           }
-    ]
-  });
-
+  var grid_filters = undefined
+//   var grid_filters = new Ext.ux.grid.GridFilters({
+//     local: true, // false
+//
+//     filters:[
+//       {dataIndex: params.primaryKey,   type: 'numeric'},
+//       {dataIndex: 'name',    type: 'string'}
+//       //{
+//       //  dataIndex: 'risk',
+//       //  type: 'list',
+//       //  active:false,//whether filter value is activated
+//       //  value:'low',//default filter value
+//       //  options: ['low','medium','high'],
+//       //  //if local = false or unspecified, phpMode has an effect
+//       //  phpMode: false
+//       //}
+//     ]
+//   });
 
 
   if(params.store_maker)
@@ -149,9 +349,9 @@ PK.make_table_view_panel = function(
 
   function editItem(id)
   {
-    if(!id && panel_getter().selModel.selections.keys.length > 0)
+    if(!id && grid_panel_getter().selModel.selections.keys.length > 0)
     {
-      id = panel_getter().selModel.selections.keys[0];
+      id = grid_panel_getter().selModel.selections.keys[0];
     }
 
     if(id)
@@ -165,7 +365,7 @@ PK.make_table_view_panel = function(
 
   function deleteItems()
   {
-    var id = panel_getter().selModel.selections.keys[0];
+    var id = grid_panel_getter().selModel.selections.keys[0];
 
     var request_url = PK.make_admin_request_url(
         params.server_handler_name + '/delete'
@@ -226,7 +426,7 @@ PK.make_table_view_panel = function(
 
   function confirmDelete()
   {
-    if(panel_getter().selModel.selections.keys.length > 0)
+    if(grid_panel_getter().selModel.selections.keys.length > 0)
       Ext.Msg.confirm(
         I18N('Irreversible action'),
         I18N('Are you sure to delete selection?'),
@@ -278,9 +478,9 @@ PK.make_table_view_panel = function(
     ];
   }
 
-  var make_button_handler_using_panel_getter = function(handler)
+  var make_button_handler_using_grid_panel_getter = function(handler)
   {
-    return function() { return handler(panel_getter()) }
+    return function() { return handler(grid_panel_getter()) }
   }
 
   if(params.custom_tbar)
@@ -294,7 +494,7 @@ PK.make_table_view_panel = function(
           text:     params.custom_tbar[i].text,
           tooltip:  params.custom_tbar[i].tooltip,
           iconCls:  params.custom_tbar[i].iconCls,
-          handler:  make_button_handler_using_panel_getter(
+          handler:  make_button_handler_using_grid_panel_getter(
               params.custom_tbar[i].handler
             )
         };
@@ -305,27 +505,86 @@ PK.make_table_view_panel = function(
     }
   }
 
-  panel = PK.make_grid_panel({
-      title: title,
-      tbar: tbar,
-      height: 550,
-      width: 1010,
+
+  var grid_panel = PKAdmin.make_grid_panel({
+      bbar: tbar,
       per_page: per_page,
       displayMsg: params.displayMsg,
       emptyMsg: params.emptyMsg,
-      render_to: 'main-module-panel',
       columns: columns,
-      filters: filters,
+      colModel_listeners:
+      {
+        columnmoved : function(cm, oldIndex, newIndex)
+        {
+          var column_order = []
+          for (var i = 0; i < cm.columns.length; i++)
+            column_order.push(cm.columns[i].dataIndex)
+
+          PKAdmin.client_settings.change_table_column_order(params.name, column_order)
+        },
+        hiddenchange : function(cm, columnIndex, hidden)
+        {
+          column_name = cm.columns[columnIndex].dataIndex
+          PKAdmin.client_settings.set_table_column_visibility(params.name, column_name, hidden)
+        }
+      },
+      gridPanel_listeners:
+      {
+        columnresize : function(columnIndex, newWidth)
+        {
+          var cm = grid_panel_getter().colModel
+          column_name = cm.columns[columnIndex].dataIndex
+          PKAdmin.client_settings.change_table_column_width(params.name, column_name, newWidth)
+        }
+      },
+      filters: grid_filters,
       store: store_
     });
 
-  panel.addListener('rowdblclick', onRowDblClick);
+  grid_panel.addListener('rowdblclick', onRowDblClick);
+
+  var filter_panel = PKAdmin.make_filter_panel(filters)
+
+  var panel = new Ext.Panel({
+      title: title,
+      baseCls: 'x-plain',
+      layout: 'auto',
+      items:
+      [
+        {
+          height: 5,
+          xtype:'spacer',
+        },
+        filter_panel,
+        {
+          height: 10,
+          xtype:'spacer',
+        },
+        {
+          height: 450,
+          layout: 'fit',
+          xtype: 'panel',
+          baseCls:'x-plain',
+          items: grid_panel
+        }
+      ]
+    });
+
+  var main_module = Ext.getCmp('main-module-panel')
+  main_module.add(panel)
+  main_module.doLayout()
 
   return panel;
 }
 
+
+//------------------------------------------------------------------------------
+//                           TABLE VIEW
+//------------------------------------------------------------------------------
+
 // Parameters:
 //   title
+//   name
 //   primaryKey
 //   columns
 //   displayMsg
@@ -333,12 +592,18 @@ PK.make_table_view_panel = function(
 //   table_element_editor
 //   server_handler_name
 // Optional parameters:
+//   read_only_data
+//   append_only_data
+//   prohibit_deletion
 //   store_maker
+//   remote_sorting_params
 //   on_add_item
 //   on_edit_item
 //   on_successful_delete
 //   add_request_params
-PK.make_table_view = function(params)
+//   per_page
+//   custom_tbar
+PKAdmin.make_table_view = function(params)
 {
   return new function()
   {
@@ -352,8 +617,13 @@ PK.make_table_view = function(params)
       else
         this.title = params.title;
 
-      panel_ = PK.make_table_view_panel(
-        function() { return panel_; },
+      panel_ = PKAdmin.make_table_view_panel(
+        function() // grid panel getter
+        {
+          if (!panel_ || !panel_.get(3) || !panel_.get(3).get(0))
+            return undefined;
+          return panel_.get(3).get(0)
+        },
         this.title,
         columns,
         params,

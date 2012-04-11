@@ -9,11 +9,11 @@ function SetGlobalSessionCookies()
     username = Get_Cookie("username"),
     profile = Get_Cookie("profile");
 
-  Delete_Cookie("uid", "/api/session");
-  Delete_Cookie("sid", "/api/session");
-  Delete_Cookie("username","/api/session");
-  Delete_Cookie("profile", "/api/session");
-  Delete_Cookie("server_answer_error", "/api/session");
+  Delete_Cookie("uid", "/session");
+  Delete_Cookie("sid", "/session");
+  Delete_Cookie("username","/session");
+  Delete_Cookie("profile", "/session");
+  Delete_Cookie("server_answer_error", "/session");
 
   if (server_answer_error != null)
     Set_Cookie("server_answer_error", server_answer_error, MINUTES_TILL_EXPIRATION * 60, "/");

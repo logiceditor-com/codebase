@@ -74,7 +74,7 @@ PK.common_custom_convertors = new function()
           break;
 
         case PK.object_tag_value_types.MONEY:
-          return v;
+          return parseFloat(v);
           break;
 
         default:

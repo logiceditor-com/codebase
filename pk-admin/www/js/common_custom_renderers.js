@@ -5,6 +5,21 @@ PK.common_custom_renderers = new function()
     return I18N('binary data');
   }
 
+  this.make_serialized_list_render = function(topic, name)
+  {
+    return function (value, metaData, record, rowIndex, colIndex, store)
+    {
+      if (!topic)
+        return I18N('binary data')
+
+      var text = I18N('Edit ' + name)
+
+      return '<a href="' + '#' + topic + '/' + record.id + '">'
+        + text
+        + '</a>'
+    }
+  }
+
   this.make_enum_renderer = function(my_enum)
   {
     return function(v)
@@ -56,19 +71,6 @@ PK.common_custom_renderers = new function()
         return dt.format("d.m.Y");
 
       return dt.format("Y-m-d H:i:sO");
-    }
-  };
-
-  this.render_profile = function(v)
-  {
-    var record = PK.stores.admin_profiles.getById(v);
-    if(record && record.data)
-    {
-      return I18N(record.data.title);
-    }
-    else
-    {
-      return I18N('invalid field value');
     }
   };
 
@@ -130,6 +132,10 @@ PK.common_custom_renderers = new function()
 
       case PK.table_element_types.BINARY_DATA:
         return this.render_binary_data;
+        break;
+
+      case PK.table_element_types.SERIALIZED_LIST:
+        return this.make_serialized_list_render(params.serialized_list_view_topic, params.serialized_list_name);
         break;
 
       case PK.table_element_types.MONEY:

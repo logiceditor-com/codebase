@@ -1,6 +1,6 @@
 PK.make_admin_request_url = function(suffix)
 {
-  return "api/json/" + suffix;
+  return "/json/" + suffix;
 };
 
 PK.make_admin_request_params = function(params)
@@ -44,7 +44,7 @@ PK.on_server_error = function(error_id)
       break;
     case "SESSION_EXPIRED":
       CRITICAL_ERROR(I18N('Session expired. Re-login, please.'));
-      PK.navigation.go_to_topic("client-login", undefined, true);
+      PK.navigation.go_to_topic("admin-login", undefined, true);
       break;
     case "DUPLICATE_WEBSITE_URL":
       CRITICAL_ERROR(I18N('Duplicated url of website'));
@@ -102,3 +102,56 @@ PK.make_common_proxy_request_error_handler = function(on_no_items)
 PK.common_proxy_request_error_handler = PK.make_common_proxy_request_error_handler(
     function() { LOG('No items'); }
   );
+
+
+PK.do_request = function(params)
+{
+  // TODO: Must render 'waitMsg' somehow
+  Ext.Ajax.request({
+    url: params.url,
+    method: 'POST',
+    params: params.params,
+
+    failure:function(response,options)
+    {
+      PK.on_request_failure(params.url, response.status);
+    },
+
+    success:function(srv_raw_response,options)
+    {
+      var response = Ext.util.JSON.decode(srv_raw_response.responseText);
+      if(response)
+      {
+        if(response.result /*&& response.result.count == 1*/)
+        {
+          if(params.on_success)
+            params.on_success(response.result)
+        }
+        else
+        {
+          if(response.error)
+          {
+            if(params.on_error)
+              params.on_error(response.error)
+            else
+              PK.on_server_error(response.error.id)
+          }
+          else
+          {
+            CRITICAL_ERROR(
+                I18N('Sorry, please try again. Unknown server error.')
+                + ' ' + srv_raw_response.responseText
+              );
+          }
+        }
+      }
+      else
+      {
+        CRITICAL_ERROR(
+            I18N('Server answer format is invalid')
+            + ': ' + srv_raw_response.responseText
+          );
+      }
+    }
+  });
+}

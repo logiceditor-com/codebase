@@ -52,9 +52,9 @@ clusters[#clusters + 1] =
 --[[BLOCK_START:STATIC_NAME]]
         { name = "#{PROJECT_NAME}-static-#{STATIC_NAME}" };
 --[[BLOCK_END:STATIC_NAME]]
---[[BLOCK_START:REDIS_BASE_HOST_DEPLOY]]
-        { name = "#{REDIS_BASE_HOST_DEPLOY}" };
---[[BLOCK_END:REDIS_BASE_HOST_DEPLOY]]
+--[[BLOCK_START:REDIS_BASE_HOST]]
+        { name = "#{REDIS_BASE_HOST}" };
+--[[BLOCK_END:REDIS_BASE_HOST]]
 --[[BLOCK_START:MYSQL_BASES]]
         { name = "#{MYSQL_BASES}" };
 --[[BLOCK_END:MYSQL_BASES]]

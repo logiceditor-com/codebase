@@ -4,8 +4,23 @@
 .\#*\#
 
 .DS_Store
+._.DS_Store
 .project
 .settings
+.directory
 
-/lua-nucleo
-/lua-aplicado
+*.kdevelop.*
+*.kdevelop
+*.kdevses
+*.kdev4
+/Doxyfile
+/tags
+
+nohup.out
+*.log
+.idea
+*.iml
+
+*.kate_swp
+tmp/*
+*.kate_swps

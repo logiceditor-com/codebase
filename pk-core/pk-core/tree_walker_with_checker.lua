@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- tree_walker_with_checker.lua: data walking with fancy checking facilities
+-- This file is a part of pk-core library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 -- Sandbox warning: alias all globals!
 --------------------------------------------------------------------------------
@@ -111,7 +115,7 @@ do
 
       if not data then
         -- TODO: ?!
-        self:checker():fail("(???):", tostring(msg))
+        self:checker():fail("(???): " .. tostring(msg))
       else
         local where = ""
         if data.file_ and data.line_ then
@@ -395,7 +399,6 @@ do
     -- TODO: Overhead! Move this check at metatable level.
     if not rawget(self.up, data[self.tag_field_]) then
       self:fail("unknown language construct")
-      self:pop_node_from_path(data)
       return "break" -- Do not traverse subtree
     end
   end
@@ -445,8 +448,8 @@ do
     local factory = walkers.factory_ or default_factory
     local mt = setmetatable(updown, prototype_mt)
 
-    return function()
-      local result = factory()
+    return function(...)
+      local result = factory(...)
 
       -- Your walker should provide checker() method.
       -- See default_factory() implementation.

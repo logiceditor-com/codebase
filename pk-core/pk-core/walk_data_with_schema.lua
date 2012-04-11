@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
 -- walk_data_with_schema.lua: data walking based on tagged-tree schemas
+-- This file is a part of pk-core library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 -- Sandbox warning: alias all globals!
 --------------------------------------------------------------------------------
@@ -29,10 +33,12 @@ local arguments,
         'method_arguments'
       }
 
-local is_table
+local is_table,
+      is_string
       = import 'lua-nucleo/type.lua'
       {
-        'is_table'
+        'is_table',
+        'is_string'
       }
 
 local assert_is_nil,
@@ -44,11 +50,13 @@ local assert_is_nil,
       }
 
 local tkeys,
-      tclone
+      tclone,
+      empty_table
       = import 'lua-nucleo/table-utils.lua'
       {
         'tkeys',
-        'tclone'
+        'tclone',
+        'empty_table'
       }
 
 local do_nothing
@@ -145,7 +153,7 @@ local load_data_walkers = function(chunk, extra_env)
       self.data_ = data
     end;
 
-    reset = function(self)
+    reset = function(self, ...)
       method_arguments(self)
       self.data_ = nil
       self.current_path_ = { }
@@ -153,7 +161,8 @@ local load_data_walkers = function(chunk, extra_env)
       self.checker_ = make_prefix_checker(self.get_current_path_closure_);
       self.context_ = self.factory_(
           self.checker_,
-          self.get_current_path_closure_
+          self.get_current_path_closure_,
+          ...
         )
     end;
 
@@ -189,7 +198,7 @@ local load_data_walkers = function(chunk, extra_env)
       return ...
     end;
 
-    walk_data_with_schema = function(self, schema, data)
+    walk_data_with_schema = function(self, schema, data, ...)
       method_arguments(
           self,
           "table", schema,
@@ -198,7 +207,7 @@ local load_data_walkers = function(chunk, extra_env)
 
       assert(#schema > 0)
 
-      self:reset()
+      self:reset(...)
       self:set_data(data)
 
       self:walk_schema_(schema)
@@ -265,6 +274,27 @@ local load_data_walkers = function(chunk, extra_env)
       data[key] = value -- Patch data with default value
     end
     return value
+  end
+
+  local update_value = function(
+      self,
+      types_schema,
+      data_schema,
+      data,
+      key,
+      value
+    )
+    method_arguments(
+        self,
+        "table", types_schema,
+        "table", data_schema,
+        "table", data
+        -- key may be of any type
+        -- value may be of any type
+      )
+    assert(key ~= nil)
+
+    data[key] = value
   end
 
   local walkers =
@@ -528,6 +558,9 @@ local load_data_walkers = function(chunk, extra_env)
             return "break"
           end
 
+          if not info.optional then
+            data.default = data.default or empty_table
+          end
           local node = get_value(
               self,
               info,
@@ -536,11 +569,32 @@ local load_data_walkers = function(chunk, extra_env)
               data.name
             )
           if node == nil then
-            self.checker_:fail("`" .. tostring(data.name) .. "' is missing")
+            if not info.optional then
+              self.checker_:fail("`" .. tostring(data.name) .. "' is missing")
+            end
             return "break"
           end
+
+          -- TODO: this should be supported in other nodes (variant, ilist...)
+          if is_string(node) and info.loadhook then
+            node = self.checker_:ensure(
+                "string to node conversion failed",
+                info.loadhook(self.context_, node)
+              )
+            if node then
+              update_value(
+                  self,
+                  info,
+                  data,
+                  self.current_path_[#self.current_path_].node,
+                  data.name,
+                  node
+                )
+            end
+          end
+
           if not is_table(node) then
-            self.checker_:fail("`" .. tostring(data.name) .. "' is not table")
+            self.checker_:fail("`" .. tostring(data.name) .. "' is not a table")
             return "break"
           end
 
@@ -647,8 +701,6 @@ local load_data_walkers = function(chunk, extra_env)
   types.get_current_path_closure_ = function()
     return types:get_current_path()
   end
-
-  types:reset()
 
   assert(walkers.root_defined_, "types:root must be defined")
 

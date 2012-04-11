@@ -1,31 +1,19 @@
 --------------------------------------------------------------------------------
 -- tools_cli_config.lua: tools CLI/configuration handler
+-- This file is a part of pk-core library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
 --------------------------------------------------------------------------------
 -- Sandbox warning: alias all globals!
 --------------------------------------------------------------------------------
 
-local lfs = require 'lfs'
+local log, dbg, spam, log_error
+      = import 'pk-core/log.lua' { 'make_loggers' } (
+         "tools_cli_config", "TCC"
+       )
 
 --------------------------------------------------------------------------------
-
-local tostring, type, assert, select, loadfile, error
-    = tostring, type, assert, select, loadfile, error
-
-local os = os
-local io = io
-local table = table
-
---------------------------------------------------------------------------------
-
-local arguments,
-      optional_arguments,
-      method_arguments
-      = import 'lua-nucleo/args.lua'
-      {
-        'arguments',
-        'optional_arguments',
-        'method_arguments'
-      }
 
 local is_function
       = import 'lua-nucleo/type.lua'
@@ -33,26 +21,12 @@ local is_function
         'is_function'
       }
 
-local empty_table,
-      tkeys,
-      tclone,
-      twithdefaults,
-      treadonly,
-      tidentityset
-      = import 'lua-nucleo/table-utils.lua'
+local arguments,
+      optional_arguments
+      = import 'lua-nucleo/args.lua'
       {
-        'empty_table',
-        'tkeys',
-        'tclone',
-        'twithdefaults',
-        'treadonly',
-        'tidentityset'
-      }
-
-local tpretty
-      = import 'lua-nucleo/tpretty.lua'
-      {
-        'tpretty'
+        'arguments',
+        'optional_arguments'
       }
 
 local tstr
@@ -61,16 +35,22 @@ local tstr
         'tstr'
       }
 
-local invariant
-      = import 'lua-nucleo/functional.lua'
-      {
-        'invariant'
-      }
-
 local unique_object
       = import 'lua-nucleo/misc.lua'
       {
         'unique_object'
+      }
+
+local get_tools_cli_data_walkers
+      = import 'pk-core/config_dsl.lua'
+      {
+        'get_data_walkers'
+      }
+
+local load_data_schema
+      = import 'pk-core/walk_data_with_schema.lua'
+      {
+        'load_data_schema'
       }
 
 local do_in_environment,
@@ -82,6 +62,7 @@ local do_in_environment,
         'dostring_in_environment',
         'make_config_environment'
       }
+
 local load_all_files,
       find_all_files
       = import 'lua-aplicado/filesystem.lua'
@@ -90,18 +71,22 @@ local load_all_files,
         'find_all_files'
       }
 
-local make_loggers
-      = import 'pk-core/log.lua'
+local empty_table,
+      tclone,
+      twithdefaults,
+      treadonly
+      = import 'lua-nucleo/table-utils.lua'
       {
-        'make_loggers'
+        'empty_table',
+        'tclone',
+        'twithdefaults',
+        'treadonly'
       }
 
-local load_data_walkers,
-      load_data_schema
-      = import 'pk-core/walk_data_with_schema.lua'
+local make_config_environment
+      = import 'lua-nucleo/sandbox.lua'
       {
-        'load_data_walkers',
-        'load_data_schema'
+        'make_config_environment'
       }
 
 local dump_nodes
@@ -109,183 +94,6 @@ local dump_nodes
       {
         'dump_nodes'
       }
-
---------------------------------------------------------------------------------
-
-local log, dbg, spam, log_error = make_loggers("pk-core/tools_cli", "TCL")
-
---------------------------------------------------------------------------------
-
-local get_tools_cli_data_walkers
-do
-  -- TODO: Heavy. Initialize on-demand?
-  local walkers = load_data_walkers(function()
-
-    --
-    -- Use these types to define your config file schema.
-    --
-
-    types:up "cfg:boolean" (function(self, info, value)
-      self:ensure_equals("unexpected type", type(value), "boolean")
-    end)
-
-    types:up "cfg:number" (function(self, info, value)
-      self:ensure_equals("unexpected type", type(value), "number")
-    end)
-
-    types:up "cfg:integer" (function(self, info, value)
-      local _ =
-        self:ensure_equals("unexpected type", type(value), "number"):good()
-        and self:ensure("must be integer", value % 1 == 0, value)
-    end)
-
-    types:up "cfg:positive_integer" (function(self, info, value)
-      local _ =
-        self:ensure_equals("unexpected type", type(value), "number"):good()
-        and self:ensure("must be integer", value % 1 == 0, value):good()
-        and self:ensure("must be > 0", value > 0, value)
-    end)
-
-    types:up "cfg:port" (function(self, info, value)
-      local _ =
-        self:ensure_equals("unexpected type", type(value), "number"):good()
-        and self:ensure(
-            "port value must be integer", value % 1 == 0, value
-          ):good()
-        and self:ensure("port value too small", value >= 1, value):good()
-        and self:ensure("port value too large", value <= 65535, value)
-    end)
-
-    types:up "cfg:string" (function(self, info, value)
-      self:ensure_equals("unexpected type", type(value), "string")
-    end)
-
-    types:up "cfg:optional_string" (function(self, info, value)
-      self:ensure(
-          "unexpected type",
-          value == nil or type(value) == "string",
-          type(value)
-        )
-    end)
-
-    types:up "cfg:non_empty_string" (function(self, info, value)
-      local _ =
-        self:ensure_equals("unexpected type", type(value), "string"):good()
-        and self:ensure("string must not be empty", value ~= "")
-    end)
-
-    types:up "cfg:host" (function(self, info, value)
-      local _ =
-        self:ensure_equals("unexpected type", type(value), "string"):good()
-        and self:ensure("host string must not be empty", value ~= "")
-    end)
-
-    types:up "cfg:path" (function(self, info, value)
-      local _ =
-        self:ensure_equals("unexpected type", type(value), "string"):good()
-        and self:ensure("path string must not be empty", value ~= "")
-    end)
-
-    types:up "cfg:optional_path" (function(self, info, value)
-      if value ~= nil then
-        local _ =
-          self:ensure_equals("unexpected type", type(value), "string"):good()
-          and self:ensure("path string must not be empty", value ~= "")
-      end
-    end)
-
-    types:up "cfg:url" (function(self, info, value)
-      local _ =
-        self:ensure_equals("unexpected type", type(value), "string"):good()
-        and self:ensure("url string must not be empty", value ~= "")
-    end)
-
-    types:up "cfg:existing_path" (function(self, info, value)
-      local _ =
-        self:ensure_equals("unexpected type", type(value), "string"):good()
-        and self:ensure("path string must not be empty", value ~= ""):good()
-        and self:ensure("path must exist", lfs.attributes(value))
-    end)
-
-    types:up "cfg:enum_value" (function(self, info, value)
-      if not info.values_set then
-        info.values_set = tidentityset(
-            assert(info.values, "bad schema: missing enum values")
-          )
-      end
-      if info.values_set[value] == nil then
-        self:fail(
-            "unexpected value `" .. tostring(value) .. "',"
-         .. " expected one of { "
-         .. table.concat(tkeys(info.values_set), " | ")
-         .. " }"
-          )
-      end
-    end)
-
-    types:up "cfg:freeform_table" (function(self, info, value)
-      self:ensure_equals("unexpected type", type(value), "table")
-    end)
-
-    types:variant "cfg:variant"
-
-    types:ilist "cfg:ilist"
-
-    types:ilist "cfg:non_empty_ilist" (function(self, info, value)
-      self:ensure("ilist must not be empty", #value > 0)
-    end)
-
-    types:node "cfg:node"
-
-    types:root "cfg:root"
-
-    --
-    -- Technical details below
-    --
-
-    local ensure_equals = function(self, msg, actual, expected)
-      if actual ~= expected then
-        self.checker_:fail(
-            msg .. ":"
-         .. " actual: " .. tostring(actual)
-         .. " expected: " .. tostring(expected)
-          )
-      end
-      return self
-    end
-
-    local ensure = function(self, ...)
-      self.checker_:ensure(...)
-      return self
-    end
-
-    local fail = function(self, msg)
-      self.checker_:fail(msg)
-      return self
-    end
-
-    local good = function(self)
-      return self.checker_:good()
-    end
-
-    types:factory (function(checker)
-
-      return
-      {
-        ensure_equals = ensure_equals;
-        ensure = ensure;
-        fail = fail;
-        good = good;
-        --
-        checker_ = checker;
-      }
-    end)
-
-  end)
-
-  -- TODO: Need write-protection.
-  get_tools_cli_data_walkers = invariant(walkers)
-end
 
 --------------------------------------------------------------------------------
 
@@ -306,7 +114,7 @@ end
 
 local load_tools_cli_data
 do
-  load_tools_cli_data = function(schema, data)
+  load_tools_cli_data = function(schema, data, env)
     if is_function(schema) then
       schema = load_tools_cli_data_schema(schema)
     end
@@ -316,10 +124,13 @@ do
         "table", data
       )
 
-    local checker = get_tools_cli_data_walkers():walk_data_with_schema(
-        schema,
-        data
-      ):get_checker()
+    local checker = get_tools_cli_data_walkers()
+      :walk_data_with_schema(
+          schema,
+          data,
+          data -- use data as environment for string_to_node
+        )
+      :get_checker()
 
     if not checker:good() then
       return checker:result()
@@ -353,6 +164,12 @@ local parse_tools_cli_arguments = function(canonicalization_map, ...)
       i = i + 1
       local value = select(i, ...)
 
+      args[canonicalization_map[name] or name] = value
+    elseif arg:match("^%-%-[^%-].*$") then
+      -- TODO: Optimize. Do not do double matching
+      local name, value = arg, true
+      assert(name)
+      assert(value)
       args[canonicalization_map[name] or name] = value
     else
       local name = canonicalization_map[arg] or arg
@@ -429,7 +246,7 @@ end
 
 -- TODO: Hack. Protect only data defined in schema!
 local freeform_table_value = function(t)
-  return tclone(t[raw_config_table_key]())
+  return tclone(assert(t[raw_config_table_key])())
 end
 
 -- TODO: Too rigid. Must be more flexible.
@@ -475,28 +292,33 @@ do
     end
 
     -- Note tclone()
-    local args_config = arg_to_param_mapper(tclone(args))
+    local CONFIG = arg_to_param_mapper(tclone(args))
+
+    -- TODO: WTF?! Rewrite this whole thing!
+    local CONFIG_OVERRIDE = tclone(CONFIG)
 
     -- Hack. Implicitly forcing config schema to have PROJECT_PATH key
     -- Better to do this explicitly somehow?
-    local PROJECT_PATH = assert(args_config.PROJECT_PATH, "missing PROJECT_PATH")
+    local PROJECT_PATH = assert(
+        CONFIG.PROJECT_PATH,
+        "missing PROJECT_PATH"
+      )
+
+    -- TODO: Uberhack, remove!
+    CONFIG.import = import
+    CONFIG.rawget = rawget
+
+    CONFIG = make_config_environment(CONFIG)
 
     local project_config_filename = args["--config"] or project_config_filename
     local base_config_filename = args["--base-config"] or base_config_filename
 
-    local extra_param = make_config_environment({ PROJECT_PATH = PROJECT_PATH })
     if args["--param"] then
-      assert(dostring_in_environment(args["--param"], extra_param, "@--param"))
+      assert(dostring_in_environment(args["--param"], CONFIG, "@--param"))
     end
 
     -- TODO: Hack? Only base and project configs are allowed import()
     -- TODO: Let user to specify environment explicitly instead.
-    local base_config = make_config_environment(
-        {
-          PROJECT_PATH = PROJECT_PATH;
-          import = import;
-        }
-      )
     if not args["--no-base-config"] and base_config_filename then
       --[[
       io.stdout:write(
@@ -510,24 +332,14 @@ do
         local base_config_files = find_all_files(base_config_filename, ".")
         local base_config_chunks = load_all_files(base_config_filename, ".")
         for i = 1, #base_config_chunks do
-          assert(do_in_environment(base_config_chunks[i], base_config))
+          assert(do_in_environment(base_config_chunks[i], CONFIG))
         end
       else
         local base_config_chunk = assert(loadfile(base_config_filename))
-        assert(do_in_environment(base_config_chunk, base_config))
+        assert(do_in_environment(base_config_chunk, CONFIG))
       end
     end
 
-    if base_config.import == import then
-      base_config.import = nil -- TODO: Hack. Use metatables instead
-    end
-
-    local config = make_config_environment(
-        {
-          PROJECT_PATH = PROJECT_PATH;
-          import = import;
-        }
-      )
     if not args["--no-config"] and project_config_filename then
       --[[
       io.stdout:write(
@@ -537,32 +349,33 @@ do
       --]]
       local attr = assert(lfs.attributes(project_config_filename))
       if attr.mode == "directory" then
-        local project_config_files = find_all_files(project_config_filename, ".")
-        local project_config_chunks = load_all_files(project_config_filename, ".")
+        local project_config_files = find_all_files(
+            project_config_filename,
+            "."
+          )
+        local project_config_chunks = load_all_files(
+            project_config_filename,
+            "."
+          )
         for i = 1, #project_config_chunks do
-          assert(do_in_environment(project_config_chunks[i], config))
+          assert(do_in_environment(project_config_chunks[i], CONFIG))
         end
       else
         local project_config_chunk = assert(loadfile(project_config_filename))
-        assert(do_in_environment(project_config_chunk, config))
+        assert(do_in_environment(project_config_chunk, CONFIG))
       end
     end
 
-    if config.import == import then
-      config.import = nil -- TODO: Hack. Use metatables instead
+    if CONFIG.import == import then
+      CONFIG.import = nil -- TODO: Hack. Use metatables instead
+    end
+
+    if CONFIG.rawget == rawget then
+      CONFIG.rawget = nil -- TODO: Hack. Use metatables instead
     end
 
     -- Hack. Doing tclone() to remove __metatabled metatable
-    config = twithdefaults(
-        args_config,
-        twithdefaults(
-            tclone(extra_param),
-            twithdefaults(
-                tclone(config),
-                tclone(base_config)
-              )
-          )
-      )
+    CONFIG = twithdefaults(CONFIG_OVERRIDE, tclone(CONFIG))
 
     --[[
     io.stdout:write("--> validating cumulative config\n")
@@ -571,12 +384,12 @@ do
 
     local err
 
-    config, err = load_tools_cli_data(schema, config)
-    if config == nil then
+    CONFIG, err = load_tools_cli_data(schema, CONFIG)
+    if CONFIG == nil then
       return nil, err
     end
 
-    return treadonly(config, callbacks, tstr), args
+    return treadonly(CONFIG, callbacks, tstr), args
   end
 end
 

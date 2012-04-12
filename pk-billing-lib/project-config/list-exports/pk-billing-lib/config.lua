@@ -10,6 +10,12 @@
 --------------------------------------------------------------------------------
 
 common.PROJECT_PATH = PROJECT_PATH
+common.file_header = [[
+-- This file is a part of pk-billing-lib library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
+]]
 common.exports =
 {
     exports_dir = PROJECT_PATH ;
@@ -22,12 +28,14 @@ common.exports =
         root_dir_only = "pk-billing-lib/lib/";
         profile_filename = "profiles.lua";
         out_filename = "code/exports.lua";
+        file_header = common.file_header;
       };
       {
         sources_dir = PROJECT_PATH .. "generated/";
         root_dir_only = "pk-billing-lib/ext/";
         profile_filename = "profiles.lua";
         out_filename = "code/extensions.lua";
+        file_header = common.file_header;
       };
     };
 }

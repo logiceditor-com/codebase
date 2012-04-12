@@ -16,6 +16,12 @@ local EXPORTS_LIST_NAME = PROJECT_PATH
     .. "tmp/" .. NAME .. "/code/exports/client_api.lua"
 
 common.PROJECT_PATH = PROJECT_PATH
+common.www.application.file_header = [[
+-- This file is a part of pk-billing-lib library
+-- Copyright (c) Alexander Gladysh <ag@logiceditor.com>
+-- Copyright (c) Dmitry Potapov <dp@logiceditor.com>
+-- See file `COPYRIGHT` for the license
+]]
 
 common.www.application.url = "http://." -- no url used
 common.www.application.api_schema_dir = PROJECT_PATH .. "schema/client_api/"
